@@ -249,3 +249,230 @@ h1 {
   font-weight: var(--w-black);
   color: var(--zloto);
 }
+
+.pilot-liczba {
+  margin-left: auto;
+  font-weight: var(--w-black);
+  color: var(--szary);
+}
+
+/* Rozgrywka na telefonie gracza */
+.gra-pasek {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0;
+}
+
+.gra-czas {
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--kamien);
+  overflow: hidden;
+  margin-bottom: var(--card-pad);
+}
+
+.gra-czas div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bursztyn), var(--zloto) 70%, var(--zloto-blask));
+  transform-origin: left;
+  transition: transform 0.25s linear;
+}
+
+.gra-pytanie {
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+  line-height: 1.3;
+  margin: 0 0 var(--card-pad);
+  overflow-wrap: anywhere;
+}
+
+.gra-grafika {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  margin: 0 auto var(--card-pad);
+  border-radius: var(--r-btn);
+  object-fit: contain;
+}
+
+.odp-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.odp {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--w-semibold);
+  text-align: left;
+  color: var(--piana);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn);
+  padding: 12px 14px;
+  transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+}
+
+button.odp {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.odp:not(:disabled):active {
+  border-color: var(--zloto);
+}
+
+.odp:disabled {
+  cursor: default;
+}
+
+.odp-litera {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-round);
+  border: 2px solid var(--zloto);
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+.odp-tekst {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.odp.wybrana {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.odp.wybrana .odp-litera {
+  background: var(--zloto);
+  color: var(--na-zlocie);
+}
+
+.odp.przygaszona {
+  opacity: 0.45;
+}
+
+.odp.poprawna {
+  border-color: var(--chmiel);
+  background: rgba(143, 182, 58, 0.12);
+}
+
+.odp.poprawna .odp-litera {
+  background: var(--chmiel);
+  border-color: var(--chmiel);
+  color: var(--na-chmielu);
+}
+
+.odp.bledna {
+  border-color: var(--szary);
+}
+
+.odp.bledna .odp-tekst {
+  text-decoration: line-through;
+  color: var(--szary);
+}
+
+.gra-status {
+  color: var(--szary);
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  text-align: center;
+  margin-top: var(--card-pad);
+}
+
+.odliczanie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: var(--section-gap);
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+}
+
+.odliczanie-liczba {
+  display: grid;
+  place-items: center;
+  width: 160px;
+  height: 160px;
+  border-radius: var(--r-round);
+  border: 4px solid var(--zloto);
+  box-shadow: var(--glow-md);
+  font-size: var(--fs-hero);
+  color: var(--piana);
+  line-height: 1;
+}
+
+.werdykt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 22px var(--card-pad);
+  border-radius: var(--r-card);
+  border: 2px solid var(--kamien2);
+  background: var(--kamien);
+  margin-bottom: var(--card-pad);
+  text-align: center;
+  animation: wjazd-werdyktu 0.7s var(--ease-wjazd) both;
+}
+
+.werdykt.dobrze {
+  border-color: var(--chmiel);
+  background: rgba(143, 182, 58, 0.12);
+}
+
+.werdykt-tytul {
+  font-size: var(--fs-stopien-xl);
+  font-weight: var(--w-black);
+  line-height: 1.15;
+}
+
+.werdykt.dobrze .werdykt-tytul {
+  color: var(--chmiel);
+}
+
+.werdykt-punkty {
+  font-size: 44px;
+  font-weight: var(--w-black);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--zloto);
+}
+
+@keyframes wjazd-werdyktu {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+}
+
+.miejsce {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: var(--section-gap);
+  font-weight: var(--w-semibold);
+  line-height: 1.3;
+}
+
+.miejsce-nr {
+  font-size: 56px;
+  font-weight: var(--w-black);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--zloto);
+}

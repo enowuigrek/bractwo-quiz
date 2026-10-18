@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
-import type { StanSesji } from "./typy";
+import type { FazaWidoczna, StanSesji } from "./typy";
 
 /** Zdarzenia z bazy na temacie `sesja:<KOD>` (patrz `wewn.rozglos`). */
 export type Zdarzenie = "stan" | "gracz" | "odpowiedz";
@@ -113,6 +113,26 @@ export function useCzasSerwera(przesuniecie: number, aktywny: boolean, coIleMs =
     return () => clearInterval(zegar);
   }, [przesuniecie, aktywny, coIleMs]);
   return teraz;
+}
+
+/**
+ * Faza w tej chwili według zegara serwera. `przygotuj` przechodzi w `pytanie`, gdy minie `faza_od`,
+ * bez czekania na bazę: wszystkie ekrany odsłaniają pytanie w tym samym momencie.
+ * `czasMinal`: pytanie trwa w bazie, ale jego czas już się skończył (czekamy na prowadzącego).
+ */
+export function fazaTeraz(
+  stan: Pick<StanSesji, "faza" | "faza_od" | "faza_do">,
+  teraz: number,
+): { faza: FazaWidoczna; doStartu: number; doKonca: number; czasMinal: boolean } {
+  const od = stan.faza_od ? Date.parse(stan.faza_od) : 0;
+  const doKonca = stan.faza_do ? Date.parse(stan.faza_do) - teraz : 0;
+  const faza = stan.faza === "przygotuj" && teraz >= od ? "pytanie" : stan.faza;
+  return { faza, doStartu: od - teraz, doKonca, czasMinal: faza === "pytanie" && doKonca <= 0 };
+}
+
+/** Czas odpowiedzi do wyświetlenia, np. „3,4 s”. */
+export function sekundy(ms: number): string {
+  return `${(ms / 1000).toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`;
 }
 
 /** Bezpieczny dostęp do localStorage (tryb prywatny, zablokowane dane). */

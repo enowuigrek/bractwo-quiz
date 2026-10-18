@@ -2,7 +2,14 @@
 
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { LogoQuiz } from "@/components/logo-quiz";
-import { komunikatBledu, pamiec, przesuniecieZegara, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
+import {
+  fazaTeraz,
+  komunikatBledu,
+  pamiec,
+  przesuniecieZegara,
+  useCzasSerwera,
+  useNasluch,
+} from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, PilotStan } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 
@@ -121,9 +128,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   }
 
   // `przygotuj` przechodzi w `pytanie` sam, gdy minie `faza_od`; nie czekamy na odpytanie bazy
-  const od = stan.faza_od ? Date.parse(stan.faza_od) : 0;
-  const doKonca = stan.faza_do ? Date.parse(stan.faza_do) - teraz : 0;
-  const faza: FazaWidoczna = stan.faza === "przygotuj" && teraz >= od ? "pytanie" : stan.faza;
+  const { faza, doStartu, doKonca } = fazaTeraz(stan, teraz);
   const z = stan.zadanie;
   const liczba = stan.quiz?.liczba_zadan ?? 0;
   const druzyny = stan.tryb === "druzyny";
@@ -165,8 +170,10 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             <span>
               Pytanie {z.lp}/{liczba}
             </span>
-            {faza === "przygotuj" && <span className="gra-kod">start za {Math.max(0, Math.ceil((od - teraz) / 1000))} s</span>}
-            {faza === "pytanie" && <span className="gra-kod">{Math.max(0, Math.ceil(doKonca / 1000))} s</span>}
+            {faza === "przygotuj" && <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>}
+            {faza === "pytanie" && (
+              <span className="gra-kod">{doKonca > 0 ? `${Math.ceil(doKonca / 1000)} s` : "czas minął"}</span>
+            )}
           </p>
           <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
           <ol className="pilot-odpowiedzi">
@@ -175,6 +182,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 <span className="pilot-litera">{LITERY[i]}</span>
                 {o}
                 {i === stan.poprawna && <span className="ok"> ✓</span>}
+                {z.rozklad && <span className="pilot-liczba">{z.rozklad[i] ?? 0}</span>}
               </li>
             ))}
           </ol>
@@ -183,6 +191,11 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             <strong className="gra-kod">
               {stan.liczba_odpowiedzi}/{stan.liczba_graczy}
             </strong>
+            {z.liczba_poprawnych !== undefined && (
+              <>
+                {" · "}dobrze <strong className="ok">{z.liczba_poprawnych}</strong>
+              </>
+            )}
           </p>
         </section>
       )}

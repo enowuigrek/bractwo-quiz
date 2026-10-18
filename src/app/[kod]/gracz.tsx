@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LogoQuiz } from "@/components/logo-quiz";
-import { komunikatBledu, pamiec, pobierzStan, useNasluch } from "@/lib/gra/nasluch";
-import type { Dolaczenie, StanSesji } from "@/lib/gra/typy";
+import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
+import type { Dolaczenie, MojWynik, StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { Miejsce, Rozgrywka, type Ja } from "./rozgrywka";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
-type Ja = { nick: string; token: string };
 
 export function Gracz({ kod }: { kod: string }) {
   const [stan, ustawStan] = useState<StanSesji | null>(null);
@@ -17,32 +17,24 @@ export function Gracz({ kod }: { kod: string }) {
   const [bladGry, ustawBladGry] = useState<string | null>(null);
   const [ja, ustawJa] = useState<Ja | null>(null);
   const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
-
-  // Powrót po odświeżeniu: token z localStorage, `dolacz` sprawdza, że to ta sama gra.
-  useEffect(() => {
-    const token = pamiec.czytaj(kluczTokenu(kod));
-    void (async () => {
-      if (token) {
-        const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: null, p_token: token });
-        if (!error) {
-          const d = data as Dolaczenie;
-          ustawJa({ nick: d.nick, token: d.token });
-        } else if (!komunikatBledu(error).startsWith("Brak połączenia")) {
-          pamiec.usun(kluczTokenu(kod));
-        }
-      }
-      ustawSprawdzamToken(false);
-    })();
-  }, [kod]);
+  const [moj, ustawMoj] = useState<MojWynik | null>(null);
+  const [przesuniecie, ustawPrzesuniecie] = useState(0);
+  // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
+  const tokenRef = useRef<string | null>(null);
 
   const pobierz = useCallback(async () => {
     try {
-      const { stan } = await pobierzStan(kod);
+      const { stan, przesuniecie } = await pobierzStan(kod);
       ustawStan(stan);
+      ustawPrzesuniecie(przesuniecie);
       ustawBladGry(null);
       if (stan.faza === "poczekalnia") {
         const { data } = await supabase().rpc("gracze_sesji", { p_kod: kod });
         if (data) ustawGraczy(data as string[]);
+      } else if (tokenRef.current) {
+        // po `stan_sesji`, więc faza w `moj_wynik` nigdy nie jest starsza niż w stanie
+        const { data } = await supabase().rpc("moj_wynik", { p_token: tokenRef.current });
+        if (data) ustawMoj(data as MojWynik);
       }
     } catch (e) {
       const komunikat = komunikatBledu(e);
@@ -52,6 +44,25 @@ export function Gracz({ kod }: { kod: string }) {
   }, [kod]);
 
   useNasluch(kod, pobierz, ["stan", "gracz"]);
+
+  // Powrót po odświeżeniu: token z localStorage, `dolacz` sprawdza, że to ta sama gra.
+  useEffect(() => {
+    const token = pamiec.czytaj(kluczTokenu(kod));
+    void (async () => {
+      if (token) {
+        const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: null, p_token: token });
+        if (!error) {
+          const d = data as Dolaczenie;
+          tokenRef.current = d.token;
+          ustawJa({ nick: d.nick, token: d.token });
+          void pobierz();
+        } else if (!komunikatBledu(error).startsWith("Brak połączenia")) {
+          pamiec.usun(kluczTokenu(kod));
+        }
+      }
+      ustawSprawdzamToken(false);
+    })();
+  }, [kod, pobierz]);
 
   if (bladGry && !stan) {
     return (
@@ -92,6 +103,7 @@ export function Gracz({ kod }: { kod: string }) {
             stan={stan}
             onDolaczono={(d) => {
               pamiec.zapisz(kluczTokenu(kod), d.token);
+              tokenRef.current = d.token;
               ustawJa({ nick: d.nick, token: d.token });
               void pobierz();
             }}
@@ -104,7 +116,7 @@ export function Gracz({ kod }: { kod: string }) {
   return (
     <>
       <Naglowek kod={kod} />
-      <WGrze stan={stan} ja={ja} gracze={gracze} />
+      <WGrze stan={stan} ja={ja} gracze={gracze} moj={moj} przesuniecie={przesuniecie} odswiez={pobierz} />
     </>
   );
 }
@@ -175,11 +187,30 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
   );
 }
 
-function WGrze({ stan, ja, gracze }: { stan: StanSesji; ja: Ja; gracze: string[] }) {
+function WGrze({
+  stan,
+  ja,
+  gracze,
+  moj,
+  przesuniecie,
+  odswiez,
+}: {
+  stan: StanSesji;
+  ja: Ja;
+  gracze: string[];
+  moj: MojWynik | null;
+  przesuniecie: number;
+  odswiez: () => Promise<void>;
+}) {
+  const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie";
+  // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
+  const teraz = useCzasSerwera(przesuniecie, liczy, stan.faza === "przygotuj" ? 100 : 250);
+
   if (stan.faza === "koniec") {
     return (
       <>
         <h1>Koniec gry</h1>
+        {moj && <Miejsce moj={moj} />}
         <p>
           Dzięki za grę, <strong className="gra-kod">{ja.nick}</strong>! Piwu Cześć!
         </p>
@@ -209,16 +240,16 @@ function WGrze({ stan, ja, gracze }: { stan: StanSesji; ja: Ja; gracze: string[]
     );
   }
 
-  // Pytania, wynik i ranking na telefonie dochodzą w dniu 4.
-  return (
-    <>
-      <p className="nadtytul">{ja.nick}</p>
-      {stan.zadanie && (
-        <h1>
-          Pytanie {stan.zadanie.lp}/{stan.quiz?.liczba_zadan ?? "?"}
-        </h1>
-      )}
-      <p>Patrz na telewizor.</p>
-    </>
-  );
+  if (stan.faza === "ranking" || stan.faza === "podium") {
+    return (
+      <>
+        <p className="nadtytul">{ja.nick}</p>
+        <h1>{stan.faza === "podium" ? "Koniec quizu!" : "Ranking"}</h1>
+        {moj && <Miejsce moj={moj} />}
+        <p>Patrz na telewizor.</p>
+      </>
+    );
+  }
+
+  return <Rozgrywka stan={stan} ja={ja} moj={moj} teraz={teraz} odswiez={odswiez} />;
 }

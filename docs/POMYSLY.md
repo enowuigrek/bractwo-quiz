@@ -29,7 +29,6 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - Podium na koniec. Anioł i diabeł z nagłówka Szabli mogą „wręczać” miejsca (spójność z design systemem).
 - Złoty blask na liderze, efekt „piany” przy wejściu nowego gracza do poczekalni.
 - Odliczanie jako napełniający się kufel zamiast paska.
-- Krótka plansza „Przygotuj się…” przed każdym pytaniem.
 - Dźwięki (start, koniec czasu, podium) z wyciszeniem na pilocie.
 
 ## Organizacyjne

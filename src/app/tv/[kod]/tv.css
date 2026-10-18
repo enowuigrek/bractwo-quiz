@@ -261,3 +261,237 @@
   font-size: 24px;
   color: var(--szary);
 }
+
+/* Przygotuj, pytanie i wynik */
+
+.tv-odliczanie {
+  display: grid;
+  place-items: center;
+  width: 320px;
+  height: 320px;
+  margin: 0;
+  border-radius: 50%;
+  border: 8px solid var(--zloto);
+  box-shadow: var(--glow-lg);
+  font-size: 200px;
+  font-weight: var(--w-black);
+  line-height: 1;
+}
+
+.tv-pytanie {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tv-pytanie-gora {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tv-pytanie-gora .tv-okazja {
+  margin: 0;
+  font-size: 52px;
+}
+
+.tv-zegar {
+  margin: 0;
+  min-width: 150px;
+  font-size: 96px;
+  font-weight: var(--w-black);
+  line-height: 1;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--piana);
+}
+
+.tv-zegar.malo {
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.tv-zegar-koniec,
+.tv-zegar-wynik {
+  font-size: 56px;
+  color: var(--zloto);
+}
+
+.tv-czas {
+  height: 14px;
+  margin-top: 20px;
+  border-radius: var(--r-pill);
+  background: var(--kamien);
+  overflow: hidden;
+}
+
+.tv-czas div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bursztyn), var(--zloto) 70%, var(--zloto-blask));
+  transform-origin: left;
+  transition: transform 0.25s linear;
+}
+
+.tv h1.tv-tresc {
+  margin: 44px 0 0;
+  font-size: 68px;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tv-pytanie-srodek {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  margin-top: 40px;
+}
+
+.tv-pytanie-grafika {
+  flex: none;
+  max-width: 640px;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--r-card);
+}
+
+.tv-odp-lista {
+  flex: 1;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.z-grafika .tv-odp-lista {
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.tv-odp {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 130px;
+  padding: 18px 32px 18px 24px;
+  background: var(--kamien);
+  border: 3px solid var(--kamien2);
+  border-radius: var(--r-card);
+  font-size: 44px;
+  font-weight: var(--w-black);
+  line-height: 1.15;
+  transition: opacity 0.6s var(--ease-std), border-color 0.6s, background 0.6s;
+}
+
+.tv-odp-lista.gesto .tv-odp,
+.z-grafika .tv-odp {
+  min-height: 96px;
+  font-size: 36px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.tv-odp > :not(.tv-odp-slupek) {
+  position: relative;
+}
+
+.tv-odp-litera {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 4px solid var(--zloto);
+  color: var(--zloto);
+}
+
+.tv-odp-tekst {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tv-odp-ile {
+  flex: none;
+  font-size: 52px;
+  color: var(--piana);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Słupek rozkładu odpowiedzi rośnie od lewej pod treścią */
+.tv-odp-slupek {
+  position: absolute;
+  inset: 0;
+  background: rgba(244, 236, 216, 0.08);
+  transform-origin: left;
+  animation: slupek 1.2s var(--ease-std) both;
+}
+
+.tv-odp.poprawna {
+  border-color: var(--chmiel);
+  background: rgba(143, 182, 58, 0.14);
+  box-shadow: 0 0 40px rgba(143, 182, 58, 0.35);
+  animation: odslona 0.8s var(--ease-wjazd) both;
+}
+
+.tv-odp.poprawna .tv-odp-slupek {
+  background: rgba(143, 182, 58, 0.22);
+}
+
+.tv-odp.poprawna .tv-odp-litera {
+  background: var(--chmiel);
+  border-color: var(--chmiel);
+  color: var(--na-chmielu);
+}
+
+.tv-odp.przygaszona {
+  opacity: 0.4;
+}
+
+@keyframes slupek {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes odslona {
+  from {
+    transform: scale(0.94);
+  }
+}
+
+.tv-pytanie-dol {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 40px;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 3px solid var(--zloto);
+  font-size: 36px;
+  font-weight: var(--w-semibold);
+}
+
+.tv-zloto {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+.tv-dobrze {
+  color: var(--chmiel);
+  font-weight: var(--w-black);
+}
+
+.tv-podpowiedz {
+  color: var(--szary);
+}

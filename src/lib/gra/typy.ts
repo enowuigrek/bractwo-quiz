@@ -14,6 +14,10 @@ export type ZadanieWidoczne = {
   czas_s: number;
   /** `poprawna` pojawia się dopiero od fazy `wynik`. */
   dane: { odpowiedzi: string[]; poprawna?: number };
+  /** Statystyki, od fazy `wynik`: ile osób wybrało każdą odpowiedź. */
+  rozklad?: number[] | null;
+  liczba_poprawnych?: number;
+  najszybszy?: { nick: string; czas_ms: number } | null;
 };
 
 export type StanSesji = {
@@ -30,16 +34,35 @@ export type StanSesji = {
   faza_do: string | null;
   zadanie: ZadanieWidoczne | null;
   liczba_graczy: number;
+  /** Ile osób odpowiedziało na bieżące zadanie. */
+  liczba_odpowiedzi: number;
   /** Zegar serwera w chwili odpowiedzi. */
   teraz: string;
 };
 
 export type PilotStan = StanSesji & {
   poprawna: number | null;
-  liczba_odpowiedzi: number;
   ostatnie_zadanie: boolean;
 };
 
 export type AkcjaPilota = "nastepne" | "wynik" | "ranking" | "podium" | "koniec";
 
 export type Dolaczenie = { token: string; nick: string; powrot: boolean };
+
+/** Odpowiedź `zapisz_odpowiedz`. Nie mówi, czy odpowiedź jest poprawna. */
+export type ZapisOdpowiedzi =
+  | { przyjeta: true; czas_ms: number }
+  | { przyjeta: false; powod: "nie_teraz" | "inne_zadanie" | "za_wczesnie" | "po_czasie" | "juz_odpowiedziano" };
+
+/** `moj_wynik`: odpowiedź gracza na bieżące zadanie, suma punktów i miejsce. */
+export type MojWynik = {
+  kod: string;
+  nick: string;
+  faza: FazaWidoczna;
+  zadanie_nr: number;
+  /** `poprawna` i `punkty` dopiero od fazy `wynik`. */
+  odpowiedz: { dane: { odpowiedz?: number }; czas_ms: number; poprawna?: boolean; punkty?: number } | null;
+  punkty: number;
+  miejsce: number;
+  liczba_graczy: number;
+};

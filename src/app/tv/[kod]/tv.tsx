@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- loga i grafiki z bucketu Supabase albo z /public */
 
 import { useCallback, useState, useSyncExternalStore } from "react";
-import { komunikatBledu, pobierzStan, useNasluch } from "@/lib/gra/nasluch";
+import { fazaTeraz, komunikatBledu, pobierzStan, sekundy, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
 import type { StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 
@@ -26,28 +26,30 @@ export function Tv({ kod, qr, adres }: Props) {
   const skala = useSkala();
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<string[]>([]);
+  const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [blad, ustawBlad] = useState<string | null>(null);
 
   const pobierz = useCallback(async () => {
     try {
-      const [{ stan }, gracze] = await Promise.all([
-        pobierzStan(kod),
-        supabase()
-          .rpc("gracze_sesji", { p_kod: kod })
-          .then(({ data, error }) => {
-            if (error) throw error;
-            return data as string[];
-          }),
-      ]);
+      const { stan, przesuniecie } = await pobierzStan(kod);
+      // lista nicków potrzebna tylko w poczekalni
+      if (stan.faza === "poczekalnia") {
+        const { data, error } = await supabase().rpc("gracze_sesji", { p_kod: kod });
+        if (error) throw error;
+        ustawGraczy(data as string[]);
+      }
       ustawStan(stan);
-      ustawGraczy(gracze);
+      ustawPrzesuniecie(przesuniecie);
       ustawBlad(null);
     } catch (e) {
       ustawBlad(komunikatBledu(e));
     }
   }, [kod]);
 
-  useNasluch(kod, pobierz, ["stan", "gracz"]);
+  useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
+
+  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
+  const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
 
   return (
     <div className="tv">
@@ -65,6 +67,8 @@ export function Tv({ kod, qr, adres }: Props) {
           </div>
         ) : stan.faza === "poczekalnia" ? (
           <Poczekalnia stan={stan} gracze={gracze} qr={qr} adres={adres} />
+        ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
+          <Pytanie stan={stan} teraz={teraz} />
         ) : (
           <Trwa stan={stan} />
         )}
@@ -138,10 +142,110 @@ function Poczekalnia({ stan, gracze, qr, adres }: { stan: StanSesji; gracze: str
   );
 }
 
-// Pytanie, wynik, ranking i podium na TV dochodzą w dniach 4 i 5.
-function Trwa({ stan }: { stan: StanSesji }) {
+const LITERY = "ABCDEF";
+
+/** Przygotuj (odliczanie 3 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
+function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const z = stan.zadanie;
+  const { faza, doStartu, doKonca, czasMinal } = fazaTeraz(stan, teraz);
+  if (!z) return <Trwa stan={stan} />;
   const liczba = stan.quiz?.liczba_zadan ?? "?";
+
+  if (faza === "przygotuj") {
+    return (
+      <div className="tv-srodek">
+        <Loga stan={stan} />
+        <p className="tv-okazja">
+          Pytanie {z.lp}/{liczba}
+        </p>
+        <p className="tv-odliczanie">{Math.max(1, Math.ceil(doStartu / 1000))}</p>
+        <p className="tv-duzy">Przygotuj się!</p>
+      </div>
+    );
+  }
+
+  const wynik = faza === "wynik";
+  const poprawna = z.dane.poprawna;
+  const rozklad = wynik ? z.rozklad : null;
+  const najwiecej = Math.max(1, ...(rozklad ?? [0]));
+  const zostalo = Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000)));
+  return (
+    <div className="tv-pytanie">
+      <header className="tv-pytanie-gora">
+        <p className="tv-okazja">
+          Pytanie {z.lp}/{liczba}
+        </p>
+        {wynik ? (
+          <p className="tv-zegar tv-zegar-wynik">Wynik</p>
+        ) : czasMinal ? (
+          <p className="tv-zegar tv-zegar-koniec">Czas minął!</p>
+        ) : (
+          <p className={`tv-zegar${doKonca <= 5000 ? " malo" : ""}`}>{Math.ceil(doKonca / 1000)}</p>
+        )}
+      </header>
+      <div className="tv-czas" aria-hidden>
+        <div style={{ transform: `scaleX(${wynik ? 0 : zostalo})` }} />
+      </div>
+
+      <h1 className="tv-tresc">{z.tresc}</h1>
+
+      <div className={`tv-pytanie-srodek${z.grafika_url ? " z-grafika" : ""}`}>
+        {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-pytanie-grafika" />}
+        <ol className={`tv-odp-lista${z.dane.odpowiedzi.length > 4 ? " gesto" : ""}`}>
+          {z.dane.odpowiedzi.map((o, i) => {
+            const klasa = !wynik ? "" : i === poprawna ? " poprawna" : " przygaszona";
+            const ile = rozklad?.[i] ?? 0;
+            return (
+              <li key={i} className={`tv-odp${klasa}`}>
+                {rozklad && <span className="tv-odp-slupek" style={{ transform: `scaleX(${ile / najwiecej})` }} />}
+                <span className="tv-odp-litera">{LITERY[i]}</span>
+                <span className="tv-odp-tekst">{o}</span>
+                {rozklad && <span className="tv-odp-ile">{ile}</span>}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      <footer className="tv-pytanie-dol">
+        {wynik ? (
+          <>
+            <span>
+              Dobrze odpowiedziało{" "}
+              <strong className="tv-dobrze">
+                {z.liczba_poprawnych ?? 0}/{stan.liczba_graczy}
+              </strong>
+            </span>
+            {z.najszybszy && (
+              <span>
+                Najszybciej: <strong className="tv-zloto">{z.najszybszy.nick}</strong> ({sekundy(z.najszybszy.czas_ms)})
+              </span>
+            )}
+          </>
+        ) : (
+          <>
+            <span>
+              Odpowiedziało{" "}
+              <strong className="tv-zloto">
+                {stan.liczba_odpowiedzi}/{stan.liczba_graczy}
+              </strong>
+            </span>
+            {czasMinal ? (
+              <span className="tv-podpowiedz">Za chwilę wynik…</span>
+            ) : (
+              <span className="tv-podpowiedz">
+                Odpowiadaj na telefonie · kod gry <strong className="tv-zloto">{stan.kod}</strong>
+              </span>
+            )}
+          </>
+        )}
+      </footer>
+    </div>
+  );
+}
+
+// Ranking i podium na TV dochodzą w dniu 5.
+function Trwa({ stan }: { stan: StanSesji }) {
   return (
     <div className="tv-srodek">
       <Loga stan={stan} />
@@ -150,18 +254,9 @@ function Trwa({ stan }: { stan: StanSesji }) {
           <p className="tv-duzy">Koniec gry</p>
           <p className="tv-okazja">Piwu Cześć!</p>
         </>
-      ) : stan.faza === "przygotuj" ? (
-        <p className="tv-duzy">Przygotuj się… {z && `Pytanie ${z.lp}/${liczba}`}</p>
-      ) : stan.faza === "pytanie" && z ? (
-        <>
-          <p className="tv-okazja">
-            Pytanie {z.lp}/{liczba}
-          </p>
-          <p className="tv-duzy">{z.tresc}</p>
-        </>
       ) : (
         <p className="tv-duzy">
-          {{ wynik: "Wynik", ranking: "Ranking", podium: "Podium" }[stan.faza as "wynik" | "ranking" | "podium"]}
+          {{ ranking: "Ranking", podium: "Podium" }[stan.faza as "ranking" | "podium"] ?? "Patrz na telefon"}
         </p>
       )}
     </div>
