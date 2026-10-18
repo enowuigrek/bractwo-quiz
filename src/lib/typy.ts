@@ -1,6 +1,6 @@
 // Wiersze tabel tak, jak widzi je panel admina (klucz serwisowy).
 
-export type Piwiarnia = {
+export type Lokal = {
   id: string;
   nazwa: string;
   miasto: string | null;
@@ -34,7 +34,7 @@ export type Sesja = {
   id: string;
   kod: string;
   quiz_id: string;
-  piwiarnia_id: string | null;
+  lokal_id: string | null;
   okazja: string | null;
   grafika_url: string | null;
   tryb: "solo" | "druzyny";

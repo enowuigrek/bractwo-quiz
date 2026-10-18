@@ -6,8 +6,8 @@ import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./gry/lista-gier";
 export default async function Panel() {
   await wymagajAdmina();
   const db = supabaseAdmin();
-  const [piwiarnie, quizy, trwajace] = await Promise.all([
-    db.from("piwiarnie").select("*", { count: "exact", head: true }),
+  const [lokale, quizy, trwajace] = await Promise.all([
+    db.from("lokale").select("*", { count: "exact", head: true }),
     db.from("quizy").select("*", { count: "exact", head: true }),
     db
       .from("sesje")
@@ -16,7 +16,7 @@ export default async function Panel() {
       .order("utworzono", { ascending: false })
       .returns<GraNaLiscie[]>(),
   ]);
-  const blad = piwiarnie.error ?? quizy.error ?? trwajace.error;
+  const blad = lokale.error ?? quizy.error ?? trwajace.error;
 
   return (
     <main>
@@ -36,7 +36,7 @@ export default async function Panel() {
           </section>
           <p className="pomocniczy panel-sekcja">
             <Link href="/admin/quizy">Quizy: {quizy.count}</Link> ·{" "}
-            <Link href="/admin/lokale">Lokale: {piwiarnie.count}</Link>
+            <Link href="/admin/lokale">Lokale: {lokale.count}</Link>
           </p>
         </>
       )}

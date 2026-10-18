@@ -47,11 +47,11 @@ Stan trzymamy w jednym wierszu `sesje` (`faza`, `zadanie_nr`, `faza_od`, `faza_d
 ## Model danych
 
 ```
-piwiarnie   id, nazwa, miasto, logo_url
+lokale      id, nazwa, miasto, logo_url
 quizy       id, tytul, opis, utworzono
 zadania     id, quiz_id, nr, typ, tresc, grafika_url, czas_s, dane jsonb
             dane dla typu 'wybor': { odpowiedzi: [..], poprawna: 2 }
-sesje       id, kod, quiz_id, piwiarnia_id, okazja, grafika_url,
+sesje       id, kod, quiz_id, lokal_id, okazja, grafika_url,
             tryb ('solo'|'druzyny'), bonus_czas bool, max_graczy (30),
             faza, zadanie_nr, faza_od, faza_do, host_token, utworzono
 gracze      id, sesja_id, nick, token, dolaczyl     unique(sesja_id, lower(nick))
@@ -61,7 +61,7 @@ odpowiedzi  id, gracz_id, sesja_id, zadanie_id, dane jsonb,
 
 `typ` + `dane jsonb` pozwala dokładać nowe rodzaje zadań (łączenie, kolejność, liczba) bez zmian w tabelach. Każdy typ ma w kodzie swój edytor, widok TV, widok gracza i funkcję oceniającą.
 
-Okazja („Dzień Porteru”) i grafika są przypięte do **sesji**, a nie do quizu, więc ten sam quiz może iść na różne eventy i do różnych piwiarni.
+Okazja („Dzień Porteru”) i grafika są przypięte do **sesji**, a nie do quizu, więc ten sam quiz może iść na różne eventy i do różnych lokali.
 
 ## Uczciwość i bezpieczeństwo
 
@@ -83,7 +83,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 ## Ekran TV
 
 **Poczekalnia (ustalone z Łukaszem):**
-- U góry logo Bractwa obok logo wybranego lokalu (`piwiarnia.logo_url` z sesji).
+- U góry logo Bractwa obok logo wybranego lokalu (`lokal.logo_url` ze `stan_sesji`).
 - Niżej tytuł quizu i okazja („Dzień Porteru”), jeśli jest ustawiona.
 - Grafika sesji (`sesje.grafika_url`), jeśli ją dodano.
 - **Duży kod QR**, czytelny z każdego miejsca w lokalu, a obok kod gry do wpisania ręcznie i adres. Do tego lista graczy, którzy już dołączyli.
@@ -93,7 +93,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 - Projektujemy na scenę 1920×1080, skalowaną do ekranu, żeby wyglądało tak samo na każdym telewizorze.
 - Duże fonty, wysoki kontrast, czarne tło z design systemu.
-- Rejestr „kręgowy”: złoto, piana i blask. Logo piwiarni i Bractwa na poczekalni.
+- Rejestr „kręgowy”: złoto, piana i blask. Logo lokalu i Bractwa na poczekalni.
 - Bez interakcji myszką. Wszystko steruje pilot, a TV tylko słucha.
 
 ## MVP: tydzień
@@ -137,9 +137,9 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 ### Dzień 2: panel
 
-- **Migracje:** `20261018161037_dane_startowe_i_kolejnosc.sql` (Piwiarnia w Alejach i PPR w Częstochowie, loga jako ścieżki `/loga/…` z `public/`; funkcja `admin_zamien_zadania` tylko dla `service_role`) oraz `20261018161703_uprawnienia_service_role.sql`.
+- **Migracje:** `20261018161037_dane_startowe_i_kolejnosc.sql` (Piwiarnia w Alejach i PPR w Częstochowie, loga jako ścieżki `/loga/…` z `public/`; funkcja `admin_zamien_zadania` tylko dla `service_role`) oraz `20261018161703_uprawnienia_service_role.sql`. Potem `20261018162508_lokale.sql`: tabela `piwiarnie` → `lokale`, kolumna `sesje.piwiarnia_id` → `lokal_id`, a `stan_sesji` zwraca klucz `lokal` zamiast `piwiarnia`.
 - **⚠️ Ten projekt Supabase nie nadaje rolom API uprawnień do nowych tabel.** Panel dostawał `permission denied` nawet z kluczem serwisowym. Każda nowa tabela potrzebuje jawnego `grant … to service_role` (a `anon`/`authenticated` dostają dostęp tylko przez funkcje).
-- **Struktura panelu:** `/admin` (trwające gry + „Uruchom nową grę”), `/admin/gry`, `/admin/gry/nowa`, `/admin/gry/[id]`, `/admin/quizy`, `/admin/quizy/[id]`, `/admin/quizy/[id]/zadania/[nowe|id]`, `/admin/lokale`, `/admin/lokale/[id]`. Nawigacja Gry · Quizy · Lokale pod nagłówkiem. W interfejsie mówimy „lokale”, a tabela w bazie zostaje `piwiarnie`.
+- **Struktura panelu:** `/admin` (trwające gry + „Uruchom nową grę”), `/admin/gry`, `/admin/gry/nowa`, `/admin/gry/[id]`, `/admin/quizy`, `/admin/quizy/[id]`, `/admin/quizy/[id]/zadania/[nowe|id]`, `/admin/lokale`, `/admin/lokale/[id]`. Nawigacja Gry · Quizy · Lokale pod nagłówkiem. Wszędzie, w interfejsie, kodzie i bazie, mówimy „lokale”.
 - **Server Actions** w `akcje.ts` przy każdej sekcji, każda zaczyna od `wymagajAdmina()`. Po zapisie przekierowanie albo `refresh()` z `next/cache`. Formularze mają `{...bezResetu(akcja)}`: React 19 czyści pola po akcji także przy błędzie, a tak zostają wypełnione.
 - **Grafiki** (`src/lib/grafiki.ts`): bucket `grafiki`, katalogi `lokale/`, `zadania/`, `sesje/`, losowe nazwy plików. Przy podmianie albo usunięciu stary plik jest kasowany ze Storage (adresy spoza bucketu, np. `/loga/…`, zostają). Limit Server Actions podniesiony do 6 MB (`next.config.ts`).
 - **Edytor pytania „wybór”:** 2–6 odpowiedzi, poprawna zaznaczana literą (zielone kółko), czas 5–300 s (domyślnie 20), grafika opcjonalna. Odpowiedzi nie mogą się powtarzać. Kolejność pytań zmieniają strzałki ↑ ↓ (zamiana numerów w jednej transakcji). Nowe pytanie idzie na koniec, a dziury w numeracji po usunięciu nie przeszkadzają.
@@ -150,9 +150,9 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 
-- Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `piwiarnie.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.
+- Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `lokale.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.
 - Na start są dane dla jednego miasta, Częstochowy, z lokalami **Piwiarnia w Alejach** i **PPR** (migracja z danymi startowymi z dnia 2).
-- Logo wybranego lokalu pokazuje się na TV (poczekalnia, podium) obok logo Bractwa. `stan_sesji` już je zwraca (`piwiarnia.logo_url`).
+- Logo wybranego lokalu pokazuje się na TV (poczekalnia, podium) obok logo Bractwa. `stan_sesji` już je zwraca (`lokal.logo_url`).
 - Loga są w `public/loga/` (`piwiarnia-w-alejach.png`, `ppr.png`): kwadrat 800×800, przycięte do koła, z przezroczystością na zewnątrz. Oba są w oryginalnych kolorach (logo Piwiarni w Alejach nie odwracamy). Piwiarnia w Alejach ma dodany biały okrąg na zewnątrz, oddzielony czarną szczeliną, tak jak na ich Instagramie. Bez niego czarna obwódka ginęła na czarnym tle. Oryginały są w `docs/loga/`.
 - Logo Bractwa jest w `public/loga/bractwo.svg`: czarne, z viewBox przyciętym do samego logo. Na ciemnym tle robimy je białym przez `filter: invert(1)`. Komponent `LogoQuiz` (`src/components/logo-quiz.tsx`) to logo + złoty napis „Quiz” i zastępuje tekst „Bractwo Quiz” w interfejsie. Tytuł karty przeglądarki zostaje tekstem.
 

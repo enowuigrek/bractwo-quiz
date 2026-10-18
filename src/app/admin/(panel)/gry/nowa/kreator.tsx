@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- loga lokali z bucketu Supabase albo z /public */
 
 import { useActionState, useState } from "react";
-import type { Piwiarnia, StanFormularza } from "@/lib/typy";
+import type { Lokal, StanFormularza } from "@/lib/typy";
 import { bezResetu } from "../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../_komponenty/grafika";
 import { KomunikatFormularza } from "../../_komponenty/stan";
@@ -10,23 +10,23 @@ import { uruchomGre } from "../akcje";
 
 export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
 
-type Props = { piwiarnie: Piwiarnia[]; quizy: QuizDoWyboru[] };
+type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[] };
 
 /** Uruchamianie gry krokami: miasto → lokal → quiz, potem szczegóły. */
-export function Kreator({ piwiarnie, quizy }: Props) {
+export function Kreator({ lokale, quizy }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
-  const miasta = [...new Set(piwiarnie.map((p) => p.miasto).filter((m): m is string => !!m))].sort((a, b) =>
+  const miasta = [...new Set(lokale.map((p) => p.miasto).filter((m): m is string => !!m))].sort((a, b) =>
     a.localeCompare(b, "pl"),
   );
   const [miasto, setMiasto] = useState(miasta.length === 1 ? miasta[0] : "");
-  const lokale = piwiarnie.filter((p) => p.miasto === miasto);
-  const [lokal, setLokal] = useState(lokale.length === 1 ? lokale[0].id : "");
+  const lokaleWMiescie = lokale.filter((p) => p.miasto === miasto);
+  const [lokal, setLokal] = useState(lokaleWMiescie.length === 1 ? lokaleWMiescie[0].id : "");
   const [quiz, setQuiz] = useState("");
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
-    const nowe = piwiarnie.filter((p) => p.miasto === m);
+    const nowe = lokale.filter((p) => p.miasto === m);
     setLokal(nowe.length === 1 ? nowe[0].id : "");
   }
 
@@ -54,11 +54,11 @@ export function Kreator({ piwiarnie, quizy }: Props) {
             <span className="krok-nr">2</span> Lokal
           </legend>
           <div className="kafelki">
-            {lokale.map((p) => (
+            {lokaleWMiescie.map((p) => (
               <label key={p.id} className="kafelek">
                 <input
                   type="radio"
-                  name="piwiarnia_id"
+                  name="lokal_id"
                   value={p.id}
                   checked={lokal === p.id}
                   onChange={() => setLokal(p.id)}

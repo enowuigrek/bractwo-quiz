@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
 
 type GraZDanymi = Sesja & {
   quizy: { tytul: string } | null;
-  piwiarnie: { nazwa: string; miasto: string | null } | null;
+  lokale: { nazwa: string; miasto: string | null } | null;
 };
 
 export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
@@ -23,7 +23,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
-    db.from("sesje").select("*, quizy(tytul), piwiarnie(nazwa, miasto)").eq("id", id).maybeSingle<GraZDanymi>(),
+    db.from("sesje").select("*, quizy(tytul), lokale(nazwa, miasto)").eq("id", id).maybeSingle<GraZDanymi>(),
     db.from("gracze").select("id", { count: "exact", head: true }).eq("sesja_id", id),
   ]);
   if (!gra) notFound();
@@ -50,7 +50,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
       <h1 style={{ marginTop: 16 }}>{gra.quizy?.tytul ?? "quiz usunięty"}</h1>
       <p className="pomocniczy">
         {[
-          gra.piwiarnie ? `${gra.piwiarnie.nazwa}${gra.piwiarnie.miasto ? `, ${gra.piwiarnie.miasto}` : ""}` : "bez lokalu",
+          gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
           gra.okazja,
           gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
           gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",

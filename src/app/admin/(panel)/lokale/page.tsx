@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import type { Piwiarnia } from "@/lib/typy";
+import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { FormularzLokalu } from "./formularz";
 
@@ -11,14 +11,14 @@ export const metadata: Metadata = { title: "Lokale · Bractwo Quiz" };
 export default async function Lokale() {
   await wymagajAdmina();
   const { data, error } = await supabaseAdmin()
-    .from("piwiarnie")
+    .from("lokale")
     .select("id, nazwa, miasto, logo_url")
     .order("miasto")
     .order("nazwa")
-    .returns<Piwiarnia[]>();
+    .returns<Lokal[]>();
 
-  const piwiarnie = data ?? [];
-  const miasta = [...new Set(piwiarnie.map((p) => p.miasto ?? "bez miasta"))];
+  const lokale = data ?? [];
+  const miasta = [...new Set(lokale.map((p) => p.miasto ?? "bez miasta"))];
 
   return (
     <main>
@@ -29,7 +29,7 @@ export default async function Lokale() {
         <section key={miasto} className="panel-sekcja">
           <h2>{miasto}</h2>
           <ul className="lista">
-            {piwiarnie
+            {lokale
               .filter((p) => (p.miasto ?? "bez miasta") === miasto)
               .map((p) => (
                 <li key={p.id}>
@@ -47,7 +47,7 @@ export default async function Lokale() {
           </ul>
         </section>
       ))}
-      {!error && piwiarnie.length === 0 && <p className="lista-pusta">Nie ma jeszcze żadnego lokalu.</p>}
+      {!error && lokale.length === 0 && <p className="lista-pusta">Nie ma jeszcze żadnego lokalu.</p>}
 
       <section className="panel-sekcja karta">
         <h2>Dodaj lokal</h2>

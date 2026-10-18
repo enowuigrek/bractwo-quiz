@@ -9,10 +9,10 @@ export type GraNaLiscie = {
   faza: Faza;
   utworzono: string;
   quizy: { tytul: string } | null;
-  piwiarnie: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
+  lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
 };
 
-export const ZAPYTANIE_GIER = "id, kod, okazja, faza, utworzono, quizy(tytul), piwiarnie(nazwa, miasto, logo_url)";
+export const ZAPYTANIE_GIER = "id, kod, okazja, faza, utworzono, quizy(tytul), lokale(nazwa, miasto, logo_url)";
 
 const data = new Intl.DateTimeFormat("pl-PL", {
   day: "numeric",
@@ -28,7 +28,7 @@ export function ListaGier({ gry, pusta }: { gry: GraNaLiscie[]; pusta: string })
     <ul className="lista">
       {gry.map((g) => (
         <li key={g.id}>
-          <Miniatura src={g.piwiarnie?.logo_url ?? null} alt="" />
+          <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
           <div className="lista-glowna">
             <div className="lista-tytul">
               <Link href={`/admin/gry/${g.id}`}>
@@ -37,7 +37,7 @@ export function ListaGier({ gry, pusta }: { gry: GraNaLiscie[]; pusta: string })
               <span className={`znaczek${g.faza === "koniec" ? "" : " aktywny"}`}>{NAZWY_FAZ[g.faza]}</span>
             </div>
             <div className="lista-opis">
-              {[g.piwiarnie?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(g.utworzono))]
+              {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(g.utworzono))]
                 .filter(Boolean)
                 .join(" · ")}
             </div>

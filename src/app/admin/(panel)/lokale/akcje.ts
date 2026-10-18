@@ -32,7 +32,7 @@ export async function zapiszLokal(
 
   let stareLogo: string | null = null;
   if (id) {
-    const { data, error } = await db.from("piwiarnie").select("logo_url").eq("id", id).single();
+    const { data, error } = await db.from("lokale").select("logo_url").eq("id", id).single();
     if (error) return { blad: "Nie ma takiego lokalu." };
     stareLogo = data.logo_url;
   }
@@ -46,8 +46,8 @@ export async function zapiszLokal(
   }
 
   const { error } = id
-    ? await db.from("piwiarnie").update(zmiany).eq("id", id)
-    : await db.from("piwiarnie").insert(zmiany);
+    ? await db.from("lokale").update(zmiany).eq("id", id)
+    : await db.from("lokale").insert(zmiany);
   if (error) {
     if (typeof zmiany.logo_url === "string") await usunGrafike(zmiany.logo_url);
     return { blad: `Nie udało się zapisać: ${error.message}` };
@@ -60,7 +60,7 @@ export async function zapiszLokal(
 export async function usunLokal(id: string): Promise<void> {
   await wymagajAdmina();
   const db = supabaseAdmin();
-  const { data } = await db.from("piwiarnie").delete().eq("id", id).select("logo_url").maybeSingle();
+  const { data } = await db.from("lokale").delete().eq("id", id).select("logo_url").maybeSingle();
   await usunGrafike(data?.logo_url);
   redirect("/admin/lokale");
 }

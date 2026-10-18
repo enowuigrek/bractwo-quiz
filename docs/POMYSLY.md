@@ -19,7 +19,7 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - **Seria:** bonus za kilka poprawnych odpowiedzi z rzędu, z licznikiem przy nicku.
 - **Rundy tematyczne** z planszą przejściową na TV („Runda 2: Portery bałtyckie”).
 - **Pełne drużyny:** kilka telefonów w jednej drużynie, wynik liczony jako średnia, żeby większa drużyna nie miała przewagi. (W MVP drużyna = jeden telefon.)
-- **Ponowne użycie quizu:** ten sam zestaw pytań w kilku piwiarniach i porównanie wyników między miastami.
+- **Ponowne użycie quizu:** ten sam zestaw pytań w kilku lokalach i porównanie wyników między miastami.
 - **Historia i statystyki:** najtrudniejsze pytania, średni czas odpowiedzi, frekwencja.
 - **Eksport wyników** (CSV / grafika) do posta na Facebooku Bractwa.
 
