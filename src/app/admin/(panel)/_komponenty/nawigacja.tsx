@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const POZYCJE = [
   { href: "/admin/gry", tekst: "Gry" },
   { href: "/admin/quizy", tekst: "Quizy" },
-  { href: "/admin/piwiarnie", tekst: "Piwiarnie" },
+  { href: "/admin/lokale", tekst: "Lokale" },
 ] as const;
 
 export function Nawigacja() {

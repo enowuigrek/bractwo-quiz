@@ -11,7 +11,7 @@ function tekst(dane: FormData, pole: string): string {
 }
 
 /** Dodaje lokal (id = null) albo zapisuje zmiany istniejącego. */
-export async function zapiszPiwiarnie(
+export async function zapiszLokal(
   id: string | null,
   _: StanFormularza,
   dane: FormData,
@@ -39,7 +39,7 @@ export async function zapiszPiwiarnie(
 
   const zmiany: Record<string, unknown> = { nazwa, miasto };
   try {
-    if (logo) zmiany.logo_url = await wyslijGrafike(logo, "piwiarnie");
+    if (logo) zmiany.logo_url = await wyslijGrafike(logo, "lokale");
     else if (dane.get("logo_usun")) zmiany.logo_url = null;
   } catch (e) {
     return { blad: (e as Error).message };
@@ -54,13 +54,13 @@ export async function zapiszPiwiarnie(
   }
   if ("logo_url" in zmiany && stareLogo) await usunGrafike(stareLogo);
 
-  redirect("/admin/piwiarnie");
+  redirect("/admin/lokale");
 }
 
-export async function usunPiwiarnie(id: string): Promise<void> {
+export async function usunLokal(id: string): Promise<void> {
   await wymagajAdmina();
   const db = supabaseAdmin();
   const { data } = await db.from("piwiarnie").delete().eq("id", id).select("logo_url").maybeSingle();
   await usunGrafike(data?.logo_url);
-  redirect("/admin/piwiarnie");
+  redirect("/admin/lokale");
 }

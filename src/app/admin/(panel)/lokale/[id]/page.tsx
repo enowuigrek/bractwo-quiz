@@ -5,12 +5,12 @@ import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Piwiarnia } from "@/lib/typy";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { usunPiwiarnie } from "../akcje";
-import { FormularzPiwiarni } from "../formularz";
+import { usunLokal } from "../akcje";
+import { FormularzLokalu } from "../formularz";
 
 export const metadata: Metadata = { title: "Lokal · Bractwo Quiz" };
 
-export default async function EdycjaPiwiarni({ params }: PageProps<"/admin/piwiarnie/[id]">) {
+export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/[id]">) {
   await wymagajAdmina();
   const { id } = await params;
   const db = supabaseAdmin();
@@ -25,15 +25,15 @@ export default async function EdycjaPiwiarni({ params }: PageProps<"/admin/piwia
   return (
     <main>
       <p className="okruchy">
-        <Link href="/admin/piwiarnie">← Piwiarnie</Link>
+        <Link href="/admin/lokale">← Lokale</Link>
       </p>
       <h1>{piwiarnia.nazwa}</h1>
       <section className="karta">
-        <FormularzPiwiarni piwiarnia={piwiarnia} miasta={miasta} />
+        <FormularzLokalu piwiarnia={piwiarnia} miasta={miasta} />
       </section>
       <section className="panel-sekcja">
         <PrzyciskPotwierdz
-          akcja={usunPiwiarnie.bind(null, piwiarnia.id)}
+          akcja={usunLokal.bind(null, piwiarnia.id)}
           pytanie={`Usunąć lokal „${piwiarnia.nazwa}”? Rozegrane w nim gry zostaną, tylko bez lokalu.`}
         >
           Usuń lokal

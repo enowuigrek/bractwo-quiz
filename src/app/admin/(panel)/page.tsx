@@ -36,7 +36,7 @@ export default async function Panel() {
           </section>
           <p className="pomocniczy panel-sekcja">
             <Link href="/admin/quizy">Quizy: {quizy.count}</Link> ·{" "}
-            <Link href="/admin/piwiarnie">Piwiarnie: {piwiarnie.count}</Link>
+            <Link href="/admin/lokale">Lokale: {piwiarnie.count}</Link>
           </p>
         </>
       )}

@@ -4,11 +4,11 @@ import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Piwiarnia } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
-import { FormularzPiwiarni } from "./formularz";
+import { FormularzLokalu } from "./formularz";
 
-export const metadata: Metadata = { title: "Piwiarnie · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Lokale · Bractwo Quiz" };
 
-export default async function Piwiarnie() {
+export default async function Lokale() {
   await wymagajAdmina();
   const { data, error } = await supabaseAdmin()
     .from("piwiarnie")
@@ -22,7 +22,7 @@ export default async function Piwiarnie() {
 
   return (
     <main>
-      <h1>Piwiarnie</h1>
+      <h1>Lokale</h1>
       {error && <p className="blad">Nie udało się pobrać lokali: {error.message}</p>}
 
       {miasta.map((miasto) => (
@@ -35,10 +35,10 @@ export default async function Piwiarnie() {
                 <li key={p.id}>
                   <Miniatura src={p.logo_url} alt="" />
                   <div className="lista-glowna lista-tytul">
-                    <Link href={`/admin/piwiarnie/${p.id}`}>{p.nazwa}</Link>
+                    <Link href={`/admin/lokale/${p.id}`}>{p.nazwa}</Link>
                   </div>
                   <div className="lista-akcje">
-                    <Link href={`/admin/piwiarnie/${p.id}`} className="przycisk-maly">
+                    <Link href={`/admin/lokale/${p.id}`} className="przycisk-maly">
                       Edytuj
                     </Link>
                   </div>
@@ -51,7 +51,7 @@ export default async function Piwiarnie() {
 
       <section className="panel-sekcja karta">
         <h2>Dodaj lokal</h2>
-        <FormularzPiwiarni miasta={miasta.filter((m) => m !== "bez miasta")} />
+        <FormularzLokalu miasta={miasta.filter((m) => m !== "bez miasta")} />
       </section>
     </main>
   );

@@ -25,7 +25,7 @@ export function bladGrafiki(plik: File): string | null {
 }
 
 /** Wysyła grafikę do publicznego bucketu i zwraca jej publiczny adres. */
-export async function wyslijGrafike(plik: File, katalog: "piwiarnie" | "zadania" | "sesje"): Promise<string> {
+export async function wyslijGrafike(plik: File, katalog: "lokale" | "zadania" | "sesje"): Promise<string> {
   const blad = bladGrafiki(plik);
   if (blad) throw new Error(blad);
 

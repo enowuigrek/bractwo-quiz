@@ -5,7 +5,7 @@ import type { Piwiarnia, StanFormularza } from "@/lib/typy";
 import { bezResetu } from "../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../_komponenty/grafika";
 import { KomunikatFormularza } from "../_komponenty/stan";
-import { zapiszPiwiarnie } from "./akcje";
+import { zapiszLokal } from "./akcje";
 
 type Props = {
   piwiarnia?: Piwiarnia;
@@ -13,9 +13,9 @@ type Props = {
   miasta: string[];
 };
 
-export function FormularzPiwiarni({ piwiarnia, miasta }: Props) {
+export function FormularzLokalu({ piwiarnia, miasta }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(
-    zapiszPiwiarnie.bind(null, piwiarnia?.id ?? null),
+    zapiszLokal.bind(null, piwiarnia?.id ?? null),
     {},
   );
 
