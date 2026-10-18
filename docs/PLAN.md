@@ -23,7 +23,7 @@ Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-
 - **Next.js** (App Router, TypeScript) na **Vercel**
 - **Supabase**: Postgres, Realtime, Storage (logo, grafiki)
 - CSS na tokenach z `tokens.css` + Open Sans przez `next/font`
-- `qrcode` (generowanie QR), `motion` (animacje rankingu)
+- `qrcode` (generowanie QR), `motion` (animacje rankingu i podium)
 
 ## Widoki
 
@@ -105,7 +105,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | 2 ✅ | panel: lokale z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji (wybór miasta → lokalu → quizu) |
 | 3 ✅ | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 ✅ | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
-| 5 | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
+| 5 ✅ | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
 | 6 | deploy, `quiz.bractwopiwne.pl`, keepalive, test z kilkoma telefonami |
 | 7 | poprawki po teście, bufor |
 
@@ -167,9 +167,20 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
   - **Gdy odpowiedzą wszyscy gracze, czas pytania kończy się od razu:** `zapisz_odpowiedz` ustawia `faza_do` na teraz, a wyzwalacz rozsyła `stan`. Na wynik nadal czeka się na prowadzącego. Przy dwóch ostatnich odpowiedziach w tej samej chwili czas może się nie skrócić, wtedy prowadzący klika „Pokaż wynik”.
 - **Odsłanianie:** `fazaTeraz(stan, teraz)` w `nasluch.ts` (dla gracza, TV i pilota) przełącza `przygotuj` → `pytanie`, gdy zegar serwera (`useCzasSerwera`, w odliczaniu co 100 ms) minie `faza_od`, i zgłasza `czasMinal` po `faza_do`. Treść pytania przychodzi już w `przygotuj` (bez poprawnej), ale ekrany pokazują ją dopiero od `faza_od`. Odpowiedź przed `faza_od` baza i tak odrzuca.
 - **Telefon gracza** (`src/app/[kod]/rozgrywka.tsx`): odliczanie 3‑2‑1 → pytanie z paskiem czasu, grafiką i przyciskami A–F → po wyborze złota ramka, reszta przygaszona, „Odpowiedź zapisana (3,4 s)”. Odrzucenia z bazy mają polskie komunikaty („Za późno, czas minął.”). Po odświeżeniu strony wybrana odpowiedź wraca z `moj_wynik`. W `wynik`: „✓ Dobrze! +789 pkt”, „✗ Niestety źle” albo „Brak odpowiedzi”, miejsce i suma punktów, poprawna odpowiedź na zielono, moja zła przekreślona. W `ranking` i `podium` telefon pokazuje miejsce i punkty, a w `koniec` też miejsce.
-- **TV:** odliczanie w złotym kole → pytanie (numer, zegar w sekundach, złoty od 5 s, pasek czasu, treść do 3 linii, odpowiedzi w dwóch kolumnach; z grafiką: grafika po lewej, odpowiedzi w kolumnie), stopka „Odpowiedziało x/y” i kod gry. Po czasie „Czas minął!” i „Za chwilę wynik…”. `wynik`: poprawna na zielono z blaskiem, reszta przygaszona, słupki rozkładu z liczbami, „Dobrze odpowiedziało x/y” i „Najszybciej: nick (1,2 s)”. TV słucha też zdarzenia `odpowiedz`, a listę nicków pobiera tylko w poczekalni. Ranking i podium na TV to wciąż plansze tymczasowe (dzień 5).
+- **TV:** odliczanie w złotym kole → pytanie (numer, zegar w sekundach, złoty od 5 s, pasek czasu, treść do 3 linii, odpowiedzi w dwóch kolumnach; z grafiką: grafika po lewej, odpowiedzi w kolumnie), stopka „Odpowiedziało x/y” i kod gry. Po czasie „Czas minął!” i „Za chwilę wynik…”. `wynik`: poprawna na zielono z blaskiem, reszta przygaszona, słupki rozkładu z liczbami, „Dobrze odpowiedziało x/y” i „Najszybciej: nick (1,2 s)”. TV słucha też zdarzenia `odpowiedz`, a listę nicków pobiera tylko w poczekalni. Ranking i podium na TV doszły w dniu 5.
 - **Pilot:** w `wynik` liczba osób przy każdej odpowiedzi i „dobrze x”, po czasie zamiast sekund „czas minął”.
 - Sprawdzone na localhost (TV, pilot i telefon 375 px, drugi gracz przez SQL jako `anon`): przygotuj → pytanie równo na TV i telefonie, odpowiedź i punkty (12,7 s z 30 s → 789), licznik na TV, powrót po odświeżeniu, koniec czasu po odpowiedzi wszystkich, „Pokaż wynik” przed końcem czasu, brak odpowiedzi, zła odpowiedź, odpowiedź po czasie odrzucona, pytanie z 6 odpowiedziami i z grafiką. Wcześniej SQL‑em: w trakcie pytania `stan_sesji` nie ma `poprawna` ani `rozklad`. Gra testowa została usunięta, `JPLA` i `NKGH` zostały bez zmian.
+
+### Dzień 5: ranking i podium
+
+- **Bez migracji.** Wystarczyła funkcja `ranking` z dnia 1 (`poprzednie_miejsce`, `zdobyte`). Doszła biblioteka `motion` (`motion/react`).
+- **Ranking na TV** (`src/app/tv/[kod]/ranking.tsx`): przez 1,6 s stoi kolejność sprzed pytania z punktami sprzed pytania. Potem wiersze przesuwają się na nowe miejsca (`layout` z motion, sprężyna), punkty doliczają się, a przy nickach pojawiają się „+zdobyte” i strzałki ▲ (chmiel) / ▼ (szary). Lider ma złotą ramkę z blaskiem. Na ekranie mieści się 10 wierszy, a pod spodem jest „…i jeszcze N w grze. Swoje miejsce masz na telefonie.” Odświeżenie TV w trakcie rankingu odtwarza animację od początku.
+- **Podium:** nagłówek z logami Bractwa i lokalu, okazją i tytułem quizu. Stopnie wjeżdżają po kolei: 3. miejsce (0,6 s), 2. (1,8 s), zwycięzca (3,4 s), ze złotym blaskiem i większym nickiem. Pod spodem miejsca 4–10. Remisy pokazują wspólny numer miejsca z bazy.
+- **Koniec gry na TV:** to samo podium, ale bez odliczania, i pod spodem „Dziękujemy za grę! Piwu Cześć!”. Gdy gra skończyła się przed pierwszym pytaniem, zostaje sam napis „Koniec gry”.
+- **Przejścia:** każda nowa faza na TV wjeżdża łagodnie (0,6 s). Od odliczania do wyniku pytanie to jeden ekran, więc nie miga. Animacje respektują `prefers-reduced-motion` (`MotionConfig reducedMotion="user"` i reguła z `globals.css`).
+- **Telefon:** w rankingu miejsce, suma, „+740 pkt za ostatnie pytanie” i zmiana miejsca. Dane bierze z `ranking` (wiersz gracza wyszukany po nicku, który jest unikalny w grze). Na podium jest zachęta, żeby patrzeć na TV, a na końcu miejsce i „Zwycięstwo!” dla pierwszego.
+- **TV pobiera** `ranking` tylko w fazach ranking, podium i koniec, a listę nicków tylko w poczekalni.
+- Sprawdzone na localhost na grze z 12 graczami (odpowiedzi wpisane SQL‑em): kolejność przed i po przetasowaniu, strzałki, „+zdobyte”, „…i jeszcze 2”, wjazd podium po kolei, koniec gry, widok rankingu i końca na telefonie 375 px. Gra testowa usunięta.
 
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 

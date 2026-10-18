@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
-import type { Dolaczenie, MojWynik, StanSesji } from "@/lib/gra/typy";
+import type { Dolaczenie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { Miejsce, Rozgrywka, type Ja } from "./rozgrywka";
+import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
@@ -18,6 +18,7 @@ export function Gracz({ kod }: { kod: string }) {
   const [ja, ustawJa] = useState<Ja | null>(null);
   const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
   const [moj, ustawMoj] = useState<MojWynik | null>(null);
+  const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
   const tokenRef = useRef<string | null>(null);
@@ -34,7 +35,15 @@ export function Gracz({ kod }: { kod: string }) {
       } else if (tokenRef.current) {
         // po `stan_sesji`, więc faza w `moj_wynik` nigdy nie jest starsza niż w stanie
         const { data } = await supabase().rpc("moj_wynik", { p_token: tokenRef.current });
-        if (data) ustawMoj(data as MojWynik);
+        if (data) {
+          const nowy = data as MojWynik;
+          ustawMoj(nowy);
+          // zmiana miejsca i punkty za ostatnie pytanie są tylko w rankingu (nick w grze jest unikalny)
+          if (nowy.faza === "ranking" || nowy.faza === "podium" || nowy.faza === "koniec") {
+            const r = await supabase().rpc("ranking", { p_kod: kod });
+            if (r.data) ustawMojWiersz((r.data as WierszRankingu[]).find((w) => w.nick === nowy.nick) ?? null);
+          }
+        }
       }
     } catch (e) {
       const komunikat = komunikatBledu(e);
@@ -116,7 +125,15 @@ export function Gracz({ kod }: { kod: string }) {
   return (
     <>
       <Naglowek kod={kod} />
-      <WGrze stan={stan} ja={ja} gracze={gracze} moj={moj} przesuniecie={przesuniecie} odswiez={pobierz} />
+      <WGrze
+        stan={stan}
+        ja={ja}
+        gracze={gracze}
+        moj={moj}
+        mojWiersz={mojWiersz}
+        przesuniecie={przesuniecie}
+        odswiez={pobierz}
+      />
     </>
   );
 }
@@ -192,6 +209,7 @@ function WGrze({
   ja,
   gracze,
   moj,
+  mojWiersz,
   przesuniecie,
   odswiez,
 }: {
@@ -199,6 +217,7 @@ function WGrze({
   ja: Ja;
   gracze: string[];
   moj: MojWynik | null;
+  mojWiersz: WierszRankingu | null;
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
@@ -211,6 +230,7 @@ function WGrze({
       <>
         <h1>Koniec gry</h1>
         {moj && <Miejsce moj={moj} />}
+        {moj?.miejsce === 1 && <p className="nadtytul">Zwycięstwo!</p>}
         <p>
           Dzięki za grę, <strong className="gra-kod">{ja.nick}</strong>! Piwu Cześć!
         </p>
@@ -246,7 +266,8 @@ function WGrze({
         <p className="nadtytul">{ja.nick}</p>
         <h1>{stan.faza === "podium" ? "Koniec quizu!" : "Ranking"}</h1>
         {moj && <Miejsce moj={moj} />}
-        <p>Patrz na telewizor.</p>
+        {stan.faza === "ranking" && mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
+        <p>{stan.faza === "podium" ? "Na telewizorze podium. Brawa dla najlepszych!" : "Patrz na telewizor."}</p>
       </>
     );
   }

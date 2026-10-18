@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { fazaTeraz, komunikatBledu, sekundy } from "@/lib/gra/nasluch";
-import type { MojWynik, StanSesji, ZapisOdpowiedzi } from "@/lib/gra/typy";
+import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 
 const LITERY = "ABCDEF";
@@ -218,5 +218,17 @@ export function Miejsce({ moj }: { moj: MojWynik }) {
         <strong className="gra-kod">{moj.punkty.toLocaleString("pl-PL")} pkt</strong>
       </span>
     </div>
+  );
+}
+
+/** Ranking na telefonie: punkty za ostatnie pytanie i zmiana miejsca. */
+export function ZmianaMiejsca({ w }: { w: WierszRankingu }) {
+  const zmiana = w.poprzednie_miejsce - w.miejsce;
+  return (
+    <p className="zmiana-miejsca">
+      <span className="gra-kod">+{w.zdobyte} pkt</span> za ostatnie pytanie
+      {zmiana > 0 && <span className="w-gore"> · ▲ {zmiana} w górę</span>}
+      {zmiana < 0 && <span className="w-dol"> · ▼ {-zmiana} w dół</span>}
+    </p>
   );
 }

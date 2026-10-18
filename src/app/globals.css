@@ -476,3 +476,16 @@ button.odp:not(:disabled):active {
   line-height: 1;
   color: var(--zloto);
 }
+
+.zmiana-miejsca {
+  margin: calc(-1 * var(--section-gap) + 8px) 0 var(--section-gap);
+  font-weight: var(--w-semibold);
+}
+
+.w-gore {
+  color: var(--chmiel);
+}
+
+.w-dol {
+  color: var(--szary);
+}

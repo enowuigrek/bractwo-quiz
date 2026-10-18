@@ -66,3 +66,12 @@ export type MojWynik = {
   miejsce: number;
   liczba_graczy: number;
 };
+
+/** Wiersz funkcji `ranking`. `poprzednie_miejsce` i `zdobyte` dotyczą ostatniego jawnego pytania. */
+export type WierszRankingu = {
+  nick: string;
+  punkty: number;
+  miejsce: number;
+  poprzednie_miejsce: number;
+  zdobyte: number;
+};

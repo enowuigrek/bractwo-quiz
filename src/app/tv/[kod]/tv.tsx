@@ -3,8 +3,9 @@
 
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { fazaTeraz, komunikatBledu, pobierzStan, sekundy, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
-import type { StanSesji } from "@/lib/gra/typy";
+import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { PodiumTv, RankingTv } from "./ranking";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
 const SZER = 1920;
@@ -26,6 +27,7 @@ export function Tv({ kod, qr, adres }: Props) {
   const skala = useSkala();
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<string[]>([]);
+  const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [blad, ustawBlad] = useState<string | null>(null);
 
@@ -37,6 +39,11 @@ export function Tv({ kod, qr, adres }: Props) {
         const { data, error } = await supabase().rpc("gracze_sesji", { p_kod: kod });
         if (error) throw error;
         ustawGraczy(data as string[]);
+      }
+      if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "koniec") {
+        const { data, error } = await supabase().rpc("ranking", { p_kod: kod });
+        if (error) throw error;
+        ustawRanking(data as WierszRankingu[]);
       }
       ustawStan(stan);
       ustawPrzesuniecie(przesuniecie);
@@ -65,12 +72,19 @@ export function Tv({ kod, qr, adres }: Props) {
           <div className="tv-srodek">
             <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
           </div>
-        ) : stan.faza === "poczekalnia" ? (
-          <Poczekalnia stan={stan} gracze={gracze} qr={qr} adres={adres} />
-        ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
-          <Pytanie stan={stan} teraz={teraz} />
         ) : (
-          <Trwa stan={stan} />
+          // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
+          <div key={kluczEkranu(stan)} className="tv-ekran">
+            {stan.faza === "poczekalnia" ? (
+              <Poczekalnia stan={stan} gracze={gracze} qr={qr} adres={adres} />
+            ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
+              <Pytanie stan={stan} teraz={teraz} />
+            ) : stan.faza === "ranking" ? (
+              <RankingTv stan={stan} ranking={ranking} />
+            ) : (
+              <Koniec stan={stan} ranking={ranking} />
+            )}
+          </div>
         )}
         {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
       </div>
@@ -148,7 +162,14 @@ const LITERY = "ABCDEF";
 function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal } = fazaTeraz(stan, teraz);
-  if (!z) return <Trwa stan={stan} />;
+  // pytanie usunięte w trakcie gry
+  if (!z)
+    return (
+      <div className="tv-srodek">
+        <Loga stan={stan} />
+        <p className="tv-duzy">Patrz na prowadzącego</p>
+      </div>
+    );
   const liczba = stan.quiz?.liczba_zadan ?? "?";
 
   if (faza === "przygotuj") {
@@ -244,21 +265,33 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   );
 }
 
-// Ranking i podium na TV dochodzą w dniu 5.
-function Trwa({ stan }: { stan: StanSesji }) {
+function kluczEkranu(stan: StanSesji): string {
+  const pytanie = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik";
+  return `${pytanie ? "pytanie" : stan.faza}:${stan.zadanie?.nr ?? 0}`;
+}
+
+/** Podium (z wjazdem po kolei) i koniec gry (podium od razu + podziękowanie). */
+function Koniec({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
+  const koniec = stan.faza === "koniec";
+  const bylaGra = stan.zadanie !== null && ranking.length > 0;
   return (
-    <div className="tv-srodek">
-      <Loga stan={stan} />
-      {stan.faza === "koniec" ? (
-        <>
-          <p className="tv-duzy">Koniec gry</p>
-          <p className="tv-okazja">Piwu Cześć!</p>
-        </>
+    <div className="tv-koniec">
+      <header className="tv-naglowek">
+        <Loga stan={stan} />
+        <div className="tv-tytul">
+          {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
+          <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
+          {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
+        </div>
+      </header>
+      {bylaGra ? (
+        <PodiumTv ranking={ranking} odRazu={koniec} />
       ) : (
-        <p className="tv-duzy">
-          {{ ranking: "Ranking", podium: "Podium" }[stan.faza as "ranking" | "podium"] ?? "Patrz na telefon"}
-        </p>
+        <div className="tv-srodek">
+          <p className="tv-duzy">Koniec gry</p>
+        </div>
       )}
+      {koniec && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
     </div>
   );
 }

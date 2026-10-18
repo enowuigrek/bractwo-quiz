@@ -25,9 +25,8 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 
 ## Animacje i ekran TV
 
-- Ranking z płynnym przetasowaniem pozycji i strzałkami awansu / spadku.
-- Podium na koniec. Anioł i diabeł z nagłówka Szabli mogą „wręczać” miejsca (spójność z design systemem).
-- Złoty blask na liderze, efekt „piany” przy wejściu nowego gracza do poczekalni.
+- Na podium anioł i diabeł z nagłówka Szabli mogą „wręczać” miejsca (spójność z design systemem). Samo podium jest od dnia 5.
+- Efekt „piany” przy wejściu nowego gracza do poczekalni (złoty blask na liderze rankingu już jest).
 - Odliczanie jako napełniający się kufel zamiast paska.
 - Dźwięki (start, koniec czasu, podium) z wyciszeniem na pilocie.
 

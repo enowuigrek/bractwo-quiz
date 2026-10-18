@@ -495,3 +495,238 @@
 .tv-podpowiedz {
   color: var(--szary);
 }
+
+/* Wejście nowej fazy */
+
+.tv-ekran {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: wejscie-ekranu 0.6s var(--ease-std) both;
+}
+
+.tv-ekran > * {
+  flex: 1;
+  min-height: 0;
+}
+
+@keyframes wejscie-ekranu {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* Ranking */
+
+.tv-ranking {
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-ranking-gora {
+  display: flex;
+  align-items: baseline;
+  gap: 32px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid var(--zloto);
+}
+
+.tv-ranking-gora h1 {
+  font-size: 80px;
+}
+
+.tv-ranking-gora .tv-okazja {
+  margin: 0;
+}
+
+.tv-ranking-lista {
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.tv-ranking-wiersz {
+  display: grid;
+  grid-template-columns: 110px 1fr 140px 170px 230px;
+  align-items: center;
+  gap: 16px;
+  height: 72px;
+  padding: 0 32px;
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-card);
+  font-size: 40px;
+  font-weight: var(--w-black);
+}
+
+.tv-ranking-lista.gesto {
+  gap: 10px;
+}
+
+.tv-ranking-lista.gesto .tv-ranking-wiersz {
+  height: 66px;
+  font-size: 36px;
+}
+
+.tv-ranking-wiersz.lider {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.tv-ranking-miejsce {
+  color: var(--zloto);
+}
+
+.tv-ranking-nick {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tv-ranking-zmiana {
+  font-size: 28px;
+  text-align: right;
+}
+
+
+
+.tv-ranking-zdobyte {
+  font-size: 30px;
+  color: var(--zloto);
+  text-align: right;
+}
+
+.tv-ranking-zdobyte span {
+  display: inline-block;
+}
+
+.tv-ranking-punkty {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tv-ranking-reszta {
+  margin: 20px 0 0;
+  font-size: 30px;
+  color: var(--szary);
+  text-align: center;
+}
+
+/* Podium i koniec gry */
+
+.tv-koniec {
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-podium {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 40px;
+  margin-top: 24px;
+}
+
+.tv-stopien {
+  width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.tv-stopien-nick {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 48px;
+  font-weight: var(--w-black);
+  line-height: 1.2;
+}
+
+.tv-stopien-punkty {
+  margin: 4px 0 18px;
+  font-size: 32px;
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+}
+
+.tv-stopien-blok {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  background: linear-gradient(180deg, var(--kamien2), var(--kamien));
+  border: 2px solid var(--kamien2);
+  border-bottom: none;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+}
+
+.tv-stopien-nr {
+  font-size: 110px;
+  font-weight: var(--w-black);
+  line-height: 1;
+  color: var(--piana);
+}
+
+.tv-stopien-1 .tv-stopien-blok {
+  height: 340px;
+  border-color: var(--zloto);
+  background: radial-gradient(circle at 50% 0%, #3a2606, var(--kamien) 75%);
+  box-shadow: var(--glow-lg);
+}
+
+.tv-stopien-1 .tv-stopien-nick {
+  font-size: 64px;
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.tv-stopien-1 .tv-stopien-punkty {
+  color: var(--piana);
+}
+
+.tv-stopien-1 .tv-stopien-nr {
+  font-size: 150px;
+  color: var(--zloto);
+}
+
+.tv-stopien-2 .tv-stopien-blok {
+  height: 240px;
+}
+
+.tv-stopien-3 .tv-stopien-blok {
+  height: 170px;
+}
+
+.tv-podium-dalej {
+  list-style: none;
+  margin: 0;
+  padding: 20px 0 0;
+  border-top: 3px solid var(--zloto);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 40px;
+  font-size: 30px;
+  font-weight: var(--w-black);
+}
+
+.tv-dziekujemy {
+  margin: 24px 0 0;
+  text-align: center;
+  font-family: var(--font-condensed);
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: 52px;
+  text-transform: uppercase;
+  color: var(--zloto);
+}
