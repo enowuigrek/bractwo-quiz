@@ -1,0 +1,39 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { wymagajAdmina } from "@/lib/admin";
+import { supabaseAdmin } from "@/lib/supabase/serwer";
+import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
+
+export const metadata: Metadata = { title: "Gry · Bractwo Quiz" };
+
+export default async function Gry() {
+  await wymagajAdmina();
+  const { data, error } = await supabaseAdmin()
+    .from("sesje")
+    .select(ZAPYTANIE_GIER)
+    .order("utworzono", { ascending: false })
+    .limit(100)
+    .returns<GraNaLiscie[]>();
+
+  const gry = data ?? [];
+  return (
+    <main>
+      <h1>Gry</h1>
+      <p>
+        <Link href="/admin/gry/nowa" className="przycisk zloty">
+          Uruchom nową grę
+        </Link>
+      </p>
+      {error && <p className="blad">Nie udało się pobrać gier: {error.message}</p>}
+
+      <section className="panel-sekcja">
+        <h2>Trwające</h2>
+        <ListaGier gry={gry.filter((g) => g.faza !== "koniec")} pusta="Żadna gra teraz nie trwa." />
+      </section>
+      <section className="panel-sekcja">
+        <h2>Zakończone</h2>
+        <ListaGier gry={gry.filter((g) => g.faza === "koniec")} pusta="Nie ma jeszcze zakończonych gier." />
+      </section>
+    </main>
+  );
+}

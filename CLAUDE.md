@@ -9,6 +9,8 @@ Zasady:
 - Rozmawiamy, piszemy UI i commity po polsku.
 - Punkty i czas liczy serwer (funkcje w Postgresie), nigdy klient. Poprawna odpowiedź nie trafia do przeglądarki przed fazą `wynik`.
 - Supabase: projekt `bractwo-quiz` (ref `yyacqskrpgnfdxtcmapw`, Frankfurt). Migracje trzymamy w repo w `supabase/migrations/`.
+- Migracje wdrażamy przez MCP (`apply_migration`), a potem zapisujemy plik w repo pod wersją z `list_migrations`, żeby historia w bazie i w repo się zgadzała.
+- Ten projekt Supabase nie nadaje rolom API uprawnień do nowych tabel. Nowa tabela = jawny `grant select, insert, update, delete … to service_role`; `anon` dostaje dostęp tylko przez funkcje.
 - Vercel: funkcje w regionie `fra1`, obok bazy.
 - Next.js 16 różni się od starszych wersji (np. `proxy` zamiast `middleware`). Przed pisaniem kodu sprawdzaj dokumentację w `node_modules/next/dist/docs/` (patrz `AGENTS.md`).
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.

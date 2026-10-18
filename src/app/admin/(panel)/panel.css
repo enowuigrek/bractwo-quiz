@@ -1,0 +1,428 @@
+/* Panel admina: telefon i laptop, kolumna do 640px. */
+
+.panel-naglowek {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-nawigacja {
+  display: flex;
+  gap: 6px;
+  margin: 18px 0 var(--section-gap);
+  border-bottom: 1px solid var(--kamien2);
+  overflow-x: auto;
+}
+
+.panel-nawigacja a {
+  color: var(--szary);
+  font-weight: var(--w-semibold);
+  text-decoration: none;
+  padding: 8px 12px 10px;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.panel-nawigacja a[aria-current="page"] {
+  color: var(--zloto);
+  border-bottom-color: var(--zloto);
+}
+
+.panel-sekcja + .panel-sekcja {
+  margin-top: var(--section-gap);
+}
+
+h2 {
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+  color: var(--zloto);
+  margin: 0 0 12px;
+}
+
+.okruchy {
+  font-size: var(--fs-small);
+  margin: 0 0 8px;
+}
+
+.okruchy a {
+  text-decoration: none;
+}
+
+/* Lista wierszy z górną złotą linią (jak drabina stopni) */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 3px solid var(--zloto);
+}
+
+.lista > li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--kamien2);
+}
+
+.lista-glowna {
+  flex: 1;
+  min-width: 0;
+}
+
+.lista-tytul {
+  font-weight: var(--w-black);
+  overflow-wrap: anywhere;
+}
+
+.lista-tytul a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lista-tytul a:hover {
+  color: var(--zloto);
+}
+
+.lista-opis {
+  color: var(--szary);
+  font-size: var(--fs-xs);
+}
+
+.lista-akcje {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.lista-pusta {
+  color: var(--szary);
+  padding: 14px 0;
+}
+
+.miniatura {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.miniatura-pusta {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-round);
+  border: 2px dashed var(--kamien2);
+  flex-shrink: 0;
+}
+
+/* Małe przyciski w wierszach */
+.przycisk-maly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+  color: var(--piana);
+  background: transparent;
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn-sm);
+  padding: 6px 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.przycisk-maly:hover {
+  border-color: var(--szary);
+}
+
+.przycisk-maly:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.przycisk-maly.zloty {
+  color: var(--na-zlocie);
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  border-color: var(--zloto);
+}
+
+.przycisk-maly.niebezpieczny:hover {
+  border-color: #e2735a;
+  color: #e2735a;
+}
+
+a.przycisk {
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Formularze */
+.formularz {
+  display: grid;
+  gap: 16px;
+}
+
+.formularz label,
+.formularz legend {
+  display: block;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  margin-bottom: 6px;
+}
+
+.formularz fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.formularz textarea.pole {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.35;
+}
+
+.formularz select.pole {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--zloto) 50%),
+    linear-gradient(135deg, var(--zloto) 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 44px;
+}
+
+.pole-plik {
+  font: inherit;
+  font-size: var(--fs-small);
+  color: var(--szary);
+  width: 100%;
+}
+
+.pole-plik::file-selector-button {
+  font: inherit;
+  font-weight: var(--w-semibold);
+  color: var(--piana);
+  background: transparent;
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn-sm);
+  padding: 8px 12px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.wiersz-pol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.przelacznik {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  color: var(--piana) !important;
+  font-size: var(--fs-body) !important;
+  font-weight: var(--w-regular) !important;
+  cursor: pointer;
+}
+
+.przelacznik input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--zloto);
+}
+
+.podpowiedz {
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  margin: 6px 0 0;
+}
+
+.sukces {
+  color: var(--chmiel);
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+}
+
+.podglad-grafiki {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.podglad-grafiki img {
+  max-width: 160px;
+  max-height: 110px;
+  object-fit: contain;
+  border-radius: var(--r-btn-sm);
+  background: var(--pole);
+}
+
+/* Edytor odpowiedzi w zadaniu typu „wybór” */
+.odpowiedzi {
+  display: grid;
+  gap: 10px;
+}
+
+.odpowiedz {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.formularz .odpowiedz-litera {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-round);
+  border: 2px solid var(--kamien2);
+  font-weight: var(--w-black);
+  color: var(--szary);
+  cursor: pointer;
+  margin: 0;
+}
+
+.odpowiedz-litera input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.odpowiedz-litera:has(input:checked) {
+  background: var(--chmiel);
+  border-color: var(--chmiel);
+  color: var(--na-chmielu);
+}
+
+.odpowiedz-litera:has(input:focus-visible) {
+  outline: 3px solid var(--zloto);
+  outline-offset: 3px;
+}
+
+.odpowiedz .pole {
+  padding: 10px 12px;
+  font-size: var(--fs-body);
+}
+
+/* Wybór lokalu przy uruchamianiu gry */
+.kafelki {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.kafelek {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px;
+  margin: 0 !important;
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn);
+  background: var(--pole);
+  color: var(--piana) !important;
+  font-weight: var(--w-semibold) !important;
+  font-size: var(--fs-small) !important;
+  text-align: center;
+  cursor: pointer;
+}
+
+.kafelek img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.kafelek input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.kafelek:has(input:checked) {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.kafelek:has(input:focus-visible) {
+  outline: 3px solid var(--zloto);
+  outline-offset: 3px;
+}
+
+.krok {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.krok-nr {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+/* Uruchomiona gra */
+.kod-gry {
+  font-size: var(--fs-hero);
+  font-weight: var(--w-black);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.qr {
+  background: var(--piana);
+  border-radius: var(--r-btn);
+  padding: 12px;
+  width: min(260px, 100%);
+  line-height: 0;
+}
+
+.qr svg {
+  width: 100%;
+  height: auto;
+}
+
+.link-kopiuj {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.link-kopiuj code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--fs-xs);
+  color: var(--szary);
+}
+
+.znaczek {
+  display: inline-block;
+  font-size: var(--fs-micro);
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--kamien2);
+  color: var(--szary);
+  vertical-align: middle;
+}
+
+.znaczek.aktywny {
+  border-color: var(--chmiel-ciemny);
+  color: var(--chmiel);
+}

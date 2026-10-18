@@ -101,8 +101,8 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | Dzień | Zakres |
 |---|---|
 | 0 (ty) ✅ | konta Bractwa: GitHub, Vercel, Supabase; podpięcie MCP |
-| 1 ✅ | repo, Next.js, tokeny, schemat bazy + RLS + funkcje, logowanie admina (⚠️ migracja napisana, ale jeszcze niewdrożona: czeka na autoryzację MCP Supabase) |
-| 2 | panel: piwiarnie z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji (wybór miasta → lokalu → quizu) |
+| 1 ✅ | repo, Next.js, tokeny, schemat bazy + RLS + funkcje, logowanie admina; migracja wdrożona i przetestowana 18.10 |
+| 2 ✅ | panel: piwiarnie z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji (wybór miasta → lokalu → quizu) |
 | 3 | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
 | 5 | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
@@ -116,9 +116,9 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 ### Dzień 1
 
 - **Next.js 16.4** (Turbopack). `cacheComponents` wyłączone: panel i tak jest dynamiczny, a gra działa po stronie klienta na Realtime. Middleware nazywa się teraz `proxy` (`src/proxy.ts`).
-- **Migracja:** `supabase/migrations/20261018120000_schemat.sql`. Funkcje pomocnicze siedzą w schemacie `wewn`, którego API nie wystawia. Przeglądarka ma dostęp tylko do funkcji: `stan_sesji`, `gracze_sesji`, `dolacz`, `zapisz_odpowiedz`, `moj_wynik`, `ranking`, `pilot_stan`, `pilot_akcja`.
+- **Migracja:** `supabase/migrations/20261018160010_schemat.sql`. Funkcje pomocnicze siedzą w schemacie `wewn`, którego API nie wystawia. Przeglądarka ma dostęp tylko do funkcji: `stan_sesji`, `gracze_sesji`, `dolacz`, `zapisz_odpowiedz`, `moj_wynik`, `ranking`, `pilot_stan`, `pilot_akcja`.
 - **Faza `przygotuj` nie jest zapisywana w bazie.** `pilot_akcja('nastepne')` ustawia fazę `pytanie` z `faza_od = teraz + 3 s`, a `stan_sesji` zwraca `przygotuj`, dopóki `faza_od` nie minie. Dzięki temu baza nie potrzebuje timera.
-- **Realtime przez Broadcast z bazy** (`realtime.send`, temat `sesja:<KOD>`, zdarzenia `stan`, `gracz`, `odpowiedz`) zamiast subskrypcji tabeli. W zdarzeniach nie ma nic tajnego, a klient po `stan` woła `stan_sesji`. Do sprawdzenia przy wdrożeniu, czy `realtime.send` jest w projekcie.
+- **Realtime przez Broadcast z bazy** (`realtime.send`, temat `sesja:<KOD>`, zdarzenia `stan`, `gracz`, `odpowiedz`) zamiast subskrypcji tabeli. W zdarzeniach nie ma nic tajnego, a klient po `stan` woła `stan_sesji`.
 - **Kod gry** to 4 litery bez I i O. Jest unikalny tylko wśród gier, które się nie skończyły, więc `PORT` może wrócić na kolejny Dzień Porteru.
 - **`zapisz_odpowiedz` nie mówi, czy odpowiedź jest poprawna.** Ocena i punkty wychodzą przez `moj_wynik` dopiero od fazy `wynik`. Odpowiedź przyjmujemy do 1 s po `faza_do` (opóźnienie sieci), a czas ucinamy do limitu.
 - **Ranking w trakcie pytania** pokazuje stan sprzed niego, żeby nie zdradzał, kto już trafił. Zwraca też `poprzednie_miejsce` i `zdobyte` pod animację w dniu 5.
@@ -127,10 +127,31 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - **Admin:** hasło w `ADMIN_HASLO`, ciasteczko `httpOnly` podpisane HMAC kluczem `ADMIN_SEKRET`, ważne 12 h. Każda strona i Server Action panelu woła `wymagajAdmina()`, a `proxy` tylko szybko przekierowuje. Zmienne opisuje `.env.example`.
 - **Klucze Supabase:** nowe nazwy, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` i `SUPABASE_SECRET_KEY`.
 
+### Wdrożenie migracji i testy (18.10)
+
+- Migracja wdrożona przez MCP. Plik w repo nosi wersję nadaną przez bazę (`20261018160010`), żeby historia migracji zgadzała się z `supabase_migrations` (zasada w CLAUDE.md).
+- Funkcje gry przetestowane SQL-em jako rola `anon`: dołączanie (nick zajęty bez względu na wielkość liter, powrót tokenem, limit graczy, zła gra), pełny przebieg pilota (przygotuj → pytanie → wynik → ranking → następne → podium → koniec, akcje w złej fazie odrzucane), odpowiedzi (za wcześnie, drugi raz, inne zadanie, po czasie, po wyniku, zły indeks/tekst/ułamek), punkty (217 ms → 989; bez bonusu 1000), ukrycie `poprawna` do fazy `wynik`, ranking w trakcie pytania bez bieżących punktów, dziura w numeracji zadań, ponowne użycie kodu po końcu gry.
+- Przez prawdziwe API (klucz publiczny): tabela `sesje` → `permission denied`, schemat `wewn` niewystawiony, RPC działają.
+- **⚠️ Realtime i partycje:** `realtime.send` zapisuje do `realtime.messages`, które jest partycjonowane po dniach. Partycje zakłada usługa Realtime dopiero, gdy ktoś się do niej podłączy (zakłada kilka dni do przodu). Bez partycji `realtime.send` **po cichu** gubi zdarzenie (tylko `WARNING`). W teście pierwsze zdarzenie przepadło, kolejne doszło. Wnioski: (1) TV i telefony muszą mieć zapasowe odpytywanie `stan_sesji` (np. co kilka sekund i po ponownym połączeniu), a nie polegać tylko na broadcaście; (2) keepalive z dnia 6 powinien też łączyć się z Realtime albo przed eventem trzeba otworzyć TV wcześniej.
+- Doradca bezpieczeństwa Supabase zgłasza `SECURITY DEFINER` dostępne dla `anon`: to celowe API gry. `rls_auto_enable` to wyzwalacz zdarzeń Supabase, nie da się go wywołać przez RPC. Doradca wydajności zgłasza 3 klucze obce bez indeksu: przy tej skali bez znaczenia.
+
+### Dzień 2: panel
+
+- **Migracje:** `20261018161037_dane_startowe_i_kolejnosc.sql` (Piwiarnia w Alejach i PPR w Częstochowie, loga jako ścieżki `/loga/…` z `public/`; funkcja `admin_zamien_zadania` tylko dla `service_role`) oraz `20261018161703_uprawnienia_service_role.sql`.
+- **⚠️ Ten projekt Supabase nie nadaje rolom API uprawnień do nowych tabel.** Panel dostawał `permission denied` nawet z kluczem serwisowym. Każda nowa tabela potrzebuje jawnego `grant … to service_role` (a `anon`/`authenticated` dostają dostęp tylko przez funkcje).
+- **Struktura panelu:** `/admin` (trwające gry + „Uruchom nową grę”), `/admin/gry`, `/admin/gry/nowa`, `/admin/gry/[id]`, `/admin/quizy`, `/admin/quizy/[id]`, `/admin/quizy/[id]/zadania/[nowe|id]`, `/admin/piwiarnie`, `/admin/piwiarnie/[id]`. Nawigacja Gry · Quizy · Piwiarnie pod nagłówkiem.
+- **Server Actions** w `akcje.ts` przy każdej sekcji, każda zaczyna od `wymagajAdmina()`. Po zapisie przekierowanie albo `refresh()` z `next/cache`. Formularze mają `{...bezResetu(akcja)}`: React 19 czyści pola po akcji także przy błędzie, a tak zostają wypełnione.
+- **Grafiki** (`src/lib/grafiki.ts`): bucket `grafiki`, katalogi `piwiarnie/`, `zadania/`, `sesje/`, losowe nazwy plików. Przy podmianie albo usunięciu stary plik jest kasowany ze Storage (adresy spoza bucketu, np. `/loga/…`, zostają). Limit Server Actions podniesiony do 6 MB (`next.config.ts`).
+- **Edytor pytania „wybór”:** 2–6 odpowiedzi, poprawna zaznaczana literą (zielone kółko), czas 5–300 s (domyślnie 20), grafika opcjonalna. Odpowiedzi nie mogą się powtarzać. Kolejność pytań zmieniają strzałki ↑ ↓ (zamiana numerów w jednej transakcji). Nowe pytanie idzie na koniec, a dziury w numeracji po usunięciu nie przeszkadzają.
+- **Uruchamianie gry:** miasto → lokal (kafelki z logo) → quiz (quizy bez pytań są wyłączone), potem okazja, tryb, bonus za szybkość, limit graczy, grafika na poczekalnię. Gdy jest jedno miasto albo jeden lokal, wybiera się sam.
+- **Ekran uruchomionej gry** (`/admin/gry/[id]`): duży kod, QR pilota (`/pilot/KOD?t=host_token`) do zeskanowania przez prowadzącego, linki do TV (`/tv/KOD`) i dla graczy (`/KOD`) z przyciskiem „Kopiuj”. Adresy składa `adresAplikacji()` (`NEXT_PUBLIC_SITE_URL` albo nagłówki żądania). Strony `/tv`, `/pilot` i `/[kod]` powstaną w dniu 3.
+- **Kończenie i usuwanie:** trwającą grę można zakończyć, a zakończoną usunąć (z graczami i odpowiedziami). Quizu, na którym były gry, nie da się usunąć, dopóki tych gier nie usunie się w „Gry”. Na stronie quizu w trwającej grze jest ostrzeżenie, że zmiany w pytaniach gracze zobaczą od razu.
+- Sprawdzone w przeglądarce: logowanie, dodanie i usunięcie lokalu z wysłaniem logo do Storage, edycja pytania, zmiana kolejności, kreator Częstochowa → PPR → quiz, QR pilota, zakończenie i usunięcie gry, usunięcie quizu. Dane testowe z wdrożenia zostały usunięte przez panel, baza jest czysta (tylko dwa lokale).
+
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 
 - Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `piwiarnie.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.
-- Na start są dane dla jednego miasta, Częstochowy, z lokalami **Piwiarnia w Alejach** i **PPR**. Wpisze je migracja z danymi startowymi w dniu 2.
+- Na start są dane dla jednego miasta, Częstochowy, z lokalami **Piwiarnia w Alejach** i **PPR** (migracja z danymi startowymi z dnia 2).
 - Logo wybranego lokalu pokazuje się na TV (poczekalnia, podium) obok logo Bractwa. `stan_sesji` już je zwraca (`piwiarnia.logo_url`).
 - Loga są w `public/loga/` (`piwiarnia-w-alejach.png`, `ppr.png`): kwadrat 800×800, przycięte do koła, z przezroczystością na zewnątrz. Oba są w oryginalnych kolorach (logo Piwiarni w Alejach nie odwracamy). Piwiarnia w Alejach ma dodany biały okrąg na zewnątrz, oddzielony czarną szczeliną, tak jak na ich Instagramie. Bez niego czarna obwódka ginęła na czarnym tle. Oryginały są w `docs/loga/`.
 - Logo Bractwa jest w `public/loga/bractwo.svg`: czarne, z viewBox przyciętym do samego logo. Na ciemnym tle robimy je białym przez `filter: invert(1)`. Komponent `LogoQuiz` (`src/components/logo-quiz.tsx`) to logo + złoty napis „Quiz” i zastępuje tekst „Bractwo Quiz” w interfejsie. Tytuł karty przeglądarki zostaje tekstem.

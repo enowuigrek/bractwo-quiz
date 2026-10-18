@@ -39,3 +39,7 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - Tryb próbny („na sucho”), który nie zapisuje wyników.
 - **Cofnięcie akcji na pilocie** („wstecz”), gdy prowadzący kliknie za wcześnie.
 - **Prawdziwy limit prób logowania** do panelu. W MVP jest tylko opóźnienie po złym haśle.
+- **Kopiowanie quizu** jednym przyciskiem w panelu (np. żeby przerobić zeszłoroczny Dzień Porteru).
+- **Podgląd wybranej grafiki** przed zapisem i przycinanie logo do koła w panelu.
+- **Przeciąganie pytań** zamiast strzałek ↑ ↓ przy długich quizach.
+- **Podgląd pytania tak, jak zobaczy je TV** prosto z edytora.

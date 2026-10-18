@@ -1,0 +1,66 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { wymagajAdmina } from "@/lib/admin";
+import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
+import { supabaseAdmin } from "@/lib/supabase/serwer";
+import type { StanFormularza } from "@/lib/typy";
+
+function tekst(dane: FormData, pole: string): string {
+  return String(dane.get(pole) ?? "").trim().replace(/\s+/g, " ");
+}
+
+/** Dodaje lokal (id = null) albo zapisuje zmiany istniejącego. */
+export async function zapiszPiwiarnie(
+  id: string | null,
+  _: StanFormularza,
+  dane: FormData,
+): Promise<StanFormularza> {
+  await wymagajAdmina();
+  const db = supabaseAdmin();
+
+  const nazwa = tekst(dane, "nazwa");
+  const miasto = tekst(dane, "miasto");
+  if (!nazwa) return { blad: "Podaj nazwę lokalu." };
+  if (!miasto) return { blad: "Podaj miasto." };
+
+  const logo = plikZFormularza(dane, "logo");
+  if (logo) {
+    const blad = bladGrafiki(logo);
+    if (blad) return { blad };
+  }
+
+  let stareLogo: string | null = null;
+  if (id) {
+    const { data, error } = await db.from("piwiarnie").select("logo_url").eq("id", id).single();
+    if (error) return { blad: "Nie ma takiego lokalu." };
+    stareLogo = data.logo_url;
+  }
+
+  const zmiany: Record<string, unknown> = { nazwa, miasto };
+  try {
+    if (logo) zmiany.logo_url = await wyslijGrafike(logo, "piwiarnie");
+    else if (dane.get("logo_usun")) zmiany.logo_url = null;
+  } catch (e) {
+    return { blad: (e as Error).message };
+  }
+
+  const { error } = id
+    ? await db.from("piwiarnie").update(zmiany).eq("id", id)
+    : await db.from("piwiarnie").insert(zmiany);
+  if (error) {
+    if (typeof zmiany.logo_url === "string") await usunGrafike(zmiany.logo_url);
+    return { blad: `Nie udało się zapisać: ${error.message}` };
+  }
+  if ("logo_url" in zmiany && stareLogo) await usunGrafike(stareLogo);
+
+  redirect("/admin/piwiarnie");
+}
+
+export async function usunPiwiarnie(id: string): Promise<void> {
+  await wymagajAdmina();
+  const db = supabaseAdmin();
+  const { data } = await db.from("piwiarnie").delete().eq("id", id).select("logo_url").maybeSingle();
+  await usunGrafike(data?.logo_url);
+  redirect("/admin/piwiarnie");
+}
