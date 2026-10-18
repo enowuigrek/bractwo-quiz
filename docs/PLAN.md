@@ -93,7 +93,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 |---|---|
 | 0 (ty) ✅ | konta Bractwa: GitHub, Vercel, Supabase; podpięcie MCP |
 | 1 ✅ | repo, Next.js, tokeny, schemat bazy + RLS + funkcje, logowanie admina (⚠️ migracja napisana, ale jeszcze niewdrożona: czeka na autoryzację MCP Supabase) |
-| 2 | panel: piwiarnie z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji |
+| 2 | panel: piwiarnie z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji (wybór miasta → lokalu → quizu) |
 | 3 | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
 | 5 | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
@@ -117,6 +117,13 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - **Storage:** publiczny bucket `grafiki` (PNG, JPG, WebP, SVG, do 5 MB). Zapis tylko kluczem serwisowym.
 - **Admin:** hasło w `ADMIN_HASLO`, ciasteczko `httpOnly` podpisane HMAC kluczem `ADMIN_SEKRET`, ważne 12 h. Każda strona i Server Action panelu woła `wymagajAdmina()`, a `proxy` tylko szybko przekierowuje. Zmienne opisuje `.env.example`.
 - **Klucze Supabase:** nowe nazwy, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` i `SUPABASE_SECRET_KEY`.
+
+### Wybór miasta i lokalu (ustalone po dniu 1)
+
+- Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `piwiarnie.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.
+- Na start są dane dla jednego miasta, Częstochowy, z lokalami **Piwiarnia w Alejach** i **PPR**. Wpisze je migracja z danymi startowymi w dniu 2.
+- Logo wybranego lokalu pokazuje się na TV (poczekalnia, podium) obok logo Bractwa. `stan_sesji` już je zwraca (`piwiarnia.logo_url`).
+- Loga obu lokali dostarcza Łukasz. Jasna wersja na czarne tło, najlepiej SVG albo PNG z przezroczystością. Do czasu edytora w panelu leżą w `public/loga/`.
 
 ## Zadania dla ciebie (dzień 0)
 
