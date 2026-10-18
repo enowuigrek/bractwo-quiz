@@ -12,6 +12,7 @@ Zasady:
 - Migracje wdrażamy przez MCP (`apply_migration`), a potem zapisujemy plik w repo pod wersją z `list_migrations`, żeby historia w bazie i w repo się zgadzała.
 - Ten projekt Supabase nie nadaje rolom API uprawnień do nowych tabel. Nowa tabela = jawny `grant select, insert, update, delete … to service_role`; `anon` dostaje dostęp tylko przez funkcje.
 - Vercel: funkcje w regionie `fra1`, obok bazy.
+- Vercel MCP dostaje 403 na zespół. Zamiast niego używamy CLI przez `npx vercel@54.20.1 … --scope bractwo-piwne` (np. `list bractwo-quiz`, `inspect <url> --logs`, `logs`). Nowsze CLI (64.x) na Node 25 kończy się po cichu bez komunikatu.
 - Next.js 16 różni się od starszych wersji (np. `proxy` zamiast `middleware`). Przed pisaniem kodu sprawdzaj dokumentację w `node_modules/next/dist/docs/` (patrz `AGENTS.md`).
 - Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime.
 - Next nie uruchomi drugiego `next dev` w tym samym katalogu. Gdy jakiś już działa, podgląd otwieraj konfiguracją `dev-dzialajacy` z `.claude/launch.json`.
