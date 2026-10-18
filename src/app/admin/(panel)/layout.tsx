@@ -1,3 +1,4 @@
+import { LogoQuiz } from "@/components/logo-quiz";
 import { wymagajAdmina } from "@/lib/admin";
 import { wylogujAdmina } from "../akcje";
 
@@ -14,7 +15,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
           marginBottom: "var(--section-gap)",
         }}
       >
-        <strong style={{ color: "var(--zloto)" }}>Bractwo Quiz · panel</strong>
+        <LogoQuiz wysokosc={44} dopisek="panel" />
         <form action={wylogujAdmina}>
           <button type="submit" className="przycisk" style={{ width: "auto", padding: "8px 14px", fontSize: "var(--fs-small)" }}>
             Wyloguj

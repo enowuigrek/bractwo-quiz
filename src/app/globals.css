@@ -116,3 +116,27 @@ h1 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Logo Bractwa: plik jest czarny, na ciemnym tle odwracamy go na biały */
+.logo-bractwo {
+  filter: invert(1);
+  display: block;
+}
+
+.logo-quiz {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.logo-quiz-napis {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.logo-quiz-dopisek {
+  color: var(--szary);
+  font-weight: var(--w-semibold);
+}

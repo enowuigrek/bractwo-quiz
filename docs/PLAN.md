@@ -124,6 +124,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Na start są dane dla jednego miasta, Częstochowy, z lokalami **Piwiarnia w Alejach** i **PPR**. Wpisze je migracja z danymi startowymi w dniu 2.
 - Logo wybranego lokalu pokazuje się na TV (poczekalnia, podium) obok logo Bractwa. `stan_sesji` już je zwraca (`piwiarnia.logo_url`).
 - Loga są w `public/loga/` (`piwiarnia-w-alejach.png`, `ppr.png`): kwadrat 800×800, przycięte do koła, z przezroczystością na zewnątrz. Oba są w oryginalnych kolorach (logo Piwiarni w Alejach nie odwracamy). Piwiarnia w Alejach ma dodany biały okrąg na zewnątrz, oddzielony czarną szczeliną, tak jak na ich Instagramie. Bez niego czarna obwódka ginęła na czarnym tle. Oryginały są w `docs/loga/`.
+- Logo Bractwa jest w `public/loga/bractwo.svg`: czarne, z viewBox przyciętym do samego logo. Na ciemnym tle robimy je białym przez `filter: invert(1)`. Komponent `LogoQuiz` (`src/components/logo-quiz.tsx`) to logo + złoty napis „Quiz” i zastępuje tekst „Bractwo Quiz” w interfejsie. Tytuł karty przeglądarki zostaje tekstem.
 
 ## Zadania dla ciebie (dzień 0)
 
