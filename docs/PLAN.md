@@ -82,6 +82,15 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 ## Ekran TV
 
+**Poczekalnia (ustalone z Łukaszem):**
+- U góry logo Bractwa obok logo wybranego lokalu (`piwiarnia.logo_url` z sesji).
+- Niżej tytuł quizu i okazja („Dzień Porteru”), jeśli jest ustawiona.
+- Grafika sesji (`sesje.grafika_url`), jeśli ją dodano.
+- **Duży kod QR**, czytelny z każdego miejsca w lokalu, a obok kod gry do wpisania ręcznie i adres. Do tego lista graczy, którzy już dołączyli.
+
+**Panel admina:** logo Bractwa w lewym górnym rogu z dopiskiem „panel”, wylogowanie po prawej, pod spodem nawigacja (piwiarnie, quizy, gry). Strona główna dla graczy ma tylko logo i pole na kod.
+
+
 - Projektujemy na scenę 1920×1080, skalowaną do ekranu, żeby wyglądało tak samo na każdym telewizorze.
 - Duże fonty, wysoki kontrast, czarne tło z design systemu.
 - Rejestr „kręgowy”: złoto, piana i blask. Logo piwiarni i Bractwa na poczekalni.
