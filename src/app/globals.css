@@ -1,0 +1,118 @@
+/* Tokeny są w docs/tokens.css. Tu tylko podstawy i wspólne klasy. */
+
+:root {
+  --font: var(--font-open-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-condensed: var(--font-open-sans), "Arial Narrow", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--piana);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--zloto);
+}
+
+:focus-visible {
+  outline: 3px solid var(--zloto);
+  outline-offset: 3px;
+}
+
+/* Kolumna treści (telefon, panel) */
+.kolumna {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--gutter) var(--gutter) 48px;
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
+  padding-bottom: max(48px, env(safe-area-inset-bottom));
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  font-weight: var(--w-black);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--card-pad);
+}
+
+.pomocniczy {
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.karta {
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-card);
+  padding: var(--card-pad);
+}
+
+.pole {
+  width: 100%;
+  font: inherit;
+  font-size: var(--fs-input);
+  color: var(--piana);
+  background: var(--pole);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn);
+  padding: 14px;
+}
+
+.pole:focus {
+  border-color: var(--zloto);
+  outline: none;
+}
+
+.przycisk {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: var(--fs-button);
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: transparent;
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn);
+  padding: 15px;
+  cursor: pointer;
+}
+
+.przycisk.zloty {
+  color: var(--na-zlocie);
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  border-color: var(--zloto);
+}
+
+.przycisk:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.blad {
+  color: #e2735a;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

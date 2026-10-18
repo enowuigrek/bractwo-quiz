@@ -7,3 +7,5 @@ out/
 .DS_Store
 *.log
 supabase/.temp/
+*.tsbuildinfo
+next-env.d.ts

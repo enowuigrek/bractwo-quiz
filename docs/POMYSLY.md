@@ -37,3 +37,5 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - Szablony quizów (np. „Dzień Porteru”), które kopiuje się przed eventem.
 - Biblioteka pytań wspólna dla wszystkich quizów, z tagami (style, historia, chmiele).
 - Tryb próbny („na sucho”), który nie zapisuje wyników.
+- **Cofnięcie akcji na pilocie** („wstecz”), gdy prowadzący kliknie za wcześnie.
+- **Prawdziwy limit prób logowania** do panelu. W MVP jest tylko opóźnienie po złym haśle.

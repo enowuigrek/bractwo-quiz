@@ -91,8 +91,8 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 | Dzień | Zakres |
 |---|---|
-| 0 (ty) | konta Bractwa: GitHub, Vercel, Supabase; podpięcie MCP |
-| 1 | repo, Next.js, tokeny, schemat bazy + RLS + funkcje, logowanie admina |
+| 0 (ty) ✅ | konta Bractwa: GitHub, Vercel, Supabase; podpięcie MCP |
+| 1 ✅ | repo, Next.js, tokeny, schemat bazy + RLS + funkcje, logowanie admina (⚠️ migracja napisana, ale jeszcze niewdrożona: czeka na autoryzację MCP Supabase) |
 | 2 | panel: piwiarnie z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji |
 | 3 | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
@@ -101,6 +101,22 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | 7 | poprawki po teście, bufor |
 
 **Poza MVP:** wszystko z [POMYSLY.md](POMYSLY.md).
+
+## Ustalenia z realizacji
+
+### Dzień 1
+
+- **Next.js 16.4** (Turbopack). `cacheComponents` wyłączone: panel i tak jest dynamiczny, a gra działa po stronie klienta na Realtime. Middleware nazywa się teraz `proxy` (`src/proxy.ts`).
+- **Migracja:** `supabase/migrations/20261018120000_schemat.sql`. Funkcje pomocnicze siedzą w schemacie `wewn`, którego API nie wystawia. Przeglądarka ma dostęp tylko do funkcji: `stan_sesji`, `gracze_sesji`, `dolacz`, `zapisz_odpowiedz`, `moj_wynik`, `ranking`, `pilot_stan`, `pilot_akcja`.
+- **Faza `przygotuj` nie jest zapisywana w bazie.** `pilot_akcja('nastepne')` ustawia fazę `pytanie` z `faza_od = teraz + 3 s`, a `stan_sesji` zwraca `przygotuj`, dopóki `faza_od` nie minie. Dzięki temu baza nie potrzebuje timera.
+- **Realtime przez Broadcast z bazy** (`realtime.send`, temat `sesja:<KOD>`, zdarzenia `stan`, `gracz`, `odpowiedz`) zamiast subskrypcji tabeli. W zdarzeniach nie ma nic tajnego, a klient po `stan` woła `stan_sesji`. Do sprawdzenia przy wdrożeniu, czy `realtime.send` jest w projekcie.
+- **Kod gry** to 4 litery bez I i O. Jest unikalny tylko wśród gier, które się nie skończyły, więc `PORT` może wrócić na kolejny Dzień Porteru.
+- **`zapisz_odpowiedz` nie mówi, czy odpowiedź jest poprawna.** Ocena i punkty wychodzą przez `moj_wynik` dopiero od fazy `wynik`. Odpowiedź przyjmujemy do 1 s po `faza_do` (opóźnienie sieci), a czas ucinamy do limitu.
+- **Ranking w trakcie pytania** pokazuje stan sprzed niego, żeby nie zdradzał, kto już trafił. Zwraca też `poprzednie_miejsce` i `zdobyte` pod animację w dniu 5.
+- **Konwencja typów zadań:** poprawna odpowiedź każdego typu jest w `dane.poprawna`. Ocena jest w `wewn.ocen`, a nowy typ to nowa gałąź tej funkcji.
+- **Storage:** publiczny bucket `grafiki` (PNG, JPG, WebP, SVG, do 5 MB). Zapis tylko kluczem serwisowym.
+- **Admin:** hasło w `ADMIN_HASLO`, ciasteczko `httpOnly` podpisane HMAC kluczem `ADMIN_SEKRET`, ważne 12 h. Każda strona i Server Action panelu woła `wymagajAdmina()`, a `proxy` tylko szybko przekierowuje. Zmienne opisuje `.env.example`.
+- **Klucze Supabase:** nowe nazwy, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` i `SUPABASE_SECRET_KEY`.
 
 ## Zadania dla ciebie (dzień 0)
 
