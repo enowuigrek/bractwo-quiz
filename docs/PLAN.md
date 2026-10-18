@@ -123,7 +123,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `piwiarnie.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.
 - Na start są dane dla jednego miasta, Częstochowy, z lokalami **Piwiarnia w Alejach** i **PPR**. Wpisze je migracja z danymi startowymi w dniu 2.
 - Logo wybranego lokalu pokazuje się na TV (poczekalnia, podium) obok logo Bractwa. `stan_sesji` już je zwraca (`piwiarnia.logo_url`).
-- Loga są w `public/loga/` (`piwiarnia-w-alejach.png`, `ppr.png`): kwadrat 800×800, przycięte do koła, z przezroczystością na zewnątrz. Oba zostały w oryginalnych kolorach, bo Łukasz nie chce odwracać logo Piwiarni w Alejach. Jego czarna obwódka zlewa się z czarnym tłem TV. Jeśli w dniu 5 będzie to źle wyglądać, damy logo na jasnym krążku albo z cienkim obrysem w `--kamien2`, bez zmiany samego pliku. Oryginały są w `docs/loga/`.
+- Loga są w `public/loga/` (`piwiarnia-w-alejach.png`, `ppr.png`): kwadrat 800×800, przycięte do koła, z przezroczystością na zewnątrz. Oba są w oryginalnych kolorach (logo Piwiarni w Alejach nie odwracamy). Piwiarnia w Alejach ma dodany biały okrąg na zewnątrz, oddzielony czarną szczeliną, tak jak na ich Instagramie. Bez niego czarna obwódka ginęła na czarnym tle. Oryginały są w `docs/loga/`.
 
 ## Zadania dla ciebie (dzień 0)
 
