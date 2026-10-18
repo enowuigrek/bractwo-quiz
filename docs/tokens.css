@@ -1,0 +1,76 @@
+/* Bractwo Piwne — tokeny design systemu
+   Źródło: bractwopiwne.pl/szable (nazwy zmiennych zachowane z oryginału) */
+
+:root {
+  color-scheme: dark;
+
+  /* Kolory: tła */
+  --bg: #000;            /* tło strony, zawsze czarne */
+  --kamien: #1a2129;     /* powierzchnia: karty, pasek postępu */
+  --kamien2: #27313b;    /* obrys kart, linie podziału, obrys przycisków */
+  --pole: #0b0f13;       /* tło pól tekstowych */
+
+  /* Kolory: akcenty */
+  --zloto: #e3ac3f;      /* główny akcent: stopnie, liczby, linki, focus */
+  --zloto-jasne: #f0c35a;/* górna część gradientu złotego przycisku */
+  --zloto-blask: #f3d27a;/* końcówka paska postępu */
+  --bursztyn: #c8711d;   /* początek paska postępu */
+  --chmiel: #8fb63a;     /* sukces, „Będę”, ptaszek */
+  --chmiel-ciemny: #4c7420; /* obrys przycisku pozytywnego */
+  --grafit: #141414;        /* tło banerów i druków (rejestr oficjalny) */
+  --grafit-liscie: #262626; /* liście chmielu w tle, ton na tonie */
+  --chmiel-szyszka: #7a9a3c;/* realistyczna szyszka chmielu */
+  --karczma: #4a1010;    /* tło panelu karczmarki (gradient do #200606) */
+  --karczma-dno: #200606;
+
+  /* Kolory: tekst */
+  --piana: #f4ecd8;      /* tekst główny, kremowy, nigdy czysta biel */
+  --szary: #9aa4ad;      /* tekst pomocniczy, nieosiągnięte stopnie */
+  --na-zlocie: #2a1a00;  /* tekst na złotym przycisku */
+  --na-chmielu: #13200a; /* tekst na zielonym przycisku */
+
+  /* Typografia */
+  --font: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-condensed: "Open Sans", Arial Narrow, sans-serif; /* z font-stretch: 75% */
+  --w-regular: 400;
+  --w-semibold: 600;
+  --w-black: 800;
+  --lh: 1.45;
+
+  --fs-hero: 74px;   /* liczba w kapslu */
+  --fs-stopien-xl: 30px; /* stopień na ekranie awansu */
+  --fs-h1: 26px;
+  --fs-stopien: 24px;
+  --fs-h3: 21px;
+  --fs-input: 19px;
+  --fs-button: 18px;
+  --fs-body: 17px;
+  --fs-small: 15px;
+  --fs-xs: 14px;
+  --fs-xxs: 13px;
+  --fs-micro: 11px;
+
+  /* Promienie */
+  --r-pill: 8px;     /* pasek postępu */
+  --r-btn-sm: 10px;
+  --r-btn: 12px;     /* przyciski, pola */
+  --r-card: 18px;    /* karty, akordeon, panel */
+  --r-round: 50%;
+
+  /* Odstępy */
+  --gutter: 22px;
+  --card-pad: 18px;
+  --section-gap: 34px;
+  --max-w: 420px;     /* kolumna treści */
+  --max-w-header: 640px;
+
+  /* Blask (zamiast cieni) */
+  --glow-sm: 0 0 8px rgba(227, 172, 63, .6);
+  --glow-md: 0 0 22px rgba(227, 172, 63, .28);
+  --glow-lg: 0 0 40px rgba(227, 172, 63, .55);
+  --shadow-panel: 0 -12px 40px rgba(0, 0, 0, .85);
+
+  /* Ruch */
+  --ease-wjazd: cubic-bezier(.2, .9, .25, 1.1);
+  --ease-std: cubic-bezier(.4, 0, .2, 1);
+}
