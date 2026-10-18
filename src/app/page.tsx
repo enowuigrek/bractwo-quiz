@@ -1,4 +1,5 @@
 import { LogoQuiz } from "@/components/logo-quiz";
+import { WpiszKod } from "./wpisz-kod";
 
 export default function Home() {
   return (
@@ -6,7 +7,8 @@ export default function Home() {
       <h1 style={{ marginBottom: "var(--section-gap)" }}>
         <LogoQuiz wysokosc={96} priorytet />
       </h1>
-      <p className="pomocniczy">Piwu Cześć! Wpisz kod z telewizora, żeby dołączyć.</p>
+      <p className="pomocniczy">Piwu Cześć! Wpisz kod z telewizora albo zeskanuj kod QR.</p>
+      <WpiszKod />
     </main>
   );
 }

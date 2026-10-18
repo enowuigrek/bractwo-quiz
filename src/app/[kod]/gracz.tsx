@@ -1,0 +1,224 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { LogoQuiz } from "@/components/logo-quiz";
+import { komunikatBledu, pamiec, pobierzStan, useNasluch } from "@/lib/gra/nasluch";
+import type { Dolaczenie, StanSesji } from "@/lib/gra/typy";
+import { supabase } from "@/lib/supabase/przegladarka";
+
+const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
+
+type Ja = { nick: string; token: string };
+
+export function Gracz({ kod }: { kod: string }) {
+  const [stan, ustawStan] = useState<StanSesji | null>(null);
+  const [gracze, ustawGraczy] = useState<string[]>([]);
+  const [bladGry, ustawBladGry] = useState<string | null>(null);
+  const [ja, ustawJa] = useState<Ja | null>(null);
+  const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
+
+  // Powrót po odświeżeniu: token z localStorage, `dolacz` sprawdza, że to ta sama gra.
+  useEffect(() => {
+    const token = pamiec.czytaj(kluczTokenu(kod));
+    void (async () => {
+      if (token) {
+        const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: null, p_token: token });
+        if (!error) {
+          const d = data as Dolaczenie;
+          ustawJa({ nick: d.nick, token: d.token });
+        } else if (!komunikatBledu(error).startsWith("Brak połączenia")) {
+          pamiec.usun(kluczTokenu(kod));
+        }
+      }
+      ustawSprawdzamToken(false);
+    })();
+  }, [kod]);
+
+  const pobierz = useCallback(async () => {
+    try {
+      const { stan } = await pobierzStan(kod);
+      ustawStan(stan);
+      ustawBladGry(null);
+      if (stan.faza === "poczekalnia") {
+        const { data } = await supabase().rpc("gracze_sesji", { p_kod: kod });
+        if (data) ustawGraczy(data as string[]);
+      }
+    } catch (e) {
+      const komunikat = komunikatBledu(e);
+      // chwilowy brak sieci nie zasłania gry, którą już widać
+      if (!komunikat.startsWith("Brak połączenia")) ustawBladGry(komunikat);
+    }
+  }, [kod]);
+
+  useNasluch(kod, pobierz, ["stan", "gracz"]);
+
+  if (bladGry && !stan) {
+    return (
+      <>
+        <Naglowek kod={kod} />
+        <h1>Nie ma takiej gry</h1>
+        <p className="pomocniczy">
+          Nie znaleźliśmy gry o kodzie <strong className="gra-kod">{kod}</strong>. Sprawdź kod na telewizorze.
+        </p>
+        <p>
+          <Link href="/">← Wpisz inny kod</Link>
+        </p>
+      </>
+    );
+  }
+
+  if (!stan || sprawdzamToken) {
+    return (
+      <>
+        <Naglowek kod={kod} />
+        <p className="pomocniczy">Łączę z grą…</p>
+      </>
+    );
+  }
+
+  if (!ja) {
+    return (
+      <>
+        <Naglowek kod={kod} />
+        {stan.faza === "koniec" ? (
+          <>
+            <h1>Ta gra już się skończyła</h1>
+            <p className="pomocniczy">Piwu Cześć! Do zobaczenia na kolejnym quizie.</p>
+          </>
+        ) : (
+          <Dolacz
+            kod={kod}
+            stan={stan}
+            onDolaczono={(d) => {
+              pamiec.zapisz(kluczTokenu(kod), d.token);
+              ustawJa({ nick: d.nick, token: d.token });
+              void pobierz();
+            }}
+          />
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Naglowek kod={kod} />
+      <WGrze stan={stan} ja={ja} gracze={gracze} />
+    </>
+  );
+}
+
+function Naglowek({ kod }: { kod: string }) {
+  return (
+    <header className="gra-naglowek">
+      <LogoQuiz wysokosc={40} />
+      <span className="gra-kod">{kod}</span>
+    </header>
+  );
+}
+
+function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDolaczono: (d: Dolaczenie) => void }) {
+  const [nick, ustawNick] = useState("");
+  const [blad, ustawBlad] = useState<string | null>(null);
+  const [wysylam, ustawWysylam] = useState(false);
+  const druzyny = stan.tryb === "druzyny";
+  const pelna = stan.liczba_graczy >= stan.max_graczy;
+
+  return (
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!nick.trim() || wysylam) return;
+        ustawWysylam(true);
+        ustawBlad(null);
+        const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: nick, p_token: null });
+        ustawWysylam(false);
+        if (error) {
+          ustawBlad(komunikatBledu(error));
+          return;
+        }
+        onDolaczono(data as Dolaczenie);
+      }}
+    >
+      {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
+      <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
+      {stan.lokal && <p className="pomocniczy">{stan.lokal.nazwa}</p>}
+
+      <label htmlFor="nick" className="etykieta">
+        {druzyny ? "Nazwa drużyny" : "Twój nick"}
+      </label>
+      <input
+        id="nick"
+        className="pole"
+        value={nick}
+        onChange={(e) => ustawNick(e.target.value)}
+        maxLength={24}
+        autoComplete="nickname"
+        autoFocus
+        enterKeyHint="go"
+      />
+      <p className="pomocniczy" style={{ margin: "6px 0 0" }}>
+        {druzyny
+          ? "Jedna drużyna gra na jednym telefonie. Nazwa pojawi się na telewizorze."
+          : "Nick pojawi się na telewizorze."}
+      </p>
+      {blad && (
+        <p className="blad" role="alert">
+          {blad}
+        </p>
+      )}
+      <button type="submit" className="przycisk zloty" style={{ marginTop: 18 }} disabled={!nick.trim() || wysylam || pelna}>
+        {pelna ? "Komplet graczy" : wysylam ? "Dołączam…" : "Dołącz do gry"}
+      </button>
+    </form>
+  );
+}
+
+function WGrze({ stan, ja, gracze }: { stan: StanSesji; ja: Ja; gracze: string[] }) {
+  if (stan.faza === "koniec") {
+    return (
+      <>
+        <h1>Koniec gry</h1>
+        <p>
+          Dzięki za grę, <strong className="gra-kod">{ja.nick}</strong>! Piwu Cześć!
+        </p>
+      </>
+    );
+  }
+
+  if (stan.faza === "poczekalnia") {
+    return (
+      <>
+        <p className="nadtytul">Jesteś w grze</p>
+        <h1 style={{ color: "var(--zloto)", overflowWrap: "anywhere" }}>{ja.nick}</h1>
+        <p>Patrz na telewizor. Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
+        <section style={{ marginTop: "var(--section-gap)" }}>
+          <p className="etykieta">
+            {stan.tryb === "druzyny" ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
+          </p>
+          <ul className="nicki">
+            {gracze.map((g) => (
+              <li key={g} className={g === ja.nick ? "ja" : undefined}>
+                {g}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </>
+    );
+  }
+
+  // Pytania, wynik i ranking na telefonie dochodzą w dniu 4.
+  return (
+    <>
+      <p className="nadtytul">{ja.nick}</p>
+      {stan.zadanie && (
+        <h1>
+          Pytanie {stan.zadanie.lp}/{stan.quiz?.liczba_zadan ?? "?"}
+        </h1>
+      )}
+      <p>Patrz na telewizor.</p>
+    </>
+  );
+}

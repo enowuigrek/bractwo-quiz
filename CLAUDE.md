@@ -13,6 +13,8 @@ Zasady:
 - Ten projekt Supabase nie nadaje rolom API uprawnień do nowych tabel. Nowa tabela = jawny `grant select, insert, update, delete … to service_role`; `anon` dostaje dostęp tylko przez funkcje.
 - Vercel: funkcje w regionie `fra1`, obok bazy.
 - Next.js 16 różni się od starszych wersji (np. `proxy` zamiast `middleware`). Przed pisaniem kodu sprawdzaj dokumentację w `node_modules/next/dist/docs/` (patrz `AGENTS.md`).
+- Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime.
+- Next nie uruchomi drugiego `next dev` w tym samym katalogu. Gdy jakiś już działa, podgląd otwieraj konfiguracją `dev-dzialajacy` z `.claude/launch.json`.
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.
 - Domena `bractwopiwne.pl` jest w Hostido, a poczta w Google Workspace. Rekordów MX nie ruszamy.
 - Na razie działamy pod adresem `*.vercel.app`, a `quiz.bractwopiwne.pl` podepniemy na końcu. Nigdzie nie wpisuj domeny na sztywno: linki i kody QR buduj z adresu bieżącego żądania (albo `NEXT_PUBLIC_SITE_URL`), żeby zmiana domeny nie wymagała zmian w kodzie.

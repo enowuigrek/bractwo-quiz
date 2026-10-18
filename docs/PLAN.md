@@ -103,7 +103,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | 0 (ty) ✅ | konta Bractwa: GitHub, Vercel, Supabase; podpięcie MCP |
 | 1 ✅ | repo, Next.js, tokeny, schemat bazy + RLS + funkcje, logowanie admina; migracja wdrożona i przetestowana 18.10 |
 | 2 ✅ | panel: lokale z logo, quizy, edytor zadań typu „wybór” z grafiką, uruchamianie sesji (wybór miasta → lokalu → quizu) |
-| 3 | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
+| 3 ✅ | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
 | 5 | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
 | 6 | deploy, `quiz.bractwopiwne.pl`, keepalive, test z kilkoma telefonami |
@@ -147,6 +147,18 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - **Ekran uruchomionej gry** (`/admin/gry/[id]`): duży kod, QR pilota (`/pilot/KOD?t=host_token`) do zeskanowania przez prowadzącego, linki do TV (`/tv/KOD`) i dla graczy (`/KOD`) z przyciskiem „Kopiuj”. Adresy składa `adresAplikacji()` (`NEXT_PUBLIC_SITE_URL` albo nagłówki żądania). Strony `/tv`, `/pilot` i `/[kod]` powstaną w dniu 3.
 - **Kończenie i usuwanie:** trwającą grę można zakończyć, a zakończoną usunąć (z graczami i odpowiedziami). Quizu, na którym były gry, nie da się usunąć, dopóki tych gier nie usunie się w „Gry”. Na stronie quizu w trwającej grze jest ostrzeżenie, że zmiany w pytaniach gracze zobaczą od razu.
 - Sprawdzone w przeglądarce: logowanie, dodanie i usunięcie lokalu z wysłaniem logo do Storage, edycja pytania, zmiana kolejności, kreator Częstochowa → PPR → quiz, QR pilota, zakończenie i usunięcie gry, usunięcie quizu. Dane testowe z wdrożenia zostały usunięte przez panel, baza jest czysta (tylko dwa lokale).
+
+### Dzień 3: sesja na żywo
+
+- **Bez migracji.** Wystarczyły funkcje z dnia 1: `dolacz`, `gracze_sesji`, `stan_sesji`, `pilot_stan`, `pilot_akcja`.
+- **Nasłuch** (`src/lib/gra/nasluch.ts`, `useNasluch`): kanał Broadcast `sesja:<KOD>` plus zapasowe odpytywanie co 5 s, po (ponownym) podłączeniu do Realtime i po powrocie karty na pierwszy plan. To odpowiedź na ⚠️ z partycjami: zgubione zdarzenie najpóźniej po 5 s nadrabia odpytanie. Pobrania się nie nakładają. Na stronie jest jeden kanał, a `pobierz` ściąga wszystko, czego strona potrzebuje. Sprawdzone: nowy gracz pojawia się na TV po ~0,5 s, poza rytmem odpytywania, czyli przez Realtime.
+- **Zegar:** `pobierzStan` i pilot liczą przesunięcie zegara serwera (`teraz` z odpowiedzi, połowa czasu żądania). `useCzasSerwera` daje bieżący czas serwera do odliczania. Dzień 4 użyje tego do odsłaniania pytania.
+- **Strona główna:** logo i pole na kod (4 litery, same wielkie), przycisk „Dołącz” → `/KOD`.
+- **Gracz `/[kod]`:** zły format kodu → 404, małe litery → przekierowanie na wielkie (jeden adres = jeden klucz w `localStorage`). Brak gry → „Nie ma takiej gry”. Formularz nicku („Nazwa drużyny” w trybie drużyn), błędy z bazy po polsku (zajęty nick, komplet). Token w `localStorage` pod `bractwo-quiz:gracz:KOD`. Po odświeżeniu `dolacz(kod, null, token)` przywraca gracza, a nieważny token jest kasowany. W poczekalni gracz widzi swój nick i listę graczy. Pozostałe fazy mają na razie tylko „Pytanie N/M · Patrz na telewizor” (dzień 4).
+- **TV `/tv/[kod]`:** scena 1920×1080 skalowana do ekranu (`useSyncExternalStore` na `resize`), bez kursora. Poczekalnia według ustaleń: logo Bractwa + logo lokalu, okazja (krój zwężony, złoto), tytuł quizu, nazwa lokalu, QR 620 px na kremowym tle (generowany na serwerze z `adresAplikacji()`), adres pod QR, kod gry 170 px w złocie, grafika sesji, lista graczy z licznikiem `n/max`. Nowy nick wskakuje ze złotym blaskiem. Przy ponad 30 graczach nicki są mniejsze. Pozostałe fazy mają tymczasową planszę (dni 4–5). Przy braku sieci w rogu jest „Brak połączenia, ponawiam…”.
+- **Pilot `/pilot/[kod]?t=…`:** po udanym `pilot_stan` token trafia do `localStorage` (`bractwo-quiz:pilot:KOD`) i znika z paska adresu, więc odświeżenie działa bez `?t=`. Zły link nie nadpisuje dobrego tokenu. Przyciski zależą od fazy: Start quizu (z pytaniem, gdy nikt nie dołączył; wyłączony, gdy quiz nie ma pytań) → Pokaż wynik (z pytaniem, gdy czas jeszcze leci) → Pokaż ranking / Następne pytanie albo Pokaż podium po ostatnim → Zakończ grę. „Zakończ grę” z potwierdzeniem jest zawsze na dole. W trakcie pytania pilot pokazuje treść, odpowiedzi z zaznaczoną poprawną, odliczanie i „Odpowiedziało x/y” (odświeżane zdarzeniem `odpowiedz`). `przygotuj` przechodzi w `pytanie` lokalnie, gdy minie `faza_od`.
+- **Podgląd lokalny:** w `.claude/launch.json` jest też `dev-dzialajacy`, który podłącza podgląd do już działającego `next dev` na porcie 3000 (Next nie pozwala na dwa serwery w jednym katalogu).
+- Sprawdzone w przeglądarce: kod na stronie głównej → nick → TV i pilot widzą gracza; drugi gracz przez `dolacz` jako `anon` → TV przez Realtime; start z pilota → TV „Przygotuj się…” → pytanie; pilot po odświeżeniu bez tokenu; zły token; nieistniejąca gra; zły format kodu; powrót gracza po odświeżeniu; widok telefonu 375 px. Gra testowa `JPLA` została w bazie (do usunięcia w panelu).
 
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 

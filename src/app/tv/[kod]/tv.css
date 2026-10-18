@@ -1,0 +1,263 @@
+/* Ekran TV: scena 1920×1080 skalowana do ekranu (transform w tv.tsx). Bez myszki i przewijania. */
+
+.tv {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+  cursor: none;
+}
+
+.scena {
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  padding: 64px 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tv h1 {
+  font-size: 64px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.tv-loga {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.tv-logo-bractwo {
+  height: 130px;
+  width: auto;
+}
+
+.tv-logo-lokalu {
+  height: 150px;
+  width: 150px;
+  object-fit: contain;
+}
+
+/* Poczekalnia */
+
+.poczekalnia {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tv-naglowek {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+}
+
+.tv-tytul {
+  text-align: right;
+  min-width: 0;
+}
+
+.tv-okazja {
+  margin: 0 0 6px;
+  color: var(--zloto);
+  font-family: var(--font-condensed);
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tv-lokal {
+  margin: 8px 0 0;
+  color: var(--szary);
+  font-size: 30px;
+  font-weight: var(--w-semibold);
+}
+
+.poczekalnia-tresc {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 80px;
+  margin-top: 56px;
+}
+
+.tv-wejscie {
+  flex: none;
+  width: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tv-qr {
+  width: 620px;
+  height: 620px;
+  padding: 36px;
+  background: var(--piana);
+  border-radius: var(--r-card);
+  box-shadow: var(--glow-md);
+}
+
+.tv-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tv-adres {
+  margin: 24px 0 0;
+  font-size: 32px;
+  font-weight: var(--w-semibold);
+  color: var(--piana);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.tv-prawa {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-kod-rzad {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.tv-etykieta {
+  margin: 0;
+  font-size: 30px;
+  font-weight: var(--w-black);
+  color: var(--szary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tv-kod {
+  margin: 0;
+  font-size: 170px;
+  font-weight: var(--w-black);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.tv-grafika {
+  max-width: 520px;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: var(--r-card);
+}
+
+.tv-gracze {
+  flex: 1;
+  min-height: 0;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 3px solid var(--zloto);
+  overflow: hidden;
+}
+
+.tv-licznik {
+  color: var(--piana);
+  margin-left: 12px;
+}
+
+.tv-zacheta {
+  margin: 28px 0 0;
+  font-size: 38px;
+  line-height: 1.4;
+  color: var(--szary);
+}
+
+.tv-nicki {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tv-nicki li {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 34px;
+  font-weight: var(--w-black);
+  padding: 8px 24px;
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn);
+  animation: wjazd-nicku 0.9s var(--ease-wjazd) both;
+}
+
+.tv-nicki.gesto {
+  gap: 10px;
+}
+
+.tv-nicki.gesto li {
+  font-size: 24px;
+  padding: 4px 16px;
+}
+
+/* Nowy gracz: wskakuje ze złotym blaskiem, który gaśnie */
+@keyframes wjazd-nicku {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+    border-color: var(--zloto);
+    box-shadow: var(--glow-lg);
+  }
+  50% {
+    opacity: 1;
+    transform: none;
+    border-color: var(--zloto);
+    box-shadow: var(--glow-lg);
+  }
+  100% {
+    border-color: var(--kamien2);
+    box-shadow: none;
+  }
+}
+
+/* Pozostałe fazy (tymczasowo, do dni 4 i 5) */
+
+.tv-srodek {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  text-align: center;
+}
+
+.tv-duzy {
+  margin: 0;
+  font-size: 72px;
+  font-weight: var(--w-black);
+  line-height: 1.15;
+  max-width: 1600px;
+}
+
+.tv-polaczenie {
+  position: absolute;
+  right: 40px;
+  bottom: 24px;
+  margin: 0;
+  font-size: 24px;
+  color: var(--szary);
+}

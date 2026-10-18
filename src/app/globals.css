@@ -140,3 +140,112 @@ h1 {
   color: var(--szary);
   font-weight: var(--w-semibold);
 }
+
+/* Telefon gracza i pilot */
+.etykieta {
+  display: block;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  margin: var(--card-pad) 0 6px;
+}
+
+.pole-kod {
+  font-size: 34px;
+  font-weight: var(--w-black);
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+  padding-left: calc(14px + 0.3em);
+}
+
+.gra-naglowek {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--section-gap);
+}
+
+.gra-kod {
+  font-weight: var(--w-black);
+  letter-spacing: 0.15em;
+  color: var(--zloto);
+}
+
+.nadtytul {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+  font-size: var(--fs-small);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+}
+
+.nicki {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nicki li {
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-btn-sm);
+  padding: 6px 12px;
+  font-weight: var(--w-semibold);
+  font-size: var(--fs-small);
+}
+
+.nicki li.ja {
+  border-color: var(--zloto);
+  color: var(--zloto);
+}
+
+.ok {
+  color: var(--chmiel);
+  font-weight: var(--w-black);
+}
+
+.przycisk-cichy {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  background: none;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.pilot-odpowiedzi {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.pilot-odpowiedzi li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-btn-sm);
+  font-size: var(--fs-small);
+}
+
+.pilot-odpowiedzi li.poprawna {
+  border-color: var(--chmiel);
+}
+
+.pilot-litera {
+  font-weight: var(--w-black);
+  color: var(--zloto);
+}
