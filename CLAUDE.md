@@ -11,6 +11,7 @@ Zasady:
 - Supabase: projekt `bractwo-quiz` (ref `yyacqskrpgnfdxtcmapw`, Frankfurt). Migracje trzymamy w repo w `supabase/migrations/`.
 - Vercel: funkcje w regionie `fra1`, obok bazy.
 - Domena `bractwopiwne.pl` jest w Hostido, a poczta w Google Workspace. Rekordów MX nie ruszamy.
+- Na razie działamy pod adresem `*.vercel.app`, a `quiz.bractwopiwne.pl` podepniemy na końcu. Nigdzie nie wpisuj domeny na sztywno: linki i kody QR buduj z adresu bieżącego żądania (albo `NEXT_PUBLIC_SITE_URL`), żeby zmiana domeny nie wymagała zmian w kodzie.
 
 ## Koniec etapu
 
