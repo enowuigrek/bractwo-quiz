@@ -106,7 +106,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | 3 ✅ | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 ✅ | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
 | 5 ✅ | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
-| 6 | deploy, `quiz.bractwopiwne.pl`, keepalive, test z kilkoma telefonami |
+| 6 ✅ (część po twojej stronie) | deploy ✅, keepalive ✅, checklista testu ✅ ([TEST.md](TEST.md)); do zrobienia przez ciebie: domena `quiz.bractwopiwne.pl` w Vercelu + CNAME w Hostido, `CRON_SECRET`, test z kilkoma telefonami |
 | 7 | poprawki po teście, bufor |
 
 **Poza MVP:** wszystko z [POMYSLY.md](POMYSLY.md).
@@ -182,6 +182,15 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - **TV pobiera** `ranking` tylko w fazach ranking, podium i koniec, a listę nicków tylko w poczekalni.
 - Sprawdzone na localhost na grze z 12 graczami (odpowiedzi wpisane SQL‑em): kolejność przed i po przetasowaniu, strzałki, „+zdobyte”, „…i jeszcze 2”, wjazd podium po kolei, koniec gry, widok rankingu i końca na telefonie 375 px. Gra testowa usunięta.
 
+### Dzień 6: keepalive, domena, test
+
+- **Deploy** był zrobiony przed dniem 4: https://bractwo-quiz.vercel.app, push na `main` = deploy, funkcje w `fra1`.
+- **Keepalive** (`src/app/api/keepalive/route.ts`) robi dwie rzeczy: małe zapytanie do bazy (klucz serwisowy) i podłączenie do Realtime kluczem publicznym na jeden kanał. To drugie jest odpowiedzią na ⚠️ z dnia 1: usługa Realtime zakłada partycje `realtime.messages` na kilka dni do przodu dopiero po podłączeniu klienta. 18.10 partycje sięgały do 21.10, a event jest 28.10. Zwraca `{"ok":true,"baza":"ok","realtime":"SUBSCRIBED"}`, przy błędzie status 500. Sprawdzone na localhost. Czy partycje przesuwają się z dnia na dzień, da się sprawdzić dopiero po kilku dniach działania crona.
+- **Vercel Cron** w `vercel.json`: `0 5 * * *` (codziennie o 5:00 UTC, na planie Hobby wolno raz dziennie, a godzina może się przesunąć w obrębie tej godziny). Gdy na Vercelu jest ustawiony `CRON_SECRET`, endpoint wymaga nagłówka `Authorization: Bearer …` (Vercel dokleja go sam). Bez zmiennej endpoint jest otwarty, ale robi tylko jedno małe zapytanie.
+- **`.env.example`** ma teraz `CRON_SECRET` i opcjonalny `NEXT_PUBLIC_SITE_URL`.
+- **Domena:** Vercel MCP nadal dostaje 403 na zakres zespołu, a CLI `vercel` nie jest zainstalowane, więc domenę trzeba dodać w panelu (instrukcja niżej, w „Zadania dla ciebie”). W DNS na 18.10 nie ma jeszcze rekordu `quiz`, serwery nazw to Hostido, a MX to Google. W kodzie nic nie trzeba zmieniać: linki i QR biorą adres z żądania.
+- **Test z telefonami:** scenariusz i lista przed eventem są w [TEST.md](TEST.md). Test robisz ty, a wnioski idą do dnia 7.
+
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 
 - Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `lokale.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.
@@ -205,3 +214,12 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
    ```
    Przy pierwszym użyciu każdy poprosi o zalogowanie w przeglądarce. Logujesz się na konta Bractwa.
 6. **Hostido:** sprawdź, czy masz dostęp do panelu. Jeśli nie, poproś Zbyszka o dodanie rekordu CNAME w dniu 6 (podam dokładną wartość).
+
+## Zadania dla ciebie (dzień 6)
+
+1. **Vercel → projekt `bractwo-quiz` → Settings → Domains → Add:** wpisz `quiz.bractwopiwne.pl` (bez przekierowania, środowisko Production). Vercel pokaże wymagany rekord. Zwykle jest to CNAME na `cname.vercel-dns.com`, a nowsze projekty dostają własną wartość w rodzaju `….vercel-dns-0xx.com`. **Wpisz dokładnie to, co pokaże Vercel.**
+2. **Hostido → DNS dla `bractwopiwne.pl`:** dodaj rekord `CNAME`, nazwa `quiz`, wartość z punktu 1, TTL domyślny. Nie ruszaj MX ani innych rekordów. Po kilku minutach do godziny Vercel pokaże „Valid Configuration” i sam wystawi certyfikat HTTPS.
+3. **Vercel → Settings → Environment Variables:** dodaj `CRON_SECRET` (losowy ciąg, np. z `openssl rand -hex 32`) dla Production, potem zrób Redeploy. Bez tego keepalive działa, ale jest otwarty.
+4. **Vercel → Settings → Cron Jobs:** po deployu powinien być widoczny `/api/keepalive`. Kliknij „Run” i sprawdź w logach odpowiedź `"ok": true`.
+5. **Test z telefonami** według [TEST.md](TEST.md), najlepiej już na `quiz.bractwopiwne.pl`.
+6. Opcjonalnie: odśwież logowanie Vercel MCP na zespół „Bractwo Piwne” (dalej jest 403), żebym mógł sam sprawdzać domenę i logi.
