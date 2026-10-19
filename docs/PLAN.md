@@ -193,6 +193,15 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - **Do zrobienia przy okazji:** w Vercelu zmienić typ `SUPABASE_SECRET_KEY`, `ADMIN_HASLO` i `ADMIN_SEKRET` na Secret (Vercel oznacza je „Needs Attention”).
 - **Test z telefonami:** scenariusz i lista przed eventem są w [TEST.md](TEST.md). Test robisz ty, a wnioski idą do dnia 7.
 
+### Poprawki wyglądu i panelu (19.10, przed testem)
+
+- Mniejsze zaokrąglenia okien (10/8 px), przyciski jako pigułki wypełnione kolorem według rodzaju (zwykły, złoty, pozytywny, niebezpieczny, ikona). Opis w DESIGN-SYSTEM.md („Promienie”, „Przyciski”).
+- Panel admina ma układ mobilny (do 640px) i desktopowy (stałe 1120px, nawigacja w pasku, gra w dwóch kolumnach). Szerokość nie zależy od treści (`scrollbar-gutter: stable`).
+- Gry można usuwać z listy (ikona kosza, z potwierdzeniem), także trwające. Na stronie gry są „Zakończ grę” i „Usuń grę”.
+- Linki na stronie gry są w ramce: kliknięcie otwiera w nowej karcie, ikona kopiuje (Clipboard API z zapasowym `execCommand`), przytrzymanie palcem na telefonie też kopiuje, a dymek potwierdza.
+- Do lokalnych testów panelu jest konfiguracja `start-test-hasla` w `.claude/launch.json`: `next start` na porcie 3100 z hasłem testowym nadpisującym `ADMIN_HASLO` (najpierw `npm run build`). Działa obok twojego `next dev` na 3000.
+- Sprawdzone na localhost: lista gier i strona gry na 1280 px i 375 px, kopiowanie z dymkiem. Nie sprawdzone: samo usuwanie z listy (nie chciałem kasować gry NKGH) i przytrzymanie palcem na prawdziwym telefonie.
+
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 
 - Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `lokale.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.

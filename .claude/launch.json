@@ -4,13 +4,30 @@
     {
       "name": "dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "dev-dzialajacy",
       "url": "http://localhost:3000",
       "port": 3000
+    },
+    {
+      "name": "start-test-hasla",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "start",
+        "-p",
+        "3100"
+      ],
+      "port": 3100,
+      "env": {
+        "ADMIN_HASLO": "lokalny-test-panelu"
+      }
     }
   ]
 }

@@ -6,6 +6,7 @@ import { adresAplikacji } from "@/lib/adres";
 import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
+import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { usunGre, zakonczGre } from "../akcje";
 import { LinkDoSkopiowania } from "./kopiuj";
@@ -43,71 +44,80 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
       <p className="okruchy">
         <Link href="/admin/gry">← Gry</Link>
       </p>
-      <p className="pomocniczy" style={{ margin: 0 }}>
-        Kod gry · <span className={`znaczek${trwa ? " aktywny" : ""}`}>{NAZWY_FAZ[gra.faza]}</span>
-      </p>
-      <div className="kod-gry">{gra.kod}</div>
-      <h1 style={{ marginTop: 16 }}>{gra.quizy?.tytul ?? "quiz usunięty"}</h1>
-      <p className="pomocniczy">
-        {[
-          gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
-          gra.okazja,
-          gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
-          gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",
-          `graczy: ${gracze ?? 0}/${gra.max_graczy}`,
-        ]
-          .filter(Boolean)
-          .join(" · ")}
-      </p>
+      <div className="uklad-dwa">
+        <div>
+          <p className="pomocniczy" style={{ margin: 0 }}>
+            Kod gry · <span className={`znaczek${trwa ? " aktywny" : ""}`}>{NAZWY_FAZ[gra.faza]}</span>
+          </p>
+          <div className="kod-gry">{gra.kod}</div>
+          <h1 style={{ marginTop: 16 }}>{gra.quizy?.tytul ?? "quiz usunięty"}</h1>
+          <p className="pomocniczy">
+            {[
+              gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
+              gra.okazja,
+              gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
+              gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",
+              `graczy: ${gracze ?? 0}/${gra.max_graczy}`,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
 
-      {trwa && qrPilota && (
-        <>
-          <section className="panel-sekcja karta">
-            <h2>Pilot prowadzącego</h2>
-            <p className="pomocniczy" style={{ marginTop: 0 }}>
-              Prowadzący skanuje ten kod telefonem i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
-            </p>
-            <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />
-            <div style={{ marginTop: 14 }}>
-              <LinkDoSkopiowania url={linki.pilot} />
-            </div>
+          <section className="panel-sekcja akcje-gry">
+            {trwa && (
+              <PrzyciskPotwierdz
+                akcja={zakonczGre.bind(null, gra.id)}
+                pytanie={`Zakończyć grę ${gra.kod}? Gracze nie będą mogli już dołączyć ani odpowiadać.`}
+                className="przycisk-maly"
+              >
+                Zakończ grę
+              </PrzyciskPotwierdz>
+            )}
+            <PrzyciskPotwierdz
+              akcja={usunGre.bind(null, gra.id, true)}
+              pytanie={
+                trwa
+                  ? `Gra ${gra.kod} jeszcze trwa. Usunąć ją razem z graczami i wynikami? Ekrany graczy i TV pokażą, że gry nie ma.`
+                  : `Usunąć grę ${gra.kod} razem z graczami i wynikami?`
+              }
+            >
+              <IkonaKosz /> Usuń grę
+            </PrzyciskPotwierdz>
           </section>
+        </div>
 
-          <section className="panel-sekcja karta">
-            <h2>Telewizor</h2>
-            <p className="pomocniczy" style={{ marginTop: 0 }}>
-              Otwórz w przeglądarce na TV. Na ekranie pojawi się kod QR dla graczy.
-            </p>
-            <LinkDoSkopiowania url={linki.tv} />
-          </section>
+        {trwa && qrPilota ? (
+          <div>
+            <section className="panel-sekcja karta">
+              <h2>Pilot prowadzącego</h2>
+              <p className="pomocniczy" style={{ marginTop: 0 }}>
+                Prowadzący skanuje ten kod telefonem i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
+              </p>
+              <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />
+              <div style={{ marginTop: 14 }}>
+                <LinkDoSkopiowania url={linki.pilot} />
+              </div>
+            </section>
 
-          <section className="panel-sekcja karta">
-            <h2>Gracze</h2>
-            <p className="pomocniczy" style={{ marginTop: 0 }}>
-              Gracze skanują QR z telewizora albo wpisują kod <strong>{gra.kod}</strong> na stronie głównej.
-            </p>
-            <LinkDoSkopiowania url={linki.gracz} />
-          </section>
-        </>
-      )}
+            <section className="panel-sekcja karta">
+              <h2>Telewizor</h2>
+              <p className="pomocniczy" style={{ marginTop: 0 }}>
+                Otwórz w przeglądarce na TV. Na ekranie pojawi się kod QR dla graczy.
+              </p>
+              <LinkDoSkopiowania url={linki.tv} />
+            </section>
 
-      <section className="panel-sekcja">
-        {trwa ? (
-          <PrzyciskPotwierdz
-            akcja={zakonczGre.bind(null, gra.id)}
-            pytanie={`Zakończyć grę ${gra.kod}? Gracze nie będą mogli już dołączyć ani odpowiadać.`}
-          >
-            Zakończ grę
-          </PrzyciskPotwierdz>
-        ) : (
-          <PrzyciskPotwierdz
-            akcja={usunGre.bind(null, gra.id)}
-            pytanie={`Usunąć grę ${gra.kod} razem z graczami i wynikami?`}
-          >
-            Usuń grę
-          </PrzyciskPotwierdz>
-        )}
-      </section>
+            <section className="panel-sekcja karta">
+              <h2>Gracze</h2>
+              <p className="pomocniczy" style={{ marginTop: 0 }}>
+                Gracze skanują QR z telewizora albo wpisują kod <strong>{gra.kod}</strong> na stronie głównej.
+              </p>
+              <LinkDoSkopiowania url={linki.gracz} />
+            </section>
+            <p className="podpowiedz">Kliknij link, żeby otworzyć go w nowej karcie. Ikona obok albo przytrzymanie palcem kopiuje.</p>
+          </div>
+        ) : null}
+      </div>
     </main>
   );
 }

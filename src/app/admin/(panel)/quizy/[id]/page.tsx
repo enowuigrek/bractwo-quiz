@@ -5,6 +5,7 @@ import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
+import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przesunZadanie, usunQuiz, usunZadanie } from "../akcje";
 import { FormularzQuizu } from "../formularz-quizu";
@@ -69,13 +70,13 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
                 </div>
                 <div className="lista-akcje">
                   <form action={przesunZadanie.bind(null, quiz.id, z.id, "gora")}>
-                    <button className="przycisk-maly" disabled={i === 0} aria-label="Przesuń wyżej" title="Wyżej">
+                    <button className="przycisk-maly ikona" disabled={i === 0} aria-label="Przesuń wyżej" title="Wyżej">
                       ↑
                     </button>
                   </form>
                   <form action={przesunZadanie.bind(null, quiz.id, z.id, "dol")}>
                     <button
-                      className="przycisk-maly"
+                      className="przycisk-maly ikona"
                       disabled={i === lista.length - 1}
                       aria-label="Przesuń niżej"
                       title="Niżej"
@@ -87,8 +88,9 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
                     akcja={usunZadanie.bind(null, quiz.id, z.id)}
                     pytanie={`Usunąć pytanie ${i + 1}?`}
                     tytul="Usuń pytanie"
+                    className="przycisk-maly ikona niebezpieczny"
                   >
-                    ✕
+                    <IkonaKosz />
                   </PrzyciskPotwierdz>
                 </div>
               </li>

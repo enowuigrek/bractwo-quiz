@@ -9,18 +9,18 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
   await wymagajAdmina();
 
   return (
-    <div className="kolumna" style={{ maxWidth: "var(--max-w-header)" }}>
+    <div className="panel">
       <header className="panel-naglowek">
-        <Link href="/admin" aria-label="Panel, strona główna" style={{ textDecoration: "none" }}>
+        <Link href="/admin" className="panel-logo" aria-label="Panel, strona główna" style={{ textDecoration: "none" }}>
           <LogoQuiz wysokosc={44} dopisek="panel" />
         </Link>
-        <form action={wylogujAdmina}>
+        <Nawigacja />
+        <form action={wylogujAdmina} className="panel-wyloguj">
           <button type="submit" className="przycisk-maly">
             Wyloguj
           </button>
         </form>
       </header>
-      <Nawigacja />
       {children}
     </div>
   );

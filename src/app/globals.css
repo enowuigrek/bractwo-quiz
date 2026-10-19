@@ -68,7 +68,7 @@ h1 {
   color: var(--piana);
   background: var(--pole);
   border: 2px solid var(--kamien2);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-pole);
   padding: 14px;
 }
 
@@ -77,6 +77,8 @@ h1 {
   outline: none;
 }
 
+/* Przyciski: pigułki wypełnione kolorem zależnym od rodzaju, bez samych obramówek.
+   zwykły = kamień, .zloty = główna akcja, .pozytywny = chmiel, .niebezpieczny = czerwień */
 .przycisk {
   display: block;
   width: 100%;
@@ -84,17 +86,36 @@ h1 {
   font-size: var(--fs-button);
   font-weight: var(--w-black);
   color: var(--piana);
-  background: transparent;
-  border: 2px solid var(--kamien2);
+  background: var(--kamien2);
+  border: 0;
   border-radius: var(--r-btn);
-  padding: 15px;
+  padding: 16px 24px;
   cursor: pointer;
+  transition: background 0.15s, filter 0.15s;
+}
+
+.przycisk:hover:not(:disabled) {
+  background: var(--kamien3);
 }
 
 .przycisk.zloty {
   color: var(--na-zlocie);
   background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
-  border-color: var(--zloto);
+}
+
+.przycisk.pozytywny {
+  color: var(--na-chmielu);
+  background: var(--chmiel);
+}
+
+.przycisk.niebezpieczny {
+  background: var(--czerwien-tlo);
+}
+
+.przycisk.zloty:hover:not(:disabled),
+.przycisk.pozytywny:hover:not(:disabled),
+.przycisk.niebezpieczny:hover:not(:disabled) {
+  filter: brightness(1.1);
 }
 
 .przycisk:disabled {
@@ -103,7 +124,7 @@ h1 {
 }
 
 .blad {
-  color: #e2735a;
+  color: var(--czerwien);
   font-size: var(--fs-small);
   font-weight: var(--w-semibold);
 }
@@ -237,7 +258,7 @@ h1 {
   gap: 10px;
   padding: 8px 10px;
   border: 1px solid var(--kamien2);
-  border-radius: var(--r-btn-sm);
+  border-radius: var(--r-pole);
   font-size: var(--fs-small);
 }
 
@@ -291,7 +312,7 @@ h1 {
   max-width: 100%;
   max-height: 220px;
   margin: 0 auto var(--card-pad);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-pole);
   object-fit: contain;
 }
 
@@ -316,7 +337,7 @@ h1 {
   color: var(--piana);
   background: var(--kamien);
   border: 2px solid var(--kamien2);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-pole);
   padding: 12px 14px;
   transition: opacity 0.2s, border-color 0.2s, background 0.2s;
 }
@@ -488,4 +509,13 @@ button.odp:not(:disabled):active {
 
 .w-dol {
   color: var(--szary);
+}
+
+/* Stała szerokość kolumny: miejsce na pasek przewijania jest zarezerwowane, żeby treść nie skakała */
+html:has(.kolumna) {
+  scrollbar-gutter: stable;
+}
+
+.kolumna {
+  width: 100%;
 }

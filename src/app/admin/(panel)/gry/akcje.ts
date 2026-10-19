@@ -69,17 +69,20 @@ export async function zakonczGre(id: string): Promise<void> {
   refresh();
 }
 
-/** Usuwa zakończoną grę razem z graczami i odpowiedziami. */
-export async function usunGre(id: string): Promise<void> {
+/**
+ * Usuwa grę (trwającą albo zakończoną) razem z graczami i odpowiedziami.
+ * `przekieruj`: ze strony gry wracamy do listy, z listy tylko ją odświeżamy.
+ */
+export async function usunGre(id: string, przekieruj: boolean): Promise<void> {
   await wymagajAdmina();
   const { data, error } = await supabaseAdmin()
     .from("sesje")
     .delete()
     .eq("id", id)
-    .eq("faza", "koniec")
     .select("grafika_url")
     .maybeSingle();
   if (error) throw new Error(`Nie udało się usunąć gry: ${error.message}`);
   await usunGrafike(data?.grafika_url);
-  redirect("/admin/gry");
+  if (przekieruj) redirect("/admin/gry");
+  refresh();
 }

@@ -83,7 +83,36 @@ Na banerze dane kontaktowe są składane małym (11–12px), regularnym tekstem 
 
 ## Promienie
 
-8 (pasek) · 10 (mały przycisk) · 12 (przycisk, input) · 18 (karta, panel) · 50% (medal).
+Zmienione 19.10 na prośbę Łukasza (duże zaokrąglenia z Szabli wyglądały zabawkowo):
+
+| Token | Wartość | Do czego |
+|---|---|---|
+| `--r-card` | 10 | karty, panele, okna |
+| `--r-pole` | 8 | pola formularzy, kafelki, kafelki odpowiedzi, grafiki, ramki linków |
+| `--r-btn`, `--r-btn-sm` | 999 | przyciski: pigułki, pełne półkola po bokach |
+| `--r-pill` | 999 | pasek postępu, znaczki, nicki |
+| `--r-round` | 50% | medal, kółka z literami |
+
+## Przyciski (Bractwo Quiz)
+
+Pigułki **wypełnione kolorem zależnym od rodzaju**, bez samych obramówek:
+- zwykły: tło `--kamien2`, po najechaniu `--kamien3`, tekst piana,
+- `.zloty` (główna akcja): złoty gradient, tekst `--na-zlocie`,
+- `.pozytywny`: `--chmiel`, tekst `--na-chmielu`,
+- `.niebezpieczny` (usuń, zakończ): `--czerwien-tlo` `#7c2a1c`, tekst piana,
+- `.ikona`: okrągły przycisk z samą ikoną (kosz, strzałki), 40×40,
+- `.przycisk-cichy`: sam tekst, dla akcji pobocznych.
+Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole`, bo tekst bywa wielowierszowy.
+
+## Linki do skopiowania
+
+Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w link otwiera go w nowej karcie, ikona po prawej kopiuje. Na telefonie przytrzymanie palcem na linku też kopiuje. Po skopiowaniu na dole wyskakuje zielony dymek „Skopiowano link”.
+
+## Panel admina: dwa układy
+
+- **Mobilny** (< 960px): kolumna do 640px, logo i „Wyloguj” u góry, nawigacja pod spodem.
+- **Desktopowy** (≥ 960px): stała szerokość 1120px, logo, nawigacja i „Wyloguj” w jednym pasku. Strony mogą mieć dwie kolumny (`.uklad-dwa`, np. gra: dane i akcje po lewej, pilot i linki po prawej). Formularze zostają węższe (do 640px), a duże przyciski mają szerokość według treści.
+- **Szerokość nie zależy od treści.** Pasek przewijania ma zarezerwowane miejsce (`scrollbar-gutter: stable`), więc strona nie skacze, gdy treść się wydłuża.
 
 ## Komponenty
 
@@ -101,7 +130,7 @@ Na banerze dane kontaktowe są składane małym (11–12px), regularnym tekstem 
 
 **Karta (`.spotkanie`).** Tło `--kamien`, obrys 1px w `--kamien2`, radius 18, padding 18. Tytuł 17/800, miejsce jako złoty link 15/600.
 
-**Przyciski.** Pełna szerokość, 18/800, padding 15, radius 12, obrys 2px.
+**Przyciski (Szable, oryginał; w Quizie patrz „Przyciski” wyżej).** Pełna szerokość, 18/800, padding 15, radius 12, obrys 2px.
 - domyślny: przezroczysty z obrysem `--kamien2`
 - pozytywny („Będę”): obrys `--chmiel-ciemny`, po wybraniu tło i obrys `--chmiel` z ciemnym tekstem
 - negatywny po wybraniu: tło `--kamien2`, obrys szary
@@ -109,7 +138,7 @@ Na banerze dane kontaktowe są składane małym (11–12px), regularnym tekstem 
 - disabled: `opacity: .5`
 - focus: `outline: 3px solid --zloto; offset 3px`
 
-**Input.** 19px, padding 14, radius 12, obrys 2px w `--kamien2`, tło `#0b0f13`.
+**Input.** 19px, padding 14, radius 8 (`--r-pole`), obrys 2px w `--kamien2`, tło `#0b0f13`.
 
 **Akordeon (`details.zasady`).** Wygląda jak karta. Strzałka to złoty chevron z obramowań 3px, obracany przy otwarciu. Wiersze mają nazwę (piana, bold), opis (szary, 14) i wartość po prawej (złoto, 17/800).
 

@@ -85,7 +85,7 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
               />
               <button
                 type="button"
-                className="przycisk-maly niebezpieczny"
+                className="przycisk-maly ikona niebezpieczny"
                 onClick={() => usun(i)}
                 disabled={odpowiedzi.length <= LIMITY.minOdpowiedzi}
                 aria-label={`Usuń odpowiedź ${LITERY[i]}`}

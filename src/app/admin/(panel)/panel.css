@@ -1,17 +1,46 @@
-/* Panel admina: telefon i laptop, kolumna do 640px. */
+/* Panel admina: dwa układy.
+   Mobilny (< 960px): kolumna 640px, nawigacja pod logo.
+   Desktopowy (≥ 960px): stała szerokość 1120px, logo, nawigacja i „Wyloguj” w jednym pasku,
+   szersze strony (np. gra: dane po lewej, linki i QR po prawej).
+   Szerokość nie zależy od treści, a pasek przewijania ma zarezerwowane miejsce, żeby nic nie skakało. */
+
+html:has(.panel) {
+  scrollbar-gutter: stable;
+}
+
+.panel {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--gutter) max(var(--gutter), env(safe-area-inset-right)) 48px max(var(--gutter), env(safe-area-inset-left));
+}
 
 .panel-naglowek {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "logo wyloguj"
+    "nawigacja nawigacja";
   align-items: center;
-  gap: 12px;
+  gap: 0 12px;
+  margin-bottom: var(--section-gap);
+  border-bottom: 1px solid var(--kamien2);
+}
+
+.panel-logo {
+  grid-area: logo;
+  text-decoration: none;
+}
+
+.panel-wyloguj {
+  grid-area: wyloguj;
 }
 
 .panel-nawigacja {
+  grid-area: nawigacja;
   display: flex;
   gap: 6px;
-  margin: 18px 0 var(--section-gap);
-  border-bottom: 1px solid var(--kamien2);
+  margin-top: 18px;
   overflow-x: auto;
 }
 
@@ -27,6 +56,58 @@
 .panel-nawigacja a[aria-current="page"] {
   color: var(--zloto);
   border-bottom-color: var(--zloto);
+}
+
+/* Formularze nie rozlewają się na całą szerokość desktopu */
+.panel .formularz,
+.panel .waska {
+  max-width: 640px;
+}
+
+/* Dwie kolumny na desktopie; na telefonie jedna pod drugą */
+.uklad-dwa {
+  display: grid;
+  gap: var(--section-gap);
+}
+
+@media (min-width: 960px) {
+  .panel {
+    max-width: 1120px;
+    padding: 28px 40px 64px;
+  }
+
+  .panel-naglowek {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "logo nawigacja wyloguj";
+    gap: 40px;
+    padding-bottom: 0;
+  }
+
+  .panel-nawigacja {
+    margin-top: 0;
+    align-self: stretch;
+    align-items: stretch;
+  }
+
+  .panel-nawigacja a {
+    display: flex;
+    align-items: center;
+    padding: 22px 16px;
+    font-size: var(--fs-body);
+  }
+
+  .uklad-dwa {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 48px;
+  }
+
+  /* duże przyciski na desktopie nie zajmują całej szerokości */
+  .panel .przycisk {
+    display: inline-block;
+    width: auto;
+    min-width: 240px;
+  }
 }
 
 .panel-sekcja + .panel-sekcja {
@@ -115,27 +196,30 @@ h2 {
   flex-shrink: 0;
 }
 
-/* Małe przyciski w wierszach */
+/* Małe przyciski w wierszach: pigułki z wypełnieniem, jak duże przyciski */
 .przycisk-maly {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-width: 40px;
   min-height: 40px;
   font: inherit;
   font-size: var(--fs-xs);
-  font-weight: var(--w-semibold);
+  font-weight: var(--w-black);
   color: var(--piana);
-  background: transparent;
-  border: 2px solid var(--kamien2);
+  background: var(--kamien2);
+  border: 0;
   border-radius: var(--r-btn-sm);
-  padding: 6px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, filter 0.15s;
 }
 
-.przycisk-maly:hover {
-  border-color: var(--szary);
+.przycisk-maly:hover:not(:disabled) {
+  background: var(--kamien3);
 }
 
 .przycisk-maly:disabled {
@@ -146,12 +230,27 @@ h2 {
 .przycisk-maly.zloty {
   color: var(--na-zlocie);
   background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
-  border-color: var(--zloto);
 }
 
-.przycisk-maly.niebezpieczny:hover {
-  border-color: #e2735a;
-  color: #e2735a;
+.przycisk-maly.niebezpieczny {
+  background: var(--czerwien-tlo);
+}
+
+.przycisk-maly.zloty:hover:not(:disabled),
+.przycisk-maly.niebezpieczny:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+/* Okrągły przycisk z samą ikoną (np. kosz) */
+.przycisk-maly.ikona {
+  width: 40px;
+  padding: 0;
+}
+
+.przycisk-maly svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
 }
 
 a.przycisk {
@@ -206,12 +305,12 @@ a.przycisk {
 
 .pole-plik::file-selector-button {
   font: inherit;
-  font-weight: var(--w-semibold);
+  font-weight: var(--w-black);
   color: var(--piana);
-  background: transparent;
-  border: 2px solid var(--kamien2);
+  background: var(--kamien2);
+  border: 0;
   border-radius: var(--r-btn-sm);
-  padding: 8px 12px;
+  padding: 9px 16px;
   margin-right: 12px;
   cursor: pointer;
 }
@@ -261,7 +360,7 @@ a.przycisk {
   max-width: 160px;
   max-height: 110px;
   object-fit: contain;
-  border-radius: var(--r-btn-sm);
+  border-radius: var(--r-pole);
   background: var(--pole);
 }
 
@@ -330,7 +429,7 @@ a.przycisk {
   padding: 14px 10px;
   margin: 0 !important;
   border: 2px solid var(--kamien2);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-pole);
   background: var(--pole);
   color: var(--piana) !important;
   font-weight: var(--w-semibold) !important;
@@ -373,6 +472,16 @@ a.przycisk {
 }
 
 /* Uruchomiona gra */
+.akcje-gry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.akcje-gry form {
+  display: contents;
+}
+
 .kod-gry {
   font-size: var(--fs-hero);
   font-weight: var(--w-black);
@@ -384,7 +493,7 @@ a.przycisk {
 
 .qr {
   background: var(--piana);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-pole);
   padding: 12px;
   width: min(260px, 100%);
   line-height: 0;
@@ -395,18 +504,88 @@ a.przycisk {
   height: auto;
 }
 
+/* Link w ramce: inny krój (stała szerokość), kliknięcie otwiera, ikona kopiuje */
 .link-kopiuj {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  align-items: stretch;
+  background: var(--pole);
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  overflow: hidden;
 }
 
-.link-kopiuj code {
+.link-kopiuj a {
   flex: 1;
   min-width: 0;
-  overflow-wrap: anywhere;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--fs-xs);
+  line-height: 1.4;
+  color: var(--piana);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.link-kopiuj a:hover {
+  color: var(--zloto);
+}
+
+.link-kopiuj-ikona {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
   color: var(--szary);
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--kamien2);
+  cursor: pointer;
+}
+
+.link-kopiuj-ikona:hover {
+  color: var(--zloto);
+  background: var(--kamien);
+}
+
+.link-kopiuj-ikona svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Komunikat na dole ekranu (np. „Skopiowano link”) */
+.dymek {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 10;
+  margin: 0;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  background: var(--chmiel);
+  color: var(--na-chmielu);
+  font-weight: var(--w-black);
+  font-size: var(--fs-small);
+  white-space: nowrap;
+  animation: wjazd-dymka 0.3s var(--ease-wjazd) both;
+}
+
+.dymek.zly {
+  background: var(--czerwien-tlo);
+  color: var(--piana);
+  white-space: normal;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
+
+@keyframes wjazd-dymka {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
 }
 
 .znaczek {

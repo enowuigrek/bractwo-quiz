@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { NAZWY_FAZ, type Faza } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
+import { IkonaKosz } from "../_komponenty/ikony";
+import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
+import { usunGre } from "./akcje";
 
 export type GraNaLiscie = {
   id: string;
@@ -46,6 +49,18 @@ export function ListaGier({ gry, pusta }: { gry: GraNaLiscie[]; pusta: string })
             <Link href={`/admin/gry/${g.id}`} className="przycisk-maly">
               Otwórz
             </Link>
+            <PrzyciskPotwierdz
+              akcja={usunGre.bind(null, g.id, false)}
+              pytanie={
+                g.faza === "koniec"
+                  ? `Usunąć grę ${g.kod} razem z graczami i wynikami?`
+                  : `Gra ${g.kod} jeszcze trwa. Usunąć ją razem z graczami i wynikami?`
+              }
+              tytul={`Usuń grę ${g.kod}`}
+              className="przycisk-maly ikona niebezpieczny"
+            >
+              <IkonaKosz />
+            </PrzyciskPotwierdz>
           </div>
         </li>
       ))}
