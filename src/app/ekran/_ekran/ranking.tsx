@@ -2,6 +2,7 @@
 
 import { animate, AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { Awatar } from "@/components/awatar";
 import { RESZTA_PODIUM_S, WJAZD_PODIUM_S } from "@/lib/gra/podium";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
@@ -80,7 +81,10 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                     className={`tv-ranking-wiersz${po && w.miejsce === 1 ? " lider" : ""}`}
                   >
                     <span className="tv-ranking-miejsce">{miejsce}.</span>
-                    <span className="tv-ranking-nick">{w.nick}</span>
+                    <span className="tv-ranking-nick">
+                      <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={52} />
+                      <span>{w.nick}</span>
+                    </span>
                     <span className="tv-ranking-zmiana">
                       {po && zmiana > 0 && <span className="w-gore">▲ {zmiana}</span>}
                       {po && zmiana < 0 && <span className="w-dol">▼ {-zmiana}</span>}
@@ -166,6 +170,7 @@ export function PodiumTv({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: opoznienie(i), type: "spring", stiffness: 120, damping: 14 }}
             >
+              <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={i === 0 ? 200 : 150} className="tv-stopien-awatar" />
               {i === 0 && <span className="tv-stopien-korona">Zwycięzca</span>}
               <span className="tv-stopien-nick">{w.nick}</span>
               <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>

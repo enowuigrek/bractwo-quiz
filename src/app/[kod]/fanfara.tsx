@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { odslonaPodiumS } from "@/lib/gra/podium";
+/* eslint-disable @next/next/no-img-element -- selfie z bucketu Supabase w medalu */
 import type { MojWynik, Nagroda } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { Miejsce } from "./rozgrywka";
@@ -17,13 +18,15 @@ type Props = {
   nick: string;
   kod: string;
   nagrody: Nagroda[] | null;
+  /** Selfie gracza: na podium pokazuje się w medalu. */
+  zdjecie: string | null;
 };
 
 /**
  * Koniec quizu na telefonie. Na podium miejsce odsłania się razem ze stopniem na TV
  * (wcześniej „werble”), a pierwsza trójka dostaje medal i konfetti.
  */
-export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagrody }: Props) {
+export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagrody, zdjecie }: Props) {
   const miejsce = moj?.miejsce ?? null;
   const nagroda = nagrody?.find((n) => n.miejsce === miejsce) ?? null;
   const [odslonieto, ustawOdslonieto] = useState(faza !== "podium");
@@ -64,7 +67,8 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagro
     return (
       <>
         <div className={`fanfara fanfara-${miejsce}`}>
-          <div className="medal" aria-hidden>
+          <div className={`medal${zdjecie ? " ze-zdjeciem" : ""}`} aria-hidden>
+            {zdjecie ? <img src={zdjecie} alt="" /> : null}
             <span>{miejsce}</span>
           </div>
           <h1 className="fanfara-tytul">{TYTULY[miejsce]}</h1>

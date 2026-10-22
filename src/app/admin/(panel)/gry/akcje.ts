@@ -105,6 +105,12 @@ export async function zakonczGre(id: string): Promise<void> {
  */
 export async function usunGre(id: string, przekieruj: boolean): Promise<void> {
   await wymagajAdmina();
+  // selfie graczy są w magazynie: kasujemy je razem z grą (wiersze graczy znikają kaskadowo)
+  const { data: zdjecia } = await supabaseAdmin()
+    .from("gracze")
+    .select("zdjecie_url")
+    .eq("sesja_id", id)
+    .not("zdjecie_url", "is", null);
   const { data, error } = await supabaseAdmin()
     .from("sesje")
     .delete()
@@ -112,7 +118,7 @@ export async function usunGre(id: string, przekieruj: boolean): Promise<void> {
     .select("grafika_url")
     .maybeSingle();
   if (error) throw new Error(`Nie udało się usunąć gry: ${error.message}`);
-  await usunGrafike(data?.grafika_url);
+  await Promise.all([usunGrafike(data?.grafika_url), ...(zdjecia ?? []).map((g) => usunGrafike(g.zdjecie_url))]);
   if (przekieruj) redirect("/admin/gry");
   refresh();
 }

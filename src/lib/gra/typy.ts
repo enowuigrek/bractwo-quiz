@@ -63,6 +63,9 @@ export type PilotStan = StanSesji & {
 
 export type AkcjaPilota = "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
 
+/** Wiersz `lista_graczy`: nick i adres selfie (null: bez zdjęcia). */
+export type GraczNaLiscie = { nick: string; zdjecie: string | null };
+
 export type Dolaczenie = { token: string; nick: string; powrot: boolean };
 
 /** Odpowiedź `zapisz_odpowiedz`. Nie mówi, czy odpowiedź jest poprawna. */
@@ -74,6 +77,7 @@ export type ZapisOdpowiedzi =
 export type MojWynik = {
   kod: string;
   nick: string;
+  zdjecie: string | null;
   faza: FazaWidoczna;
   zadanie_nr: number;
   /** `poprawna` i `punkty` dopiero od fazy `wynik`. */
@@ -89,6 +93,7 @@ export type MojWynik = {
  */
 export type WierszOdpowiedzi = {
   nick: string;
+  zdjecie: string | null;
   dane: { odpowiedz?: number } | null;
   poprawna: boolean | null;
   czas_ms: number | null;
@@ -98,6 +103,7 @@ export type WierszOdpowiedzi = {
 /** Wiersz funkcji `ranking`. `poprzednie_miejsce` i `zdobyte` dotyczą ostatniego jawnego pytania. */
 export type WierszRankingu = {
   nick: string;
+  zdjecie: string | null;
   punkty: number;
   miejsce: number;
   poprzednie_miejsce: number;

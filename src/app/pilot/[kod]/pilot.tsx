@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { Awatar } from "@/components/awatar";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { usePotwierdzenie, type OpcjePotwierdzenia } from "@/components/okno";
 import {
@@ -12,8 +13,9 @@ import {
   useCzasSerwera,
   useNasluch,
 } from "@/lib/gra/nasluch";
-import type { AkcjaPilota, FazaWidoczna, PilotStan } from "@/lib/gra/typy";
+import type { AkcjaPilota, FazaWidoczna, GraczNaLiscie, PilotStan } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { usunZdjecie } from "@/lib/zdjecie";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 const LITERY = "ABCDEF";
@@ -52,7 +54,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   }, [kod, tokenZAdresu]);
 
   const [stan, ustawStan] = useState<PilotStan | null>(null);
-  const [gracze, ustawGraczy] = useState<string[]>([]);
+  const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [bladDostepu, ustawBladDostepu] = useState<string | null>(null);
   const [bladSieci, ustawBladSieci] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     const wyslano = Date.now();
     const [s, g] = await Promise.all([
       supabase().rpc("pilot_stan", { p_kod: kod, p_host_token: token }),
-      supabase().rpc("gracze_sesji", { p_kod: kod }),
+      supabase().rpc("lista_graczy", { p_kod: kod }),
     ]);
     const odebrano = Date.now();
     if (s.error) {
@@ -76,7 +78,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     const nowy = s.data as PilotStan;
     ustawStan(nowy);
     ustawPrzesuniecie(przesuniecieZegara(nowy.teraz, wyslano, odebrano));
-    if (g.data) ustawGraczy(g.data as string[]);
+    if (g.data) ustawGraczy(g.data as GraczNaLiscie[]);
     ustawBladDostepu(null);
     ustawBladSieci(null);
     zapamietaj();
@@ -111,6 +113,19 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         <p className="pomocniczy">{bladSieci ?? "Łączę z grą…"}</p>
       </>
     );
+  }
+
+  async function zdejmijZdjecie(nick: string) {
+    if (!token) return;
+    if (!(await potwierdz(`Usunąć zdjęcie gracza ${nick}? Na TV zostanie kółko z literą.`, { tak: "Usuń zdjęcie", niebezpieczne: true }))) {
+      return;
+    }
+    try {
+      await usunZdjecie({ kod, host_token: token, nick });
+      await pobierz();
+    } catch (e) {
+      ustawBladAkcji((e as Error).message);
+    }
   }
 
   async function akcja(a: AkcjaPilota, pytanie?: string, opcje?: OpcjePotwierdzenia) {
@@ -163,9 +178,29 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           ) : (
             <ul className="nicki">
               {gracze.map((g) => (
-                <li key={g}>{g}</li>
+                <li key={g.nick}>
+                  {g.zdjecie ? (
+                    // zdjęcie trafia na TV: prowadzący może je zdjąć, gdy się nie nadaje
+                    <button
+                      type="button"
+                      className="nick-zdjecie"
+                      aria-label={`Usuń zdjęcie gracza ${g.nick}`}
+                      onClick={() => void zdejmijZdjecie(g.nick)}
+                    >
+                      <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={26} />
+                    </button>
+                  ) : (
+                    <Awatar nick={g.nick} zdjecie={null} rozmiar={26} />
+                  )}
+                  {g.nick}
+                </li>
               ))}
             </ul>
+          )}
+          {gracze.some((g) => g.zdjecie) && (
+            <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+              Zdjęcie się nie nadaje? Dotknij go, żeby usunąć.
+            </p>
           )}
         </section>
       )}

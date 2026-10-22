@@ -3,7 +3,8 @@
 
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { fazaTeraz, komunikatBledu, pobierzStan, sekundy, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
-import type { StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
+import { Awatar } from "@/components/awatar";
+import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { PodiumTv, RankingTv } from "./ranking";
@@ -46,7 +47,7 @@ type Props = { kod: string; qr: string; host: string };
 
 export function Tv({ kod, qr, host }: Props) {
   const [stan, ustawStan] = useState<StanSesji | null>(null);
-  const [gracze, ustawGraczy] = useState<string[]>([]);
+  const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
   const [odpowiedzi, ustawOdpowiedzi] = useState<WierszOdpowiedzi[]>([]);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
@@ -57,9 +58,9 @@ export function Tv({ kod, qr, host }: Props) {
       const { stan, przesuniecie } = await pobierzStan(kod);
       // lista nicków potrzebna tylko w poczekalni
       if (stan.faza === "poczekalnia") {
-        const { data, error } = await supabase().rpc("gracze_sesji", { p_kod: kod });
+        const { data, error } = await supabase().rpc("lista_graczy", { p_kod: kod });
         if (error) throw error;
-        ustawGraczy(data as string[]);
+        ustawGraczy(data as GraczNaLiscie[]);
       }
       if (stan.faza === "odpowiedzi") {
         const { data, error } = await supabase().rpc("odpowiedzi_zadania", { p_kod: kod });
@@ -126,7 +127,7 @@ export function Loga({ lokal }: { lokal: { nazwa: string; logo_url: string | nul
  * Poczekalnia: duży QR po lewej (pod nim drobniej adres i kod dla wpisujących ręcznie),
  * na pierwszym planie okazja, tytuł quizu i grafika, pod nimi gracze.
  */
-function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: string[]; qr: string; host: string }) {
+function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: GraczNaLiscie[]; qr: string; host: string }) {
   const druzyny = stan.tryb === "druzyny";
   return (
     <div className="poczekalnia">
@@ -164,7 +165,10 @@ function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: stri
             ) : (
               <ul className={`tv-nicki${gracze.length > 30 ? " gesto" : ""}`}>
                 {gracze.map((g) => (
-                  <li key={g}>{g}</li>
+                  <li key={g.nick}>
+                    <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={gracze.length > 30 ? 34 : 58} />
+                    {g.nick}
+                  </li>
                 ))}
               </ul>
             )}

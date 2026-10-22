@@ -745,3 +745,109 @@ html:has(.kolumna) {
   color: var(--piana);
   font-weight: var(--w-black);
 }
+
+/* Awatar gracza: selfie w kółku albo pierwsza litera nicku */
+.awatar {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--r-round);
+  object-fit: cover;
+  background: var(--kamien2);
+  border: 2px solid var(--kamien2);
+  color: var(--na-zlocie);
+  font-weight: var(--w-black);
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.awatar-litera {
+  border-color: transparent;
+}
+
+/* Selfie przy nicku na telefonie */
+.zdjecie-gracza {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0 4px;
+}
+
+.zdjecie-gracza-akcje {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
+.zdjecie-gracza-akcje .pomocniczy,
+.zdjecie-gracza-akcje .blad {
+  font-size: var(--fs-xs);
+}
+
+.zdjecie-gracza-akcje .przycisk-cichy {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-size: var(--fs-xs);
+}
+
+/* nicki w poczekalni na telefonie: kółko ze zdjęciem albo literą przed nickiem */
+.nicki li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* medal ze zdjęciem: selfie w środku, numer miejsca w plakietce */
+.medal.ze-zdjeciem {
+  position: relative;
+  padding: 0;
+}
+
+.medal.ze-zdjeciem img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-round);
+  object-fit: cover;
+}
+
+.medal.ze-zdjeciem span {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-round);
+  background: var(--medal);
+  border: 4px solid var(--bg);
+  font-size: 30px;
+}
+
+.przycisk-zdjecie {
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: var(--kamien2);
+  border: 0;
+  border-radius: var(--r-btn-sm);
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.przycisk-zdjecie:disabled {
+  opacity: 0.5;
+}
+
+/* Zdjęcie gracza na pilocie: przycisk do usunięcia */
+.nick-zdjecie {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: var(--r-round);
+  cursor: pointer;
+}

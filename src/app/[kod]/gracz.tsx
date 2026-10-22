@@ -2,19 +2,21 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Awatar } from "@/components/awatar";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
-import type { Dolaczenie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
+import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
+import { ZdjecieGracza } from "./zdjecie-gracza";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
-
 export function Gracz({ kod }: { kod: string }) {
   const [stan, ustawStan] = useState<StanSesji | null>(null);
-  const [gracze, ustawGraczy] = useState<string[]>([]);
+  const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [bladGry, ustawBladGry] = useState<string | null>(null);
   const [ja, ustawJa] = useState<Ja | null>(null);
   const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
@@ -31,8 +33,8 @@ export function Gracz({ kod }: { kod: string }) {
       ustawPrzesuniecie(przesuniecie);
       ustawBladGry(null);
       if (stan.faza === "poczekalnia") {
-        const { data } = await supabase().rpc("gracze_sesji", { p_kod: kod });
-        if (data) ustawGraczy(data as string[]);
+        const { data } = await supabase().rpc("lista_graczy", { p_kod: kod });
+        if (data) ustawGraczy(data as GraczNaLiscie[]);
       } else if (tokenRef.current) {
         // po `stan_sesji`, więc faza w `moj_wynik` nigdy nie jest starsza niż w stanie
         const { data } = await supabase().rpc("moj_wynik", { p_token: tokenRef.current });
@@ -151,7 +153,8 @@ function Naglowek({ kod }: { kod: string }) {
 function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDolaczono: (d: Dolaczenie) => void }) {
   const [nick, ustawNick] = useState("");
   const [blad, ustawBlad] = useState<string | null>(null);
-  const [wysylam, ustawWysylam] = useState(false);
+  const [wysylam, ustawWysylam] = useState<false | "gracz" | "zdjecie">(false);
+  const [zdjecie, ustawZdjecie] = useState<{ blob: Blob; podglad: string } | null>(null);
   const druzyny = stan.tryb === "druzyny";
   const pelna = stan.liczba_graczy >= stan.max_graczy;
 
@@ -160,15 +163,22 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
       onSubmit={async (e) => {
         e.preventDefault();
         if (!nick.trim() || wysylam) return;
-        ustawWysylam(true);
+        ustawWysylam("gracz");
         ustawBlad(null);
         const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: nick, p_token: null });
-        ustawWysylam(false);
         if (error) {
+          ustawWysylam(false);
           ustawBlad(komunikatBledu(error));
           return;
         }
-        onDolaczono(data as Dolaczenie);
+        const d = data as Dolaczenie;
+        // zdjęcie po dołączeniu (potrzebny token); nieudane nie blokuje gry, można dodać je potem
+        if (zdjecie) {
+          ustawWysylam("zdjecie");
+          await wyslijZdjecie(d.token, zdjecie.blob).catch(() => undefined);
+        }
+        ustawWysylam(false);
+        onDolaczono(d);
       }}
     >
       {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
@@ -193,13 +203,19 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
           ? "Jedna drużyna gra na jednym telefonie. Nazwa pojawi się na telewizorze."
           : "Nick pojawi się na telewizorze."}
       </p>
+      <ZdjecieGracza
+        nick={nick}
+        zdjecie={zdjecie?.podglad ?? null}
+        onWybrano={(blob, podglad) => ustawZdjecie({ blob, podglad })}
+        onUsun={() => ustawZdjecie(null)}
+      />
       {blad && (
         <p className="blad" role="alert">
           {blad}
         </p>
       )}
-      <button type="submit" className="przycisk zloty" style={{ marginTop: 18 }} disabled={!nick.trim() || wysylam || pelna}>
-        {pelna ? "Komplet graczy" : wysylam ? "Dołączam…" : "Dołącz do gry"}
+      <button type="submit" className="przycisk zloty" style={{ marginTop: 18 }} disabled={!nick.trim() || !!wysylam || pelna}>
+        {pelna ? "Komplet graczy" : wysylam === "zdjecie" ? "Wysyłam zdjęcie…" : wysylam ? "Dołączam…" : "Dołącz do gry"}
       </button>
     </form>
   );
@@ -216,7 +232,7 @@ function WGrze({
 }: {
   stan: StanSesji;
   ja: Ja;
-  gracze: string[];
+  gracze: GraczNaLiscie[];
   moj: MojWynik | null;
   mojWiersz: WierszRankingu | null;
   przesuniecie: number;
@@ -237,6 +253,7 @@ function WGrze({
         nick={ja.nick}
         kod={stan.kod}
         nagrody={stan.nagrody}
+        zdjecie={moj?.zdjecie ?? null}
       />
     );
   }
@@ -246,6 +263,18 @@ function WGrze({
       <>
         <p className="nadtytul">Jesteś w grze</p>
         <h1 style={{ color: "var(--zloto)", overflowWrap: "anywhere" }}>{ja.nick}</h1>
+        <ZdjecieGracza
+          nick={ja.nick}
+          zdjecie={gracze.find((g) => g.nick === ja.nick)?.zdjecie ?? null}
+          onWybrano={async (blob) => {
+            await wyslijZdjecie(ja.token, blob);
+            await odswiez();
+          }}
+          onUsun={async () => {
+            await usunZdjecie({ token: ja.token });
+            await odswiez();
+          }}
+        />
         <p>Patrz na telewizor. Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
         <section style={{ marginTop: "var(--section-gap)" }}>
           <p className="etykieta">
@@ -253,8 +282,9 @@ function WGrze({
           </p>
           <ul className="nicki">
             {gracze.map((g) => (
-              <li key={g} className={g === ja.nick ? "ja" : undefined}>
-                {g}
+              <li key={g.nick} className={g.nick === ja.nick ? "ja" : undefined}>
+                <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={26} />
+                {g.nick}
               </li>
             ))}
           </ul>

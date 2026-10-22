@@ -1086,3 +1086,43 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Awatary graczy na TV (selfie albo pierwsza litera) */
+.tv-nicki li {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 8px;
+}
+
+.tv-ranking-nick,
+.tv-odpowiedzi-nick {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tv-ranking-nick > span,
+.tv-odpowiedzi-nick > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tv-odpowiedzi.gesto .tv-odpowiedzi-nick .awatar {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.tv-stopien-awatar {
+  margin-bottom: 14px;
+  border-width: 4px;
+  border-color: var(--kamien2);
+  box-shadow: var(--glow-md);
+}
+
+.tv-stopien-1 .tv-stopien-awatar {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-lg);
+}

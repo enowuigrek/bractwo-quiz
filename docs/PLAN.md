@@ -257,6 +257,13 @@ Kolejność: nagrody → selfie → typy pytań, każda rzecz osobno wypchnięta
 
 **Nagrody ✅ (migracja `20261022160506_nagrody`):** `sesje.nagrody` jsonb (null albo `[{miejsce, nagroda, instrukcja}]`, 1–3 pozycje), zwracane w `stan_sesji`. W kreatorze jest wybór „bez nagród / za 1. miejsce / za pierwszą trójkę”, a przy każdym miejscu nagroda i opcjonalna instrukcja. TV pokazuje nagrodę w złotej pigułce pod punktami na podium. Telefon pokazuje kartę nagrody z mieniącą się ramką, nickiem, kodem gry i tykającym zegarem. Przy remisie obaj gracze widzą nagrodę za to miejsce, a o wydaniu decyduje obsługa. Sprawdzone na localhost z tymczasową grą KRBN (usunięta): telefon zwycięzcy, podium na TV, pola w kreatorze.
 
+**Selfie ✅ (migracja `20261022161457_zdjecia_graczy`):** `gracze.zdjecie_url`. Nowa funkcja `lista_graczy` (nick i zdjęcie) zastępuje w aplikacji `gracze_sesji`, który zostaje dla zgodności. `ranking`, `odpowiedzi_zadania` i `moj_wynik` zwracają `zdjecie`, a zmiana zdjęcia wysyła zdarzenie `gracz`.
+- Zapis i usuwanie idą przez `/api/zdjecie` (klucz serwisowy): POST z tokenem gracza (tylko JPEG albo WebP, do 400 KB, nie po końcu gry), DELETE tokenem gracza albo kodem z kluczem pilota i nickiem.
+- Telefon przycina zdjęcie do 256×256 JPEG (`src/lib/zdjecie.ts`, z obrotem według EXIF). „📷 Dodaj selfie” jest w formularzu dołączania i w poczekalni (zmień albo usuń).
+- `Awatar` (`src/components/awatar.tsx`): zdjęcie w kółku albo pierwsza litera na kolorze dobranym po nicku. Pokazuje się w poczekalni (TV, telefon, pilot), rankingu, tabeli, odpowiedziach, na podium (200/150 px nad stopniem) i w medalu na telefonie.
+- Pilot: dotknięcie zdjęcia pyta, czy je usunąć. Zdjęcia znikają po 7 dniach (`/api/keepalive`) i razem z usuniętą grą.
+- Sprawdzone na localhost z tymczasową grą XAST (usunięta razem ze zdjęciami): dołączenie z podłożonym zdjęciem, poczekalnia na telefonie i TV, usunięcie z pilota (telefon gracza odświeżył się sam), podium ze zdjęciem, odrzucenie złego tokenu, SVG i złego klucza pilota. Nie sprawdzone: prawdziwy aparat w telefonie i kasowanie po 7 dniach (zadziała przy najbliższym cronie).
+
 ### Fanfary na podium (22.10)
 
 - **TV:** gdy wjeżdża zwycięzca, konfetti wybucha z obu dolnych rogów i przez 6 s pada złoty deszcz (`canvas-confetti`, kolory z design systemu, wyłączone przy `prefers-reduced-motion`). Nad zwycięzcą jest napis „Zwycięzca”, a jego stopień pulsuje blaskiem. Na końcu gry jest krótszy wybuch.

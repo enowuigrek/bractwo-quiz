@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { usunGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 
 /**
@@ -6,6 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
  * 1. Małe zapytanie do bazy.
  * 2. Podłączenie do Realtime: dopiero wtedy usługa zakłada partycje `realtime.messages`
  *    na kolejne dni, a bez nich `realtime.send` po cichu gubi zdarzenia (PLAN.md, ⚠️ z dnia 1).
+ * 3. Sprzątanie: selfie graczy starsze niż 7 dni (dane osobowe), historia gry zostaje bez zdjęć.
  *
  * Vercel wysyła `Authorization: Bearer <CRON_SECRET>`, gdy zmienna jest ustawiona.
  */
@@ -18,10 +20,11 @@ export async function GET(request: Request) {
   const start = Date.now();
   const { error: bladBazy } = await supabaseAdmin().from("lokale").select("id").limit(1);
   const realtime = await podlaczRealtime();
+  const zdjecia = await usunStareZdjecia();
 
   const ok = !bladBazy && realtime === "SUBSCRIBED";
   return Response.json(
-    { ok, baza: bladBazy ? bladBazy.message : "ok", realtime, ms: Date.now() - start },
+    { ok, baza: bladBazy ? bladBazy.message : "ok", realtime, zdjecia, ms: Date.now() - start },
     { status: ok ? 200 : 500, headers: { "Cache-Control": "no-store" } },
   );
 }
@@ -47,4 +50,27 @@ async function podlaczRealtime(): Promise<string> {
   } finally {
     await klient.removeAllChannels();
   }
+}
+
+/** Usuwa selfie graczy, którzy dołączyli ponad 7 dni temu. Zwraca liczbę usuniętych albo opis błędu. */
+async function usunStareZdjecia(): Promise<number | string> {
+  const granica = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const db = supabaseAdmin();
+  const { data, error } = await db
+    .from("gracze")
+    .select("id, zdjecie_url")
+    .not("zdjecie_url", "is", null)
+    .lt("dolaczyl", granica)
+    .limit(500);
+  if (error) return error.message;
+  if (!data?.length) return 0;
+  await Promise.all(data.map((g) => usunGrafike(g.zdjecie_url)));
+  const { error: bladZmiany } = await db
+    .from("gracze")
+    .update({ zdjecie_url: null })
+    .in(
+      "id",
+      data.map((g) => g.id),
+    );
+  return bladZmiany ? bladZmiany.message : data.length;
 }

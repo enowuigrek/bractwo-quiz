@@ -2,6 +2,7 @@
 
 import { motion, MotionConfig } from "motion/react";
 import type { CSSProperties } from "react";
+import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/gra/nasluch";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 
@@ -34,7 +35,10 @@ function Wiersz({ o, i, nr, odpowiedzi }: PropsWiersza) {
   return (
     <motion.li className="tv-odpowiedzi-wiersz" {...wjazd(i)}>
       <span className="tv-odpowiedzi-nr">{nr ? `${nr}.` : ""}</span>
-      <span className="tv-odpowiedzi-nick">{o.nick}</span>
+      <span className="tv-odpowiedzi-nick">
+        <Awatar nick={o.nick} zdjecie={o.zdjecie} rozmiar={38} />
+        <span>{o.nick}</span>
+      </span>
       <span className="tv-odpowiedzi-odp">
         {idx !== undefined && (
           <>
@@ -141,7 +145,10 @@ export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                 {...wjazd(i)}
               >
                 <span className="tv-ranking-miejsce">{w.miejsce}.</span>
-                <span className="tv-ranking-nick">{w.nick}</span>
+                <span className="tv-ranking-nick">
+                  <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={44} />
+                  <span>{w.nick}</span>
+                </span>
                 <span className="tv-ranking-punkty">{w.punkty.toLocaleString("pl-PL")}</span>
               </motion.li>
             ))}
