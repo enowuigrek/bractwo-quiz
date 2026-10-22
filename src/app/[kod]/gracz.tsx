@@ -356,7 +356,6 @@ function WGrze({
         <h1>Ranking</h1>
         {moj && <Miejsce moj={moj} />}
         {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
-        <p>Patrz na telewizor.</p>
       </>
     );
   }

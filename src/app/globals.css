@@ -1169,10 +1169,6 @@ html:has(.kolumna) {
   height: 28px;
 }
 
-.gra-wynik + .gra-status {
-  margin-top: 12px;
-}
-
 /* Medal nad kartą nagrody mniejszy, żeby koniec gry mieścił się na telefonie bez przewijania */
 .fanfara.z-nagroda {
   gap: 6px;

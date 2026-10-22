@@ -279,7 +279,6 @@ export function Rozgrywka({
           </ol>
         )}
       </div>
-      <p className="gra-status">Patrz na telewizor.</p>
     </>
   );
 }
