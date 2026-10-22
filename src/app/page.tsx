@@ -3,14 +3,13 @@ import Link from "next/link";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
-import { WpiszKod } from "./wpisz-kod";
 
 // lista lokali zmienia się rzadko: odświeżamy ją co 5 minut zamiast przy każdym wejściu
 export const revalidate = 300;
 
 /**
- * Strona główna. Gracz wpisuje tu kod (QR z TV prowadzi od razu do gry), obsługa lokalu
- * otwiera ekran swojego lokalu na telewizorze, a prowadzący wchodzi do panelu albo czyta, jak to działa.
+ * Strona główna dla obsługi: ekrany lokali do otwarcia na telewizorze, panel i opis, jak to działa.
+ * Gracze tu nie trafiają: QR z telewizora prowadzi od razu do gry (`/<kod>`).
  */
 export default async function Home() {
   const { data } = await supabaseAdmin()
@@ -26,14 +25,6 @@ export default async function Home() {
       <h1 style={{ marginBottom: "var(--section-gap)" }}>
         <LogoQuiz wysokosc={96} priorytet />
       </h1>
-
-      <section aria-labelledby="graj">
-        <h2 id="graj" className="nadtytul">
-          Grasz?
-        </h2>
-        <p className="pomocniczy">Piwu Cześć! Wpisz kod z telewizora albo zeskanuj kod QR.</p>
-        <WpiszKod />
-      </section>
 
       {lokale.length > 0 && (
         <section className="glowna-sekcja" aria-labelledby="ekrany">

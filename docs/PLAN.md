@@ -293,7 +293,7 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 ### Domena, strona główna i „Jak to działa” (22.10)
 
 - **Domena ✅:** `https://quiz.bractwopiwne.pl` działa. Rekord A `quiz` → `76.76.21.21` jest w strefie DNS na hostingu Hostido (konto host367070, DirectAdmin → Zarządzanie DNS). Panel domeny zostaje na „Przekierowanie na serwery DNS”, a MX Google są nietknięte. Certyfikat Let's Encrypt wystawił Vercel (`vercel certs issue`, sam się nie wystawił po dodaniu rekordu), `http://` przekierowuje na `https://`.
-- **Strona główna:** pole na kod gry („Grasz?”), lista ekranów lokali z logami i linkami `/ekran/<adres>` (ISR co 5 minut), a dla prowadzących „Panel obsługi” i „Jak to działa?”.
+- **Strona główna (dla obsługi):** lista ekranów lokali z logami i linkami `/ekran/<adres>` (ISR co 5 minut), a dla prowadzących „Panel obsługi” i „Jak to działa?”. Bez pola na kod gry, bo gracze skanują QR. Na TV pod QR jest pełny adres gry (`quiz.bractwopiwne.pl/KOD`) dla tych, którzy nie mogą skanować.
 - **`/jak-to-dziala`:** opis całości dla prowadzących i obsługi (do przeczytania przez Zbyszka przed testem): cztery ekrany, wieczór krok po kroku, punkty, rodzaje pytań, nagrody, uczciwość, co robić przy awariach i lista do testu.
 - **Favicon:** logo Bractwa z bractwopiwne.pl (`src/app/icon.png`, `apple-icon.png`) zamiast ikony Next.js.
 

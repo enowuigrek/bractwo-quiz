@@ -66,7 +66,7 @@ export default function JakToDziala() {
           <div>
             <dt>Telefon gracza</dt>
             <dd>
-              Gracz skanuje QR z telewizora (albo wpisuje kod na stronie głównej), podaje imię albo nick i może dodać
+              Gracz skanuje QR z telewizora (albo wpisuje w przeglądarce adres widoczny pod kodem), podaje imię albo nick i może dodać
               selfie, które pokaże się przy nicku na TV. Odpowiada na telefonie, a po każdym pytaniu widzi, czy
               trafił, ile zdobył i które ma miejsce.
             </dd>

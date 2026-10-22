@@ -158,7 +158,7 @@ export function Loga({
 }
 
 /**
- * Poczekalnia: duży QR po lewej (pod nim drobniej adres i kod dla wpisujących ręcznie),
+ * Poczekalnia: duży QR po lewej (pod nim drobniej adres gry dla wpisujących ręcznie),
  * na pierwszym planie okazja, tytuł quizu i grafika, pod nimi gracze.
  */
 function Poczekalnia({
@@ -187,7 +187,8 @@ function Poczekalnia({
         <section className="tv-wejscie">
           <div className="tv-qr" dangerouslySetInnerHTML={{ __html: qr }} />
           <p className="tv-adres">
-            Bez skanowania: {host} · kod <strong className="tv-zloto">{stan.kod}</strong>
+            {/* bez skanowania: adres do wpisania w przeglądarce prowadzi od razu do gry */}
+            Bez skanowania: {host}/<strong className="tv-zloto">{stan.kod}</strong>
           </p>
         </section>
 
