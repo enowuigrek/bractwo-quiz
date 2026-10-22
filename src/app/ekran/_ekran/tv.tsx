@@ -33,7 +33,8 @@ function useSkala() {
 }
 
 /** Scena 1920×1080 przeskalowana do ekranu. Wspólna dla gry i plansz ekranu lokalu. */
-export function Scena({ children }: { children: React.ReactNode }) {
+/** `bezLogoWRogu`: plansze lokalu mają duże logo Bractwa, więc w rogu go nie dublujemy. */
+export function Scena({ children, bezLogoWRogu = false }: { children: React.ReactNode; bezLogoWRogu?: boolean }) {
   const skala = useSkala();
   return (
     <div className="tv">
@@ -46,7 +47,7 @@ export function Scena({ children }: { children: React.ReactNode }) {
         }}
       >
         {children}
-        <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-bractwo-rog" />
+        {!bezLogoWRogu && <img src="/loga/bractwo.svg" alt="" className="logo-bractwo tv-bractwo-rog" />}
       </div>
     </div>
   );
@@ -204,7 +205,7 @@ function Poczekalnia({
             </p>
             {gracze.length === 0 ? (
               <p className="tv-zacheta">
-                Zeskanuj kod telefonem i wpisz {druzyny ? "nazwę drużyny" : "swój nick"}.
+                Zeskanuj kod telefonem i wpisz {druzyny ? "nazwę drużyny" : "imię albo nick"}.
                 <br />
                 Czekamy na {druzyny ? "pierwsze drużyny" : "pierwszych graczy"}…
               </p>

@@ -290,6 +290,17 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
+### Poprawki po trzecim teście (22.10)
+
+- **Przyciski:** hover złotego, zielonego i czerwonego przycisku tylko je rozjaśnia (wcześniej reguła zwykłego przycisku dawała szare tło i tekst był prawie niewidoczny). Przejście trwa 0,35 s. Na stronie gry „Prowadź z tego urządzenia”.
+- **Nicki:** baza już pilnuje unikalności w grze bez względu na wielkość liter. Telefon przy zajętym nicku pisze „Ktoś już gra jako „Piotr”. Dopisz coś od siebie, np. pierwszą literę nazwiska („Piotr K.”) albo przydomek” i niczego nie dopisuje sam. Pole to „Imię albo nick”, a w instrukcjach na TV nie ma drużyn („Wpisz swoje imię albo nick”).
+- **Telefon:** „Niestety źle” w czerwonej karcie, zła odpowiedź z czerwoną ramką i czerwonym skreśleniem.
+- **Bez przewijania na 375×667:** wynik pytania jest ciaśniejszy (miejsce jednym wierszem pod werdyktem, bez grafiki, niższe kafelki), medal nad kartą nagrody jest mniejszy, a poczekalnia pokazuje 8 nicków (z Twoim) i „+N”. Sprawdzone: dołączanie, poczekalnia przy 19 graczach, pytanie, wynik, koniec z nagrodą.
+- **Odbiór nagrody z panelu:** przy każdej nagrodzie „Oznacz odbiór” albo „Cofnij” (akcja `ustawOdbiorNagrody`, klucz serwisowy). Telefon gracza zmienia kartę w ciągu kilku sekund w obie strony.
+- **Podium 3D:** stopnie ze złota, srebra i brązu (cieniowany przód, jaśniejsza górna ścianka w perspektywie, numer wybity w metalu, cień pod spodem). Metal idzie za miejscem, więc przy remisie na 1. miejscu oba stopnie są złote. Nicki 2. i 3. miejsca w kolorze metalu.
+- **Plansze lokalu:** pierwsza ma duże logo Bractwa obok dużego logo lokalu, plansza „Piwu Cześć!” ma większe logo i mniejszy napis. Na planszach z dużym logo nie ma małego w rogu.
+- Sprawdzone na localhost z tymczasowymi grami XCCN i JPJQ (usunięte).
+
 ### Fanfary na podium (22.10)
 
 - **TV:** gdy wjeżdża zwycięzca, konfetti wybucha z obu dolnych rogów i przez 6 s pada złoty deszcz (`canvas-confetti`, kolory z design systemu, wyłączone przy `prefers-reduced-motion`). Nad zwycięzcą jest napis „Zwycięzca”, a jego stopień pulsuje blaskiem. Na końcu gry jest krótszy wybuch.

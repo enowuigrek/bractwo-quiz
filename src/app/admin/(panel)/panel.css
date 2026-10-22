@@ -223,10 +223,10 @@ h2 {
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: background 0.15s, filter 0.15s;
+  transition: background 0.35s var(--ease-std), filter 0.35s var(--ease-std);
 }
 
-.przycisk-maly:hover:not(:disabled) {
+.przycisk-maly:not(.zloty, .niebezpieczny):hover:not(:disabled) {
   background: var(--kamien3);
 }
 

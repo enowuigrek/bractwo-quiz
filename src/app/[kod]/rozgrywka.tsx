@@ -248,39 +248,47 @@ export function Rozgrywka({
           <span className="werdykt-punkty">+0 pkt</span>
         </div>
       )}
-      {gotowe && <Miejsce moj={moj} />}
-
-      <Pytanie stan={stan} />
-      {z.typ !== "wybor" ? (
-        <Rozwiazanie z={z} moja={moja} />
-      ) : (
-        <ol className="odp-lista">
-          {(z.dane.odpowiedzi ?? []).map((o, i) => {
-            const klasa = i === poprawna ? " poprawna" : i === wybrana ? " bledna" : " przygaszona";
-            return (
-              <li key={i}>
-                <div className={`odp${klasa}`}>
-                  <span className="odp-litera">{LITERY[i]}</span>
-                  <span className="odp-tekst">{o}</span>
-                  {i === poprawna && <span className="ok">✓</span>}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+      {gotowe && moj.miejsce != null && (
+        <p className="wynik-miejsce">
+          <strong>{moj.miejsce}.</strong> miejsce z {moj.liczba_graczy} ·{" "}
+          <span className="gra-kod">{moj.punkty.toLocaleString("pl-PL")} pkt</span>
+        </p>
       )}
+
+      {/* po wyniku bez grafiki i ciaśniej, żeby ekran mieścił się bez przewijania */}
+      <div className="gra-wynik">
+        <Pytanie stan={stan} bezGrafiki />
+        {z.typ !== "wybor" ? (
+          <Rozwiazanie z={z} moja={moja} />
+        ) : (
+          <ol className="odp-lista">
+            {(z.dane.odpowiedzi ?? []).map((o, i) => {
+              const klasa = i === poprawna ? " poprawna" : i === wybrana ? " bledna" : " przygaszona";
+              return (
+                <li key={i}>
+                  <div className={`odp${klasa}`}>
+                    <span className="odp-litera">{LITERY[i]}</span>
+                    <span className="odp-tekst">{o}</span>
+                    {i === poprawna && <span className="ok">✓</span>}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </div>
       <p className="gra-status">Patrz na telewizor.</p>
     </>
   );
 }
 
-function Pytanie({ stan }: { stan: StanSesji }) {
+function Pytanie({ stan, bezGrafiki = false }: { stan: StanSesji; bezGrafiki?: boolean }) {
   const z = stan.zadanie;
   if (!z) return null;
   return (
     <>
       <h2 className="gra-pytanie">{z.tresc}</h2>
-      {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
+      {z.grafika_url && !bezGrafiki && <img src={z.grafika_url} alt="" className="gra-grafika" />}
     </>
   );
 }

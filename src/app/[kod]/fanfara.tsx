@@ -78,7 +78,7 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token
   if (moj && miejsce && miejsce <= 3) {
     return (
       <>
-        <div className={`fanfara fanfara-${miejsce}`}>
+        <div className={`fanfara fanfara-${miejsce}${nagroda ? " z-nagroda" : ""}`}>
           <div className={`medal${zdjecie ? " ze-zdjeciem" : ""}`} aria-hidden>
             {zdjecie ? <img src={zdjecie} alt="" /> : null}
             <span>{miejsce}</span>
@@ -137,6 +137,12 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
   const { nagroda, nick, kod, token } = props;
   const teraz = useZegar();
   const [odebrana, ustawOdebrana] = useState(props.odebrana);
+  // odbiór oznaczony (albo cofnięty) w panelu przychodzi z bazy i wygrywa z lokalnym kliknięciem
+  const [zBazy, ustawZBazy] = useState(props.odebrana);
+  if (props.odebrana !== zBazy) {
+    ustawZBazy(props.odebrana);
+    ustawOdebrana(props.odebrana);
+  }
   const [blad, ustawBlad] = useState<string | null>(null);
   const [potwierdz, okno] = usePotwierdzenie();
 
@@ -154,7 +160,7 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
     ustawOdebrana((data as { odebrana: string }).odebrana);
   }
 
-  const widocznaOdebrana = odebrana ?? props.odebrana;
+  const widocznaOdebrana = odebrana;
   if (widocznaOdebrana) {
     return (
       <section className="karta-nagrody odebrana" aria-label="Nagroda odebrana">

@@ -8,7 +8,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
 import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { usunGre, zakonczGre } from "../akcje";
+import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { wynikiGry, zadaniaGry } from "../wyniki";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { TabelaWynikow } from "./tabela-wynikow";
@@ -106,10 +106,10 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
             <section className="panel-sekcja karta">
               <h2>Prowadzenie</h2>
               <p className="pomocniczy" style={{ marginTop: 0 }}>
-                Prowadzisz sam? Otwórz pilota na tym telefonie. Grę możesz też przekazać komuś innemu.
+                Prowadzisz sam? Otwórz pilota na tym urządzeniu (telefon albo laptop). Grę możesz też przekazać komuś innemu.
               </p>
               <a href={linki.pilot} className="przycisk zloty">
-                Prowadź z tego telefonu
+                Prowadź z tego urządzenia
               </a>
               <details className="przekaz">
                 <summary>Przekaż prowadzącemu (kod QR)</summary>
@@ -164,7 +164,8 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
         <section className="panel-sekcja">
           <h2>Nagrody</h2>
           <p className="pomocniczy" style={{ marginTop: 0 }}>
-            Zwycięzca klika na telefonie „Potwierdź odbiór”, gdy dostanie nagrodę. Godzina pojawia się tutaj.
+            Zwycięzca klika na telefonie „Potwierdź odbiór”, gdy dostanie nagrodę. Godzina pojawia się tutaj. Jeśli z
+            telefonu się nie udało, oznacz odbiór tutaj: telefon gracza też pokaże „Odebrana”.
           </p>
           <ul className="lista">
             {gra.nagrody.flatMap((n) => {
@@ -200,6 +201,18 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
                         })}`
                       : "jeszcze nieodebrana"}
                   </span>
+                  <PrzyciskPotwierdz
+                    akcja={ustawOdbiorNagrody.bind(null, gra.id, w.id, !w.nagrodaOdebrana)}
+                    pytanie={
+                      w.nagrodaOdebrana
+                        ? `Cofnąć odbiór nagrody „${n.nagroda}” dla ${w.nick}? Karta na telefonie znów będzie do odebrania.`
+                        : `Oznaczyć nagrodę „${n.nagroda}” jako odebraną przez ${w.nick}?`
+                    }
+                    tak={w.nagrodaOdebrana ? "Cofnij odbiór" : "Oznacz odbiór"}
+                    className="przycisk-maly"
+                  >
+                    {w.nagrodaOdebrana ? "Cofnij" : "Oznacz odbiór"}
+                  </PrzyciskPotwierdz>
                 </li>
               ));
             })}

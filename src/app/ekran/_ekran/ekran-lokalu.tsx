@@ -55,7 +55,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
     return <Tv key={kod} kod={kod} qr={qr.svg} host={baza.replace(/^https?:\/\//, "")} />;
   }
   return (
-    <Scena>
+    <Scena bezLogoWRogu>
       <Plansze lokal={lokal} ostatnia={ostatnia} />
     </Scena>
   );

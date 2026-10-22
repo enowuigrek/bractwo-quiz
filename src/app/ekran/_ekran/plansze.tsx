@@ -36,6 +36,7 @@ export function Plansze({ lokal, ostatnia }: Props) {
         {nr === 0 && (
           <div className="plansza-srodek">
             <div className="plansza-loga">
+              <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo-duze" />
               <Loga lokal={lokal} />
             </div>
             <h1 className="plansza-tytul">Quiz Bractwa Piwnego</h1>
@@ -50,7 +51,7 @@ export function Plansze({ lokal, ostatnia }: Props) {
                 <span>1</span> Zeskanuj telefonem kod QR, który pojawi się na tym ekranie.
               </li>
               <li>
-                <span>2</span> Wpisz swój nick albo nazwę drużyny.
+                <span>2</span> Wpisz swoje imię albo nick.
               </li>
               <li>
                 <span>3</span> Odpowiadaj na telefonie. Im szybciej dobrze odpowiesz, tym więcej punktów!
@@ -85,6 +86,8 @@ export function Plansze({ lokal, ostatnia }: Props) {
           </div>
         )}
       </div>
+      {/* plansze 1 i 3 nie mają dużego logo Bractwa, więc dostają małe w rogu */}
+      {(nr === 1 || nr === 3) && <img src="/loga/bractwo.svg" alt="" className="logo-bractwo tv-bractwo-rog" />}
       <ol className="plansze-kropki" aria-hidden>
         {Array.from({ length: liczbaPlansz }, (_, i) => (
           <li key={i} className={i === nr ? "teraz" : undefined} />

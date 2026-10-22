@@ -14,6 +14,18 @@ import { ZdjecieGracza } from "./zdjecie-gracza";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
+/** Ile nicków mieści się w poczekalni na telefonie; reszta jako „+N”. */
+const NICKI_W_POCZEKALNI = 8;
+
+function widoczni(gracze: GraczNaLiscie[], ja: string): GraczNaLiscie[] {
+  if (gracze.length <= NICKI_W_POCZEKALNI) return gracze;
+  const pierwsi = gracze.slice(0, NICKI_W_POCZEKALNI);
+  if (pierwsi.some((g) => g.nick === ja)) return pierwsi;
+  return [gracze.find((g) => g.nick === ja), ...pierwsi.slice(0, NICKI_W_POCZEKALNI - 1)].filter(
+    (g): g is GraczNaLiscie => !!g,
+  );
+}
+
 export function Gracz({ kod }: { kod: string }) {
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
@@ -201,7 +213,13 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
         const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: nick, p_token: null });
         if (error) {
           ustawWysylam(false);
-          ustawBlad(komunikatBledu(error));
+          const komunikat = komunikatBledu(error);
+          // nick jest unikalny w grze (bez względu na wielkość liter); gracz sam dopisuje coś od siebie
+          ustawBlad(
+            komunikat.includes("jest już zajęty")
+              ? `Ktoś już gra jako „${nick.trim()}”. Dopisz coś od siebie, np. pierwszą literę nazwiska („${nick.trim()} K.”) albo przydomek.`
+              : komunikat,
+          );
           return;
         }
         const d = data as Dolaczenie;
@@ -220,7 +238,7 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
       {stan.browar && <p className="pomocniczy">Kranoprzejęcie: {stan.browar.nazwa}</p>}
 
       <label htmlFor="nick" className="etykieta">
-        {druzyny ? "Nazwa drużyny" : "Twój nick"}
+        {druzyny ? "Nazwa drużyny" : "Imię albo nick"}
       </label>
       <input
         id="nick"
@@ -235,7 +253,7 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
       <p className="pomocniczy" style={{ margin: "6px 0 0" }}>
         {druzyny
           ? "Jedna drużyna gra na jednym telefonie. Nazwa pojawi się na telewizorze."
-          : "Nick pojawi się na telewizorze."}
+          : "Pojawi się na telewizorze. Każdy w grze musi mieć inne."}
       </p>
       <ZdjecieGracza
         nick={nick}
@@ -316,13 +334,15 @@ function WGrze({
           <p className="etykieta">
             {stan.tryb === "druzyny" ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
           </p>
+          {/* przy wielu graczach tylko część listy (z Tobą), żeby ekran nie przewijał się */}
           <ul className="nicki">
-            {gracze.map((g) => (
+            {widoczni(gracze, ja.nick).map((g) => (
               <li key={g.nick} className={g.nick === ja.nick ? "ja" : undefined}>
                 <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={26} />
                 {g.nick}
               </li>
             ))}
+            {gracze.length > NICKI_W_POCZEKALNI && <li>+{gracze.length - NICKI_W_POCZEKALNI}</li>}
           </ul>
         </section>
       </>

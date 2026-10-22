@@ -91,10 +91,11 @@ h1 {
   border-radius: var(--r-btn);
   padding: 16px 24px;
   cursor: pointer;
-  transition: background 0.15s, filter 0.15s;
+  transition: background 0.35s var(--ease-std), filter 0.35s var(--ease-std);
 }
 
-.przycisk:hover:not(:disabled) {
+/* hover zwykłego przycisku jaśnieje; kolorowe (niżej) tylko się rozjaśniają, tło i tekst zostają */
+.przycisk:not(.zloty, .pozytywny, .niebezpieczny):hover:not(:disabled) {
   background: var(--kamien3);
 }
 
@@ -404,13 +405,21 @@ button.odp:not(:disabled):active {
   color: var(--na-chmielu);
 }
 
+/* zła odpowiedź gracza: czerwona ramka i czerwone skreślenie */
 .odp.bledna {
-  border-color: var(--szary);
+  border-color: var(--czerwien);
 }
 
 .odp.bledna .odp-tekst {
   text-decoration: line-through;
+  text-decoration-color: var(--czerwien);
+  text-decoration-thickness: 2px;
   color: var(--szary);
+}
+
+.odp.bledna .odp-litera {
+  border-color: var(--czerwien);
+  color: var(--czerwien);
 }
 
 .gra-status {
@@ -467,6 +476,15 @@ button.odp:not(:disabled):active {
   font-size: var(--fs-stopien-xl);
   font-weight: var(--w-black);
   line-height: 1.15;
+}
+
+.werdykt.zle {
+  border-color: var(--czerwien);
+  background: rgba(226, 115, 90, 0.1);
+}
+
+.werdykt.zle .werdykt-tytul {
+  color: var(--czerwien);
 }
 
 .werdykt.dobrze .werdykt-tytul {
@@ -1008,6 +1026,7 @@ html:has(.kolumna) {
   font-weight: var(--w-semibold);
   color: var(--szary);
   text-decoration: line-through;
+  text-decoration-color: var(--czerwien);
 }
 
 .odp .zle {
@@ -1091,4 +1110,89 @@ html:has(.kolumna) {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Wynik pytania na telefonie: ciaśniej, żeby werdykt, miejsce i rozwiązanie mieściły się bez przewijania */
+.werdykt {
+  padding: 14px var(--card-pad);
+  margin-bottom: 10px;
+}
+
+.werdykt-punkty {
+  font-size: 38px;
+}
+
+.wynik-miejsce {
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+}
+
+.wynik-miejsce strong {
+  color: var(--piana);
+  font-weight: var(--w-black);
+}
+
+.gra-wynik .gra-pytanie {
+  font-size: var(--fs-body);
+  margin-bottom: 10px;
+}
+
+.gra-wynik .odp-lista {
+  gap: 6px;
+}
+
+.gra-wynik .odp {
+  min-height: 46px;
+  padding: 7px 12px;
+}
+
+.gra-wynik .odp-litera {
+  width: 28px;
+  height: 28px;
+}
+
+.gra-wynik + .gra-status {
+  margin-top: 12px;
+}
+
+/* Medal nad kartą nagrody mniejszy, żeby koniec gry mieścił się na telefonie bez przewijania */
+.fanfara.z-nagroda {
+  gap: 6px;
+  margin: 0 0 16px;
+}
+
+.fanfara.z-nagroda .medal {
+  width: 104px;
+  height: 104px;
+  border-width: 5px;
+}
+
+.fanfara.z-nagroda .medal span {
+  font-size: 54px;
+}
+
+.fanfara.z-nagroda .fanfara-tytul {
+  margin-top: 4px;
+  font-size: 32px;
+}
+
+.fanfara.z-nagroda ~ .karta-nagrody {
+  margin-bottom: 18px;
+  padding: 16px var(--card-pad);
+}
+
+.karta-nagrody-odbior {
+  margin-top: 12px;
+}
+
+.fanfara ~ .podziekowanie {
+  margin: 0;
+}
+
+.fanfara ~ .autor {
+  margin-top: 18px;
+  padding-top: 10px;
 }

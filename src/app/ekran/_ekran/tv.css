@@ -979,9 +979,25 @@
   gap: 28px;
 }
 
+.plansza-loga {
+  display: flex;
+  align-items: center;
+  gap: 100px;
+}
+
+.plansza-loga .tv-logo-bractwo-duze {
+  height: 360px;
+  width: auto;
+}
+
 .plansza-loga .tv-logo-lokalu {
-  width: 260px;
-  height: 260px;
+  width: 380px;
+  height: 380px;
+}
+
+.plansza-loga .tv-logo-browaru {
+  height: 380px;
+  max-width: 480px;
 }
 
 .plansza-loga .tv-loga {
@@ -1032,12 +1048,12 @@
 }
 
 .plansza-logo-duze {
-  height: 300px;
+  height: 560px;
   width: auto;
 }
 
 .plansza-haslo {
-  font-size: 150px !important;
+  font-size: 84px !important;
   color: var(--zloto);
   text-shadow: var(--glow-md);
 }
@@ -1081,7 +1097,9 @@
 
 @keyframes blask-zwyciezcy {
   50% {
-    box-shadow: 0 0 80px rgba(227, 172, 63, 0.8);
+    box-shadow:
+      0 40px 60px -20px rgba(0, 0, 0, 0.8),
+      0 0 110px rgba(227, 172, 63, 0.85);
   }
 }
 
@@ -1205,18 +1223,6 @@
   margin-top: 8px;
 }
 
-.tv-koniec .tv-stopien-1 .tv-stopien-blok {
-  height: 200px;
-}
-
-.tv-koniec .tv-stopien-2 .tv-stopien-blok {
-  height: 160px;
-}
-
-.tv-koniec .tv-stopien-3 .tv-stopien-blok {
-  height: 110px;
-}
-
 .tv-koniec .tv-stopien-nr {
   font-size: 90px;
 }
@@ -1267,4 +1273,110 @@
 .plansza-podium-miejsce {
   font-size: 30px;
   color: var(--szary);
+}
+
+/* Podium 3D: stopnie z metalu (złoto, srebro, brąz; metal według miejsca, więc remis na 1. to dwa złote). Przód cieniowany jak walcowana blacha,
+   nad nim jaśniejsza górna ścianka w perspektywie, numer wybity w metalu. */
+.tv-stopien {
+  --metal-jasny: #f1f3f5;
+  --metal: #c5ccd3;
+  --metal-ciemny: #8a949e;
+  --metal-cien: #4d555d;
+}
+
+.tv-stopien.metal-1 {
+  --metal-jasny: #fbe7a1;
+  --metal: #e3ac3f;
+  --metal-ciemny: #a8741a;
+  --metal-cien: #5e3d07;
+}
+
+.tv-stopien.metal-3 {
+  --metal-jasny: #f3c49a;
+  --metal: #c9804a;
+  --metal-ciemny: #8e5228;
+  --metal-cien: #4f2a0d;
+}
+
+.tv-koniec .tv-stopien .tv-stopien-blok {
+  position: relative;
+  margin-top: 30px;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 22%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.45)),
+    linear-gradient(90deg, var(--metal-cien) 0%, var(--metal-ciemny) 10%, var(--metal) 32%, var(--metal-jasny) 48%, var(--metal) 64%, var(--metal-ciemny) 88%, var(--metal-cien) 100%);
+  box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.8);
+}
+
+/* górna ścianka: trapez jaśniejszy od przodu */
+.tv-koniec .tv-stopien .tv-stopien-blok::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 30px;
+  clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+  background: linear-gradient(90deg, var(--metal-ciemny), var(--metal-jasny) 45%, var(--metal) 70%, var(--metal-ciemny));
+}
+
+/* krawędź między ścianką a przodem łapie światło */
+.tv-koniec .tv-stopien .tv-stopien-blok::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+}
+
+.tv-koniec .tv-stopien .tv-stopien-nr {
+  color: var(--metal-cien);
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.45),
+    0 -2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.tv-koniec .tv-stopien-1 .tv-stopien-blok {
+  height: 180px;
+  box-shadow:
+    0 40px 60px -20px rgba(0, 0, 0, 0.8),
+    0 0 70px rgba(227, 172, 63, 0.45);
+}
+
+.tv-koniec .tv-stopien-2 .tv-stopien-blok {
+  height: 130px;
+}
+
+.tv-koniec .tv-stopien-3 .tv-stopien-blok {
+  height: 90px;
+}
+
+.tv-koniec .tv-stopien-3 .tv-stopien-nr {
+  font-size: 70px;
+}
+
+/* nicki i punkty w kolorze swojego metalu */
+.tv-koniec .metal-2 .tv-stopien-nick {
+  color: #dfe4e8;
+}
+
+.tv-koniec .metal-3 .tv-stopien-nick {
+  color: #e8a774;
+}
+
+.tv-koniec .metal-2 .tv-stopien-awatar {
+  border-color: #c5ccd3;
+}
+
+.tv-koniec .metal-3 .tv-stopien-awatar {
+  border-color: #c9804a;
+}
+
+/* logo w rogu na planszach: .plansze ma position: relative, więc wracamy do rogu sceny */
+.plansze > .tv-bractwo-rog {
+  right: -44px;
+  bottom: -78px;
 }

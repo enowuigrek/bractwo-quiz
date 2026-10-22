@@ -165,7 +165,7 @@ export function PodiumTv({
           return (
             <motion.div
               key={w.nick}
-              className={`tv-stopien tv-stopien-${i + 1}`}
+              className={`tv-stopien tv-stopien-${i + 1} metal-${Math.min(w.miejsce, 3)}`}
               initial={odRazu ? false : { opacity: 0, y: 120, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: opoznienie(i), type: "spring", stiffness: 120, damping: 14 }}

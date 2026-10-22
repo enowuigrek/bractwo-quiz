@@ -111,6 +111,21 @@ export async function zakonczGre(id: string): Promise<void> {
 }
 
 /**
+ * Odbiór nagrody ustawiony w panelu, gdy z telefonu się nie udało (albo cofnięcie pomyłki).
+ * Telefon gracza pokaże „Odebrana” przy najbliższym odświeżeniu stanu (co kilka sekund).
+ */
+export async function ustawOdbiorNagrody(sesjaId: string, graczId: string, odebrana: boolean): Promise<void> {
+  await wymagajAdmina();
+  const { error } = await supabaseAdmin()
+    .from("gracze")
+    .update({ nagroda_odebrana: odebrana ? new Date().toISOString() : null })
+    .eq("id", graczId)
+    .eq("sesja_id", sesjaId);
+  if (error) throw new Error(`Nie udało się zapisać odbioru: ${error.message}`);
+  refresh();
+}
+
+/**
  * Usuwa grę (trwającą albo zakończoną) razem z graczami i odpowiedziami.
  * `przekieruj`: ze strony gry wracamy do listy, z listy tylko ją odświeżamy.
  */
