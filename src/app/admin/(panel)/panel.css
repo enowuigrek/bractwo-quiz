@@ -83,10 +83,12 @@ html:has(.panel) {
     padding-bottom: 0;
   }
 
+  /* nawigacja przy prawej krawędzi, obok „Wyloguj”, żeby nie czytała się jako ciąg dalszy „Quiz · panel” */
   .panel-nawigacja {
     margin-top: 0;
     align-self: stretch;
     align-items: stretch;
+    justify-content: flex-end;
   }
 
   .panel-nawigacja a {
@@ -110,7 +112,11 @@ html:has(.panel) {
   }
 }
 
-.panel-sekcja + .panel-sekcja {
+/* Sekcja (np. karta „Nowy quiz”) pod listą albo komunikatem nie przykleja się do ostatniej linii */
+.panel-sekcja + .panel-sekcja,
+.lista + .panel-sekcja,
+.lista-pusta + .panel-sekcja,
+.blad + .panel-sekcja {
   margin-top: var(--section-gap);
 }
 
