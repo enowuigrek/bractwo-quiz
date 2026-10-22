@@ -11,7 +11,8 @@ export type ZadanieWidoczne = {
   typ: "wybor";
   tresc: string;
   grafika_url: string | null;
-  czas_s: number;
+  /** `null`: bez limitu czasu. */
+  czas_s: number | null;
   /** `poprawna` pojawia się dopiero od fazy `wynik`. */
   dane: { odpowiedzi: string[]; poprawna?: number };
   /** Statystyki, od fazy `wynik`: ile osób wybrało każdą odpowiedź. */

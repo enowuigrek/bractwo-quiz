@@ -39,7 +39,7 @@ export function Rozgrywka({
   const [blad, ustawBlad] = useState<{ zadanieId: string; tekst: string } | null>(null);
 
   const z = stan.zadanie;
-  const { faza, doStartu, doKonca, czasMinal } = fazaTeraz(stan, teraz);
+  const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   const liczba = stan.quiz?.liczba_zadan ?? "?";
 
   if (!z) {
@@ -58,7 +58,11 @@ export function Rozgrywka({
       <span>
         Pytanie {z.lp}/{liczba}
       </span>
-      {faza === "pytanie" && <span className="gra-kod">{czasMinal ? "koniec czasu" : `${Math.ceil(doKonca / 1000)} s`}</span>}
+      {faza === "pytanie" && (
+        <span className="gra-kod">
+          {czasMinal ? (z.czas_s ? "koniec czasu" : "wszyscy odpowiedzieli") : bezLimitu ? "bez limitu" : `${Math.ceil(doKonca / 1000)} s`}
+        </span>
+      )}
     </p>
   );
 
@@ -104,13 +108,15 @@ export function Rozgrywka({
   }
 
   if (faza === "pytanie") {
-    const zostalo = Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000)));
+    const zostalo = z.czas_s ? Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000))) : 0;
     return (
       <>
         {naglowek}
-        <div className="gra-czas" aria-hidden>
-          <div style={{ transform: `scaleX(${zostalo})` }} />
-        </div>
+        {z.czas_s ? (
+          <div className="gra-czas" aria-hidden>
+            <div style={{ transform: `scaleX(${zostalo})` }} />
+          </div>
+        ) : null}
         <Pytanie stan={stan} />
         <ol className="odp-lista">
           {z.dane.odpowiedzi.map((o, i) => {
@@ -140,7 +146,9 @@ export function Rozgrywka({
               ? `Odpowiedź zapisana (${sekundy(czasOdp)}). Czekamy na wynik…`
               : "Wysyłam odpowiedź…"
             : czasMinal
-              ? "Czas minął. Czekamy na wynik…"
+              ? z.czas_s
+                ? "Czas minął. Czekamy na wynik…"
+                : "Wszyscy odpowiedzieli. Czekamy na wynik…"
               : "Wybierz odpowiedź."}
         </p>
       </>

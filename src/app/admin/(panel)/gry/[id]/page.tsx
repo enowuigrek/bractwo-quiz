@@ -68,6 +68,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               <PrzyciskPotwierdz
                 akcja={zakonczGre.bind(null, gra.id)}
                 pytanie={`Zakończyć grę ${gra.kod}? Gracze nie będą mogli już dołączyć ani odpowiadać.`}
+                tak="Zakończ grę"
                 className="przycisk-maly"
               >
                 Zakończ grę

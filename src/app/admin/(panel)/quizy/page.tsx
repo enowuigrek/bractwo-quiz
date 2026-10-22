@@ -2,21 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { FormularzQuizu } from "./formularz-quizu";
+import { IkonaEdytuj, IkonaKosz } from "../_komponenty/ikony";
+import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
+import { usunQuiz } from "./akcje";
+import { liczbaPytan } from "./limity";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
 
 type QuizNaLiscie = { id: string; tytul: string; opis: string | null; zadania: { count: number }[] };
 
-function liczbaPytan(n: number): string {
-  if (n === 1) return "1 pytanie";
-  const r10 = n % 10;
-  const r100 = n % 100;
-  return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "pytania" : "pytań"}`;
-}
+const BLEDY: Record<string, string> = {
+  gry: "Tego quizu nie da się usunąć, bo były na nim rozegrane gry. Najpierw usuń te gry w zakładce „Gry”.",
+  usuwanie: "Nie udało się usunąć quizu.",
+};
 
-export default async function Quizy() {
+export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">) {
   await wymagajAdmina();
+  const { blad } = await searchParams;
   const { data, error } = await supabaseAdmin()
     .from("quizy")
     .select("id, tytul, opis, zadania(count)")
@@ -26,6 +28,11 @@ export default async function Quizy() {
   return (
     <main>
       <h1>Quizy</h1>
+      {typeof blad === "string" && BLEDY[blad] && (
+        <p className="blad" role="alert">
+          {BLEDY[blad]}
+        </p>
+      )}
       {error && <p className="blad">Nie udało się pobrać quizów: {error.message}</p>}
       {data && data.length > 0 ? (
         <ul className="lista">
@@ -41,9 +48,22 @@ export default async function Quizy() {
                 </div>
               </div>
               <div className="lista-akcje">
-                <Link href={`/admin/quizy/${q.id}`} className="przycisk-maly">
-                  Otwórz
+                <Link
+                  href={`/admin/quizy/${q.id}`}
+                  className="przycisk-maly ikona"
+                  aria-label={`Edytuj quiz ${q.tytul}`}
+                  data-podpis="Edytuj"
+                >
+                  <IkonaEdytuj />
                 </Link>
+                <PrzyciskPotwierdz
+                  akcja={usunQuiz.bind(null, q.id)}
+                  pytanie={`Usunąć quiz „${q.tytul}” razem ze wszystkimi pytaniami?`}
+                  tytul="Usuń"
+                  className="przycisk-maly ikona niebezpieczny"
+                >
+                  <IkonaKosz />
+                </PrzyciskPotwierdz>
               </div>
             </li>
           ))}
@@ -52,10 +72,11 @@ export default async function Quizy() {
         !error && <p className="lista-pusta">Nie ma jeszcze żadnego quizu.</p>
       )}
 
-      <section className="panel-sekcja karta">
-        <h2>Nowy quiz</h2>
-        <FormularzQuizu />
-      </section>
+      <p className="panel-sekcja">
+        <Link href="/admin/quizy/nowy" className="przycisk zloty">
+          Nowy quiz
+        </Link>
+      </p>
     </main>
   );
 }

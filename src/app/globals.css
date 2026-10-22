@@ -519,3 +519,90 @@ html:has(.kolumna) {
 .kolumna {
   width: 100%;
 }
+
+/* Okno potwierdzenia (src/components/okno.tsx) zamiast window.confirm */
+.okno {
+  width: min(440px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--piana);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-panel);
+}
+
+.okno::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.okno[open] {
+  animation: wjazd-okna 0.25s var(--ease-wjazd) both;
+}
+
+@keyframes wjazd-okna {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+.okno-tresc {
+  display: grid;
+  gap: 22px;
+  padding: 24px var(--gutter) var(--gutter);
+}
+
+.okno-pytanie {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: var(--w-semibold);
+  line-height: var(--lh);
+}
+
+.okno-przyciski {
+  display: flex;
+  gap: 10px;
+}
+
+.okno .okno-przyciski .przycisk {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  padding: 12px 16px;
+  font-size: var(--fs-small);
+}
+
+/* Podpis przycisku z samą ikoną: dymek nad przyciskiem po najechaniu albo fokusie z klawiatury */
+[data-podpis] {
+  position: relative;
+}
+
+[data-podpis]::after {
+  content: attr(data-podpis);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  z-index: 5;
+  padding: 5px 10px;
+  border-radius: var(--r-pole);
+  background: var(--kamien3);
+  border: 1px solid var(--kamien2);
+  color: var(--piana);
+  font-size: var(--fs-xxs);
+  font-weight: var(--w-semibold);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+[data-podpis]:hover::after,
+[data-podpis]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+[data-podpis]:disabled::after {
+  display: none;
+}

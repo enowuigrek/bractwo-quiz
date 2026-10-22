@@ -7,22 +7,16 @@ import type { Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
 import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { przesunZadanie, usunQuiz, usunZadanie } from "../akcje";
-import { FormularzQuizu } from "../formularz-quizu";
+import { przesunZadanie, usunZadanie } from "../akcje";
+import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
 
-const BLEDY: Record<string, string> = {
-  gry: "Tego quizu nie da się usunąć, bo były na nim rozegrane gry. Najpierw usuń te gry w zakładce „Gry”.",
-  usuwanie: "Nie udało się usunąć quizu.",
-};
-
 const LITERY = "ABCDEF";
 
-export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/admin/quizy/[id]">) {
+export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[id]">) {
   await wymagajAdmina();
   const { id } = await params;
-  const { blad } = await searchParams;
   const db = supabaseAdmin();
 
   const [{ data: quiz }, { data: zadania }, { count: aktywneGry }] = await Promise.all([
@@ -38,12 +32,7 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
       <p className="okruchy">
         <Link href="/admin/quizy">← Quizy</Link>
       </p>
-      <h1>{quiz.tytul}</h1>
-      {typeof blad === "string" && BLEDY[blad] && (
-        <p className="blad" role="alert">
-          {BLEDY[blad]}
-        </p>
-      )}
+      <NaglowekQuizu quiz={quiz} />
       {!!aktywneGry && (
         <p className="blad">
           Ten quiz jest teraz w trwającej grze. Zmiany w pytaniach gracze zobaczą od razu.
@@ -65,12 +54,12 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
                     <Link href={`/admin/quizy/${quiz.id}/zadania/${z.id}`}>{z.tresc}</Link>
                   </div>
                   <div className="lista-opis">
-                    {z.czas_s} s · poprawna: {LITERY[z.dane.poprawna]}. {z.dane.odpowiedzi[z.dane.poprawna]}
+                    {z.czas_s === null ? "bez limitu" : `${z.czas_s} s`} · poprawna: {LITERY[z.dane.poprawna]}. {z.dane.odpowiedzi[z.dane.poprawna]}
                   </div>
                 </div>
                 <div className="lista-akcje">
                   <form action={przesunZadanie.bind(null, quiz.id, z.id, "gora")}>
-                    <button className="przycisk-maly ikona" disabled={i === 0} aria-label="Przesuń wyżej" title="Wyżej">
+                    <button className="przycisk-maly ikona" disabled={i === 0} aria-label="Przesuń wyżej" data-podpis="Wyżej">
                       ↑
                     </button>
                   </form>
@@ -79,7 +68,7 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
                       className="przycisk-maly ikona"
                       disabled={i === lista.length - 1}
                       aria-label="Przesuń niżej"
-                      title="Niżej"
+                      data-podpis="Niżej"
                     >
                       ↓
                     </button>
@@ -87,7 +76,7 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
                   <PrzyciskPotwierdz
                     akcja={usunZadanie.bind(null, quiz.id, z.id)}
                     pytanie={`Usunąć pytanie ${i + 1}?`}
-                    tytul="Usuń pytanie"
+                    tytul="Usuń"
                     className="przycisk-maly ikona niebezpieczny"
                   >
                     <IkonaKosz />
@@ -100,24 +89,16 @@ export default async function EdycjaQuizu({ params, searchParams }: PageProps<"/
           <p className="lista-pusta">Quiz nie ma jeszcze pytań.</p>
         )}
         <p style={{ marginTop: 16 }}>
-          <Link href={`/admin/quizy/${quiz.id}/zadania/nowe`} className="przycisk zloty">
-            Dodaj pytanie
+          <Link href={`/admin/quizy/${quiz.id}/zadania/nowe`} className="przycisk">
+            + Dodaj pytanie
           </Link>
         </p>
       </section>
 
-      <section className="panel-sekcja karta">
-        <h2>Tytuł i opis</h2>
-        <FormularzQuizu quiz={quiz} />
-      </section>
-
-      <section className="panel-sekcja">
-        <PrzyciskPotwierdz
-          akcja={usunQuiz.bind(null, quiz.id)}
-          pytanie={`Usunąć quiz „${quiz.tytul}” razem ze wszystkimi pytaniami?`}
-        >
-          Usuń quiz
-        </PrzyciskPotwierdz>
+      <section className="panel-sekcja quiz-zapisz">
+        <button type="submit" form={FORMULARZ_QUIZU} name="wroc" value="1" className="przycisk zloty">
+          Zapisz quiz
+        </button>
       </section>
     </main>
   );

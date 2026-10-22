@@ -15,7 +15,7 @@
 
 ## Scenariusz testu (kilka telefonów, ok. 15 min)
 
-Ustaw grę z 3–4 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami, jedno z krótkim czasem (5–10 s).
+Ustaw grę z 4–5 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami, jedno z krótkim czasem (5–10 s), jedno bez limitu czasu.
 
 | # | Co zrobić | Czego oczekiwać |
 |---|---|---|
@@ -30,6 +30,7 @@ Ustaw grę z 3–4 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami, jedno z
 | 9 | Pilot: Pokaż ranking | Przetasowanie, „+zdobyte”, strzałki. Telefon: miejsce i zmiana. |
 | 10 | Ostatnie pytanie → Pokaż podium → Zakończ grę | Podium wjeżdża 3 → 2 → 1, na końcu podziękowanie. |
 | 11 | Wyłącz na chwilę Wi‑Fi na TV | W rogu „Brak połączenia, ponawiam…”, a po powrocie sieci TV dogania grę sam. |
+| 12 | Pytanie z zaznaczonym „Bez limitu czasu” | TV, telefon i pilot pokazują „Bez limitu”, bez paska czasu. Po ostatniej odpowiedzi: „Wszyscy odpowiedzieli”. „Pokaż wynik”, zanim wszyscy odpowiedzą, pyta o potwierdzenie. Poprawna = 1000 pkt. |
 
 Do zanotowania po teście (dzień 7):
 - czy bonus za szybkość jest sprawiedliwy (przełącznik przy uruchamianiu gry),

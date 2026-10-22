@@ -41,6 +41,8 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
 
   const { error } = await supabaseAdmin().from("quizy").update({ tytul, opis: opis || null }).eq("id", id);
   if (error) return { blad: `Nie udało się zapisać: ${error.message}` };
+  // „Zapisz quiz” na dole edycji: zapis i powrót do listy
+  if (dane.get("wroc")) redirect("/admin/quizy");
   refresh();
   return { ok: "Zapisano." };
 }
@@ -50,11 +52,11 @@ export async function usunQuiz(id: string): Promise<void> {
   const db = supabaseAdmin();
 
   const { count } = await db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id);
-  if (count) redirect(`/admin/quizy/${id}?blad=gry`);
+  if (count) redirect("/admin/quizy?blad=gry");
 
   const { data: zadania } = await db.from("zadania").select("grafika_url").eq("quiz_id", id);
   const { error } = await db.from("quizy").delete().eq("id", id);
-  if (error) redirect(`/admin/quizy/${id}?blad=usuwanie`);
+  if (error) redirect("/admin/quizy?blad=usuwanie");
   await Promise.all((zadania ?? []).map((z) => usunGrafike(z.grafika_url)));
   redirect("/admin/quizy");
 }
@@ -63,13 +65,14 @@ export async function usunQuiz(id: string): Promise<void> {
 // Zadania (typ „wybór”)
 // ---------------------------------------------------------------------------
 
-function odczytajZadanie(dane: FormData): { blad: string } | { tresc: string; czas_s: number; dane: DaneWybor } {
+function odczytajZadanie(dane: FormData): { blad: string } | { tresc: string; czas_s: number | null; dane: DaneWybor } {
   const tresc = tekst(dane, "tresc");
   if (!tresc) return { blad: "Wpisz treść pytania." };
   if (tresc.length > LIMITY.tresc) return { blad: `Pytanie może mieć najwyżej ${LIMITY.tresc} znaków.` };
 
-  const czas_s = Number(dane.get("czas_s"));
-  if (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas) {
+  // bez limitu: pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik
+  const czas_s = dane.get("bez_limitu") ? null : Number(dane.get("czas_s"));
+  if (czas_s !== null && (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas)) {
     return { blad: `Czas musi być liczbą sekund od ${LIMITY.minCzas} do ${LIMITY.maxCzas}.` };
   }
 

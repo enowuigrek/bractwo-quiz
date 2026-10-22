@@ -26,6 +26,12 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
   );
   const [poprawna, setPoprawna] = useState<number | null>(zadanie?.dane.poprawna ?? null);
   const [nastepnyKlucz, setNastepnyKlucz] = useState(odpowiedzi.length);
+  const [bezLimitu, setBezLimitu] = useState(zadanie ? zadanie.czas_s === null : false);
+
+  // te same odpowiedzi (bez względu na wielkość liter) podświetlamy od razu, przed zapisem
+  const porownanie = odpowiedzi.map((o) => o.tekst.trim().toLocaleLowerCase("pl"));
+  const powtorzona = (i: number) => !!porownanie[i] && porownanie.indexOf(porownanie[i]) !== porownanie.lastIndexOf(porownanie[i]);
+  const literyPowtorzen = odpowiedzi.map((_, i) => i).filter(powtorzona).map((i) => LITERY[i]);
 
   function dodaj() {
     setOdpowiedzi((o) => [...o, { klucz: nastepnyKlucz, tekst: "" }]);
@@ -76,7 +82,8 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
               </label>
               <input
                 name="odpowiedz"
-                className="pole"
+                className={`pole${powtorzona(i) ? " pole-zle" : ""}`}
+                aria-invalid={powtorzona(i) || undefined}
                 value={o.tekst}
                 onChange={(e) => zmien(i, e.target.value)}
                 required
@@ -89,13 +96,18 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
                 onClick={() => usun(i)}
                 disabled={odpowiedzi.length <= LIMITY.minOdpowiedzi}
                 aria-label={`Usuń odpowiedź ${LITERY[i]}`}
-                title="Usuń odpowiedź"
+                data-podpis="Usuń"
               >
                 ✕
               </button>
             </div>
           ))}
         </div>
+        {literyPowtorzen.length > 0 && (
+          <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>
+            Odpowiedzi {literyPowtorzen.join(" i ")} są takie same. Popraw je przed zapisem.
+          </p>
+        )}
         {odpowiedzi.length < LIMITY.maxOdpowiedzi && (
           <button type="button" className="przycisk-maly" onClick={dodaj} style={{ marginTop: 10 }}>
             + odpowiedź
@@ -103,21 +115,34 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
         )}
       </fieldset>
 
-      <div className="wiersz-pol">
-        <div>
-          <label htmlFor="czas_s">Czas na odpowiedź (s)</label>
-          <input
-            id="czas_s"
-            name="czas_s"
-            type="number"
-            inputMode="numeric"
-            className="pole"
-            defaultValue={zadanie?.czas_s ?? DOMYSLNY_CZAS}
-            min={LIMITY.minCzas}
-            max={LIMITY.maxCzas}
-            required
-          />
+      <div>
+        <div className="wiersz-pol wiersz-czasu">
+          <div>
+            <label htmlFor="czas_s">Czas na odpowiedź (s)</label>
+            <input
+              id="czas_s"
+              name="czas_s"
+              type="number"
+              inputMode="numeric"
+              className="pole"
+              defaultValue={zadanie?.czas_s ?? DOMYSLNY_CZAS}
+              min={LIMITY.minCzas}
+              max={LIMITY.maxCzas}
+              required={!bezLimitu}
+              disabled={bezLimitu}
+            />
+          </div>
+          <label className="przelacznik">
+            <input type="checkbox" name="bez_limitu" checked={bezLimitu} onChange={(e) => setBezLimitu(e.target.checked)} />
+            Bez limitu czasu
+          </label>
         </div>
+        {bezLimitu && (
+          <p className="podpowiedz">
+            Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik. Bez bonusu za szybkość: poprawna
+            odpowiedź daje 1000 pkt.
+          </p>
+        )}
       </div>
 
       <PoleGrafiki

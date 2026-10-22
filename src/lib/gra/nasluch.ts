@@ -119,15 +119,18 @@ export function useCzasSerwera(przesuniecie: number, aktywny: boolean, coIleMs =
  * Faza w tej chwili według zegara serwera. `przygotuj` przechodzi w `pytanie`, gdy minie `faza_od`,
  * bez czekania na bazę: wszystkie ekrany odsłaniają pytanie w tym samym momencie.
  * `czasMinal`: pytanie trwa w bazie, ale jego czas już się skończył (czekamy na prowadzącego).
+ * `bezLimitu`: pytanie bez limitu czasu, które jeszcze trwa (`faza_do` puste, `doKonca` = ∞).
+ * Kończy się, gdy odpowiedzą wszyscy (baza ustawia wtedy `faza_do`) albo prowadzący pokaże wynik.
  */
 export function fazaTeraz(
   stan: Pick<StanSesji, "faza" | "faza_od" | "faza_do">,
   teraz: number,
-): { faza: FazaWidoczna; doStartu: number; doKonca: number; czasMinal: boolean } {
+): { faza: FazaWidoczna; doStartu: number; doKonca: number; czasMinal: boolean; bezLimitu: boolean } {
   const od = stan.faza_od ? Date.parse(stan.faza_od) : 0;
-  const doKonca = stan.faza_do ? Date.parse(stan.faza_do) - teraz : 0;
   const faza = stan.faza === "przygotuj" && teraz >= od ? "pytanie" : stan.faza;
-  return { faza, doStartu: od - teraz, doKonca, czasMinal: faza === "pytanie" && doKonca <= 0 };
+  const bezLimitu = (faza === "przygotuj" || faza === "pytanie") && !stan.faza_do;
+  const doKonca = bezLimitu ? Infinity : stan.faza_do ? Date.parse(stan.faza_do) - teraz : 0;
+  return { faza, doStartu: od - teraz, doKonca, czasMinal: faza === "pytanie" && doKonca <= 0, bezLimitu };
 }
 
 /** Czas odpowiedzi do wyświetlenia, np. „3,4 s”. */

@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { LogoQuiz } from "@/components/logo-quiz";
+import { usePotwierdzenie, type OpcjePotwierdzenia } from "@/components/okno";
 import {
   fazaTeraz,
   komunikatBledu,
@@ -82,6 +83,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
   const teraz = useCzasSerwera(przesuniecie, liczy);
+  const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
   if (!zamontowany) {
     return <Naglowek kod={kod} />;
@@ -108,9 +110,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     );
   }
 
-  async function akcja(a: AkcjaPilota, pytanie?: string) {
+  async function akcja(a: AkcjaPilota, pytanie?: string, opcje?: OpcjePotwierdzenia) {
     if (wysylam || !token) return;
-    if (pytanie && !window.confirm(pytanie)) return;
+    if (pytanie && !(await potwierdz(pytanie, opcje))) return;
     ustawWysylam(true);
     ustawBladAkcji(null);
     const wyslano = Date.now();
@@ -128,7 +130,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   }
 
   // `przygotuj` przechodzi w `pytanie` sam, gdy minie `faza_od`; nie czekamy na odpytanie bazy
-  const { faza, doStartu, doKonca } = fazaTeraz(stan, teraz);
+  const { faza, doStartu, doKonca, bezLimitu } = fazaTeraz(stan, teraz);
+  const wszyscy = stan.liczba_graczy > 0 && stan.liczba_odpowiedzi >= stan.liczba_graczy;
   const z = stan.zadanie;
   const liczba = stan.quiz?.liczba_zadan ?? 0;
   const druzyny = stan.tryb === "druzyny";
@@ -172,7 +175,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </span>
             {faza === "przygotuj" && <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>}
             {faza === "pytanie" && (
-              <span className="gra-kod">{doKonca > 0 ? `${Math.ceil(doKonca / 1000)} s` : "czas minął"}</span>
+              <span className="gra-kod">
+                {bezLimitu ? "bez limitu" : doKonca > 0 ? `${Math.ceil(doKonca / 1000)} s` : wszyscy ? "wszyscy odpowiedzieli" : "czas minął"}
+              </span>
             )}
           </p>
           <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
@@ -216,6 +221,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
               akcja(
                 "nastepne",
                 stan.liczba_graczy === 0 ? "Nikt jeszcze nie dołączył. Wystartować mimo to?" : undefined,
+                { tak: "Wystartuj" },
               )
             }
           >
@@ -228,7 +234,17 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             className="przycisk zloty"
             disabled={wysylam}
             onClick={() =>
-              akcja("wynik", doKonca > 0 ? "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?" : undefined)
+              akcja(
+                "wynik",
+                bezLimitu
+                  ? wszyscy
+                    ? undefined
+                    : "Nie wszyscy odpowiedzieli. Zakończyć pytanie teraz i pokazać wynik?"
+                  : doKonca > 0
+                    ? "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?"
+                    : undefined,
+                { tak: "Pokaż wynik" },
+              )
             }
           >
             Pokaż wynik
@@ -265,12 +281,13 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             className="przycisk-cichy"
             style={{ marginTop: 24 }}
             disabled={wysylam}
-            onClick={() => akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.")}
+            onClick={() => akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", { tak: "Zakończ grę", niebezpieczne: true })}
           >
             Zakończ grę
           </button>
         )}
       </section>
+      {oknoPotwierdzenia}
     </>
   );
 }

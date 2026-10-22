@@ -24,7 +24,8 @@ export type Zadanie = {
   typ: "wybor";
   tresc: string;
   grafika_url: string | null;
-  czas_s: number;
+  /** `null`: bez limitu czasu. */
+  czas_s: number | null;
   dane: DaneWybor;
 };
 

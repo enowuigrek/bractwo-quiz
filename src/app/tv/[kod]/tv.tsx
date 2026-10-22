@@ -161,7 +161,7 @@ const LITERY = "ABCDEF";
 /** Przygotuj (odliczanie 3 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
 function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const z = stan.zadanie;
-  const { faza, doStartu, doKonca, czasMinal } = fazaTeraz(stan, teraz);
+  const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   // pytanie usunięte w trakcie gry
   if (!z)
     return (
@@ -189,7 +189,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const poprawna = z.dane.poprawna;
   const rozklad = wynik ? z.rozklad : null;
   const najwiecej = Math.max(1, ...(rozklad ?? [0]));
-  const zostalo = Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000)));
+  const zostalo = z.czas_s ? Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000))) : 0;
   return (
     <div className="tv-pytanie">
       <header className="tv-pytanie-gora">
@@ -199,14 +199,18 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         {wynik ? (
           <p className="tv-zegar tv-zegar-wynik">Wynik</p>
         ) : czasMinal ? (
-          <p className="tv-zegar tv-zegar-koniec">Czas minął!</p>
+          <p className="tv-zegar tv-zegar-koniec">{z.czas_s ? "Czas minął!" : "Wszyscy odpowiedzieli!"}</p>
+        ) : bezLimitu ? (
+          <p className="tv-zegar tv-zegar-koniec">Bez limitu</p>
         ) : (
           <p className={`tv-zegar${doKonca <= 5000 ? " malo" : ""}`}>{Math.ceil(doKonca / 1000)}</p>
         )}
       </header>
-      <div className="tv-czas" aria-hidden>
-        <div style={{ transform: `scaleX(${wynik ? 0 : zostalo})` }} />
-      </div>
+      {z.czas_s ? (
+        <div className="tv-czas" aria-hidden>
+          <div style={{ transform: `scaleX(${wynik ? 0 : zostalo})` }} />
+        </div>
+      ) : null}
 
       <h1 className="tv-tresc">{z.tresc}</h1>
 

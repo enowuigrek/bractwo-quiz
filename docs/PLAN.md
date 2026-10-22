@@ -68,7 +68,7 @@ Okazja („Dzień Porteru”) i grafika są przypięte do **sesji**, a nie do qu
 - **Nikt nie widzi poprawnej odpowiedzi przed czasem.** Tabela `zadania` jest niedostępna publicznie. Gracze i TV dostają pytanie przez funkcję, która zwraca tylko **bieżące** zadanie i **bez** pola `poprawna`, dopóki faza nie przejdzie na `wynik`.
 - **Czas liczy serwer.** `zapisz_odpowiedz(token, zadanie, dane)` to funkcja w Postgresie. Bierze `now()`, odrzuca odpowiedzi po `faza_do`, sama ocenia i liczy punkty. Telefon nie ma tu nic do powiedzenia.
 - **Wszyscy startują razem.** Faza `przygotuj` trwa 3 s, a `faza_od` pytania jest znane z wyprzedzeniem. Telefony przy wejściu mierzą różnicę swojego zegara względem serwera i odsłaniają pytanie w tym samym momencie, niezależnie od opóźnienia sieci.
-- **Punkty:** poprawna = 500 + (bonus) 500 × (1 − czas/limit), zła = 0. Przy wyłączonym bonusie poprawna = 1000.
+- **Punkty:** poprawna = 500 + (bonus) 500 × (1 − czas/limit), zła = 0. Przy wyłączonym bonusie poprawna = 1000. Pytanie bez limitu czasu nie ma bonusu: poprawna = 1000.
 - **Gracz** dostaje losowy token w `localStorage`. Po odświeżeniu strony wraca do gry z tym samym nickiem.
 - **Pilot:** każda akcja prowadzącego wymaga `host_token`.
 - **Admin:** hasło jest w zmiennej środowiskowej na Vercelu. Po zalogowaniu serwer ustawia podpisane ciasteczko `httpOnly`. Zapisy admina idą przez Server Actions kluczem serwisowym Supabase, który nigdy nie trafia do przeglądarki.
@@ -201,6 +201,17 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Linki na stronie gry są w ramce: kliknięcie otwiera w nowej karcie, ikona kopiuje (Clipboard API z zapasowym `execCommand`), przytrzymanie palcem na telefonie też kopiuje, a dymek potwierdza.
 - Do lokalnych testów panelu jest konfiguracja `start-test-hasla` w `.claude/launch.json`: `next start` na porcie 3100 z hasłem testowym nadpisującym `ADMIN_HASLO` (najpierw `npm run build`). Działa obok twojego `next dev` na 3000.
 - Sprawdzone na localhost: lista gier i strona gry na 1280 px i 375 px, kopiowanie z dymkiem. Nie sprawdzone: samo usuwanie z listy (nie chciałem kasować gry NKGH) i przytrzymanie palcem na prawdziwym telefonie.
+
+### Poprawki po pierwszych testach (22.10)
+
+- **Mniejsze zaokrąglenia:** karty 6 px, pola i kafelki 4 px. Przyciski zostają pigułkami.
+- **Panel:** nawigacja na desktopie stoi przy prawej krawędzi, obok „Wyloguj”. Sekcja pod listą (np. karta) ma odstęp od ostatniego wiersza.
+- **Quizy, lista:** przy każdym quizie ikona ołówka („Edytuj”) i kosza („Usuń”), z dymkiem po najechaniu. Pod listą przycisk „Nowy quiz”, który otwiera osobny ekran `/admin/quizy/nowy`. Błędy usuwania (np. quiz z rozegranymi grami) pokazują się na liście.
+- **Quizy, edycja:** tytuł i opis są w nagłówku, a ołówek otwiera ich edycję w miejscu. Na dole jest „Zapisz quiz”: zapisuje tytuł i opis (także te w trakcie edycji) i wraca do listy. Pytania zapisują się jak dotąd, każde osobno. „Dodaj pytanie” jest teraz zwykłym przyciskiem, a złoty jest tylko „Zapisz quiz”. Usuwanie quizu jest tylko na liście.
+- **Pytanie, powtórzone odpowiedzi:** takie same odpowiedzi (bez względu na wielkość liter) mają czerwoną ramkę od razu przy wpisywaniu, a pod listą jest komunikat, których to dotyczy. Serwer i tak sprawdza to przy zapisie.
+- **Pytanie bez limitu czasu** (pole „Bez limitu czasu” przy czasie): `zadania.czas_s = null`, a w trakcie pytania `sesje.faza_do` jest puste. Pytanie kończy się, gdy odpowiedzą wszyscy (baza ustawia wtedy `faza_do`, tak jak przy pytaniach na czas) albo gdy prowadzący kliknie „Pokaż wynik”. Pilot pyta wtedy o potwierdzenie, jeśli nie wszyscy odpowiedzieli. Bez bonusu za szybkość: poprawna odpowiedź = 1000 pkt. TV i telefon zamiast zegara i paska czasu pokazują „Bez limitu”, a po ostatniej odpowiedzi „Wszyscy odpowiedzieli”. Migracja `20261022141218_bez_limitu_czasu`, sprawdzona SQL-em w wycofanej transakcji.
+- **Okno potwierdzenia zamiast `window.confirm`:** `src/components/okno.tsx`. W panelu `PrzyciskPotwierdz`, na pilocie `usePotwierdzenie()`. W aplikacji nie zostało już żadne okno przeglądarki.
+- Sprawdzone na localhost (1280 px): lista quizów z dymkiem, nowy quiz, edycja nagłówka, pytanie z powtórzeniem i bez limitu, okno przy usuwaniu (Esc anuluje), „Zapisz quiz” wraca do listy, usunięcie quizu z listy. **Nie sprawdzone na żywo:** pytanie bez limitu na TV, telefonie i pilocie w prawdziwej grze (scenariusz w `docs/TEST.md`, punkt 12).
 
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 

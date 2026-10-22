@@ -611,3 +611,54 @@ a.przycisk {
   border-color: var(--chmiel-ciemny);
   color: var(--chmiel);
 }
+
+/* Pole z błędem, np. powtórzona odpowiedź */
+.pole.pole-zle,
+.pole.pole-zle:focus {
+  border-color: var(--czerwien);
+}
+
+/* Czas na odpowiedź + „bez limitu” w jednym wierszu */
+.wiersz-czasu {
+  align-items: end;
+}
+
+.wiersz-czasu .przelacznik {
+  min-height: 56px;
+}
+
+.formularz .pole:disabled {
+  opacity: 0.4;
+}
+
+/* Nagłówek edycji quizu: tytuł z ołówkiem, opis pod spodem, edycja w miejscu */
+.quiz-naglowek {
+  margin-bottom: var(--section-gap);
+}
+
+.quiz-naglowek-tytul {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quiz-naglowek-tytul h1 {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.quiz-naglowek-opis {
+  margin: 6px 0 0;
+}
+
+.quiz-naglowek-przyciski {
+  display: flex;
+  gap: 8px;
+}
+
+/* „Zapisz quiz” na dole edycji, oddzielony linią od pytań */
+.quiz-zapisz {
+  padding-top: var(--section-gap);
+  border-top: 1px solid var(--kamien2);
+}

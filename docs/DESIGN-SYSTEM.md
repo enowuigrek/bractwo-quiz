@@ -116,6 +116,12 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 ## Komponenty
 
+**Okno potwierdzenia (Quiz).** Zamiast okien przeglądarki (`confirm`). Wyśrodkowany natywny `<dialog>`, max 440px, tło `--kamien`, obrys 1px w `--kamien2`, radius `--r-card`, cień `--shadow-panel`, tło pod spodem przyciemnione do 75%. Pytanie 17/600, pod nim dwa przyciski obok siebie: „Anuluj” (zwykły, zaznaczony na start, żeby Enter niczego nie usunął) i akcja (niebezpieczny przy usuwaniu i kończeniu, złoty przy pozostałych). Esc i kliknięcie obok zamykają bez akcji. Wjazd 0.25s z lekkim powiększeniem.
+
+**Podpis ikony (Quiz).** Przyciski z samą ikoną (ołówek, kosz, strzałki) mają `data-podpis="Edytuj"`. Po najechaniu albo fokusie z klawiatury nad przyciskiem pojawia się dymek: 13/600, tło `--kamien3`, obrys `--kamien2`, radius `--r-pole`. Zamiast atrybutu `title`, bo systemowy dymek nie pasuje do wyglądu.
+
+**Pole z błędem (Quiz).** Ramka w `--czerwien` (np. powtórzona odpowiedź), a pod polem komunikat `.blad`.
+
 **Nagłówek z animacją.** Anioł i diabeł wjeżdżają z centrum na boki, logo pojawia się ze `scale(.92)`. Całość trwa 2.8s, krzywa `cubic-bezier(.4,0,.2,1)`. Logo jest białe (`filter: invert(1)` + `mix-blend-mode: screen`).
 
 **Kapsel.** Okrągły kapsel w SVG ze złotym blaskiem `0 0 22px rgba(227,172,63,.28)`. W środku duża liczba w kolorze piany i jednostka złotem („szable”).
