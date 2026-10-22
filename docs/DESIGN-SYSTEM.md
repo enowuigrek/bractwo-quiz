@@ -83,12 +83,12 @@ Na banerze dane kontaktowe są składane małym (11–12px), regularnym tekstem 
 
 ## Promienie
 
-Zmienione 19.10 na prośbę Łukasza (duże zaokrąglenia z Szabli wyglądały zabawkowo):
+Zmienione 19.10 i jeszcze raz 22.10 na prośbę Łukasza: duże zaokrąglenia z Szabli wyglądały zabawkowo. Ramki i pola mają być prawie kanciaste, a zaokrąglone zostają tylko przyciski i drobne znaczki.
 
 | Token | Wartość | Do czego |
 |---|---|---|
-| `--r-card` | 10 | karty, panele, okna |
-| `--r-pole` | 8 | pola formularzy, kafelki, kafelki odpowiedzi, grafiki, ramki linków |
+| `--r-card` | 6 | karty, panele, okna |
+| `--r-pole` | 4 | pola formularzy, kafelki, kafelki odpowiedzi, grafiki, ramki linków |
 | `--r-btn`, `--r-btn-sm` | 999 | przyciski: pigułki, pełne półkola po bokach |
 | `--r-pill` | 999 | pasek postępu, znaczki, nicki |
 | `--r-round` | 50% | medal, kółka z literami |
@@ -138,7 +138,7 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 - disabled: `opacity: .5`
 - focus: `outline: 3px solid --zloto; offset 3px`
 
-**Input.** 19px, padding 14, radius 8 (`--r-pole`), obrys 2px w `--kamien2`, tło `#0b0f13`.
+**Input.** 19px, padding 14, radius 4 (`--r-pole`), obrys 2px w `--kamien2`, tło `#0b0f13`.
 
 **Akordeon (`details.zasady`).** Wygląda jak karta. Strzałka to złoty chevron z obramowań 3px, obracany przy otwarciu. Wiersze mają nazwę (piana, bold), opis (szary, 14) i wartość po prawej (złoto, 17/800).
 

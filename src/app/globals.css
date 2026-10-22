@@ -215,7 +215,7 @@ h1 {
 .nicki li {
   background: var(--kamien);
   border: 1px solid var(--kamien2);
-  border-radius: var(--r-btn-sm);
+  border-radius: var(--r-pill);
   padding: 6px 12px;
   font-weight: var(--w-semibold);
   font-size: var(--fs-small);

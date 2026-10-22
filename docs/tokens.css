@@ -57,8 +57,8 @@
   --r-pill: 999px;   /* pasek postępu, znaczki, nicki */
   --r-btn-sm: 999px; /* małe przyciski: pełne półkola po bokach */
   --r-btn: 999px;    /* przyciski */
-  --r-pole: 8px;     /* pola, kafelki, kafelki odpowiedzi, grafiki */
-  --r-card: 10px;    /* karty, panele, okna */
+  --r-pole: 4px;     /* pola, kafelki, kafelki odpowiedzi, grafiki */
+  --r-card: 6px;     /* karty, panele, okna */
   --r-round: 50%;
 
   /* Odstępy */

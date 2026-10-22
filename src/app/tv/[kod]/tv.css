@@ -200,7 +200,7 @@
   padding: 8px 24px;
   background: var(--kamien);
   border: 2px solid var(--kamien2);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-pill);
   animation: wjazd-nicku 0.9s var(--ease-wjazd) both;
 }
 
