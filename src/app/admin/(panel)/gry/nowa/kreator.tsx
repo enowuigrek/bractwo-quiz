@@ -6,6 +6,7 @@ import type { Lokal, StanFormularza } from "@/lib/typy";
 import { bezResetu } from "../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../_komponenty/grafika";
 import { KomunikatFormularza } from "../../_komponenty/stan";
+import { LIMITY } from "../../quizy/limity";
 import { uruchomGre } from "../akcje";
 
 export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
@@ -23,6 +24,8 @@ export function Kreator({ lokale, quizy }: Props) {
   const lokaleWMiescie = lokale.filter((p) => p.miasto === miasto);
   const [lokal, setLokal] = useState(lokaleWMiescie.length === 1 ? lokaleWMiescie[0].id : "");
   const [quiz, setQuiz] = useState("");
+  const [czas, setCzas] = useState<string>(String(LIMITY.domyslnyCzas));
+  const bezLimitu = czas === "bez";
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
@@ -108,11 +111,41 @@ export function Kreator({ lokale, quizy }: Props) {
             </label>
           </fieldset>
 
+          <fieldset>
+            <legend>Czas na odpowiedź (każde pytanie)</legend>
+            <div className="wybor-czasu">
+              {LIMITY.czasyGry.map((c) => {
+                const wartosc = c === null ? "bez" : String(c);
+                return (
+                  <label key={wartosc} className={`wybor-czasu-opcja${czas === wartosc ? " wybrana" : ""}`}>
+                    <input
+                      type="radio"
+                      name="czas_s"
+                      value={wartosc}
+                      checked={czas === wartosc}
+                      onChange={() => setCzas(wartosc)}
+                    />
+                    {c === null ? "bez limitu" : `${c} s`}
+                  </label>
+                );
+              })}
+            </div>
+            {bezLimitu && (
+              <p className="podpowiedz">
+                Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik.
+              </p>
+            )}
+          </fieldset>
+
           <div>
             <label className="przelacznik">
-              <input type="checkbox" name="bonus_czas" defaultChecked /> bonus za szybkość
+              <input type="checkbox" name="bonus_czas" defaultChecked disabled={bezLimitu} /> bonus za szybkość
             </label>
-            <p className="podpowiedz">Z bonusem poprawna odpowiedź daje 500–1000 pkt zależnie od czasu, bez niego zawsze 1000.</p>
+            <p className="podpowiedz">
+              {bezLimitu
+                ? "Bez limitu czasu nie ma bonusu: poprawna odpowiedź zawsze daje 1000 pkt."
+                : "Z bonusem poprawna odpowiedź daje 500–1000 pkt zależnie od czasu, bez niego zawsze 1000."}
+            </p>
           </div>
 
           <div className="wiersz-pol">

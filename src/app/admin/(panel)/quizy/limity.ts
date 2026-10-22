@@ -8,6 +8,9 @@ export const LIMITY = {
   maxOdpowiedzi: 6,
   minCzas: 5,
   maxCzas: 300,
+  /** Do wyboru przy uruchamianiu gry; `null` = bez limitu. */
+  czasyGry: [10, 20, 30, 45, null] as (number | null)[],
+  domyslnyCzas: 20,
 } as const;
 
 /** „1 pytanie”, „3 pytania”, „5 pytań”. */

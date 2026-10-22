@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
 
 type GraZDanymi = Sesja & {
   quizy: { tytul: string } | null;
-  lokale: { nazwa: string; miasto: string | null } | null;
+  lokale: { nazwa: string; miasto: string | null; adres_ekranu: string } | null;
 };
 
 export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
@@ -26,18 +26,23 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
-    db.from("sesje").select("*, quizy(tytul), lokale(nazwa, miasto)").eq("id", id).maybeSingle<GraZDanymi>(),
+    db.from("sesje").select("*, quizy(tytul), lokale(nazwa, miasto, adres_ekranu)").eq("id", id).maybeSingle<GraZDanymi>(),
     db.from("gracze").select("id", { count: "exact", head: true }).eq("sesja_id", id),
   ]);
   if (!gra) notFound();
 
   const adres = await adresAplikacji();
   const linki = {
-    tv: `${adres}/tv/${gra.kod}`,
+    ekran: `${adres}/ekran/${gra.kod}`,
+    ekranLokalu: gra.lokale ? `${adres}/ekran/${gra.lokale.adres_ekranu}` : null,
     gracz: `${adres}/${gra.kod}`,
     pilot: `${adres}/pilot/${gra.kod}?t=${gra.host_token}`,
   };
   const trwa = gra.faza !== "koniec";
+  // ekran lokalu pokazuje najnowszą trwającą grę, więc ostrzegamy o innych w tym samym lokalu
+  const { data: inneGry } = trwa && gra.lokal_id
+    ? await db.from("sesje").select("kod").eq("lokal_id", gra.lokal_id).neq("faza", "koniec").neq("id", gra.id)
+    : { data: [] as { kod: string }[] };
   // historia zakończonej gry: tabela końcowa, a z niej odpowiedzi każdego gracza
   const [wyniki, zadania] = trwa
     ? [[], []]
@@ -48,7 +53,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   return (
     <main>
       <p className="okruchy">
-        <Link href="/admin/gry">← Gry</Link>
+        <Link href="/admin/gry">← Rozgrywki</Link>
       </p>
       <div className="uklad-dwa">
         <div>
@@ -62,6 +67,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
               gra.okazja,
               gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
+              gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,
               gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",
               `graczy: ${gracze ?? 0}/${gra.max_graczy}`,
             ]
@@ -96,22 +102,48 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
         {trwa && qrPilota ? (
           <div>
             <section className="panel-sekcja karta">
-              <h2>Pilot prowadzącego</h2>
+              <h2>Prowadzenie</h2>
               <p className="pomocniczy" style={{ marginTop: 0 }}>
-                Prowadzący skanuje ten kod telefonem i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
+                Prowadzisz sam? Otwórz pilota na tym telefonie. Grę możesz też przekazać komuś innemu.
               </p>
-              <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />
-              <div style={{ marginTop: 14 }}>
-                <LinkDoSkopiowania url={linki.pilot} />
-              </div>
+              <a href={linki.pilot} className="przycisk zloty">
+                Prowadź z tego telefonu
+              </a>
+              <details className="przekaz">
+                <summary>Przekaż prowadzącemu (kod QR)</summary>
+                <p className="pomocniczy">
+                  Prowadzący skanuje ten kod i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
+                </p>
+                <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />
+                <div style={{ marginTop: 14 }}>
+                  <LinkDoSkopiowania url={linki.pilot} />
+                </div>
+              </details>
             </section>
 
             <section className="panel-sekcja karta">
-              <h2>Telewizor</h2>
-              <p className="pomocniczy" style={{ marginTop: 0 }}>
-                Otwórz w przeglądarce na TV. Na ekranie pojawi się kod QR dla graczy.
-              </p>
-              <LinkDoSkopiowania url={linki.tv} />
+              <h2>Ekran</h2>
+              {linki.ekranLokalu ? (
+                <>
+                  <p className="pomocniczy" style={{ marginTop: 0 }}>
+                    Ekran lokalu {gra.lokale?.nazwa} przełączy się na tę grę sam. Jeśli TV nie ma go w zakładkach, otwórz:
+                  </p>
+                  <LinkDoSkopiowania url={linki.ekranLokalu} />
+                  {!!inneGry?.length && (
+                    <p className="blad" style={{ marginBottom: 0 }}>
+                      W tym lokalu trwa też gra {inneGry.map((g) => g.kod).join(", ")}. Ekran lokalu pokazuje najnowszą, czyli
+                      tę. Zakończ starą, jeśli już nie jest potrzebna.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="pomocniczy" style={{ marginTop: 0 }}>
+                    Otwórz w przeglądarce na TV. Na ekranie pojawi się kod QR dla graczy.
+                  </p>
+                  <LinkDoSkopiowania url={linki.ekran} />
+                </>
+              )}
             </section>
 
             <section className="panel-sekcja karta">

@@ -4,8 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
 import type { FazaWidoczna, StanSesji } from "./typy";
 
-/** Zdarzenia z bazy na temacie `sesja:<KOD>` (patrz `wewn.rozglos`). */
-export type Zdarzenie = "stan" | "gracz" | "odpowiedz";
+/**
+ * Zdarzenia z bazy: na temacie `sesja:<KOD>` (patrz `wewn.rozglos`) oraz `gra`
+ * na temacie `lokal:<adres_ekranu>` (patrz `wewn.po_zmianie_gry_lokalu`).
+ */
+export type Zdarzenie = "stan" | "gracz" | "odpowiedz" | "gra";
 
 /**
  * Trzyma dane strony gry w zgodzie z bazą. Woła `pobierz`:
@@ -16,8 +19,13 @@ export type Zdarzenie = "stan" | "gracz" | "odpowiedz";
  *   (brak partycji `realtime.messages`, patrz PLAN.md).
  * Wywołania nie nakładają się: zdarzenie w trakcie pobierania kończy się jednym dodatkowym pobraniem.
  */
-export function useNasluch(
-  kod: string,
+export function useNasluch(kod: string, pobierz: () => Promise<void>, zdarzenia: Zdarzenie[], coIleMs = 5000) {
+  useNasluchTematu(`sesja:${kod}`, pobierz, zdarzenia, coIleMs);
+}
+
+/** Jak `useNasluch`, ale na dowolnym temacie Realtime (np. `lokal:<adres_ekranu>`). */
+export function useNasluchTematu(
+  temat: string,
   pobierz: () => Promise<void>,
   zdarzenia: Zdarzenie[],
   coIleMs = 5000,
@@ -51,7 +59,7 @@ export function useNasluch(
       }
     }
 
-    const kanal = supabase().channel(`sesja:${kod}`);
+    const kanal = supabase().channel(temat);
     for (const zdarzenie of klucz.split(",").filter(Boolean)) {
       kanal.on("broadcast", { event: zdarzenie }, () => void odswiez());
     }
@@ -72,7 +80,7 @@ export function useNasluch(
       document.removeEventListener("visibilitychange", naWidok);
       void supabase().removeChannel(kanal);
     };
-  }, [kod, klucz, coIleMs]);
+  }, [temat, klucz, coIleMs]);
 }
 
 /**

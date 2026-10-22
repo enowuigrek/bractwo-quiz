@@ -227,11 +227,11 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Telefon: w `odpowiedzi` dalej pokazuje swój wynik pytania, a w `tabela` to samo co na podium.
 - Sprawdzone: SQL-em w wycofanej transakcji (kolejność, pusta lista w trakcie pytania jako `anon`, niedozwolone przejście odrzucone) oraz na żywo na localhost z tymczasową grą (14 graczy): ekran odpowiedzi i tabela na TV w 1920×1080, przyciski pilota w 375 px i przejście „Pokaż odpowiedzi graczy”. Tymczasowa gra i quiz są usunięte. Nie sprawdzone: 25–30 graczy (gęsty układ) i telefon gracza w nowych fazach.
 
-### Ustalenia z rozmowy po testach (22.10), do zrobienia
+### Ustalenia z rozmowy po testach (22.10) ✅ zrobione
 
 Cel: wieczór quizowy bez wpisywania kodów. Quiz tworzymy w domu, a w lokalu prowadzący uruchamia grę na swoim telefonie.
 
-1. **Ekran lokalu** `/ekran/<adres-lokalu>`: lokal zapisuje go raz w zakładkach na TV. Bez gry pokazuje plansze zmieniane co ~10 s: (1) logo Bractwa i lokalu, „Quiz Bractwa Piwnego · wkrótce start”, (2) jak grać w 3 krokach, (3) „Piwu Cześć!” i dane Bractwa. Gdy w lokalu ruszy gra, ekran sam przechodzi na poczekalnię z QR (gracze dołączają jeszcze przed „Start quizu”), a po grze wraca do plansz. Przy dwóch grach naraz w jednym lokalu pokazuje najnowszą. `/ekran` bez adresu ma pole na kod gry, `/ekran/KOD` działa jak dotąd, a stare `/tv/...` przekierowują.
+1. **Ekran lokalu** `/ekran/<adres-lokalu>`: lokal zapisuje go raz w zakładkach na TV. Bez gry pokazuje plansze zmieniane co ~10 s: (1) logo Bractwa i lokalu, „Quiz Bractwa Piwnego · wkrótce start”, (2) jak grać w 3 krokach, (3) logo Bractwa i „Piwu Cześć!” (bez podpisów). Gdy w lokalu ruszy gra, ekran sam przechodzi na poczekalnię z QR (gracze dołączają jeszcze przed „Start quizu”), a po grze wraca do plansz. Przy dwóch grach naraz w jednym lokalu pokazuje najnowszą. `/ekran` bez adresu ma pole na kod gry, `/ekran/KOD` działa jak dotąd, a stare `/tv/...` przekierowują.
 2. **Adres ekranu lokalu** powstaje z nazwy przy dodawaniu lokalu (bez polskich znaków, przy powtórce `-2`). Nie zmienia się przy zmianie nazwy, można go poprawić ręcznie z ostrzeżeniem o zakładce. Widać go na liście i na stronie lokalu, z kopiowaniem i QR.
 3. **Lokale w panelu jak quizy:** lista z „Edytuj”, bez usuwania z listy. „Dodaj lokal” pod listą, na osobnym ekranie. Usuwanie tylko na stronie lokalu.
 4. **Czas i zasady przy uruchamianiu gry** (wariant A): tryb, czas na odpowiedź (10/20/30/45 s albo bez limitu, jeden dla wszystkich pytań), bonus za szybkość (przy „bez limitu” wyłączony), limit graczy. Pole czasu znika z edytora pytań. Czas wędruje z `zadania` do `sesje`.
@@ -240,6 +240,12 @@ Cel: wieczór quizowy bez wpisywania kodów. Quiz tworzymy w domu, a w lokalu pr
 7. **Domena** `quiz.bractwopiwne.pl`: CNAME w Hostido, MX bez zmian.
 
 Na później (POMYSLY.md): własne plansze na ekranie lokalu dodawane w panelu; „dłuższy czas” dla wybranych pytań.
+
+**Jak to zrobiliśmy:**
+- Migracje `20261022152607_adres_ekranu_lokalu` (`lokale.adres_ekranu`, unikalny, z nazwy), `20261022152709_czas_w_grze` (`sesje.czas_s`, null = bez limitu; `stan_sesji` zwraca go jako `zadanie.czas_s`, więc klienci się nie zmienili; `zadania.czas_s` zostaje w tabeli nieużywane) i `20261022152718_ekran_lokalu` (`ekran_lokalu(adres)` zwraca lokal i kod najnowszej trwającej gry albo zakończonej w ostatnich 10 min; wyzwalacz wysyła `gra` na temat `lokal:<adres>`).
+- Ekran: `src/app/ekran/` (`/ekran` z polem na kod, `/ekran/[adres]` = lokal albo kod gry). Pliki TV są w `src/app/ekran/_ekran/`. `/tv/...` przekierowuje. `useNasluchTematu` słucha dowolnego tematu Realtime, a `useNasluch(kod)` to jego wersja dla gry.
+- Panel: nawigacja **Quizy · Rozgrywki · ▶ Uruchom quiz · ⚙ (lokale)**. Adresy zostały (`/admin/gry`, `/admin/lokale`), zmieniły się tylko nazwy. Kreator gry ma czas w pigułkach 10/20/30/45 s / bez limitu, a bonus przy „bez limitu” jest wyłączony. Strona gry: „Prowadź z tego telefonu” (pilot w tej samej karcie), „Przekaż prowadzącemu” (QR pod rozwijanym nagłówkiem), karta ekranu lokalu z ostrzeżeniem, gdy w lokalu trwa inna gra. Pilot ma link „← Panel obsługi”.
+- Sprawdzone: SQL w wycofanej transakcji (adresy, ekran lokalu jako `anon`, czas 10 s, 747 pkt po 5 s, ekran po końcu gry) i na localhost: plansze, poczekalnia, automatyczne przełączenie ekranu Piwiarni w Alejach po uruchomieniu gry z kreatora (30 s), pilot ze startem i oknem potwierdzenia, powrót do plansz po usunięciu gry, lokale z adresem i QR, `/tv/umvw` → `/ekran/UMVW`, `/ekran`. Testowa gra GHNV jest usunięta. Nie sprawdzone: telefon gracza w nowej poczekalni i Realtime na produkcji (lokalnie mogło zadziałać odpytywanie co 5 s).
 
 ### Historia zakończonych gier w panelu (22.10)
 

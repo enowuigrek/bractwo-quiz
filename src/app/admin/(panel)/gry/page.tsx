@@ -4,7 +4,7 @@ import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
 
-export const metadata: Metadata = { title: "Gry · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
 
 export default async function Gry() {
   await wymagajAdmina();
@@ -18,21 +18,21 @@ export default async function Gry() {
   const gry = data ?? [];
   return (
     <main>
-      <h1>Gry</h1>
+      <h1>Rozgrywki</h1>
       <p>
         <Link href="/admin/gry/nowa" className="przycisk zloty">
-          Uruchom nową grę
+          ▶ Uruchom quiz
         </Link>
       </p>
-      {error && <p className="blad">Nie udało się pobrać gier: {error.message}</p>}
+      {error && <p className="blad">Nie udało się pobrać rozgrywek: {error.message}</p>}
 
       <section className="panel-sekcja">
         <h2>Trwające</h2>
-        <ListaGier gry={gry.filter((g) => g.faza !== "koniec")} pusta="Żadna gra teraz nie trwa." />
+        <ListaGier gry={gry.filter((g) => g.faza !== "koniec")} pusta="Żadna rozgrywka teraz nie trwa." />
       </section>
       <section className="panel-sekcja">
         <h2>Zakończone</h2>
-        <ListaGier gry={gry.filter((g) => g.faza === "koniec")} pusta="Nie ma jeszcze zakończonych gier." />
+        <ListaGier gry={gry.filter((g) => g.faza === "koniec")} pusta="Nie ma jeszcze zakończonych rozgrywek." />
       </section>
     </main>
   );

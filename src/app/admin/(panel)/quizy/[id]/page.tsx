@@ -54,7 +54,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                     <Link href={`/admin/quizy/${quiz.id}/zadania/${z.id}`}>{z.tresc}</Link>
                   </div>
                   <div className="lista-opis">
-                    {z.czas_s === null ? "bez limitu" : `${z.czas_s} s`} · poprawna: {LITERY[z.dane.poprawna]}. {z.dane.odpowiedzi[z.dane.poprawna]}
+                    Poprawna: {LITERY[z.dane.poprawna]}. {z.dane.odpowiedzi[z.dane.poprawna]}
                   </div>
                 </div>
                 <div className="lista-akcje">

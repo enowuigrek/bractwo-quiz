@@ -5,6 +5,8 @@ export type Lokal = {
   nazwa: string;
   miasto: string | null;
   logo_url: string | null;
+  /** Stały adres ekranu lokalu: /ekran/<adres_ekranu>. */
+  adres_ekranu: string;
 };
 
 export type Quiz = {
@@ -40,6 +42,8 @@ export type Sesja = {
   grafika_url: string | null;
   tryb: "solo" | "druzyny";
   bonus_czas: boolean;
+  /** Czas na odpowiedź w s, jeden dla wszystkich pytań; `null`: bez limitu. */
+  czas_s: number | null;
   max_graczy: number;
   faza: Faza;
   zadanie_nr: number;

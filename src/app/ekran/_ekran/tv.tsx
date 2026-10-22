@@ -22,10 +22,29 @@ function useSkala() {
   return useSyncExternalStore(subskrybujRozmiar, skalaOkna, () => 1);
 }
 
-type Props = { kod: string; qr: string; adres: string };
-
-export function Tv({ kod, qr, adres }: Props) {
+/** Scena 1920×1080 przeskalowana do ekranu. Wspólna dla gry i plansz ekranu lokalu. */
+export function Scena({ children }: { children: React.ReactNode }) {
   const skala = useSkala();
+  return (
+    <div className="tv">
+      <div
+        className="scena"
+        style={{
+          transform: `scale(${skala})`,
+          left: `calc(50% - ${(SZER * skala) / 2}px)`,
+          top: `calc(50% - ${(WYS * skala) / 2}px)`,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** `host`: adres aplikacji bez protokołu, np. quiz.bractwopiwne.pl (pod QR, dla wpisujących ręcznie). */
+type Props = { kod: string; qr: string; host: string };
+
+export function Tv({ kod, qr, host }: Props) {
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<string[]>([]);
   const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
@@ -66,15 +85,7 @@ export function Tv({ kod, qr, adres }: Props) {
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
 
   return (
-    <div className="tv">
-      <div
-        className="scena"
-        style={{
-          transform: `scale(${skala})`,
-          left: `calc(50% - ${(SZER * skala) / 2}px)`,
-          top: `calc(50% - ${(WYS * skala) / 2}px)`,
-        }}
-      >
+    <Scena>
         {!stan ? (
           <div className="tv-srodek">
             <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
@@ -83,7 +94,7 @@ export function Tv({ kod, qr, adres }: Props) {
           // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
           <div key={kluczEkranu(stan)} className="tv-ekran">
             {stan.faza === "poczekalnia" ? (
-              <Poczekalnia stan={stan} gracze={gracze} qr={qr} adres={adres} />
+              <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} />
             ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
               <Pytanie stan={stan} teraz={teraz} />
             ) : stan.faza === "odpowiedzi" ? (
@@ -98,47 +109,44 @@ export function Tv({ kod, qr, adres }: Props) {
           </div>
         )}
         {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
-      </div>
-    </div>
+    </Scena>
   );
 }
 
-function Loga({ stan }: { stan: StanSesji }) {
+export function Loga({ lokal }: { lokal: { nazwa: string; logo_url: string | null } | null }) {
   return (
     <div className="tv-loga">
       <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo" />
-      {stan.lokal?.logo_url && <img src={stan.lokal.logo_url} alt={stan.lokal.nazwa} className="tv-logo-lokalu" />}
+      {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="tv-logo-lokalu" />}
     </div>
   );
 }
 
-function Poczekalnia({ stan, gracze, qr, adres }: { stan: StanSesji; gracze: string[]; qr: string; adres: string }) {
+/**
+ * Poczekalnia: duży QR po lewej (pod nim drobniej adres i kod dla wpisujących ręcznie),
+ * na pierwszym planie okazja, tytuł quizu i grafika, pod nimi gracze.
+ */
+function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: string[]; qr: string; host: string }) {
   const druzyny = stan.tryb === "druzyny";
   return (
     <div className="poczekalnia">
       <header className="tv-naglowek">
-        <Loga stan={stan} />
-        <div className="tv-tytul">
-          {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
-          <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
-          {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
-        </div>
+        <Loga lokal={stan.lokal} />
+        {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
       </header>
 
       <div className="poczekalnia-tresc">
         <section className="tv-wejscie">
           <div className="tv-qr" dangerouslySetInnerHTML={{ __html: qr }} />
-          <p className="tv-adres">{adres}</p>
+          <p className="tv-adres">
+            Bez skanowania: {host} · kod <strong className="tv-zloto">{stan.kod}</strong>
+          </p>
         </section>
 
         <section className="tv-prawa">
-          <div className="tv-kod-rzad">
-            <div>
-              <p className="tv-etykieta">Kod gry</p>
-              <p className="tv-kod">{stan.kod}</p>
-            </div>
-            {stan.grafika_url && <img src={stan.grafika_url} alt="" className="tv-grafika" />}
-          </div>
+          {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
+          <h1 className="tv-tytul-quizu">{stan.quiz?.tytul ?? "Quiz"}</h1>
+          {stan.grafika_url && <img src={stan.grafika_url} alt="" className="tv-grafika" />}
 
           <div className="tv-gracze">
             <p className="tv-etykieta">
@@ -177,7 +185,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   if (!z)
     return (
       <div className="tv-srodek">
-        <Loga stan={stan} />
+        <Loga lokal={stan.lokal} />
         <p className="tv-duzy">Patrz na prowadzącego</p>
       </div>
     );
@@ -186,7 +194,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   if (faza === "przygotuj") {
     return (
       <div className="tv-srodek">
-        <Loga stan={stan} />
+        <Loga lokal={stan.lokal} />
         <p className="tv-okazja">
           Pytanie {z.lp}/{liczba}
         </p>
@@ -292,7 +300,7 @@ function Koniec({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] 
   return (
     <div className="tv-koniec">
       <header className="tv-naglowek">
-        <Loga stan={stan} />
+        <Loga lokal={stan.lokal} />
         <div className="tv-tytul">
           {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
           <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>

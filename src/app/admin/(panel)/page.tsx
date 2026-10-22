@@ -27,16 +27,16 @@ export default async function Panel() {
         <>
           <p>
             <Link href="/admin/gry/nowa" className="przycisk zloty">
-              Uruchom nową grę
+              ▶ Uruchom quiz
             </Link>
           </p>
           <section className="panel-sekcja">
-            <h2>Trwające gry</h2>
-            <ListaGier gry={trwajace.data ?? []} pusta="Żadna gra teraz nie trwa." />
+            <h2>Trwające rozgrywki</h2>
+            <ListaGier gry={trwajace.data ?? []} pusta="Żadna rozgrywka teraz nie trwa." />
           </section>
           <p className="pomocniczy panel-sekcja">
             <Link href="/admin/quizy">Quizy: {quizy.count}</Link> ·{" "}
-            <Link href="/admin/lokale">Lokale: {lokale.count}</Link>
+            <Link href="/admin/lokale">Lokale (ustawienia): {lokale.count}</Link>
           </p>
         </>
       )}

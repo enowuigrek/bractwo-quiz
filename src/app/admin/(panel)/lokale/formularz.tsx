@@ -43,6 +43,29 @@ export function FormularzLokalu({ lokal, miasta }: Props) {
           ))}
         </datalist>
       </div>
+      {lokal && (
+        <div>
+          <label htmlFor="adres_ekranu">Adres ekranu lokalu</label>
+          <div className="pole-z-przedrostkiem">
+            <span>/ekran/</span>
+            <input
+              id="adres_ekranu"
+              name="adres_ekranu"
+              className="pole"
+              defaultValue={lokal.adres_ekranu}
+              required
+              maxLength={60}
+              pattern="[a-z0-9]+(-[a-z0-9]+)*"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
+          <p className="podpowiedz">
+            Zmieniaj tylko w razie potrzeby: zakładka zapisana na TV w lokalu przestanie działać i trzeba ją zapisać od
+            nowa.
+          </p>
+        </div>
+      )}
       <PoleGrafiki
         nazwa="logo"
         etykieta="Logo"

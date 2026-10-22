@@ -6,6 +6,7 @@ import { wymagajAdmina } from "@/lib/admin";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
+import { LIMITY } from "../quizy/limity";
 
 const MAX_OKAZJA = 80;
 
@@ -17,11 +18,17 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const quiz_id = String(dane.get("quiz_id") ?? "");
   const okazja = String(dane.get("okazja") ?? "").trim().replace(/\s+/g, " ");
   const tryb = dane.get("tryb") === "druzyny" ? "druzyny" : "solo";
-  const bonus_czas = dane.get("bonus_czas") === "on";
+  // czas na odpowiedź dla wszystkich pytań; bez limitu nie ma od czego liczyć bonusu
+  const czasPole = String(dane.get("czas_s") ?? "");
+  const czas_s = czasPole === "bez" ? null : Number(czasPole);
+  const bonus_czas = czas_s !== null && dane.get("bonus_czas") === "on";
   const max_graczy = Number(dane.get("max_graczy") || 30);
 
   if (!lokal_id) return { blad: "Wybierz lokal." };
   if (!quiz_id) return { blad: "Wybierz quiz." };
+  if (czas_s !== null && (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas)) {
+    return { blad: "Wybierz czas na odpowiedź." };
+  }
   if (okazja.length > MAX_OKAZJA) return { blad: `Okazja może mieć najwyżej ${MAX_OKAZJA} znaków.` };
   if (!Number.isInteger(max_graczy) || max_graczy < 1 || max_graczy > 500) {
     return { blad: "Limit graczy musi być liczbą od 1 do 500." };
@@ -48,7 +55,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   const { data, error } = await db
     .from("sesje")
-    .insert({ lokal_id, quiz_id, okazja: okazja || null, tryb, bonus_czas, max_graczy, grafika_url })
+    .insert({ lokal_id, quiz_id, okazja: okazja || null, tryb, czas_s, bonus_czas, max_graczy, grafika_url })
     .select("id")
     .single();
   if (error) {

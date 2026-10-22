@@ -4,8 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { poprawnyKod } from "@/lib/gra/kod";
 
-/** Pole na kod gry ze strony głównej. Sprawdzenie, czy gra istnieje, robi już strona `/[kod]`. */
-export function WpiszKod() {
+/**
+ * Pole na kod gry (strona główna i `/ekran`). Sprawdzenie, czy gra istnieje, robi już strona docelowa.
+ * `cel`: początek adresu, do którego doklejamy kod („/” dla graczy, „/ekran/” dla TV).
+ */
+export function WpiszKod({ cel = "/", przycisk = "Dołącz" }: { cel?: string; przycisk?: string }) {
   const router = useRouter();
   const [kod, ustawKod] = useState("");
   const [wysylam, ustawWysylam] = useState(false);
@@ -16,7 +19,7 @@ export function WpiszKod() {
         e.preventDefault();
         if (!poprawnyKod(kod)) return;
         ustawWysylam(true);
-        router.push(`/${kod.toUpperCase()}`);
+        router.push(`${cel}${kod.toUpperCase()}`);
       }}
     >
       <label htmlFor="kod" className="etykieta">
@@ -37,7 +40,7 @@ export function WpiszKod() {
         autoFocus
       />
       <button type="submit" className="przycisk zloty" style={{ marginTop: 14 }} disabled={!poprawnyKod(kod) || wysylam}>
-        Dołącz
+        {przycisk}
       </button>
     </form>
   );

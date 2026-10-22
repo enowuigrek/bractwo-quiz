@@ -6,13 +6,13 @@ import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { IkonaEdytuj } from "../_komponenty/ikony";
 
-export const metadata: Metadata = { title: "Lokale · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Ustawienia: lokale · Bractwo Quiz" };
 
 export default async function Lokale() {
   await wymagajAdmina();
   const { data, error } = await supabaseAdmin()
     .from("lokale")
-    .select("id, nazwa, miasto, logo_url")
+    .select("id, nazwa, miasto, logo_url, adres_ekranu")
     .order("miasto")
     .order("nazwa")
     .returns<Lokal[]>();
@@ -22,6 +22,7 @@ export default async function Lokale() {
 
   return (
     <main>
+      <p className="okruchy">Ustawienia</p>
       <h1>Lokale</h1>
       {error && <p className="blad">Nie udało się pobrać lokali: {error.message}</p>}
 
@@ -34,8 +35,11 @@ export default async function Lokale() {
               .map((p) => (
                 <li key={p.id}>
                   <Miniatura src={p.logo_url} alt="" />
-                  <div className="lista-glowna lista-tytul">
-                    <Link href={`/admin/lokale/${p.id}`}>{p.nazwa}</Link>
+                  <div className="lista-glowna">
+                    <div className="lista-tytul">
+                      <Link href={`/admin/lokale/${p.id}`}>{p.nazwa}</Link>
+                    </div>
+                    <div className="lista-opis">ekran: /ekran/{p.adres_ekranu}</div>
                   </div>
                   <div className="lista-akcje">
                     <Link

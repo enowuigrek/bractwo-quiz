@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { usePotwierdzenie, type OpcjePotwierdzenia } from "@/components/okno";
@@ -332,6 +333,12 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </button>
         )}
       </section>
+      <p style={{ marginTop: 32, textAlign: "center" }}>
+        {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło */}
+        <Link href="/admin/gry" className="pomocniczy">
+          ← Panel obsługi
+        </Link>
+      </p>
       {oknoPotwierdzenia}
     </>
   );

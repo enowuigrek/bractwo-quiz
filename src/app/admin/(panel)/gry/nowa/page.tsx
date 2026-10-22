@@ -5,7 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Kreator } from "./kreator";
 
-export const metadata: Metadata = { title: "Nowa gra · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Uruchom quiz · Bractwo Quiz" };
 
 export default async function NowaGra() {
   await wymagajAdmina();
@@ -22,9 +22,9 @@ export default async function NowaGra() {
   return (
     <main>
       <p className="okruchy">
-        <Link href="/admin/gry">← Gry</Link>
+        <Link href="/admin/gry">← Rozgrywki</Link>
       </p>
-      <h1>Nowa gra</h1>
+      <h1>Uruchom quiz</h1>
       <section className="karta">
         <Kreator
           lokale={lokale ?? []}

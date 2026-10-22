@@ -620,15 +620,6 @@ a.przycisk {
   border-color: var(--czerwien);
 }
 
-/* Czas na odpowiedź + „bez limitu” w jednym wierszu */
-.wiersz-czasu {
-  align-items: end;
-}
-
-.wiersz-czasu .przelacznik {
-  min-height: 56px;
-}
-
 .formularz .pole:disabled {
   opacity: 0.4;
 }
@@ -806,4 +797,103 @@ a.przycisk {
   display: flex;
   justify-content: space-between;
   gap: 10px;
+}
+
+/* Pole z nieedytowalnym początkiem, np. „/ekran/” przed adresem lokalu */
+.pole-z-przedrostkiem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pole-z-przedrostkiem span {
+  flex: none;
+  color: var(--szary);
+  font-size: var(--fs-input);
+}
+
+/* Wybór czasu na odpowiedź przy uruchamianiu gry: rząd pigułek */
+.wybor-czasu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wybor-czasu-opcja {
+  display: inline-flex !important;
+  align-items: center;
+  margin: 0 !important;
+  padding: 10px 18px;
+  border-radius: var(--r-btn-sm);
+  background: var(--kamien2);
+  color: var(--piana) !important;
+  font-size: var(--fs-small) !important;
+  font-weight: var(--w-black) !important;
+  cursor: pointer;
+}
+
+.wybor-czasu-opcja input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wybor-czasu-opcja.wybrana {
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  color: var(--na-zlocie) !important;
+}
+
+.wybor-czasu-opcja:has(input:focus-visible) {
+  outline: 3px solid var(--zloto);
+  outline-offset: 3px;
+}
+
+/* „Przekaż prowadzącemu”: QR pilota schowany pod rozwijanym nagłówkiem */
+.przekaz {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--kamien2);
+}
+
+.przekaz summary {
+  cursor: pointer;
+  color: var(--zloto);
+  font-weight: var(--w-semibold);
+}
+
+.przekaz[open] summary {
+  margin-bottom: 8px;
+}
+
+/* „Uruchom quiz” i ustawienia w pasku nawigacji: przyciski, nie zakładki */
+.panel-nawigacja {
+  align-items: center;
+}
+
+.panel-nawigacja a.nawigacja-start,
+.panel-nawigacja a.nawigacja-ustawienia {
+  align-self: center;
+  border-bottom: 0;
+  margin-left: 8px;
+}
+
+.panel-nawigacja a.nawigacja-start {
+  padding: 8px 16px;
+  color: var(--na-zlocie);
+}
+
+.panel-nawigacja a.nawigacja-ustawienia {
+  padding: 0;
+  color: var(--piana);
+}
+
+.panel-nawigacja a.nawigacja-ustawienia[aria-current="page"] {
+  color: var(--zloto);
+  box-shadow: 0 0 0 2px var(--zloto);
+}
+
+@media (max-width: 559px) {
+  .panel-nawigacja .na-szerokim {
+    display: none;
+  }
 }

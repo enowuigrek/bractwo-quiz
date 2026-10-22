@@ -9,7 +9,6 @@ import { zapiszZadanie } from "../../akcje";
 import { LIMITY } from "../../limity";
 
 const LITERY = "ABCDEF";
-const DOMYSLNY_CZAS = 20;
 
 type Props = { quizId: string; zadanie?: Zadanie };
 
@@ -26,7 +25,6 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
   );
   const [poprawna, setPoprawna] = useState<number | null>(zadanie?.dane.poprawna ?? null);
   const [nastepnyKlucz, setNastepnyKlucz] = useState(odpowiedzi.length);
-  const [bezLimitu, setBezLimitu] = useState(zadanie ? zadanie.czas_s === null : false);
 
   // te same odpowiedzi (bez względu na wielkość liter) podświetlamy od razu, przed zapisem
   const porownanie = odpowiedzi.map((o) => o.tekst.trim().toLocaleLowerCase("pl"));
@@ -114,36 +112,6 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
           </button>
         )}
       </fieldset>
-
-      <div>
-        <div className="wiersz-pol wiersz-czasu">
-          <div>
-            <label htmlFor="czas_s">Czas na odpowiedź (s)</label>
-            <input
-              id="czas_s"
-              name="czas_s"
-              type="number"
-              inputMode="numeric"
-              className="pole"
-              defaultValue={zadanie?.czas_s ?? DOMYSLNY_CZAS}
-              min={LIMITY.minCzas}
-              max={LIMITY.maxCzas}
-              required={!bezLimitu}
-              disabled={bezLimitu}
-            />
-          </div>
-          <label className="przelacznik">
-            <input type="checkbox" name="bez_limitu" checked={bezLimitu} onChange={(e) => setBezLimitu(e.target.checked)} />
-            Bez limitu czasu
-          </label>
-        </div>
-        {bezLimitu && (
-          <p className="podpowiedz">
-            Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik. Bez bonusu za szybkość: poprawna
-            odpowiedź daje 1000 pkt.
-          </p>
-        )}
-      </div>
 
       <PoleGrafiki
         nazwa="grafika"

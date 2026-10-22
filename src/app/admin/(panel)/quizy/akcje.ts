@@ -65,16 +65,10 @@ export async function usunQuiz(id: string): Promise<void> {
 // Zadania (typ „wybór”)
 // ---------------------------------------------------------------------------
 
-function odczytajZadanie(dane: FormData): { blad: string } | { tresc: string; czas_s: number | null; dane: DaneWybor } {
+function odczytajZadanie(dane: FormData): { blad: string } | { tresc: string; dane: DaneWybor } {
   const tresc = tekst(dane, "tresc");
   if (!tresc) return { blad: "Wpisz treść pytania." };
   if (tresc.length > LIMITY.tresc) return { blad: `Pytanie może mieć najwyżej ${LIMITY.tresc} znaków.` };
-
-  // bez limitu: pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik
-  const czas_s = dane.get("bez_limitu") ? null : Number(dane.get("czas_s"));
-  if (czas_s !== null && (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas)) {
-    return { blad: `Czas musi być liczbą sekund od ${LIMITY.minCzas} do ${LIMITY.maxCzas}.` };
-  }
 
   const odpowiedzi = dane.getAll("odpowiedz").map((o) => String(o).trim());
   if (odpowiedzi.length < LIMITY.minOdpowiedzi || odpowiedzi.length > LIMITY.maxOdpowiedzi) {
@@ -93,7 +87,8 @@ function odczytajZadanie(dane: FormData): { blad: string } | { tresc: string; cz
     return { blad: "Zaznacz poprawną odpowiedź." };
   }
 
-  return { tresc, czas_s, dane: { odpowiedzi, poprawna } };
+  // czas na odpowiedź ustawia się przy uruchamianiu gry, nie w pytaniu
+  return { tresc, dane: { odpowiedzi, poprawna } };
 }
 
 /** Dodaje zadanie na koniec quizu (zadanieId = null) albo zapisuje zmiany. */

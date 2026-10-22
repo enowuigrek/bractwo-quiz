@@ -10,6 +10,7 @@ Zasady:
 - Punkty i czas liczy serwer (funkcje w Postgresie), nigdy klient. Poprawna odpowiedź nie trafia do przeglądarki przed fazą `wynik`.
 - Supabase: projekt `bractwo-quiz` (ref `yyacqskrpgnfdxtcmapw`, Frankfurt). Migracje trzymamy w repo w `supabase/migrations/`.
 - Migracje wdrażamy przez MCP (`apply_migration`), a potem zapisujemy plik w repo pod wersją z `list_migrations`, żeby historia w bazie i w repo się zgadzała.
+- MCP Supabase po cichu odrzuca (`"status":"declined"`) polecenia, które uznaje za niszczące: `UPDATE`/`DELETE` bez `WHERE` w migracji i usuwanie danych przez `execute_sql`. Aplikacja nie pokazuje wtedy żadnego okna. W migracjach zawsze dawaj `WHERE` (np. `where kolumna is null`), a dane testowe usuwaj przez panel.
 - Ten projekt Supabase nie nadaje rolom API uprawnień do nowych tabel. Nowa tabela = jawny `grant select, insert, update, delete … to service_role`; `anon` dostaje dostęp tylko przez funkcje.
 - Vercel: funkcje w regionie `fra1`, obok bazy.
 - Vercel MCP dostaje 403 na zespół. Zamiast niego używamy CLI: `npx vercel@54.20.1 …` (nowsze 64.x na Node 25 kończy się po cichu). Katalog jest podlinkowany (`.vercel/`, poza repo), więc działa bez flag: `list`, `logs --since 1h`, `crons ls`, `inspect <url> --logs` (logi buildu). `vercel link` dopisuje `VERCEL_OIDC_TOKEN` do `.env.local` i próbuje zmienić `.gitignore`. Zmian w `.gitignore` nie commitujemy.
