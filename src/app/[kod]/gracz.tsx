@@ -6,6 +6,7 @@ import { LogoQuiz } from "@/components/logo-quiz";
 import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
 import type { Dolaczenie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
@@ -225,16 +226,10 @@ function WGrze({
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, liczy, stan.faza === "przygotuj" ? 100 : 250);
 
-  if (stan.faza === "koniec") {
+  // podium, tabela i koniec to jeden ekran, żeby medal i konfetti nie startowały od nowa przy przejściach
+  if (stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {
     return (
-      <>
-        <h1>Koniec gry</h1>
-        {moj && <Miejsce moj={moj} />}
-        {moj?.miejsce === 1 && <p className="nadtytul">Zwycięstwo!</p>}
-        <p>
-          Dzięki za grę, <strong className="gra-kod">{ja.nick}</strong>! Piwu Cześć!
-        </p>
-      </>
+      <KoniecGracza faza={stan.faza} fazaOd={stan.faza_od} przesuniecie={przesuniecie} moj={moj} nick={ja.nick} />
     );
   }
 
@@ -260,21 +255,14 @@ function WGrze({
     );
   }
 
-  if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "tabela") {
-    const poGrze = stan.faza !== "ranking";
+  if (stan.faza === "ranking") {
     return (
       <>
         <p className="nadtytul">{ja.nick}</p>
-        <h1>{poGrze ? "Koniec quizu!" : "Ranking"}</h1>
+        <h1>Ranking</h1>
         {moj && <Miejsce moj={moj} />}
-        {stan.faza === "ranking" && mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
-        <p>
-          {stan.faza === "podium"
-            ? "Na telewizorze podium. Brawa dla najlepszych!"
-            : stan.faza === "tabela"
-              ? "Na telewizorze pełna tabela wyników."
-              : "Patrz na telewizor."}
-        </p>
+        {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
+        <p>Patrz na telewizor.</p>
       </>
     );
   }

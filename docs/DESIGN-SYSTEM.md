@@ -120,6 +120,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Podpis ikony (Quiz).** Przyciski z samą ikoną (ołówek, kosz, strzałki) mają `data-podpis="Edytuj"`. Po najechaniu albo fokusie z klawiatury nad przyciskiem pojawia się dymek: 13/600, tło `--kamien3`, obrys `--kamien2`, radius `--r-pole`. Zamiast atrybutu `title`, bo systemowy dymek nie pasuje do wyglądu.
 
+**Fanfara podium (Quiz).** Konfetti w kolorach złoto, złoto jasne, blask, piana, chmiel, bursztyn. Medale na telefonie: 160 px, kolor `--zloto` / `--srebro` / `--braz` z jasnym refleksem, wjazd z obrotem 1 s (`--ease-wjazd`). Przed odsłoną pulsujący napis „Werble…”.
+
 **Pole z błędem (Quiz).** Ramka w `--czerwien` (np. powtórzona odpowiedź), a pod polem komunikat `.blad`.
 
 **Nagłówek z animacją.** Anioł i diabeł wjeżdżają z centrum na boki, logo pojawia się ze `scale(.92)`. Całość trwa 2.8s, krzywa `cubic-bezier(.4,0,.2,1)`. Logo jest białe (`filter: invert(1)` + `mix-blend-mode: screen`).

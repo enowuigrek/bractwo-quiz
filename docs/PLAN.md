@@ -247,6 +247,13 @@ Na później (POMYSLY.md): własne plansze na ekranie lokalu dodawane w panelu; 
 - Panel: nawigacja **Quizy · Rozgrywki · ▶ Uruchom quiz · ⚙ (lokale)**. Adresy zostały (`/admin/gry`, `/admin/lokale`), zmieniły się tylko nazwy. Kreator gry ma czas w pigułkach 10/20/30/45 s / bez limitu, a bonus przy „bez limitu” jest wyłączony. Strona gry: „Prowadź z tego telefonu” (pilot w tej samej karcie), „Przekaż prowadzącemu” (QR pod rozwijanym nagłówkiem), karta ekranu lokalu z ostrzeżeniem, gdy w lokalu trwa inna gra. Pilot ma link „← Panel obsługi”.
 - Sprawdzone: SQL w wycofanej transakcji (adresy, ekran lokalu jako `anon`, czas 10 s, 747 pkt po 5 s, ekran po końcu gry) i na localhost: plansze, poczekalnia, automatyczne przełączenie ekranu Piwiarni w Alejach po uruchomieniu gry z kreatora (30 s), pilot ze startem i oknem potwierdzenia, powrót do plansz po usunięciu gry, lokale z adresem i QR, `/tv/umvw` → `/ekran/UMVW`, `/ekran`. Testowa gra GHNV jest usunięta. Nie sprawdzone: telefon gracza w nowej poczekalni i Realtime na produkcji (lokalnie mogło zadziałać odpytywanie co 5 s).
 
+### Fanfary na podium (22.10)
+
+- **TV:** gdy wjeżdża zwycięzca, konfetti wybucha z obu dolnych rogów i przez 6 s pada złoty deszcz (`canvas-confetti`, kolory z design systemu, wyłączone przy `prefers-reduced-motion`). Nad zwycięzcą jest napis „Zwycięzca”, a jego stopień pulsuje blaskiem. Na końcu gry jest krótszy wybuch.
+- **Telefon:** podium, tabela i koniec to jeden ekran (`[kod]/fanfara.tsx`). Do chwili, gdy TV pokaże stopień gracza, telefon wyświetla „Werble… patrz na telewizor”. Potem pierwsza trójka dostaje medal (złoty, srebrny, brązowy) z wjazdem, „Zwycięstwo!” / „Srebro!” / „Brąz!” i konfetti (przy 1. miejscu z deszczem). Pozostali widzą swoje miejsce.
+- **Wspólny zegar:** czasy wjazdu stopni są w `src/lib/gra/podium.ts`. TV i telefony liczą je od `faza_od` podium w bazie (z poprawką zegara), więc odsłaniają się razem, a przeładowane TV nie powtarza animacji.
+- Sprawdzone na localhost z tymczasową grą HUFB (4 graczy): telefon zwycięzcy (werble, potem medal i konfetti) i TV (3. i 2. po 1,5 s, zwycięzca z konfetti po ~4 s). Gra usunięta. Dźwięków nie ma: przeglądarki blokują je bez kliknięcia na TV (pomysł zostaje w POMYSLY.md).
+
 ### Historia zakończonych gier w panelu (22.10)
 
 - Strona zakończonej gry (`/admin/gry/[id]`) ma sekcję **Wyniki**: tabela końcowa wszystkich graczy (miejsce z remisami, nick, punkty, dobre odpowiedzi x/N, średni czas; średni czas znika poniżej 560 px). Cały wiersz prowadzi do historii gracza.

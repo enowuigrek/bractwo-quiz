@@ -1048,3 +1048,26 @@
 .plansze-kropki li.teraz {
   background: var(--zloto);
 }
+
+/* Zwycięzca na podium: złoty napis nad nickiem i pulsujący blask stopnia */
+.tv-stopien-korona {
+  margin-bottom: 6px;
+  font-family: var(--font-condensed);
+  font-stretch: 75%;
+  font-size: 40px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--zloto-blask);
+  text-shadow: var(--glow-md);
+}
+
+.tv-stopien-1 .tv-stopien-blok {
+  animation: blask-zwyciezcy 2.4s ease-in-out 4s infinite;
+}
+
+@keyframes blask-zwyciezcy {
+  50% {
+    box-shadow: 0 0 80px rgba(227, 172, 63, 0.8);
+  }
+}

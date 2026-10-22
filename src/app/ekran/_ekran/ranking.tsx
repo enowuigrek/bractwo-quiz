@@ -2,7 +2,9 @@
 
 import { animate, AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { RESZTA_PODIUM_S, WJAZD_PODIUM_S } from "@/lib/gra/podium";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
+import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 
 /** Ile wierszy mieści ranking na scenie 1920×1080. */
 const W_RANKINGU = 10;
@@ -107,17 +109,39 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
 
 /** Kolejność stopni na podium: 2. z lewej, 1. w środku, 3. z prawej. */
 const STOPNIE = [1, 0, 2] as const;
-/** Kiedy wjeżdża który stopień (indeks w rankingu → s): od trzeciego do pierwszego. */
-const WJAZD_S = [3.4, 1.8, 0.6];
 
 /**
  * Podium: trzy pierwsze miejsca wjeżdżają po kolei, zwycięzca na końcu i ze złotym blaskiem.
  * Pod spodem miejsca 4–10. `odRazu` (faza `koniec`) pokazuje wszystko bez odliczania.
  */
-export function PodiumTv({ ranking, odRazu }: { ranking: WierszRankingu[]; odRazu: boolean }) {
+export function PodiumTv({ ranking, odRazu, start }: { ranking: WierszRankingu[]; odRazu: boolean; start: number | null }) {
   const top = ranking.slice(0, 3);
   const dalej = ranking.slice(3, 10);
-  const opoznienie = (i: number) => (odRazu ? 0 : WJAZD_S[i]);
+  // Czasy liczymy od początku fazy w bazie, nie od chwili, gdy TV ją zauważyło
+  // (telefony odsłaniają miejsca według tego samego zegara). Po przeładowaniu w trakcie podium nie ma powtórki.
+  const [uplynelo] = useState(() => (start ? Math.max(0, (Date.now() - start) / 1000) : 0));
+  const opoznienie = (i: number) => (odRazu ? 0 : Math.max(0, WJAZD_PODIUM_S[i] - uplynelo));
+
+  // fanfara: gdy wjeżdża zwycięzca, konfetti z obu stron i złoty deszcz; na końcu gry krótszy wybuch
+  useEffect(() => {
+    if (top.length === 0) return;
+    if (odRazu) {
+      wybuchKonfetti();
+      return;
+    }
+    const za = WJAZD_PODIUM_S[0] + 0.5 - uplynelo;
+    // TV włączone długo po wjeździe zwycięzcy: bez fanfary
+    if (za < -10) return;
+    let przerwij: (() => void) | undefined;
+    const zegar = setTimeout(() => {
+      wybuchKonfetti();
+      przerwij = deszczKonfetti(6000);
+    }, Math.max(0, za) * 1000);
+    return () => {
+      clearTimeout(zegar);
+      przerwij?.();
+    };
+  }, [odRazu, top.length, uplynelo]);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -132,6 +156,7 @@ export function PodiumTv({ ranking, odRazu }: { ranking: WierszRankingu[]; odRaz
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: opoznienie(i), type: "spring", stiffness: 120, damping: 14 }}
             >
+              {i === 0 && <span className="tv-stopien-korona">Zwycięzca</span>}
               <span className="tv-stopien-nick">{w.nick}</span>
               <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
               <div className="tv-stopien-blok">
@@ -146,7 +171,7 @@ export function PodiumTv({ ranking, odRazu }: { ranking: WierszRankingu[]; odRaz
           className="tv-podium-dalej"
           initial={odRazu ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: odRazu ? 0 : WJAZD_S[0] + 1.2 }}
+          transition={{ delay: odRazu ? 0 : Math.max(0, RESZTA_PODIUM_S - uplynelo) }}
         >
           {dalej.map((w) => (
             <li key={w.nick}>

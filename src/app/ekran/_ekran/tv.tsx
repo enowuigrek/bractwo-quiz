@@ -104,7 +104,7 @@ export function Tv({ kod, qr, host }: Props) {
             ) : stan.faza === "tabela" ? (
               <TabelaTv stan={stan} ranking={ranking} />
             ) : (
-              <Koniec stan={stan} ranking={ranking} />
+              <Koniec stan={stan} ranking={ranking} przesuniecie={przesuniecie} />
             )}
           </div>
         )}
@@ -294,7 +294,7 @@ function kluczEkranu(stan: StanSesji): string {
 }
 
 /** Podium (z wjazdem po kolei) i koniec gry (podium od razu + podziękowanie). */
-function Koniec({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
+function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: WierszRankingu[]; przesuniecie: number }) {
   const koniec = stan.faza === "koniec";
   const bylaGra = stan.zadanie !== null && ranking.length > 0;
   return (
@@ -308,7 +308,12 @@ function Koniec({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] 
         </div>
       </header>
       {bylaGra ? (
-        <PodiumTv ranking={ranking} odRazu={koniec} />
+        <PodiumTv
+          ranking={ranking}
+          odRazu={koniec}
+          // początek podium w zegarze tego urządzenia: TV i telefony odsłaniają miejsca razem
+          start={stan.faza_od ? Date.parse(stan.faza_od) - przesuniecie : null}
+        />
       ) : (
         <div className="tv-srodek">
           <p className="tv-duzy">Koniec gry</p>
