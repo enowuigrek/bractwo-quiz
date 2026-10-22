@@ -82,7 +82,6 @@ export function Plansze({ lokal, ostatnia }: Props) {
         {nr === 2 && (
           <div className="plansza-srodek">
             <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo plansza-logo-duze" />
-            <h1 className="plansza-haslo">Piwu Cześć!</h1>
           </div>
         )}
       </div>

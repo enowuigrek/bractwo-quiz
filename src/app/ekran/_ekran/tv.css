@@ -1380,3 +1380,16 @@
   right: -44px;
   bottom: -78px;
 }
+
+/* Rodzaj pytania w odliczaniu na TV */
+.tv-odliczanie-typ {
+  margin: 0;
+  padding: 10px 32px;
+  border: 3px solid var(--zloto);
+  border-radius: var(--r-pill);
+  font-size: 44px;
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--zloto);
+}

@@ -63,6 +63,8 @@ export type PilotStan = StanSesji & {
   /** Rozwiązanie bieżącego zadania (kształt jak `dane.poprawna`). */
   poprawna: number | number[] | null;
   ostatnie_zadanie: boolean;
+  /** Rodzaj następnego pytania (null po ostatnim): prowadzący uprzedza graczy przed startem. */
+  nastepne_typ: TypZadania | null;
 };
 
 /** Wiersz `pilot_gracze`: token służy do QR, którym gracz wraca do gry na innym telefonie. */

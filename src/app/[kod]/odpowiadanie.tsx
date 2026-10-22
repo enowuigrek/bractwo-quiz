@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
 import { LITERY, type DaneOdpowiedzi } from "@/lib/zadania";
 
@@ -101,6 +101,56 @@ export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij }: Props)
 }
 
 /** Pary: stuknij lewy, potem prawy. Para dostaje wspólny numer; stuknięcie sparowanego rozłącza. */
+/** Kolory par: takie same jak `.para-0` … `.para-5` w globals.css. */
+const KOLORY_PAR = ["#e3ac3f", "#8fb63a", "#6fa8dc", "#e2735a", "#c39bd3", "#f4ecd8"];
+
+type Linia = { x1: number; y1: number; x2: number; y2: number; kolor: string };
+
+/**
+ * Kreski między połączonymi parami: od prawej krawędzi lewego kafelka do lewej krawędzi prawego.
+ * Pozycje mierzymy z DOM po każdej zmianie par i przy zmianie rozmiaru siatki.
+ */
+function useLiniePar(polaczone: (number | null)[]) {
+  const siatka = useRef<HTMLDivElement>(null);
+  const [linie, ustawLinie] = useState<Linia[]>([]);
+  const klucz = polaczone.join(",");
+
+  useEffect(() => {
+    const el = siatka.current;
+    if (!el) return;
+    function zmierz() {
+      if (!el) return;
+      const baza = el.getBoundingClientRect();
+      const lewe = el.querySelectorAll<HTMLElement>("[data-lewy]");
+      const prawe = el.querySelectorAll<HTMLElement>("[data-prawy]");
+      const nowe: Linia[] = [];
+      klucz.split(",").forEach((k, i) => {
+        if (k === "") return;
+        const a = lewe[i]?.getBoundingClientRect();
+        const b = prawe[Number(k)]?.getBoundingClientRect();
+        if (!a || !b) return;
+        nowe.push({
+          x1: a.right - baza.left,
+          y1: a.top + a.height / 2 - baza.top,
+          x2: b.left - baza.left,
+          y2: b.top + b.height / 2 - baza.top,
+          kolor: KOLORY_PAR[i % KOLORY_PAR.length],
+        });
+      });
+      ustawLinie(nowe);
+    }
+    const klatka = requestAnimationFrame(zmierz);
+    const obserwator = new ResizeObserver(zmierz);
+    obserwator.observe(el);
+    return () => {
+      cancelAnimationFrame(klatka);
+      obserwator.disconnect();
+    };
+  }, [klucz]);
+
+  return { siatka, linie };
+}
+
 export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   const lewe = z.dane.lewe ?? [];
   const prawe = z.dane.prawe ?? [];
@@ -109,6 +159,7 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   const polaczone = wyslana?.pary ?? pary;
   const koniec = !!wyslana || zablokowane;
   const komplet = pary.every((p) => p !== null);
+  const { siatka, linie } = useLiniePar(polaczone);
 
   function stuknijLewy(i: number) {
     if (pary[i] !== null) {
@@ -132,13 +183,23 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
 
   return (
     <>
-      <div className="pary-siatka">
+      <div className="pary-siatka" ref={siatka}>
+        <svg className="pary-linie" aria-hidden>
+          {linie.map((l, i) => (
+            <g key={i} stroke={l.kolor} fill={l.kolor}>
+              <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} strokeWidth={3} strokeLinecap="round" />
+              <circle cx={l.x1} cy={l.y1} r={4} />
+              <circle cx={l.x2} cy={l.y2} r={4} />
+            </g>
+          ))}
+        </svg>
         <ol className="odp-lista">
           {lewe.map((l, i) => {
             const para = polaczone[i];
             return (
               <li key={i}>
                 <button
+                  data-lewy
                   className={`odp odp-para${aktywny === i ? " aktywna" : ""}${para != null ? ` para-${i % 6}` : ""}`}
                   disabled={koniec}
                   onClick={() => stuknijLewy(i)}
@@ -156,6 +217,7 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
             return (
               <li key={k}>
                 <button
+                  data-prawy
                   className={`odp odp-para${lewy >= 0 ? ` para-${lewy % 6}` : ""}`}
                   disabled={koniec}
                   onClick={() => stuknijPrawy(k)}

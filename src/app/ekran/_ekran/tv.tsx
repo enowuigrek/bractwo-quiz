@@ -250,6 +250,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         </p>
         <p className="tv-odliczanie">{Math.max(1, Math.ceil(doStartu / 1000))}</p>
         <p className="tv-duzy">Przygotuj się!</p>
+        <p className="tv-odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</p>
       </div>
     );
   }

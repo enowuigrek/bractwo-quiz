@@ -290,6 +290,14 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
+### Zapowiedź rodzaju pytania i kreski w parach (22.10)
+
+- **Pilot** (migracja `20261022200536_pilot_nastepne_pytanie`, `pilot_stan` zwraca `nastepne_typ`): przed startem pytania innego niż zwykłe A–D (albo przy powrocie do A–D) pokazuje w złotej ramce „Następne pytanie: pary. Powiedz graczom przed startem: „Połącz w pary””.
+- **Odliczanie** na telefonie i TV pokazuje pod „Przygotuj się!” rodzaj pytania: „Wybierz jedną odpowiedź”, „Zaznacz wszystkie poprawne”, „Ułóż we właściwej kolejności”, „Połącz w pary” (TV w złotej pigułce).
+- **Pary na telefonie:** połączone kafelki łączy kreska w kolorze pary (SVG nad siatką, pozycje liczone z DOM po każdej zmianie i przy zmianie rozmiaru). Kolumny są dalej od siebie, a kafelki niższe, więc ekran mieści się na 375×667.
+- Plansza z logiem Bractwa na ekranie lokalu jest bez „Piwu Cześć!”.
+- Sprawdzone na localhost (gry NXBT i TRBC, usunięte): zapowiedź na pilocie, „Połącz w pary” w odliczaniu na telefonie, kreski przy trzech parach. Odliczania na TV nie oglądałem na zrzucie.
+
 ### Domena, strona główna i „Jak to działa” (22.10)
 
 - **Domena ✅:** `https://quiz.bractwopiwne.pl` działa. Rekord A `quiz` → `76.76.21.21` jest w strefie DNS na hostingu Hostido (konto host367070, DirectAdmin → Zarządzanie DNS). Panel domeny zostaje na „Przekierowanie na serwery DNS”, a MX Google są nietknięte. Certyfikat Let's Encrypt wystawił Vercel (`vercel certs issue`, sam się nie wystawił po dodaniu rekordu), `http://` przekierowuje na `https://`.

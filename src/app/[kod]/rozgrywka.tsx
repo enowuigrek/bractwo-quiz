@@ -88,6 +88,8 @@ export function Rozgrywka({
         <div className="odliczanie" aria-live="polite">
           <span className="odliczanie-liczba">{Math.max(1, Math.ceil(doStartu / 1000))}</span>
           <span>Przygotuj się!</span>
+          {/* rodzaj pytania już w odliczaniu, żeby nikt nie był zaskoczony parami czy kolejnością */}
+          <span className="odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</span>
         </div>
       </>
     );

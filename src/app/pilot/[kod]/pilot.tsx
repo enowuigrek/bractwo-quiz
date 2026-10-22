@@ -15,7 +15,7 @@ import {
 } from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { LITERY, NAZWY_TYPOW } from "@/lib/zadania";
+import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
 import { GraczePilota } from "./gracze";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
@@ -246,6 +246,16 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </p>
       )}
       {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
+
+      {/* inny rodzaj pytania niż zwykłe A–D (albo powrót do A–D): prowadzący uprzedza graczy przed startem */}
+      {stan.nastepne_typ &&
+        (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") &&
+        (stan.nastepne_typ !== "wybor" || (z && z.typ !== "wybor")) && (
+          <p className="pilot-zapowiedz" role="status">
+            <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed
+            startem: „{PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”.
+          </p>
+        )}
 
       <section style={{ marginTop: "var(--section-gap)", display: "grid", gap: 12 }}>
         {faza === "poczekalnia" && (
