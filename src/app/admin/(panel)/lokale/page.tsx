@@ -4,7 +4,7 @@ import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
-import { FormularzLokalu } from "./formularz";
+import { IkonaEdytuj } from "../_komponenty/ikony";
 
 export const metadata: Metadata = { title: "Lokale · Bractwo Quiz" };
 
@@ -38,8 +38,13 @@ export default async function Lokale() {
                     <Link href={`/admin/lokale/${p.id}`}>{p.nazwa}</Link>
                   </div>
                   <div className="lista-akcje">
-                    <Link href={`/admin/lokale/${p.id}`} className="przycisk-maly">
-                      Edytuj
+                    <Link
+                      href={`/admin/lokale/${p.id}`}
+                      className="przycisk-maly ikona"
+                      aria-label={`Edytuj lokal ${p.nazwa}`}
+                      data-podpis="Edytuj"
+                    >
+                      <IkonaEdytuj />
                     </Link>
                   </div>
                 </li>
@@ -49,10 +54,11 @@ export default async function Lokale() {
       ))}
       {!error && lokale.length === 0 && <p className="lista-pusta">Nie ma jeszcze żadnego lokalu.</p>}
 
-      <section className="panel-sekcja karta">
-        <h2>Dodaj lokal</h2>
-        <FormularzLokalu miasta={miasta.filter((m) => m !== "bez miasta")} />
-      </section>
+      <p className="panel-sekcja">
+        <Link href="/admin/lokale/nowy" className="przycisk zloty">
+          Dodaj lokal
+        </Link>
+      </p>
     </main>
   );
 }

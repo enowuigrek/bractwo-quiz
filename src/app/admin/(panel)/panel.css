@@ -114,6 +114,7 @@ html:has(.panel) {
 
 /* Sekcja (np. karta „Nowy quiz”) pod listą albo komunikatem nie przykleja się do ostatniej linii */
 .panel-sekcja + .panel-sekcja,
+.karta + .panel-sekcja,
 .uklad-dwa + .panel-sekcja,
 .lista + .panel-sekcja,
 .lista-pusta + .panel-sekcja,

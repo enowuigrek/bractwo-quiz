@@ -43,3 +43,5 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - **Podgląd wybranej grafiki** przed zapisem i przycinanie logo do koła w panelu.
 - **Przeciąganie pytań** zamiast strzałek ↑ ↓ przy długich quizach.
 - **Podgląd pytania tak, jak zobaczy je TV** prosto z edytora.
+- **Własne plansze na ekranie lokalu**, dodawane i zmieniane w panelu: grafiki, zapowiedzi wydarzeń (np. Dzień Porteru), ciekawostki piwne.
+- **„Dłuższy czas” dla wybranych pytań** (np. ×2 przy grafice albo długiej treści), jeśli jeden czas na całą grę okaże się za mało elastyczny.

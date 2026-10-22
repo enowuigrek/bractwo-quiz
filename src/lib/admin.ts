@@ -4,7 +4,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 const CIASTECZKO = "bq_admin";
-const WAZNOSC_S = 12 * 60 * 60;
+// 30 dni: prowadzący loguje się w domu i w lokalu nie musi wpisywać hasła na telefonie.
+// Zmiana ADMIN_SEKRET na Vercelu wylogowuje wszystkich (np. po zgubieniu telefonu).
+const WAZNOSC_S = 30 * 24 * 60 * 60;
 
 function sekret(): string {
   const s = process.env.ADMIN_SEKRET;

@@ -227,6 +227,20 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Telefon: w `odpowiedzi` dalej pokazuje swój wynik pytania, a w `tabela` to samo co na podium.
 - Sprawdzone: SQL-em w wycofanej transakcji (kolejność, pusta lista w trakcie pytania jako `anon`, niedozwolone przejście odrzucone) oraz na żywo na localhost z tymczasową grą (14 graczy): ekran odpowiedzi i tabela na TV w 1920×1080, przyciski pilota w 375 px i przejście „Pokaż odpowiedzi graczy”. Tymczasowa gra i quiz są usunięte. Nie sprawdzone: 25–30 graczy (gęsty układ) i telefon gracza w nowych fazach.
 
+### Ustalenia z rozmowy po testach (22.10), do zrobienia
+
+Cel: wieczór quizowy bez wpisywania kodów. Quiz tworzymy w domu, a w lokalu prowadzący uruchamia grę na swoim telefonie.
+
+1. **Ekran lokalu** `/ekran/<adres-lokalu>`: lokal zapisuje go raz w zakładkach na TV. Bez gry pokazuje plansze zmieniane co ~10 s: (1) logo Bractwa i lokalu, „Quiz Bractwa Piwnego · wkrótce start”, (2) jak grać w 3 krokach, (3) „Piwu Cześć!” i dane Bractwa. Gdy w lokalu ruszy gra, ekran sam przechodzi na poczekalnię z QR (gracze dołączają jeszcze przed „Start quizu”), a po grze wraca do plansz. Przy dwóch grach naraz w jednym lokalu pokazuje najnowszą. `/ekran` bez adresu ma pole na kod gry, `/ekran/KOD` działa jak dotąd, a stare `/tv/...` przekierowują.
+2. **Adres ekranu lokalu** powstaje z nazwy przy dodawaniu lokalu (bez polskich znaków, przy powtórce `-2`). Nie zmienia się przy zmianie nazwy, można go poprawić ręcznie z ostrzeżeniem o zakładce. Widać go na liście i na stronie lokalu, z kopiowaniem i QR.
+3. **Lokale w panelu jak quizy:** lista z „Edytuj”, bez usuwania z listy. „Dodaj lokal” pod listą, na osobnym ekranie. Usuwanie tylko na stronie lokalu.
+4. **Czas i zasady przy uruchamianiu gry** (wariant A): tryb, czas na odpowiedź (10/20/30/45 s albo bez limitu, jeden dla wszystkich pytań), bonus za szybkość (przy „bez limitu” wyłączony), limit graczy. Pole czasu znika z edytora pytań. Czas wędruje z `zadania` do `sesje`.
+5. **Poczekalnia:** QR duży po lewej, pod nim drobniej adres i kod. Na pierwszym planie okazja, tytuł quizu i grafika, pod nimi gracze.
+6. **Prowadzący z telefonu:** na stronie gry „Prowadź z tego telefonu” (pilot w tej samej karcie) i „Przekaż prowadzącemu” (QR pilota). Logowanie do panelu ważne 30 dni.
+7. **Domena** `quiz.bractwopiwne.pl`: CNAME w Hostido, MX bez zmian.
+
+Na później (POMYSLY.md): własne plansze na ekranie lokalu dodawane w panelu; „dłuższy czas” dla wybranych pytań.
+
 ### Historia zakończonych gier w panelu (22.10)
 
 - Strona zakończonej gry (`/admin/gry/[id]`) ma sekcję **Wyniki**: tabela końcowa wszystkich graczy (miejsce z remisami, nick, punkty, dobre odpowiedzi x/N, średni czas; średni czas znika poniżej 560 px). Cały wiersz prowadzi do historii gracza.
