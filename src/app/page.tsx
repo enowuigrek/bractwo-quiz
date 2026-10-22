@@ -8,7 +8,7 @@ import type { Lokal } from "@/lib/typy";
 export const revalidate = 300;
 
 /**
- * Strona główna dla obsługi: ekrany lokali do otwarcia na telewizorze, panel i opis, jak to działa.
+ * Strona główna dla obsługi: ekrany lokali do otwarcia na telewizorze i wejście do panelu.
  * Gracze tu nie trafiają: QR z telewizora prowadzi od razu do gry (`/<kod>`).
  */
 export default async function Home() {
@@ -66,9 +66,6 @@ export default async function Home() {
         <div className="glowna-przyciski">
           <Link href="/admin" className="przycisk zloty">
             Panel obsługi
-          </Link>
-          <Link href="/jak-to-dziala" className="przycisk">
-            Jak to działa?
           </Link>
         </div>
       </section>
