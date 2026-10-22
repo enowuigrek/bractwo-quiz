@@ -217,6 +217,24 @@ export function Kreator({ lokale, quizy }: Props) {
             </div>
           </div>
 
+          <fieldset>
+            <legend>Kranoprzejęcie (opcjonalnie)</legend>
+            <input
+              name="browar_nazwa"
+              className="pole"
+              placeholder="Nazwa gościnnego browaru"
+              aria-label="Nazwa gościnnego browaru"
+              maxLength={80}
+            />
+            <div style={{ marginTop: 10 }}>
+              <PoleGrafiki
+                nazwa="browar_logo"
+                etykieta="Logo browaru"
+                podpowiedz="Pokaże się na TV obok logo Bractwa i lokalu. Najlepiej z przezroczystym tłem, do 5 MB."
+              />
+            </div>
+          </fieldset>
+
           <PoleGrafiki
             nazwa="grafika"
             etykieta="Grafika na poczekalnię (opcjonalnie)"

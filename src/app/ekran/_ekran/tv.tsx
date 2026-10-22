@@ -114,11 +114,30 @@ export function Tv({ kod, qr, host }: Props) {
   );
 }
 
-export function Loga({ lokal }: { lokal: { nazwa: string; logo_url: string | null } | null }) {
+export function Loga({
+  lokal,
+  browar,
+}: {
+  lokal: { nazwa: string; logo_url: string | null } | null;
+  /** Gościnny browar (kranoprzejęcie): jego logo po znaku ×. */
+  browar?: { nazwa: string; logo_url: string | null } | null;
+}) {
   return (
     <div className="tv-loga">
       <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo" />
       {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="tv-logo-lokalu" />}
+      {browar && (
+        <>
+          <span className="tv-loga-x" aria-hidden>
+            ×
+          </span>
+          {browar.logo_url ? (
+            <img src={browar.logo_url} alt={browar.nazwa} className="tv-logo-browaru" />
+          ) : (
+            <span className="tv-browar-nazwa">{browar.nazwa}</span>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -132,8 +151,11 @@ function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: Grac
   return (
     <div className="poczekalnia">
       <header className="tv-naglowek">
-        <Loga lokal={stan.lokal} />
-        {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
+        <Loga lokal={stan.lokal} browar={stan.browar} />
+        <div className="tv-tytul">
+          {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
+          {stan.browar && <p className="tv-lokal">Kranoprzejęcie: {stan.browar.nazwa}</p>}
+        </div>
       </header>
 
       <div className="poczekalnia-tresc">
@@ -189,7 +211,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   if (!z)
     return (
       <div className="tv-srodek">
-        <Loga lokal={stan.lokal} />
+        <Loga lokal={stan.lokal} browar={stan.browar} />
         <p className="tv-duzy">Patrz na prowadzącego</p>
       </div>
     );
@@ -198,7 +220,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   if (faza === "przygotuj") {
     return (
       <div className="tv-srodek">
-        <Loga lokal={stan.lokal} />
+        <Loga lokal={stan.lokal} browar={stan.browar} />
         <p className="tv-okazja">
           Pytanie {z.lp}/{liczba}
         </p>
@@ -304,7 +326,7 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
   return (
     <div className="tv-koniec">
       <header className="tv-naglowek">
-        <Loga lokal={stan.lokal} />
+        <Loga lokal={stan.lokal} browar={stan.browar} />
         <div className="tv-tytul">
           {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
           <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
@@ -325,6 +347,7 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
         </div>
       )}
       {koniec && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
+      <p className="tv-autor">Aplikacja: lukasznowak.dev</p>
     </div>
   );
 }

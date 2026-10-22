@@ -1126,3 +1126,33 @@
   border-color: var(--zloto);
   box-shadow: var(--glow-lg);
 }
+
+/* Gościnny browar (kranoprzejęcie) obok logo Bractwa i lokalu */
+.tv-loga-x {
+  font-size: 56px;
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+}
+
+.tv-logo-browaru {
+  height: 150px;
+  max-width: 300px;
+  object-fit: contain;
+}
+
+.tv-browar-nazwa {
+  font-size: 40px;
+  font-weight: var(--w-black);
+  color: var(--zloto);
+}
+
+/* Podpis autora aplikacji: drobny, w rogu ekranu */
+.tv-autor {
+  position: absolute;
+  right: 32px;
+  bottom: 18px;
+  margin: 0;
+  font-size: 20px;
+  color: var(--szary);
+  opacity: 0.6;
+}

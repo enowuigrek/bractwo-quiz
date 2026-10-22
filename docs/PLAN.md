@@ -255,6 +255,8 @@ Na później (POMYSLY.md): własne plansze na ekranie lokalu dodawane w panelu; 
 
 Kolejność: nagrody → selfie → typy pytań, każda rzecz osobno wypchnięta.
 
+**Kranoprzejęcie ✅ (migracja `20261022162137_browar`):** opcjonalna nazwa i logo gościnnego browaru przy grze (`sesje.browar_nazwa`, `browar_logo_url`, w `stan_sesji` jako `browar`). TV: logo po znaku „×” obok logo Bractwa i lokalu we wszystkich nagłówkach, a w poczekalni napis „Kranoprzejęcie: …”. Telefon: nazwa w formularzu dołączania. Logo znika z magazynu razem z grą. Podpis „Aplikacja: lukasznowak.dev” jest drobno w rogu planszy i ekranu końca na TV oraz pod podziękowaniem na telefonie (link). „Dzięki za grę” pod medalem jest wyśrodkowane.
+
 **Nagrody ✅ (migracja `20261022160506_nagrody`):** `sesje.nagrody` jsonb (null albo `[{miejsce, nagroda, instrukcja}]`, 1–3 pozycje), zwracane w `stan_sesji`. W kreatorze jest wybór „bez nagród / za 1. miejsce / za pierwszą trójkę”, a przy każdym miejscu nagroda i opcjonalna instrukcja. TV pokazuje nagrodę w złotej pigułce pod punktami na podium. Telefon pokazuje kartę nagrody z mieniącą się ramką, nickiem, kodem gry i tykającym zegarem. Przy remisie obaj gracze widzą nagrodę za to miejsce, a o wydaniu decyduje obsługa. Sprawdzone na localhost z tymczasową grą KRBN (usunięta): telefon zwycięzcy, podium na TV, pola w kreatorze.
 
 **Selfie ✅ (migracja `20261022161457_zdjecia_graczy`):** `gracze.zdjecie_url`. Nowa funkcja `lista_graczy` (nick i zdjęcie) zastępuje w aplikacji `gracze_sesji`, który zostaje dla zgodności. `ranking`, `odpowiedzi_zadania` i `moj_wynik` zwracają `zdjecie`, a zmiana zdjęcia wysyła zdarzenie `gracz`.

@@ -49,6 +49,9 @@ export type Sesja = {
   czas_s: number | null;
   /** Nagrody za miejsca; `null`: bez nagród. */
   nagrody: Nagroda[] | null;
+  /** Gościnny browar przy grze (kranoprzejęcie), opcjonalny. */
+  browar_nazwa: string | null;
+  browar_logo_url: string | null;
   max_graczy: number;
   faza: Faza;
   zadanie_nr: number;

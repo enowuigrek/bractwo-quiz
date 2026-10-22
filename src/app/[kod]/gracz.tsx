@@ -184,6 +184,7 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
       {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
       <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
       {stan.lokal && <p className="pomocniczy">{stan.lokal.nazwa}</p>}
+      {stan.browar && <p className="pomocniczy">Kranoprzejęcie: {stan.browar.nazwa}</p>}
 
       <label htmlFor="nick" className="etykieta">
         {druzyny ? "Nazwa drużyny" : "Twój nick"}

@@ -66,6 +66,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
             {[
               gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
               gra.okazja,
+              gra.browar_nazwa ? `kranoprzejęcie: ${gra.browar_nazwa}` : null,
               gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
               gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,
               gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",

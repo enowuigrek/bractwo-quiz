@@ -48,9 +48,17 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagro
   }, [odslonieto, faza, miejsce]);
 
   const podziekowanie = (
-    <p>
-      Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
-    </p>
+    <>
+      <p className="podziekowanie">
+        Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
+      </p>
+      <p className="autor">
+        Aplikacja:{" "}
+        <a href="https://lukasznowak.dev" target="_blank" rel="noopener">
+          lukasznowak.dev
+        </a>
+      </p>
+    </>
   );
 
   if (!odslonieto) {

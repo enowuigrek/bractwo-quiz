@@ -54,15 +54,24 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
 
+  // gościnny browar (kranoprzejęcie): nazwa wymagana, gdy jest logo
+  const browar_nazwa = String(dane.get("browar_nazwa") ?? "").trim().replace(/\s+/g, " ") || null;
+  const browarLogo = plikZFormularza(dane, "browar_logo");
+  if (browarLogo && !browar_nazwa) return { blad: "Podaj nazwę browaru do logo." };
+  if (browar_nazwa && browar_nazwa.length > 80) return { blad: "Nazwa browaru może mieć najwyżej 80 znaków." };
+
   const grafika = plikZFormularza(dane, "grafika");
-  if (grafika) {
-    const blad = bladGrafiki(grafika);
+  for (const plik of [grafika, browarLogo]) {
+    const blad = plik && bladGrafiki(plik);
     if (blad) return { blad };
   }
   let grafika_url: string | null = null;
+  let browar_logo_url: string | null = null;
   try {
     if (grafika) grafika_url = await wyslijGrafike(grafika, "sesje");
+    if (browarLogo) browar_logo_url = await wyslijGrafike(browarLogo, "sesje");
   } catch (e) {
+    await usunGrafike(grafika_url);
     return { blad: (e as Error).message };
   }
 
@@ -78,11 +87,13 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       max_graczy,
       grafika_url,
       nagrody: nagrody.length ? nagrody : null,
+      browar_nazwa,
+      browar_logo_url,
     })
     .select("id")
     .single();
   if (error) {
-    await usunGrafike(grafika_url);
+    await Promise.all([usunGrafike(grafika_url), usunGrafike(browar_logo_url)]);
     return { blad: `Nie udało się uruchomić gry: ${error.message}` };
   }
   redirect(`/admin/gry/${data.id}`);
@@ -115,10 +126,14 @@ export async function usunGre(id: string, przekieruj: boolean): Promise<void> {
     .from("sesje")
     .delete()
     .eq("id", id)
-    .select("grafika_url")
+    .select("grafika_url, browar_logo_url")
     .maybeSingle();
   if (error) throw new Error(`Nie udało się usunąć gry: ${error.message}`);
-  await Promise.all([usunGrafike(data?.grafika_url), ...(zdjecia ?? []).map((g) => usunGrafike(g.zdjecie_url))]);
+  await Promise.all([
+    usunGrafike(data?.grafika_url),
+    usunGrafike(data?.browar_logo_url),
+    ...(zdjecia ?? []).map((g) => usunGrafike(g.zdjecie_url)),
+  ]);
   if (przekieruj) redirect("/admin/gry");
   refresh();
 }

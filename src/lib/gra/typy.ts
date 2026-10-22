@@ -42,6 +42,8 @@ export type StanSesji = {
   bonus_czas: boolean;
   /** Nagrody za miejsca (null: bez nagród). Nie są tajne. */
   nagrody: Nagroda[] | null;
+  /** Gościnny browar (kranoprzejęcie): logo obok Bractwa i lokalu. */
+  browar: { nazwa: string; logo_url: string | null } | null;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
   quiz: { tytul: string; liczba_zadan: number } | null;

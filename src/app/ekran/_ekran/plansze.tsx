@@ -56,6 +56,7 @@ export function Plansze({ lokal }: Props) {
           </div>
         )}
       </div>
+      <p className="tv-autor">Aplikacja: lukasznowak.dev</p>
       <ol className="plansze-kropki" aria-hidden>
         {Array.from({ length: LICZBA_PLANSZ }, (_, i) => (
           <li key={i} className={i === nr ? "teraz" : undefined} />

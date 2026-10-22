@@ -851,3 +851,19 @@ html:has(.kolumna) {
   border-radius: var(--r-round);
   cursor: pointer;
 }
+
+/* Koniec quizu na telefonie: podziękowanie pod medalem na środku, podpis autora aplikacji */
+.fanfara ~ .podziekowanie {
+  text-align: center;
+}
+
+.autor {
+  margin: var(--section-gap) 0 0;
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--szary);
+}
+
+.autor a {
+  color: var(--szary);
+}
