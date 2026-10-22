@@ -170,7 +170,7 @@ export function PodiumTv({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: opoznienie(i), type: "spring", stiffness: 120, damping: 14 }}
             >
-              <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={i === 0 ? 200 : 150} className="tv-stopien-awatar" />
+              <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={i === 0 ? 170 : 130} className="tv-stopien-awatar" />
               {i === 0 && <span className="tv-stopien-korona">Zwycięzca</span>}
               <span className="tv-stopien-nick">{w.nick}</span>
               <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>

@@ -160,6 +160,53 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
         ) : null}
       </div>
 
+      {!trwa && !!gra.nagrody?.length && (
+        <section className="panel-sekcja">
+          <h2>Nagrody</h2>
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            Zwycięzca klika na telefonie „Potwierdź odbiór”, gdy dostanie nagrodę. Godzina pojawia się tutaj.
+          </p>
+          <ul className="lista">
+            {gra.nagrody.flatMap((n) => {
+              const zdobywcy = wyniki.filter((w) => w.miejsce === n.miejsce);
+              if (zdobywcy.length === 0) {
+                return [
+                  <li key={`${n.miejsce}`}>
+                    <div className="lista-glowna">
+                      <div className="lista-tytul">
+                        {n.miejsce}. miejsce · {n.nagroda}
+                      </div>
+                      <div className="lista-opis">Nikt nie zajął tego miejsca.</div>
+                    </div>
+                  </li>,
+                ];
+              }
+              return zdobywcy.map((w) => (
+                <li key={`${n.miejsce}-${w.id}`}>
+                  <div className="lista-glowna">
+                    <div className="lista-tytul">
+                      {n.miejsce}. miejsce · {n.nagroda}
+                    </div>
+                    <div className="lista-opis">{w.nick}</div>
+                  </div>
+                  <span className={`znaczek${w.nagrodaOdebrana ? " aktywny" : ""}`}>
+                    {w.nagrodaOdebrana
+                      ? `odebrana ${new Date(w.nagrodaOdebrana).toLocaleString("pl-PL", {
+                          timeZone: "Europe/Warsaw",
+                          day: "numeric",
+                          month: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}`
+                      : "jeszcze nieodebrana"}
+                  </span>
+                </li>
+              ));
+            })}
+          </ul>
+        </section>
+      )}
+
       {!trwa && (
         <section className="panel-sekcja">
           <h2>Wyniki</h2>

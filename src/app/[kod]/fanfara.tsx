@@ -57,7 +57,7 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token
         Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
       </p>
       <p className="autor">
-        Aplikacja:{" "}
+        <span className="autor-etykieta">Aplikacja</span>
         <a href="https://lukasznowak.dev" target="_blank" rel="noopener">
           lukasznowak.dev
         </a>
@@ -129,8 +129,9 @@ const godzina = (iso: string) => new Date(iso).toLocaleTimeString("pl-PL", { hou
 
 /**
  * Karta nagrody do pokazania obsłudze: nagroda, instrukcja, nick, kod gry i żywy zegar.
- * Po wydaniu nagrody barman klika „Potwierdź odbiór”: karta zmienia się w „ODEBRANA o …”,
- * więc tym samym ekranem nie da się odebrać drugi raz.
+ * Po odebraniu nagrody (przy barze albo gdziekolwiek ją wydają) ktoś klika „Potwierdź odbiór”:
+ * karta zmienia się w „ODEBRANA o …”, więc tym samym ekranem nie da się odebrać drugi raz,
+ * a w panelu przy grze widać, kto i kiedy odebrał.
  */
 function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; token: string; odebrana: string | null }) {
   const { nagroda, nick, kod, token } = props;
@@ -141,8 +142,8 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
 
   async function odbierz() {
     const tak = await potwierdz(
-      "Kliknij dopiero przy barze, gdy dostaniesz nagrodę. Potem karta pokaże „Odebrana” i nie da się jej użyć drugi raz.",
-      { tak: "Nagroda wydana" },
+      "Kliknij dopiero po odebraniu nagrody. Karta zmieni się wtedy w „Odebrana”.",
+      { tak: "Odebrana", nie: "Jeszcze nie" },
     );
     if (!tak) return;
     const { data, error } = await supabase().rpc("odbierz_nagrode", { p_token: token });
@@ -181,7 +182,7 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
         </span>
       </p>
       <button type="button" className="przycisk-zdjecie karta-nagrody-odbior" onClick={() => void odbierz()}>
-        Potwierdź odbiór (klika barman)
+        Potwierdź odbiór
       </button>
       {blad && (
         <p className="blad" role="alert" style={{ marginTop: 8 }}>

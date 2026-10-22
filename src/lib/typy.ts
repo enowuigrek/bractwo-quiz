@@ -16,20 +16,20 @@ export type Quiz = {
   utworzono: string;
 };
 
-/** Dane zadania typu `wybor`. Poprawna odpowiedź to indeks w `odpowiedzi`. */
-export type DaneWybor = { odpowiedzi: string[]; poprawna: number };
+import type { ZadanieDane } from "./zadania";
 
+export type { DaneWybor } from "./zadania";
+
+/** Zadanie quizu: `typ` + `dane` (kształt zależny od typu, patrz src/lib/zadania.ts). */
 export type Zadanie = {
   id: string;
   quiz_id: string;
   nr: number;
-  typ: "wybor";
   tresc: string;
   grafika_url: string | null;
-  /** `null`: bez limitu czasu. */
+  /** Nieużywane od czasu „czas przy grze” (zostaje w tabeli). */
   czas_s: number | null;
-  dane: DaneWybor;
-};
+} & ZadanieDane;
 
 /** Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”. */
 export type Nagroda = { miejsce: 1 | 2 | 3; nagroda: string; instrukcja: string | null };

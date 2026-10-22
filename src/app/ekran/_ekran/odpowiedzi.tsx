@@ -4,9 +4,8 @@ import { motion, MotionConfig } from "motion/react";
 import type { CSSProperties } from "react";
 import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/gra/nasluch";
-import type { StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
-
-const LITERY = "ABCDEF";
+import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
+import { LITERY, liczbaCzesci, ulamek } from "@/lib/zadania";
 
 /**
  * Ile kolumn w ramce, żeby 30 graczy zmieściło się na scenie 1920×1080.
@@ -18,7 +17,10 @@ function kolumny(n: number): number {
 
 function siatka(n: number): CSSProperties {
   const k = kolumny(n);
-  return { gridTemplateColumns: `repeat(${k}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${Math.ceil(n / k)}, auto)` };
+  return {
+    gridTemplateColumns: `repeat(${k}, minmax(0, 1fr))`,
+    gridTemplateRows: `repeat(${Math.ceil(n / k)}, auto)`,
+  };
 }
 
 /** Wiersz pojawia się z małym opóźnieniem po poprzednim. */
@@ -28,10 +30,43 @@ const wjazd = (i: number) => ({
   transition: { delay: 0.25 + i * 0.06, duration: 0.35 },
 });
 
-type PropsWiersza = { o: WierszOdpowiedzi; i: number; nr?: number; odpowiedzi?: string[] };
+type PropsWiersza = {
+  o: WierszOdpowiedzi;
+  i: number;
+  nr?: number;
+  z: ZadanieWidoczne | null;
+};
 
-function Wiersz({ o, i, nr, odpowiedzi }: PropsWiersza) {
-  const idx = o.dane?.odpowiedz;
+/** Co gracz odpowiedział: litera i tekst (jedna odpowiedź), litery (kilka) albo ułamek „3/4”. */
+function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null }) {
+  if (!o.dane) return <span className="tv-odpowiedzi-tekst tv-odpowiedzi-bez">brak odpowiedzi</span>;
+  if (!z) return null;
+  const idx = o.dane.odpowiedz;
+  if (z.typ === "wybor" && idx !== undefined) {
+    return (
+      <>
+        <span className="tv-odpowiedzi-litera">{LITERY[idx]}</span>
+        <span className="tv-odpowiedzi-tekst">{z.dane.odpowiedzi?.[idx]}</span>
+      </>
+    );
+  }
+  const wybrane = z.typ === "wielokrotny" ? (o.dane.odpowiedzi ?? []) : null;
+  return (
+    <>
+      {wybrane?.map((j) => (
+        <span key={j} className="tv-odpowiedzi-litera">
+          {LITERY[j]}
+        </span>
+      ))}
+      {z.typ !== "wielokrotny" && (
+        <span className="tv-odpowiedzi-tekst">{ulamek(o.ocena ?? 0, liczbaCzesci(z.typ, z.dane))} na miejscu</span>
+      )}
+      {o.punkty ? <span className="tv-odpowiedzi-tekst">+{o.punkty}</span> : null}
+    </>
+  );
+}
+
+function Wiersz({ o, i, nr, z }: PropsWiersza) {
   return (
     <motion.li className="tv-odpowiedzi-wiersz" {...wjazd(i)}>
       <span className="tv-odpowiedzi-nr">{nr ? `${nr}.` : ""}</span>
@@ -40,12 +75,7 @@ function Wiersz({ o, i, nr, odpowiedzi }: PropsWiersza) {
         <span>{o.nick}</span>
       </span>
       <span className="tv-odpowiedzi-odp">
-        {idx !== undefined && (
-          <>
-            <span className="tv-odpowiedzi-litera">{LITERY[idx]}</span>
-            <span className="tv-odpowiedzi-tekst">{odpowiedzi?.[idx]}</span>
-          </>
-        )}
+        <Odpowiedz o={o} z={z} />
       </span>
       <span className="tv-odpowiedzi-czas">{o.czas_ms !== null ? sekundy(o.czas_ms) : ""}</span>
     </motion.li>
@@ -54,13 +84,15 @@ function Wiersz({ o, i, nr, odpowiedzi }: PropsWiersza) {
 
 /**
  * Odpowiedzi na pytanie: w zielonej ramce dobre (od najszybszej, z numerem),
- * w czerwonej złe, a pod spodem gracze bez odpowiedzi. Przy każdym odpowiedź i czas.
+ * w żółtej częściowo dobre (nowe typy pytań), w czerwonej złe i na końcu bez odpowiedzi.
+ * Przy każdym odpowiedź i czas.
  */
 export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi: WierszOdpowiedzi[] }) {
   const z = stan.zadanie;
   const dobre = odpowiedzi.filter((o) => o.poprawna === true);
-  const zle = odpowiedzi.filter((o) => o.poprawna === false);
-  const brak = odpowiedzi.filter((o) => o.poprawna === null);
+  const czesciowo = odpowiedzi.filter((o) => o.poprawna === false && (o.ocena ?? 0) > 0);
+  // brak odpowiedzi też w czerwonej ramce, na końcu (baza zwraca ich po odpowiedziach)
+  const zle = odpowiedzi.filter((o) => o.poprawna === null || (o.poprawna === false && !((o.ocena ?? 0) > 0)));
   const gesto = odpowiedzi.length > 16;
   const liczba = stan.quiz?.liczba_zadan ?? "?";
 
@@ -85,11 +117,24 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           ) : (
             <ol className="tv-odpowiedzi-lista" style={siatka(dobre.length)}>
               {dobre.map((o, i) => (
-                <Wiersz key={o.nick} o={o} i={i} nr={i + 1} odpowiedzi={z?.dane.odpowiedzi} />
+                <Wiersz key={o.nick} o={o} i={i} nr={i + 1} z={z} />
               ))}
             </ol>
           )}
         </section>
+
+        {czesciowo.length > 0 && (
+          <section className="tv-odpowiedzi-ramka czesciowo">
+            <p className="tv-odpowiedzi-etykieta">
+              Częściowo <span>{czesciowo.length}</span>
+            </p>
+            <ul className="tv-odpowiedzi-lista" style={siatka(czesciowo.length)}>
+              {czesciowo.map((o, i) => (
+                <Wiersz key={o.nick} o={o} i={dobre.length + i} z={z} />
+              ))}
+            </ul>
+          </section>
+        )}
 
         {zle.length > 0 && (
           <section className="tv-odpowiedzi-ramka zle">
@@ -98,16 +143,10 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             </p>
             <ul className="tv-odpowiedzi-lista" style={siatka(zle.length)}>
               {zle.map((o, i) => (
-                <Wiersz key={o.nick} o={o} i={dobre.length + i} odpowiedzi={z?.dane.odpowiedzi} />
+                <Wiersz key={o.nick} o={o} i={dobre.length + czesciowo.length + i} z={z} />
               ))}
             </ul>
           </section>
-        )}
-
-        {brak.length > 0 && (
-          <p className="tv-odpowiedzi-brak">
-            Bez odpowiedzi: {brak.map((o) => o.nick).join(", ")}
-          </p>
         )}
       </div>
     </MotionConfig>
@@ -139,11 +178,7 @@ export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
             aria-label={druzyny ? "Drużyny" : "Gracze"}
           >
             {wiersze.map((w, i) => (
-              <motion.li
-                key={w.nick}
-                className={`tv-tabela-wiersz${w.miejsce === 1 ? " lider" : ""}`}
-                {...wjazd(i)}
-              >
+              <motion.li key={w.nick} className={`tv-tabela-wiersz${w.miejsce === 1 ? " lider" : ""}`} {...wjazd(i)}>
                 <span className="tv-ranking-miejsce">{w.miejsce}.</span>
                 <span className="tv-ranking-nick">
                   <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={44} />

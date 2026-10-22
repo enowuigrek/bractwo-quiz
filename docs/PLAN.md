@@ -44,7 +44,9 @@ poczekalnia → przygotuj (3 s) → pytanie (czas) → wynik → [odpowiedzi] �
 
 `odpowiedzi` i `ranking` prowadzący może pominąć. Po ostatnim pytaniu obok podium jest `tabela`: pełna lista graczy z punktami.
 
-Stan trzymamy w jednym wierszu `sesje` (`faza`, `zadanie_nr`, `faza_od`, `faza_do`). Zmienia go wyłącznie prowadzący przez funkcję w bazie. TV i telefony subskrybują ten wiersz przez Realtime i same rysują to, co trzeba.
+`pytanie → wynik` dzieje się samo: gdy odpowiedzą wszyscy (w `zapisz_odpowiedz`) albo gdy minie czas (`dokoncz_pytanie`, które wołają TV, pilot i telefony; baza sama sprawdza zegar). Ręcznie prowadzący kończy tylko pytanie bez limitu albo wcześniej.
+
+Stan trzymamy w jednym wierszu `sesje` (`faza`, `zadanie_nr`, `faza_od`, `faza_do`). Zmieniają go tylko funkcje w bazie (akcje prowadzącego i automatyczny wynik). TV i telefony subskrybują ten wiersz przez Realtime i same rysują to, co trzeba.
 
 ## Model danych
 
@@ -259,9 +261,11 @@ Kolejność: nagrody → selfie → typy pytań, każda rzecz osobno wypchnięta
 
 **Nawigacja (poprawka 22.10):** kolejność Rozgrywki, Quizy. Na telefonie zakładki po lewej, „▶ Uruchom” i ⚙ po prawej. Na komputerze pasek nie przycina dymka „Ustawienia” (pokazuje się pod ikoną) ani obwódki ⚙.
 
-**Typy pytań, baza ✅ (migracja `20261022162605_typy_pytan`):** `wewn.ocena(typ, dane, odpowiedź)` zwraca 0..1 dla `wybor`, `wielokrotny`, `kolejnosc` i `pary`, ze ścisłym sprawdzaniem odpowiedzi (`wewn.indeksy_ok`). `odpowiedzi.ocena`, punkty = punkty pytania × ocena, rozkład także dla wielokrotnego wyboru, a ekran odpowiedzi sortuje po ocenie. Sprawdzone SQL-em. Edytor, telefon i TV dla nowych typów są w toku.
+**Typy pytań, baza ✅ (migracja `20261022162605_typy_pytan`):** `wewn.ocena(typ, dane, odpowiedź)` zwraca 0..1 dla `wybor`, `wielokrotny`, `kolejnosc` i `pary`, ze ścisłym sprawdzaniem odpowiedzi (`wewn.indeksy_ok`). `odpowiedzi.ocena`, punkty = punkty pytania × ocena, rozkład także dla wielokrotnego wyboru, a ekran odpowiedzi sortuje po ocenie. Sprawdzone SQL-em.
 
-**Kranoprzejęcie ✅ (migracja `20261022162137_browar`):** opcjonalna nazwa i logo gościnnego browaru przy grze (`sesje.browar_nazwa`, `browar_logo_url`, w `stan_sesji` jako `browar`). TV: logo po znaku „×” obok logo Bractwa i lokalu we wszystkich nagłówkach, a w poczekalni napis „Kranoprzejęcie: …”. Telefon: nazwa w formularzu dołączania. Logo znika z magazynu razem z grą. Podpis „Aplikacja: lukasznowak.dev” jest drobno w rogu planszy i ekranu końca na TV oraz pod podziękowaniem na telefonie (link). „Dzięki za grę” pod medalem jest wyśrodkowane.
+**Typy pytań, aplikacja ✅:** edytor w panelu (przełącznik rodzaju, litery z zaznaczaniem, kolejność ze strzałkami, pary lewa ↔ prawa; kolejność i pary miesza serwer przy zapisie). Telefon: kilka odpowiedzi to kafelki i „Zatwierdź”, kolejność to stukanie po kolei z numerami i „Cofnij”, pary to stuknięcie lewego i prawego (para dostaje wspólny kolor i numer, ponowne stuknięcie rozłącza). Po wyniku „Częściowo: 2/4” z punktami i rozwiązanie (przy pomyłce dopisek „Ty: …”). TV: podpowiedź pod pytaniem, w parach dwie kolumny, w wyniku właściwa kolejność i pary. Pilot pokazuje rozwiązanie każdego typu. Historia gracza w panelu opisuje odpowiedź i częściową ocenę. W testowym quizie są pytania 11–14 nowych typów.
+
+**Kranoprzejęcie ✅ (migracja `20261022162137_browar`):** opcjonalna nazwa i logo gościnnego browaru przy grze (`sesje.browar_nazwa`, `browar_logo_url`, w `stan_sesji` jako `browar`). TV: logo po znaku „×” obok logo Bractwa i lokalu we wszystkich nagłówkach, a w poczekalni napis „Kranoprzejęcie: …”. Telefon: nazwa w formularzu dołączania. Logo znika z magazynu razem z grą. Podpis autora jest tylko na telefonie, na końcu gry (zmiana 22.10, patrz niżej). „Dzięki za grę” pod medalem jest wyśrodkowane.
 
 **Nagrody ✅ (migracja `20261022160506_nagrody`):** `sesje.nagrody` jsonb (null albo `[{miejsce, nagroda, instrukcja}]`, 1–3 pozycje), zwracane w `stan_sesji`. W kreatorze jest wybór „bez nagród / za 1. miejsce / za pierwszą trójkę”, a przy każdym miejscu nagroda i opcjonalna instrukcja. TV pokazuje nagrodę w złotej pigułce pod punktami na podium. Telefon pokazuje kartę nagrody z mieniącą się ramką, nickiem, kodem gry i tykającym zegarem. Przy remisie obaj gracze widzą nagrodę za to miejsce, a o wydaniu decyduje obsługa. Sprawdzone na localhost z tymczasową grą KRBN (usunięta): telefon zwycięzcy, podium na TV, pola w kreatorze.
 
@@ -271,6 +275,20 @@ Kolejność: nagrody → selfie → typy pytań, każda rzecz osobno wypchnięta
 - `Awatar` (`src/components/awatar.tsx`): zdjęcie w kółku albo pierwsza litera na kolorze dobranym po nicku. Pokazuje się w poczekalni (TV, telefon, pilot), rankingu, tabeli, odpowiedziach, na podium (200/150 px nad stopniem) i w medalu na telefonie.
 - Pilot: dotknięcie zdjęcia pyta, czy je usunąć. Zdjęcia znikają po 7 dniach (`/api/keepalive`) i razem z usuniętą grą.
 - Sprawdzone na localhost z tymczasową grą XAST (usunięta razem ze zdjęciami): dołączenie z podłożonym zdjęciem, poczekalnia na telefonie i TV, usunięcie z pilota (telefon gracza odświeżył się sam), podium ze zdjęciem, odrzucenie złego tokenu, SVG i złego klucza pilota. Nie sprawdzone: prawdziwy aparat w telefonie i kasowanie po 7 dniach (zadziała przy najbliższym cronie).
+
+### Poprawki po drugim teście (22.10)
+
+Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gracza`.
+
+- **Wynik sam:** po czasie albo gdy wszyscy odpowiedzą. Na pilocie zamiast „Pokaż wynik” jest informacja i ciche „Zakończ pytanie wcześniej”, a przy pytaniu bez limitu „Zakończ pytanie i pokaż wynik”. Odpowiedzi graczy i ranking prowadzący pokazuje ręcznie jak dotąd.
+- **Gracze na pilocie:** lista (w poczekalni od razu, w grze rozwijana) z punktami i ✓ przy tych, którzy odpowiedzieli. Przycisk QR pokazuje kod powrotu `/<kod>#powrot=<token>` (fragment nie trafia na serwer, telefon zapisuje token i czyści adres), więc gracz wraca z tymi samymi punktami, także na innym telefonie. ✕ usuwa gracza przez `/api/gracz` (klucz serwisowy, sprawdza klucz pilota), potem `po_usunieciu_gracza` rozsyła zmianę i kończy pytanie, jeśli reszta już odpowiedziała. Usunięty telefon wraca do dołączania z komunikatem.
+- **Ekran odpowiedzi:** brak odpowiedzi jest w czerwonej ramce na końcu z napisem „brak odpowiedzi”, częściowo dobre w żółtej ramce „Częściowo”.
+- **Telefon:** czas odpowiedzi w złocie, reszta zdania szara. Odbiór nagrody: „Potwierdź odbiór” bez „klika barman”, okno „Kliknij dopiero po odebraniu nagrody” (Odebrana / Jeszcze nie). Podpis „Aplikacja · lukasznowak.dev” tylko na końcu gry, bez podkreślenia.
+- **Panel gry:** sekcja „Nagrody” przy zakończonej grze: miejsce, nagroda, gracz i „odebrana 22.10, 21:09” albo „jeszcze nieodebrana”.
+- **TV:** logo Bractwa stale w prawym dolnym rogu, u góry tylko lokal × browar. Bez podpisu autora. Na końcu gry mniejsze loga i stopnie, żeby zwycięzca nie wchodził na tytuł (odstęp 41 px przy 1920×1080).
+- **Ekran lokalu po grze:** na pilocie po końcu „Pokaż plansze na ekranie lokalu” (`ekran_zwolniony`), bez tego plansze wracają same po 10 minutach. Przez 6 godzin po grze plansze mają dodatkową: „Zwycięzcy ostatniego quizu” z pierwszą trójką (gracze z punktami).
+- W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
+- Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
 ### Fanfary na podium (22.10)
 

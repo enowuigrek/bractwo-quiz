@@ -188,6 +188,13 @@ h1 {
   margin-bottom: var(--section-gap);
 }
 
+/* Czas odpowiedzi na telefonie: sam czas w akcencie, reszta zdania szara */
+.czas-odp {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+}
+
 .gra-kod {
   font-weight: var(--w-black);
   letter-spacing: 0.15em;
@@ -858,17 +865,38 @@ html:has(.kolumna) {
 }
 
 .autor {
-  margin: var(--section-gap) 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: var(--section-gap) auto 0;
+  padding-top: 14px;
+  width: 160px;
+  border-top: 1px solid var(--kamien2);
   text-align: center;
-  font-size: var(--fs-xs);
+}
+
+.autor-etykieta {
+  font-size: 11px;
+  font-weight: var(--w-semibold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--szary);
 }
 
 .autor a {
-  color: var(--szary);
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+  color: var(--zloto);
+  text-decoration: none;
 }
 
-/* Odbiór nagrody: przycisk dla barmana i „pieczątka” po odbiorze */
+.autor a:hover,
+.autor a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Odbiór nagrody: przycisk „Odebrałem” i „pieczątka” po odbiorze */
 .karta-nagrody-odbior {
   margin-top: 14px;
   width: 100%;
@@ -898,4 +926,169 @@ html:has(.kolumna) {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   transform: rotate(-4deg);
+}
+
+/* Nowe typy pytań na telefonie: kilka odpowiedzi, kolejność, pary */
+.gra-podpowiedz {
+  margin: 0 0 12px;
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--zloto);
+}
+
+.odp-zatwierdz {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.odp-akcje {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.odp-litera.odp-numer {
+  background: var(--zloto);
+  color: var(--na-zlocie);
+}
+
+.pary-siatka {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.odp.odp-para {
+  gap: 10px;
+  min-height: 56px;
+  padding: 10px;
+  font-size: var(--fs-small);
+}
+
+.odp-para .odp-litera {
+  width: 28px;
+  height: 28px;
+}
+
+.odp.odp-para.aktywna {
+  border-color: var(--piana);
+  box-shadow: 0 0 0 2px var(--piana);
+}
+
+/* Połączone pary: wspólny kolor po obu stronach */
+.odp-para[class*="para-"] .odp-litera {
+  color: var(--bg);
+}
+
+.odp-para.para-0 { border-color: #e3ac3f; }
+.odp-para.para-0 .odp-litera { background: #e3ac3f; border-color: #e3ac3f; }
+.odp-para.para-1 { border-color: #8fb63a; }
+.odp-para.para-1 .odp-litera { background: #8fb63a; border-color: #8fb63a; }
+.odp-para.para-2 { border-color: #6fa8dc; }
+.odp-para.para-2 .odp-litera { background: #6fa8dc; border-color: #6fa8dc; }
+.odp-para.para-3 { border-color: #e2735a; }
+.odp-para.para-3 .odp-litera { background: #e2735a; border-color: #e2735a; }
+.odp-para.para-4 { border-color: #c39bd3; }
+.odp-para.para-4 .odp-litera { background: #c39bd3; border-color: #c39bd3; }
+.odp-para.para-5 { border-color: #f4ecd8; }
+.odp-para.para-5 .odp-litera { background: #f4ecd8; border-color: #f4ecd8; }
+
+/* Wynik w kolejności i parach: właściwe rozwiązanie bez skreśleń, pomyłka z dopiskiem „Ty: …” */
+.odp.nietrafiona {
+  border-color: var(--czerwien);
+}
+
+.odp-twoja {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  text-decoration: line-through;
+}
+
+.odp .zle {
+  color: var(--czerwien);
+  font-weight: var(--w-black);
+}
+
+.werdykt.czesciowo {
+  border-color: var(--zloto);
+  background: rgba(227, 172, 63, 0.1);
+}
+
+.werdykt.czesciowo .werdykt-tytul {
+  color: var(--zloto);
+}
+
+/* Pilot: lista graczy z kodem powrotu i usuwaniem */
+.pilot-gracze-karta summary {
+  margin: 0;
+  cursor: pointer;
+}
+
+.pilot-gracze-karta[open] summary {
+  margin-bottom: 12px;
+}
+
+.pilot-gracze {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.pilot-gracze li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--kamien2);
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+}
+
+.pilot-gracz-nick {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pilot-gracz-punkty {
+  color: var(--szary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pilot-gracze .przycisk-zdjecie {
+  padding: 6px 12px;
+}
+
+.przycisk-zdjecie.pilot-usun {
+  background: var(--czerwien-tlo);
+}
+
+.pilot-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.pilot-qr-kod {
+  display: block;
+  width: min(260px, 70vw);
+  padding: 12px;
+  background: #f4ecd8;
+  border-radius: var(--r-pole);
+}
+
+.pilot-qr-kod svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }

@@ -13,9 +13,21 @@
   width: 1920px;
   height: 1080px;
   transform-origin: top left;
-  padding: 64px 80px;
+  /* na dole miejsce na logo Bractwa w rogu */
+  padding: 64px 80px 96px;
   display: flex;
   flex-direction: column;
+}
+
+/* Logo Bractwa Piwnego: stale w prawym dolnym rogu, góra zostaje dla lokalu i browaru */
+.tv-bractwo-rog {
+  position: absolute;
+  right: 36px;
+  bottom: 18px;
+  height: 72px;
+  width: auto;
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .tv h1 {
@@ -28,11 +40,6 @@
   display: flex;
   align-items: center;
   gap: 40px;
-}
-
-.tv-logo-bractwo {
-  height: 130px;
-  width: auto;
 }
 
 .tv-logo-lokalu {
@@ -768,6 +775,24 @@
   border-color: var(--czerwien);
 }
 
+.tv-odpowiedzi-ramka.czesciowo {
+  border-color: var(--zloto);
+}
+
+.czesciowo .tv-odpowiedzi-etykieta {
+  color: var(--zloto);
+}
+
+.czesciowo .tv-odpowiedzi-litera {
+  border-color: var(--zloto);
+  color: var(--zloto);
+}
+
+.tv-odpowiedzi-bez {
+  font-style: italic;
+  color: var(--szary);
+}
+
 .tv-odpowiedzi-etykieta {
   margin: 0 0 12px;
   font-size: 30px;
@@ -888,14 +913,6 @@
   padding: 12px 20px 14px;
 }
 
-.tv-odpowiedzi-brak {
-  margin: 20px 0 0;
-  font-size: 28px;
-  color: var(--szary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 /* Pełna tabela wyników po grze */
 
@@ -960,10 +977,6 @@
   justify-content: center;
   text-align: center;
   gap: 28px;
-}
-
-.plansza-loga .tv-logo-bractwo {
-  height: 220px;
 }
 
 .plansza-loga .tv-logo-lokalu {
@@ -1146,13 +1159,112 @@
   color: var(--zloto);
 }
 
-/* Podpis autora aplikacji: drobny, w rogu ekranu */
-.tv-autor {
-  position: absolute;
-  right: 32px;
-  bottom: 18px;
-  margin: 0;
-  font-size: 20px;
+
+/* Nowe typy pytań na TV */
+.tv-typ-podpowiedz {
+  margin: 10px 0 0;
+  font-size: 32px;
+  font-weight: var(--w-semibold);
+  color: var(--zloto);
+}
+
+.tv-odp-lista.tv-odp-jedna {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.tv-odp-jedna .tv-odp {
+  min-height: 84px;
+  font-size: 38px;
+}
+
+.tv-pary {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.tv-para-laczenie {
+  margin: 0 14px;
+  color: var(--zloto);
+}
+
+/* Podium na końcu: bloki niższe, żeby zwycięzca nie wchodził na nagłówek */
+.tv-koniec .tv-naglowek .tv-logo-lokalu,
+.tv-koniec .tv-naglowek .tv-logo-browaru {
+  height: 110px;
+}
+
+.tv-koniec .tv-naglowek .tv-logo-lokalu {
+  width: 110px;
+}
+
+.tv-koniec .tv-podium {
+  margin-top: 8px;
+}
+
+.tv-koniec .tv-stopien-1 .tv-stopien-blok {
+  height: 200px;
+}
+
+.tv-koniec .tv-stopien-2 .tv-stopien-blok {
+  height: 160px;
+}
+
+.tv-koniec .tv-stopien-3 .tv-stopien-blok {
+  height: 110px;
+}
+
+.tv-koniec .tv-stopien-nr {
+  font-size: 90px;
+}
+
+.tv-koniec .tv-stopien-1 .tv-stopien-nr {
+  font-size: 120px;
+}
+
+/* Plansza z podium ostatniego quizu w lokalu */
+.plansza-podium {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.plansza-podium-lista {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 80px;
+}
+
+.plansza-podium-lista li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  font-size: 44px;
+  font-weight: var(--w-black);
+}
+
+.plansza-podium-lista li.pierwszy {
+  font-size: 64px;
+  color: var(--zloto);
+}
+
+.plansza-podium-lista li.pierwszy .awatar {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-lg);
+}
+
+.plansza-podium-miejsce {
+  font-size: 30px;
   color: var(--szary);
-  opacity: 0.6;
 }

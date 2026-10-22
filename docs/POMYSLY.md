@@ -4,8 +4,6 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 
 ## Typy zadań
 
-- **Łączenie w pary:** piwo ↔ styl, browar ↔ miasto, chmiel ↔ kraj pochodzenia.
-- **Układanie w kolejności:** od najjaśniejszego do najciemniejszego, od najsłabszego do najmocniejszego, chronologicznie (np. powstanie browarów).
 - **Strzał liczbowy:** „Ile IBU / % alk. / °Blg ma to piwo?”. Wygrywa najbliższy, punkty maleją z odległością od prawidłowej wartości.
 - **Degustacja na ślepo:** prowadzący podaje próbki A, B i C, a gracze dopasowują je do stylów. To typ stworzony pod degustacje i Dzień Porteru.
 - **Prawda / fałsz:** szybkie rundy z krótkim czasem.
@@ -18,6 +16,7 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - **Joker / podwójne punkty:** gracz raz na quiz obstawia pytanie, na którym jest pewny.
 - **Seria:** bonus za kilka poprawnych odpowiedzi z rzędu, z licznikiem przy nicku.
 - **Rundy tematyczne** z planszą przejściową na TV („Runda 2: Portery bałtyckie”).
+- **Konkurencje (do obgadania, pomysł z 22.10):** quiz podzielony na części z własną nazwą i planszą na TV, np. „Rozgrzewka”, „Degustacja”, „Finał”. Do ustalenia: czy konkurencja ma własny ranking i zwycięzcę, czy tylko sumuje się do ogólnego wyniku, czy może mieć własne zasady (czas, mnożnik punktów, jeden typ pytań), i czy konkurencje to grupy pytań w jednym quizie, czy kilka quizów w jednej rozgrywce.
 - **Pełne drużyny:** kilka telefonów w jednej drużynie, wynik liczony jako średnia, żeby większa drużyna nie miała przewagi. (W MVP drużyna = jeden telefon.)
 - **Ponowne użycie quizu:** ten sam zestaw pytań w kilku lokalach i porównanie wyników między miastami.
 - **Historia i statystyki:** najtrudniejsze pytania, średni czas odpowiedzi, frekwencja.
@@ -35,7 +34,6 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - Szablony quizów (np. „Dzień Porteru”), które kopiuje się przed eventem.
 - Biblioteka pytań wspólna dla wszystkich quizów, z tagami (style, historia, chmiele).
 - Tryb próbny („na sucho”), który nie zapisuje wyników.
-- **Usuwanie gracza z poczekalni na pilocie**, np. przy nieodpowiednim nicku na TV. Wymaga nowej funkcji z `host_token`.
 - **Zmiana nicku** przez gracza przed startem quizu.
 - **Cofnięcie akcji na pilocie** („wstecz”), gdy prowadzący kliknie za wcześnie.
 - **Prawdziwy limit prób logowania** do panelu. W MVP jest tylko opóźnienie po złym haśle.

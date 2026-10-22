@@ -2,24 +2,33 @@
 /* eslint-disable @next/next/no-img-element -- logo z /public skalowane CSS-em na scenie 1920×1080 */
 
 import { useEffect, useState } from "react";
+import { Awatar } from "@/components/awatar";
+import type { WierszRankingu } from "@/lib/gra/typy";
 import { Loga } from "./tv";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
 const ZMIANA_MS = 10_000;
-const LICZBA_PLANSZ = 3;
 
-type Props = { lokal: { nazwa: string; logo_url: string | null } };
+/** Ostatni quiz w lokalu (z `ekran_lokalu`, do 6 godzin po końcu): pierwsza trójka. */
+export type OstatniQuiz = { tytul: string; okazja: string | null; podium: WierszRankingu[] };
+
+type Props = { lokal: { nazwa: string; logo_url: string | null }; ostatnia: OstatniQuiz | null };
+
+/** Kolejność na planszy: 2., 1., 3. */
+const STOPNIE = [1, 0, 2];
 
 /**
- * Ekran lokalu, gdy nie ma gry: plansze zmieniane co 10 s.
+ * Ekran lokalu, gdy nie ma gry: plansze zmieniane co 10 s. Po quizie dochodzi plansza z jego podium.
  * Własne plansze z panelu (zapowiedzi, grafiki) są w POMYSLY.md.
  */
-export function Plansze({ lokal }: Props) {
-  const [nr, ustawNr] = useState(0);
+export function Plansze({ lokal, ostatnia }: Props) {
+  const liczbaPlansz = ostatnia ? 4 : 3;
+  const [licznik, ustawLicznik] = useState(0);
   useEffect(() => {
-    const zegar = setInterval(() => ustawNr((n) => (n + 1) % LICZBA_PLANSZ), ZMIANA_MS);
+    const zegar = setInterval(() => ustawLicznik((n) => n + 1), ZMIANA_MS);
     return () => clearInterval(zegar);
   }, []);
+  const nr = licznik % liczbaPlansz;
 
   return (
     <div className="plansze">
@@ -49,6 +58,26 @@ export function Plansze({ lokal }: Props) {
             </ol>
           </div>
         )}
+        {nr === 3 && ostatnia && (
+          <div className="plansza-podium">
+            <p className="tv-okazja">{[ostatnia.okazja, "Zwycięzcy ostatniego quizu"].filter(Boolean).join(" · ")}</p>
+            <h1 className="plansza-tytul">{ostatnia.tytul}</h1>
+            <ol className="plansza-podium-lista">
+              {STOPNIE.filter((i) => ostatnia.podium[i]).map((i) => {
+                const w = ostatnia.podium[i];
+                return (
+                  <li key={w.nick} className={i === 0 ? "pierwszy" : undefined}>
+                    <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={i === 0 ? 220 : 150} />
+                    <span>{w.nick}</span>
+                    <span className="plansza-podium-miejsce">
+                      {w.miejsce}. miejsce · {w.punkty.toLocaleString("pl-PL")} pkt
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        )}
         {nr === 2 && (
           <div className="plansza-srodek">
             <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo plansza-logo-duze" />
@@ -56,9 +85,8 @@ export function Plansze({ lokal }: Props) {
           </div>
         )}
       </div>
-      <p className="tv-autor">Aplikacja: lukasznowak.dev</p>
       <ol className="plansze-kropki" aria-hidden>
-        {Array.from({ length: LICZBA_PLANSZ }, (_, i) => (
+        {Array.from({ length: liczbaPlansz }, (_, i) => (
           <li key={i} className={i === nr ? "teraz" : undefined} />
         ))}
       </ol>

@@ -9,10 +9,9 @@ import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przesunZadanie, usunZadanie } from "../akcje";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
+import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
-
-const LITERY = "ABCDEF";
 
 export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[id]">) {
   await wymagajAdmina();
@@ -54,7 +53,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                     <Link href={`/admin/quizy/${quiz.id}/zadania/${z.id}`}>{z.tresc}</Link>
                   </div>
                   <div className="lista-opis">
-                    Poprawna: {LITERY[z.dane.poprawna]}. {z.dane.odpowiedzi[z.dane.poprawna]}
+                    {NAZWY_TYPOW[z.typ]} · {opisRozwiazania(z)}
                   </div>
                 </div>
                 <div className="lista-akcje">

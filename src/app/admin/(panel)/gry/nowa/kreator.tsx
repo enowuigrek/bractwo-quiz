@@ -178,7 +178,7 @@ export function Kreator({ lokale, quizy }: Props) {
                       <input
                         name={`nagroda_${m}`}
                         className="pole"
-                        placeholder={m === 1 ? "Nagroda, np. Piwo z kija gratis" : "Nagroda"}
+                        placeholder={m === 1 ? "Nagroda, np. Lane Piwo gratis" : "Nagroda"}
                         aria-label={`Nagroda za ${m}. miejsce`}
                         maxLength={LIMITY.nagroda}
                         required

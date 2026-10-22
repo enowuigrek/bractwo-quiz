@@ -126,9 +126,9 @@ export function useCzasSerwera(przesuniecie: number, aktywny: boolean, coIleMs =
 /**
  * Faza w tej chwili według zegara serwera. `przygotuj` przechodzi w `pytanie`, gdy minie `faza_od`,
  * bez czekania na bazę: wszystkie ekrany odsłaniają pytanie w tym samym momencie.
- * `czasMinal`: pytanie trwa w bazie, ale jego czas już się skończył (czekamy na prowadzącego).
+ * `czasMinal`: pytanie trwa w bazie, ale jego czas już się skończył (za chwilę wynik, patrz `useKoniecPytania`).
  * `bezLimitu`: pytanie bez limitu czasu, które jeszcze trwa (`faza_do` puste, `doKonca` = ∞).
- * Kończy się, gdy odpowiedzą wszyscy (baza ustawia wtedy `faza_do`) albo prowadzący pokaże wynik.
+ * Kończy się, gdy odpowiedzą wszyscy (baza od razu pokazuje wynik) albo prowadzący zakończy je ręcznie.
  */
 export function fazaTeraz(
   stan: Pick<StanSesji, "faza" | "faza_od" | "faza_do">,
@@ -139,6 +139,31 @@ export function fazaTeraz(
   const bezLimitu = (faza === "przygotuj" || faza === "pytanie") && !stan.faza_do;
   const doKonca = bezLimitu ? Infinity : stan.faza_do ? Date.parse(stan.faza_do) - teraz : 0;
   return { faza, doStartu: od - teraz, doKonca, czasMinal: faza === "pytanie" && doKonca <= 0, bezLimitu };
+}
+
+/**
+ * Gdy zegar pokazuje koniec czasu pytania, prosi bazę o wynik (`dokoncz_pytanie`; baza sama
+ * sprawdza czas, więc wcześniejsze wołanie nic nie zmienia). Woła TV, pilot i telefony, co 2 s do skutku.
+ */
+export function useKoniecPytania(kod: string, stan: Pick<StanSesji, "faza" | "faza_od" | "faza_do"> | null, teraz: number) {
+  const ostatnio = useRef(0);
+  const faza = stan ? fazaTeraz(stan, teraz).faza : null;
+  // sekunda zapasu w bazie na opóźnione odpowiedzi
+  const poKoncu = faza === "pytanie" && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > 1100 : false;
+  const [tik, ustawTik] = useState(0);
+  useEffect(() => {
+    if (!poKoncu) return;
+    const zegar = setInterval(() => ustawTik((t) => t + 1), 2000);
+    return () => clearInterval(zegar);
+  }, [poKoncu]);
+  useEffect(() => {
+    if (!poKoncu || Date.now() - ostatnio.current < 1500) return;
+    ostatnio.current = Date.now();
+    // zapytanie Supabase rusza dopiero po `then`; błąd sieci: kolejna próba za 2 s
+    void supabase()
+      .rpc("dokoncz_pytanie", { p_kod: kod })
+      .then(() => undefined);
+  }, [kod, poKoncu, tik]);
 }
 
 /** Czas odpowiedzi do wyświetlenia, np. „3,4 s”. */

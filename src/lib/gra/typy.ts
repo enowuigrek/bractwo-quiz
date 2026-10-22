@@ -1,6 +1,7 @@
 // Odpowiedzi funkcji gry (RPC) tak, jak widzą je przeglądarki.
 
 import type { Nagroda } from "../typy";
+import type { DaneOdpowiedzi, DaneWidoczne, TypZadania } from "../zadania";
 
 export type { Nagroda };
 
@@ -21,13 +22,13 @@ export type ZadanieWidoczne = {
   nr: number;
   /** Numer kolejny w quizie (numeracja `nr` może mieć dziury). */
   lp: number;
-  typ: "wybor";
+  typ: TypZadania;
   tresc: string;
   grafika_url: string | null;
   /** `null`: bez limitu czasu. */
   czas_s: number | null;
-  /** `poprawna` pojawia się dopiero od fazy `wynik`. */
-  dane: { odpowiedzi: string[]; poprawna?: number };
+  /** `poprawna` pojawia się dopiero od fazy `wynik`. Kształt zależy od typu (src/lib/zadania.ts). */
+  dane: DaneWidoczne;
   /** Statystyki, od fazy `wynik`: ile osób wybrało każdą odpowiedź. */
   rozklad?: number[] | null;
   liczba_poprawnych?: number;
@@ -59,11 +60,15 @@ export type StanSesji = {
 };
 
 export type PilotStan = StanSesji & {
-  poprawna: number | null;
+  /** Rozwiązanie bieżącego zadania (kształt jak `dane.poprawna`). */
+  poprawna: number | number[] | null;
   ostatnie_zadanie: boolean;
 };
 
-export type AkcjaPilota = "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
+/** Wiersz `pilot_gracze`: token służy do QR, którym gracz wraca do gry na innym telefonie. */
+export type GraczPilota = { nick: string; zdjecie: string | null; token: string; punkty: number; odpowiedzial: boolean };
+
+export type AkcjaPilota = "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec" | "plansze";
 
 /** Wiersz `lista_graczy`: nick i adres selfie (null: bez zdjęcia). */
 export type GraczNaLiscie = { nick: string; zdjecie: string | null };
@@ -83,7 +88,7 @@ export type MojWynik = {
   faza: FazaWidoczna;
   zadanie_nr: number;
   /** `poprawna` i `punkty` dopiero od fazy `wynik`. */
-  odpowiedz: { dane: { odpowiedz?: number }; czas_ms: number; poprawna?: boolean; punkty?: number; ocena?: number } | null;
+  odpowiedz: { dane: DaneOdpowiedzi; czas_ms: number; poprawna?: boolean; punkty?: number; ocena?: number } | null;
   /** Kiedy obsługa potwierdziła odbiór nagrody (null: jeszcze nie). */
   nagroda_odebrana: string | null;
   punkty: number;
@@ -98,8 +103,10 @@ export type MojWynik = {
 export type WierszOdpowiedzi = {
   nick: string;
   zdjecie: string | null;
-  dane: { odpowiedz?: number } | null;
+  dane: DaneOdpowiedzi | null;
   poprawna: boolean | null;
+  /** Ocena 0..1 (częściowa w nowych typach). */
+  ocena: number | null;
   czas_ms: number | null;
   punkty: number | null;
 };

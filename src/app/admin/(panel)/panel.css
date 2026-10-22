@@ -971,3 +971,28 @@ a.przycisk {
     margin-left: 6px;
   }
 }
+
+/* Edytor pytań: wiersze kolejności (numer, pole, strzałki, usuń) i par (lewa ↔ prawa, usuń) */
+.odpowiedz.odpowiedz-kolejnosc {
+  grid-template-columns: auto 1fr auto auto;
+}
+
+.odpowiedz.odpowiedz-para {
+  grid-template-columns: 1fr auto 1fr auto;
+}
+
+.odpowiedz-strzalki {
+  display: flex;
+  gap: 4px;
+}
+
+.odpowiedz-laczenie {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+.odpowiedz-kolejnosc .odpowiedz-litera {
+  cursor: default;
+  color: var(--zloto);
+  border-color: var(--zloto);
+}

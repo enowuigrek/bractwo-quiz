@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { LogoQuiz } from "@/components/logo-quiz";
-import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
+import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useKoniecPytania, useNasluch } from "@/lib/gra/nasluch";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
@@ -23,8 +23,20 @@ export function Gracz({ kod }: { kod: string }) {
   const [moj, ustawMoj] = useState<MojWynik | null>(null);
   const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
+  const [usuniety, ustawUsuniety] = useState(false);
   // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
   const tokenRef = useRef<string | null>(null);
+  const nickRef = useRef<string | null>(null);
+
+  // Prowadzący usunął gracza: telefon zapomina token i wraca do dołączania.
+  const wyrzuc = useCallback(() => {
+    pamiec.usun(kluczTokenu(kod));
+    tokenRef.current = null;
+    nickRef.current = null;
+    ustawJa(null);
+    ustawMoj(null);
+    ustawUsuniety(true);
+  }, [kod]);
 
   const pobierz = useCallback(async () => {
     try {
@@ -34,10 +46,15 @@ export function Gracz({ kod }: { kod: string }) {
       ustawBladGry(null);
       if (stan.faza === "poczekalnia") {
         const { data } = await supabase().rpc("lista_graczy", { p_kod: kod });
-        if (data) ustawGraczy(data as GraczNaLiscie[]);
+        if (data) {
+          const lista = data as GraczNaLiscie[];
+          ustawGraczy(lista);
+          if (nickRef.current && !lista.some((g) => g.nick === nickRef.current)) wyrzuc();
+        }
       } else if (tokenRef.current) {
         // po `stan_sesji`, więc faza w `moj_wynik` nigdy nie jest starsza niż w stanie
-        const { data } = await supabase().rpc("moj_wynik", { p_token: tokenRef.current });
+        const { data, error } = await supabase().rpc("moj_wynik", { p_token: tokenRef.current });
+        if (error && komunikatBledu(error).includes("Nieznany gracz")) wyrzuc();
         if (data) {
           const nowy = data as MojWynik;
           ustawMoj(nowy);
@@ -53,19 +70,26 @@ export function Gracz({ kod }: { kod: string }) {
       // chwilowy brak sieci nie zasłania gry, którą już widać
       if (!komunikat.startsWith("Brak połączenia")) ustawBladGry(komunikat);
     }
-  }, [kod]);
+  }, [kod, wyrzuc]);
 
   useNasluch(kod, pobierz, ["stan", "gracz"]);
 
   // Powrót po odświeżeniu: token z localStorage, `dolacz` sprawdza, że to ta sama gra.
+  // Powrót na innym telefonie: QR z pilota prowadzi na `/<kod>#powrot=<token>` (fragment nie trafia na serwer).
   useEffect(() => {
-    const token = pamiec.czytaj(kluczTokenu(kod));
+    const zLinku = /^#powrot=([0-9a-f]{64})$/.exec(window.location.hash)?.[1];
+    if (zLinku) {
+      pamiec.zapisz(kluczTokenu(kod), zLinku);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+    const token = zLinku ?? pamiec.czytaj(kluczTokenu(kod));
     void (async () => {
       if (token) {
         const { data, error } = await supabase().rpc("dolacz", { p_kod: kod, p_nick: null, p_token: token });
         if (!error) {
           const d = data as Dolaczenie;
           tokenRef.current = d.token;
+          nickRef.current = d.nick;
           ustawJa({ nick: d.nick, token: d.token });
           void pobierz();
         } else if (!komunikatBledu(error).startsWith("Brak połączenia")) {
@@ -110,16 +134,25 @@ export function Gracz({ kod }: { kod: string }) {
             <p className="pomocniczy">Piwu Cześć! Do zobaczenia na kolejnym quizie.</p>
           </>
         ) : (
+          <>
+          {usuniety && (
+            <p className="blad" role="alert">
+              Prowadzący usunął Cię z gry. Możesz dołączyć jeszcze raz.
+            </p>
+          )}
           <Dolacz
             kod={kod}
             stan={stan}
             onDolaczono={(d) => {
               pamiec.zapisz(kluczTokenu(kod), d.token);
               tokenRef.current = d.token;
+              nickRef.current = d.nick;
+              ustawUsuniety(false);
               ustawJa({ nick: d.nick, token: d.token });
               void pobierz();
             }}
           />
+          </>
         )}
       </>
     );
@@ -242,6 +275,7 @@ function WGrze({
   const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie";
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, liczy, stan.faza === "przygotuj" ? 100 : 250);
+  useKoniecPytania(stan.kod, stan, teraz);
 
   // podium, tabela i koniec to jeden ekran, żeby medal i konfetti nie startowały od nowa przy przejściach
   if (stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {

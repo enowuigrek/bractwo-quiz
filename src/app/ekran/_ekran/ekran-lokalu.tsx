@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { useCallback, useEffect, useState } from "react";
 import { useNasluchTematu } from "@/lib/gra/nasluch";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { Plansze } from "./plansze";
+import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
 
 type Props = {
@@ -16,17 +16,21 @@ type Props = {
 
 /**
  * Stały ekran lokalu (zakładka na TV). Bez gry pokazuje plansze, a gdy w lokalu ruszy gra,
- * sam przechodzi na nią (zdarzenie `gra` z bazy, zapasowo odpytywanie co 5 s).
+ * sam przechodzi na nią (zdarzenie `gra` z bazy, zapasowo odpytywanie co 5 s). Po grze plansze
+ * przez kilka godzin pokazują też jej podium.
  */
 export function EkranLokalu({ adres, lokal, baza }: Props) {
   const [kod, ustawKod] = useState<string | null>(null);
   const [qr, ustawQr] = useState<{ kod: string; svg: string } | null>(null);
+  const [ostatnia, ustawOstatnia] = useState<OstatniQuiz | null>(null);
 
   const pobierz = useCallback(async () => {
     const { data, error } = await supabase().rpc("ekran_lokalu", { p_adres: adres });
     // chwilowy błąd sieci: zostaje to, co już widać
     if (error) return;
-    ustawKod((data as { kod: string | null }).kod);
+    const d = data as { kod: string | null; ostatnia: OstatniQuiz | null };
+    ustawKod(d.kod);
+    ustawOstatnia(d.ostatnia?.podium.length ? d.ostatnia : null);
   }, [adres]);
 
   useNasluchTematu(`lokal:${adres}`, pobierz, ["gra"]);
@@ -52,7 +56,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   }
   return (
     <Scena>
-      <Plansze lokal={lokal} />
+      <Plansze lokal={lokal} ostatnia={ostatnia} />
     </Scena>
   );
 }

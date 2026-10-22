@@ -3,11 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
+import { LITERY, liczbaCzesci, opisOdpowiedzi, opisRozwiazania, ulamek } from "@/lib/zadania";
 import { sekundy, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../../../wyniki";
 
 export const metadata: Metadata = { title: "Gracz · Bractwo Quiz" };
-
-const LITERY = "ABCDEF";
 
 /** Historia gracza w grze: pytanie po pytaniu, co odpowiedział, w jakim czasie i za ile punktów. */
 export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[id]/gracze/[gracz]">) {
@@ -27,7 +26,7 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
     zadaniaGry(db, gra.quiz_id, gra.zadanie_nr),
     db
       .from("odpowiedzi")
-      .select("gracz_id, zadanie_id, dane, czas_ms, poprawna, punkty")
+      .select("gracz_id, zadanie_id, dane, czas_ms, poprawna, punkty, ocena")
       .eq("sesja_id", gra.id)
       .eq("gracz_id", graczId)
       .returns<OdpowiedzGracza[]>(),
@@ -58,19 +57,27 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
           <ol className="lista historia">
             {zadania.map((z, n) => {
               const o = (odpowiedzi ?? []).find((x) => x.zadanie_id === z.id);
-              const idx = o?.dane.odpowiedz;
-              const poprawna = z.dane.poprawna;
+              const idx = z.typ === "wybor" ? o?.dane.odpowiedz : undefined;
               const stan = !o ? "brak" : o.poprawna ? "dobrze" : "zle";
+              const czesciowo = o && !o.poprawna && (o.ocena ?? 0) > 0;
               return (
                 <li key={z.id} className={`historia-${stan}`}>
                   <span className="krok-nr historia-nr">{n + 1}.</span>
                   <div className="lista-glowna">
                     <div className="lista-tytul">{z.tresc}</div>
                     <div className="historia-odp">
-                      {o && idx !== undefined ? (
+                      {o && idx !== undefined && z.typ === "wybor" ? (
                         <>
                           <span className="historia-litera">{LITERY[idx]}</span>
                           <span>{z.dane.odpowiedzi[idx] ?? "odpowiedź usunięta z pytania"}</span>
+                          <span className="historia-czas">{sekundy(o.czas_ms)}</span>
+                        </>
+                      ) : o ? (
+                        <>
+                          <span>
+                            {opisOdpowiedzi(z, o.dane)}
+                            {czesciowo && ` (częściowo: ${ulamek(o.ocena ?? 0, liczbaCzesci(z.typ, z.dane))})`}
+                          </span>
                           <span className="historia-czas">{sekundy(o.czas_ms)}</span>
                         </>
                       ) : (
@@ -78,9 +85,7 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
                       )}
                     </div>
                     {stan !== "dobrze" && (
-                      <div className="lista-opis">
-                        Poprawna: {LITERY[poprawna]}. {z.dane.odpowiedzi[poprawna]}
-                      </div>
+                      <div className="lista-opis">{opisRozwiazania(z)}</div>
                     )}
                   </div>
                   <span className="historia-punkty">{o ? (o.punkty > 0 ? `+${o.punkty}` : "0") : "–"}</span>

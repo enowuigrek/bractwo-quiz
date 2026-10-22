@@ -2,10 +2,19 @@
 /* eslint-disable @next/next/no-img-element -- loga i grafiki z bucketu Supabase albo z /public */
 
 import { useCallback, useState, useSyncExternalStore } from "react";
-import { fazaTeraz, komunikatBledu, pobierzStan, sekundy, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
+import {
+  fazaTeraz,
+  komunikatBledu,
+  pobierzStan,
+  sekundy,
+  useCzasSerwera,
+  useKoniecPytania,
+  useNasluch,
+} from "@/lib/gra/nasluch";
 import { Awatar } from "@/components/awatar";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { LITERY, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { PodiumTv, RankingTv } from "./ranking";
 
@@ -37,6 +46,7 @@ export function Scena({ children }: { children: React.ReactNode }) {
         }}
       >
         {children}
+        <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-bractwo-rog" />
       </div>
     </div>
   );
@@ -58,12 +68,16 @@ export function Tv({ kod, qr, host }: Props) {
       const { stan, przesuniecie } = await pobierzStan(kod);
       // lista nicków potrzebna tylko w poczekalni
       if (stan.faza === "poczekalnia") {
-        const { data, error } = await supabase().rpc("lista_graczy", { p_kod: kod });
+        const { data, error } = await supabase().rpc("lista_graczy", {
+          p_kod: kod,
+        });
         if (error) throw error;
         ustawGraczy(data as GraczNaLiscie[]);
       }
       if (stan.faza === "odpowiedzi") {
-        const { data, error } = await supabase().rpc("odpowiedzi_zadania", { p_kod: kod });
+        const { data, error } = await supabase().rpc("odpowiedzi_zadania", {
+          p_kod: kod,
+        });
         if (error) throw error;
         ustawOdpowiedzi(data as WierszOdpowiedzi[]);
       }
@@ -84,32 +98,33 @@ export function Tv({ kod, qr, host }: Props) {
 
   const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
+  useKoniecPytania(kod, stan, teraz);
 
   return (
     <Scena>
-        {!stan ? (
-          <div className="tv-srodek">
-            <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
-          </div>
-        ) : (
-          // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
-          <div key={kluczEkranu(stan)} className="tv-ekran">
-            {stan.faza === "poczekalnia" ? (
-              <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} />
-            ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
-              <Pytanie stan={stan} teraz={teraz} />
-            ) : stan.faza === "odpowiedzi" ? (
-              <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
-            ) : stan.faza === "ranking" ? (
-              <RankingTv stan={stan} ranking={ranking} />
-            ) : stan.faza === "tabela" ? (
-              <TabelaTv stan={stan} ranking={ranking} />
-            ) : (
-              <Koniec stan={stan} ranking={ranking} przesuniecie={przesuniecie} />
-            )}
-          </div>
-        )}
-        {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
+      {!stan ? (
+        <div className="tv-srodek">
+          <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
+        </div>
+      ) : (
+        // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
+        <div key={kluczEkranu(stan)} className="tv-ekran">
+          {stan.faza === "poczekalnia" ? (
+            <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} />
+          ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
+            <Pytanie stan={stan} teraz={teraz} />
+          ) : stan.faza === "odpowiedzi" ? (
+            <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
+          ) : stan.faza === "ranking" ? (
+            <RankingTv stan={stan} ranking={ranking} />
+          ) : stan.faza === "tabela" ? (
+            <TabelaTv stan={stan} ranking={ranking} />
+          ) : (
+            <Koniec stan={stan} ranking={ranking} przesuniecie={przesuniecie} />
+          )}
+        </div>
+      )}
+      {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
     </Scena>
   );
 }
@@ -124,7 +139,6 @@ export function Loga({
 }) {
   return (
     <div className="tv-loga">
-      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo" />
       {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="tv-logo-lokalu" />}
       {browar && (
         <>
@@ -146,7 +160,17 @@ export function Loga({
  * Poczekalnia: duży QR po lewej (pod nim drobniej adres i kod dla wpisujących ręcznie),
  * na pierwszym planie okazja, tytuł quizu i grafika, pod nimi gracze.
  */
-function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: GraczNaLiscie[]; qr: string; host: string }) {
+function Poczekalnia({
+  stan,
+  gracze,
+  qr,
+  host,
+}: {
+  stan: StanSesji;
+  gracze: GraczNaLiscie[];
+  qr: string;
+  host: string;
+}) {
   const druzyny = stan.tryb === "druzyny";
   return (
     <div className="poczekalnia">
@@ -201,8 +225,6 @@ function Poczekalnia({ stan, gracze, qr, host }: { stan: StanSesji; gracze: Grac
   );
 }
 
-const LITERY = "ABCDEF";
-
 /** Przygotuj (odliczanie 3 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
 function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const z = stan.zadanie;
@@ -231,7 +253,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   }
 
   const wynik = faza === "wynik";
-  const poprawna = z.dane.poprawna;
+  const p = z.dane.poprawna;
+  const czyPoprawna = (i: number) => (Array.isArray(p) ? p.includes(i) : i === p);
   const rozklad = wynik ? z.rozklad : null;
   const najwiecej = Math.max(1, ...(rozklad ?? [0]));
   const zostalo = z.czas_s ? Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000))) : 0;
@@ -258,30 +281,73 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       ) : null}
 
       <h1 className="tv-tresc">{z.tresc}</h1>
+      {z.typ !== "wybor" && !wynik && <p className="tv-typ-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
 
       <div className={`tv-pytanie-srodek${z.grafika_url ? " z-grafika" : ""}`}>
         {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-pytanie-grafika" />}
-        <ol className={`tv-odp-lista${z.dane.odpowiedzi.length > 4 ? " gesto" : ""}`}>
-          {z.dane.odpowiedzi.map((o, i) => {
-            const klasa = !wynik ? "" : i === poprawna ? " poprawna" : " przygaszona";
-            const ile = rozklad?.[i] ?? 0;
-            return (
-              <li key={i} className={`tv-odp${klasa}`}>
-                {rozklad && <span className="tv-odp-slupek" style={{ transform: `scaleX(${ile / najwiecej})` }} />}
-                <span className="tv-odp-litera">{LITERY[i]}</span>
-                <span className="tv-odp-tekst">{o}</span>
-                {rozklad && <span className="tv-odp-ile">{ile}</span>}
+        {z.typ === "kolejnosc" ? (
+          <ol className={`tv-odp-lista tv-odp-jedna${(z.dane.elementy?.length ?? 0) > 4 ? " gesto" : ""}`}>
+            {(wynik && Array.isArray(p) ? p : (z.dane.elementy ?? []).map((_, i) => i)).map((idx, pozycja) => (
+              <li key={idx} className={`tv-odp${wynik ? " poprawna" : ""}`}>
+                <span className="tv-odp-litera">{wynik ? pozycja + 1 : "·"}</span>
+                <span className="tv-odp-tekst">{z.dane.elementy?.[idx]}</span>
               </li>
-            );
-          })}
-        </ol>
+            ))}
+          </ol>
+        ) : z.typ === "pary" ? (
+          wynik && Array.isArray(p) ? (
+            <ol className={`tv-odp-lista tv-odp-jedna${(z.dane.lewe?.length ?? 0) > 4 ? " gesto" : ""}`}>
+              {(z.dane.lewe ?? []).map((l, i) => (
+                <li key={i} className="tv-odp poprawna">
+                  <span className="tv-odp-tekst">
+                    {l} <span className="tv-para-laczenie">↔</span> {z.dane.prawe?.[p[i]]}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="tv-pary">
+              <ol className={`tv-odp-lista tv-odp-jedna${(z.dane.lewe?.length ?? 0) > 4 ? " gesto" : ""}`}>
+                {(z.dane.lewe ?? []).map((l, i) => (
+                  <li key={i} className="tv-odp">
+                    <span className="tv-odp-litera">{i + 1}</span>
+                    <span className="tv-odp-tekst">{l}</span>
+                  </li>
+                ))}
+              </ol>
+              <ol className={`tv-odp-lista tv-odp-jedna${(z.dane.prawe?.length ?? 0) > 4 ? " gesto" : ""}`}>
+                {(z.dane.prawe ?? []).map((r, k) => (
+                  <li key={k} className="tv-odp">
+                    <span className="tv-odp-litera">{LITERY[k]}</span>
+                    <span className="tv-odp-tekst">{r}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )
+        ) : (
+          <ol className={`tv-odp-lista${(z.dane.odpowiedzi?.length ?? 0) > 4 ? " gesto" : ""}`}>
+            {(z.dane.odpowiedzi ?? []).map((o, i) => {
+              const klasa = !wynik ? "" : czyPoprawna(i) ? " poprawna" : " przygaszona";
+              const ile = rozklad?.[i] ?? 0;
+              return (
+                <li key={i} className={`tv-odp${klasa}`}>
+                  {rozklad && <span className="tv-odp-slupek" style={{ transform: `scaleX(${ile / najwiecej})` }} />}
+                  <span className="tv-odp-litera">{LITERY[i]}</span>
+                  <span className="tv-odp-tekst">{o}</span>
+                  {rozklad && <span className="tv-odp-ile">{ile}</span>}
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </div>
 
       <footer className="tv-pytanie-dol">
         {wynik ? (
           <>
             <span>
-              Dobrze odpowiedziało{" "}
+              {z.typ === "wybor" ? "Dobrze odpowiedziało" : "W pełni dobrze"}{" "}
               <strong className="tv-dobrze">
                 {z.liczba_poprawnych ?? 0}/{stan.liczba_graczy}
               </strong>
@@ -347,7 +413,6 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
         </div>
       )}
       {koniec && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
-      <p className="tv-autor">Aplikacja: lukasznowak.dev</p>
     </div>
   );
 }

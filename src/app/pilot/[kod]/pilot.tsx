@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
-import { Awatar } from "@/components/awatar";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { usePotwierdzenie, type OpcjePotwierdzenia } from "@/components/okno";
 import {
@@ -11,14 +10,15 @@ import {
   pamiec,
   przesuniecieZegara,
   useCzasSerwera,
+  useKoniecPytania,
   useNasluch,
 } from "@/lib/gra/nasluch";
-import type { AkcjaPilota, FazaWidoczna, GraczNaLiscie, PilotStan } from "@/lib/gra/typy";
+import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { usunZdjecie } from "@/lib/zdjecie";
+import { LITERY, NAZWY_TYPOW } from "@/lib/zadania";
+import { GraczePilota } from "./gracze";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
-const LITERY = "ABCDEF";
 
 const NAZWY: Record<FazaWidoczna, string> = {
   poczekalnia: "Poczekalnia",
@@ -39,8 +39,16 @@ type Props = { kod: string; tokenZAdresu: string | null };
 export function Pilot({ kod, tokenZAdresu }: Props) {
   // Token z linku zapisujemy w localStorage i usuwamy z paska adresu,
   // żeby nie wyciekł przy pokazywaniu ekranu. Odświeżenie strony bierze go z pamięci.
-  const zamontowany = useSyncExternalStore(bezSubskrypcji, () => true, () => false);
-  const zPamieci = useSyncExternalStore(bezSubskrypcji, () => pamiec.czytaj(kluczPilota(kod)), () => null);
+  const zamontowany = useSyncExternalStore(
+    bezSubskrypcji,
+    () => true,
+    () => false,
+  );
+  const zPamieci = useSyncExternalStore(
+    bezSubskrypcji,
+    () => pamiec.czytaj(kluczPilota(kod)),
+    () => null,
+  );
   const token = tokenZAdresu ?? zPamieci;
 
   // Zapis dopiero po udanym `pilot_stan`, żeby zły link nie nadpisał dobrego tokenu.
@@ -54,7 +62,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   }, [kod, tokenZAdresu]);
 
   const [stan, ustawStan] = useState<PilotStan | null>(null);
-  const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
+  const [gracze, ustawGraczy] = useState<GraczPilota[]>([]);
+  const [ekranOddany, ustawEkranOddany] = useState(false);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [bladDostepu, ustawBladDostepu] = useState<string | null>(null);
   const [bladSieci, ustawBladSieci] = useState<string | null>(null);
@@ -66,7 +75,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     const wyslano = Date.now();
     const [s, g] = await Promise.all([
       supabase().rpc("pilot_stan", { p_kod: kod, p_host_token: token }),
-      supabase().rpc("lista_graczy", { p_kod: kod }),
+      supabase().rpc("pilot_gracze", { p_kod: kod, p_host_token: token }),
     ]);
     const odebrano = Date.now();
     if (s.error) {
@@ -78,7 +87,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     const nowy = s.data as PilotStan;
     ustawStan(nowy);
     ustawPrzesuniecie(przesuniecieZegara(nowy.teraz, wyslano, odebrano));
-    if (g.data) ustawGraczy(g.data as GraczNaLiscie[]);
+    if (g.data) ustawGraczy(g.data as GraczPilota[]);
     ustawBladDostepu(null);
     ustawBladSieci(null);
     zapamietaj();
@@ -88,6 +97,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
   const teraz = useCzasSerwera(przesuniecie, liczy);
+  useKoniecPytania(kod, stan, teraz);
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
   if (!zamontowany) {
@@ -115,26 +125,17 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     );
   }
 
-  async function zdejmijZdjecie(nick: string) {
-    if (!token) return;
-    if (!(await potwierdz(`Usunąć zdjęcie gracza ${nick}? Na TV zostanie kółko z literą.`, { tak: "Usuń zdjęcie", niebezpieczne: true }))) {
-      return;
-    }
-    try {
-      await usunZdjecie({ kod, host_token: token, nick });
-      await pobierz();
-    } catch (e) {
-      ustawBladAkcji((e as Error).message);
-    }
-  }
-
   async function akcja(a: AkcjaPilota, pytanie?: string, opcje?: OpcjePotwierdzenia) {
     if (wysylam || !token) return;
     if (pytanie && !(await potwierdz(pytanie, opcje))) return;
     ustawWysylam(true);
     ustawBladAkcji(null);
     const wyslano = Date.now();
-    const { data, error } = await supabase().rpc("pilot_akcja", { p_kod: kod, p_host_token: token, p_akcja: a });
+    const { data, error } = await supabase().rpc("pilot_akcja", {
+      p_kod: kod,
+      p_host_token: token,
+      p_akcja: a,
+    });
     const odebrano = Date.now();
     ustawWysylam(false);
     if (error) {
@@ -155,7 +156,10 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   const druzyny = stan.tryb === "druzyny";
   const nastepne = stan.ostatnie_zadanie
     ? { akcja: "podium" as const, napis: "Pokaż podium" }
-    : { akcja: "nastepne" as const, napis: z ? `Następne pytanie (${z.lp + 1}/${liczba})` : "Start quizu" };
+    : {
+        akcja: "nastepne" as const,
+        napis: z ? `Następne pytanie (${z.lp + 1}/${liczba})` : "Start quizu",
+      };
 
   return (
     <>
@@ -171,64 +175,40 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           <p className="etykieta" style={{ marginTop: 0 }}>
             {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
           </p>
-          {gracze.length === 0 ? (
-            <p className="pomocniczy" style={{ margin: 0 }}>
-              Nikt jeszcze nie dołączył. Gracze skanują QR z telewizora.
-            </p>
-          ) : (
-            <ul className="nicki">
-              {gracze.map((g) => (
-                <li key={g.nick}>
-                  {g.zdjecie ? (
-                    // zdjęcie trafia na TV: prowadzący może je zdjąć, gdy się nie nadaje
-                    <button
-                      type="button"
-                      className="nick-zdjecie"
-                      aria-label={`Usuń zdjęcie gracza ${g.nick}`}
-                      onClick={() => void zdejmijZdjecie(g.nick)}
-                    >
-                      <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={26} />
-                    </button>
-                  ) : (
-                    <Awatar nick={g.nick} zdjecie={null} rozmiar={26} />
-                  )}
-                  {g.nick}
-                </li>
-              ))}
-            </ul>
-          )}
-          {gracze.some((g) => g.zdjecie) && (
-            <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-              Zdjęcie się nie nadaje? Dotknij go, żeby usunąć.
-            </p>
-          )}
+          <GraczePilota kod={kod} token={token} gracze={gracze} pytanie={false} koniec={false} odswiez={pobierz} />
         </section>
       )}
 
       {z && faza !== "poczekalnia" && faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
         <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+          <p
+            className="etykieta"
+            style={{
+              marginTop: 0,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
             <span>
               Pytanie {z.lp}/{liczba}
             </span>
-            {faza === "przygotuj" && <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>}
+            {faza === "przygotuj" && (
+              <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>
+            )}
             {faza === "pytanie" && (
               <span className="gra-kod">
-                {bezLimitu ? "bez limitu" : doKonca > 0 ? `${Math.ceil(doKonca / 1000)} s` : wszyscy ? "wszyscy odpowiedzieli" : "czas minął"}
+                {bezLimitu
+                  ? "bez limitu"
+                  : doKonca > 0
+                    ? `${Math.ceil(doKonca / 1000)} s`
+                    : wszyscy
+                      ? "wszyscy odpowiedzieli"
+                      : "czas minął"}
               </span>
             )}
           </p>
           <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
-          <ol className="pilot-odpowiedzi">
-            {z.dane.odpowiedzi.map((o, i) => (
-              <li key={i} className={i === stan.poprawna ? "poprawna" : undefined}>
-                <span className="pilot-litera">{LITERY[i]}</span>
-                {o}
-                {i === stan.poprawna && <span className="ok"> ✓</span>}
-                {z.rozklad && <span className="pilot-liczba">{z.rozklad[i] ?? 0}</span>}
-              </li>
-            ))}
-          </ol>
+          <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
           <p style={{ margin: "14px 0 0" }}>
             Odpowiedziało{" "}
             <strong className="gra-kod">
@@ -236,11 +216,28 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </strong>
             {z.liczba_poprawnych !== undefined && (
               <>
-                {" · "}dobrze <strong className="ok">{z.liczba_poprawnych}</strong>
+                {" · "}
+                {z.typ === "wybor" ? "dobrze" : "w pełni dobrze"} <strong className="ok">{z.liczba_poprawnych}</strong>
               </>
             )}
           </p>
         </section>
+      )}
+
+      {faza !== "poczekalnia" && (
+        <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
+          <summary className="etykieta">
+            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
+          </summary>
+          <GraczePilota
+            kod={kod}
+            token={token}
+            gracze={gracze}
+            pytanie={faza === "pytanie"}
+            koniec={faza === "koniec"}
+            odswiez={pobierz}
+          />
+        </details>
       )}
 
       {bladAkcji && (
@@ -267,27 +264,40 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </button>
         )}
 
-        {(faza === "przygotuj" || faza === "pytanie") && (
-          <button
-            className="przycisk zloty"
-            disabled={wysylam}
-            onClick={() =>
-              akcja(
-                "wynik",
-                bezLimitu
-                  ? wszyscy
-                    ? undefined
-                    : "Nie wszyscy odpowiedzieli. Zakończyć pytanie teraz i pokazać wynik?"
-                  : doKonca > 0
-                    ? "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?"
-                    : undefined,
-                { tak: "Pokaż wynik" },
-              )
-            }
-          >
-            Pokaż wynik
-          </button>
-        )}
+        {/* wynik pokazuje się sam po czasie albo gdy wszyscy odpowiedzą; ręcznie tylko wcześniej */}
+        {(faza === "przygotuj" || faza === "pytanie") &&
+          (bezLimitu ? (
+            <button
+              className="przycisk zloty"
+              disabled={wysylam}
+              onClick={() =>
+                akcja("wynik", "Nie wszyscy odpowiedzieli. Zakończyć pytanie teraz i pokazać wynik?", {
+                  tak: "Pokaż wynik",
+                })
+              }
+            >
+              Zakończ pytanie i pokaż wynik
+            </button>
+          ) : (
+            <>
+              <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
+                Wynik pokaże się sam, gdy minie czas albo odpowiedzą wszyscy.
+              </p>
+              {doKonca > 0 && (
+                <button
+                  className="przycisk-cichy"
+                  disabled={wysylam}
+                  onClick={() =>
+                    akcja("wynik", "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?", {
+                      tak: "Pokaż wynik",
+                    })
+                  }
+                >
+                  Zakończ pytanie wcześniej
+                </button>
+              )}
+            </>
+          ))}
 
         {/* po pytaniu: wynik → odpowiedzi → ranking → następne; każdy krok można pominąć */}
         {faza === "wynik" && (
@@ -355,14 +365,41 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </>
         )}
 
-        {faza === "koniec" && <p className="pomocniczy">Gra zakończona. Piwu Cześć!</p>}
+        {faza === "koniec" && (
+          <>
+            <p className="pomocniczy">Gra zakończona. Piwu Cześć!</p>
+            {stan.lokal && (
+              <>
+                <button
+                  className="przycisk"
+                  disabled={wysylam || ekranOddany}
+                  onClick={async () => {
+                    await akcja("plansze");
+                    ustawEkranOddany(true);
+                  }}
+                >
+                  {ekranOddany ? "Ekran lokalu pokazuje plansze" : "Pokaż plansze na ekranie lokalu"}
+                </button>
+                <p className="pomocniczy" style={{ margin: 0 }}>
+                  Bez tego ekran lokalu wróci do plansz sam po 10 minutach. Podium tego quizu będzie wracać na planszach
+                  jeszcze przez kilka godzin.
+                </p>
+              </>
+            )}
+          </>
+        )}
 
         {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
           <button
             className="przycisk-cichy"
             style={{ marginTop: 24 }}
             disabled={wysylam}
-            onClick={() => akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", { tak: "Zakończ grę", niebezpieczne: true })}
+            onClick={() =>
+              akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
+                tak: "Zakończ grę",
+                niebezpieczne: true,
+              })
+            }
           >
             Zakończ grę
           </button>
@@ -375,6 +412,64 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </Link>
       </p>
       {oknoPotwierdzenia}
+    </>
+  );
+}
+
+/** Pytanie na pilocie z rozwiązaniem (prowadzący widzi je od początku). */
+function RozwiazaniePilota({ z, poprawna }: { z: ZadanieWidoczne; poprawna: PilotStan["poprawna"] }) {
+  const p = Array.isArray(poprawna) ? poprawna : null;
+  if (z.typ === "kolejnosc" && p) {
+    return (
+      <>
+        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+          {NAZWY_TYPOW[z.typ]} · właściwa:
+        </p>
+        <ol className="pilot-odpowiedzi">
+          {p.map((idx, poz) => (
+            <li key={idx} className="poprawna">
+              <span className="pilot-litera">{poz + 1}</span>
+              {z.dane.elementy?.[idx]}
+            </li>
+          ))}
+        </ol>
+      </>
+    );
+  }
+  if (z.typ === "pary" && p) {
+    return (
+      <>
+        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+          {NAZWY_TYPOW[z.typ]}:
+        </p>
+        <ol className="pilot-odpowiedzi">
+          {(z.dane.lewe ?? []).map((l, i) => (
+            <li key={i} className="poprawna">
+              {l} ↔ {z.dane.prawe?.[p[i]]}
+            </li>
+          ))}
+        </ol>
+      </>
+    );
+  }
+  const czyPoprawna = (i: number) => (p ? p.includes(i) : i === poprawna);
+  return (
+    <>
+      {z.typ !== "wybor" && (
+        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+          {NAZWY_TYPOW[z.typ]}
+        </p>
+      )}
+      <ol className="pilot-odpowiedzi">
+        {(z.dane.odpowiedzi ?? []).map((o, i) => (
+          <li key={i} className={czyPoprawna(i) ? "poprawna" : undefined}>
+            <span className="pilot-litera">{LITERY[i]}</span>
+            {o}
+            {czyPoprawna(i) && <span className="ok"> ✓</span>}
+            {z.rozklad && <span className="pilot-liczba">{z.rozklad[i] ?? 0}</span>}
+          </li>
+        ))}
+      </ol>
     </>
   );
 }

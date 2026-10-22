@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { DaneWybor } from "@/lib/typy";
+import type { DaneOdpowiedzi, ZadanieDane } from "@/lib/zadania";
 
 /** Wiersz tabeli końcowej gry w panelu. */
 export type WynikGracza = {
@@ -13,16 +13,20 @@ export type WynikGracza = {
   odpowiedzi: number;
   /** Średni czas odpowiedzi (dobrych i złych), null gdy gracz nic nie odpowiedział. */
   sredniCzasMs: number | null;
+  /** Kiedy gracz potwierdził odbiór nagrody (null: nie odebrał albo bez nagrody). */
+  nagrodaOdebrana: string | null;
 };
 
-export type ZadanieGry = { id: string; nr: number; tresc: string; czas_s: number | null; dane: DaneWybor };
+export type ZadanieGry = { id: string; nr: number; tresc: string; czas_s: number | null } & ZadanieDane;
 
 export type OdpowiedzGracza = {
   gracz_id: string;
   zadanie_id: string;
-  dane: { odpowiedz?: number };
+  dane: DaneOdpowiedzi;
   czas_ms: number;
   poprawna: boolean;
+  /** Ocena 0..1 (częściowa w nowych typach pytań). */
+  ocena: number | null;
   punkty: number;
 };
 
@@ -33,7 +37,7 @@ export type OdpowiedzGracza = {
 export async function zadaniaGry(db: SupabaseClient, quizId: string, doNr: number): Promise<ZadanieGry[]> {
   const { data } = await db
     .from("zadania")
-    .select("id, nr, tresc, czas_s, dane")
+    .select("id, nr, tresc, czas_s, typ, dane")
     .eq("quiz_id", quizId)
     .lte("nr", doNr)
     .order("nr")
@@ -44,7 +48,11 @@ export async function zadaniaGry(db: SupabaseClient, quizId: string, doNr: numbe
 /** Tabela końcowa: wszyscy gracze gry z punktami, miejscem i liczbą dobrych odpowiedzi. */
 export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<WynikGracza[]> {
   const [{ data: gracze }, { data: odpowiedzi }] = await Promise.all([
-    db.from("gracze").select("id, nick").eq("sesja_id", sesjaId).returns<{ id: string; nick: string }[]>(),
+    db
+      .from("gracze")
+      .select("id, nick, nagroda_odebrana")
+      .eq("sesja_id", sesjaId)
+      .returns<{ id: string; nick: string; nagroda_odebrana: string | null }[]>(),
     db
       .from("odpowiedzi")
       .select("gracz_id, czas_ms, poprawna, punkty")
@@ -62,6 +70,7 @@ export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<Wy
       dobre: jego.filter((o) => o.poprawna).length,
       odpowiedzi: jego.length,
       sredniCzasMs: jego.length ? jego.reduce((s, o) => s + o.czas_ms, 0) / jego.length : null,
+      nagrodaOdebrana: g.nagroda_odebrana,
     };
   });
 
