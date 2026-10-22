@@ -9,7 +9,9 @@ import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
 import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { usunGre, zakonczGre } from "../akcje";
+import { wynikiGry, zadaniaGry } from "../wyniki";
 import { LinkDoSkopiowania } from "./kopiuj";
+import { TabelaWynikow } from "./tabela-wynikow";
 
 export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
 
@@ -36,6 +38,10 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
     pilot: `${adres}/pilot/${gra.kod}?t=${gra.host_token}`,
   };
   const trwa = gra.faza !== "koniec";
+  // historia zakończonej gry: tabela końcowa, a z niej odpowiedzi każdego gracza
+  const [wyniki, zadania] = trwa
+    ? [[], []]
+    : await Promise.all([wynikiGry(db, gra.id), zadaniaGry(db, gra.quiz_id, gra.zadanie_nr)]);
   // SVG z biblioteki qrcode, bez danych od użytkownika poza adresem, który sami złożyliśmy
   const qrPilota = trwa ? await QRCode.toString(linki.pilot, { type: "svg", margin: 0, errorCorrectionLevel: "M" }) : null;
 
@@ -119,6 +125,16 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
           </div>
         ) : null}
       </div>
+
+      {!trwa && (
+        <section className="panel-sekcja">
+          <h2>Wyniki</h2>
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            {zadania.length > 0 ? `Pytań w grze: ${zadania.length}. ` : ""}Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy.
+          </p>
+          <TabelaWynikow graId={gra.id} wyniki={wyniki} liczbaPytan={zadania.length} />
+        </section>
+      )}
     </main>
   );
 }

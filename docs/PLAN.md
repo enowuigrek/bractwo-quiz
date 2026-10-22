@@ -227,6 +227,13 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Telefon: w `odpowiedzi` dalej pokazuje swój wynik pytania, a w `tabela` to samo co na podium.
 - Sprawdzone: SQL-em w wycofanej transakcji (kolejność, pusta lista w trakcie pytania jako `anon`, niedozwolone przejście odrzucone) oraz na żywo na localhost z tymczasową grą (14 graczy): ekran odpowiedzi i tabela na TV w 1920×1080, przyciski pilota w 375 px i przejście „Pokaż odpowiedzi graczy”. Tymczasowa gra i quiz są usunięte. Nie sprawdzone: 25–30 graczy (gęsty układ) i telefon gracza w nowych fazach.
 
+### Historia zakończonych gier w panelu (22.10)
+
+- Strona zakończonej gry (`/admin/gry/[id]`) ma sekcję **Wyniki**: tabela końcowa wszystkich graczy (miejsce z remisami, nick, punkty, dobre odpowiedzi x/N, średni czas; średni czas znika poniżej 560 px). Cały wiersz prowadzi do historii gracza.
+- **Historia gracza** (`/admin/gry/[id]/gracze/[gracz]`): pytanie po pytaniu jego odpowiedź (litera i treść), czas i punkty. Pasek z lewej jest zielony przy dobrej odpowiedzi, czerwony przy złej, szary przy braku odpowiedzi. Przy złej i braku pokazuje też poprawną. Na dole przejście do poprzedniego i następnego gracza w tabeli.
+- Bez zmian w bazie: panel liczy wyniki z tabel kluczem serwisowym (`gry/wyniki.ts`). Pytania gry to zadania quizu do `zadanie_nr`, na którym gra stanęła. Jeśli quiz zmieniono po grze, treści pytań i odpowiedzi są w obecnej wersji, a punkty i czasy z gry.
+- Sprawdzone na localhost na zakończonej grze LQRL (1280 px i 375 px), tylko podgląd, bez zmian w danych.
+
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 
 - Uruchamianie gry w panelu idzie krokami: **miasto → lokal → quiz** (+ okazja, tryb, bonus). Lista miast to unikalne wartości `lokale.miasto`, bez osobnej tabeli. Jeśli kiedyś miasta będą potrzebowały własnych danych, wydzielimy je wtedy.

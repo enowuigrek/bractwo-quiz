@@ -114,6 +114,7 @@ html:has(.panel) {
 
 /* Sekcja (np. karta „Nowy quiz”) pod listą albo komunikatem nie przykleja się do ostatniej linii */
 .panel-sekcja + .panel-sekcja,
+.uklad-dwa + .panel-sekcja,
 .lista + .panel-sekcja,
 .lista-pusta + .panel-sekcja,
 .blad + .panel-sekcja {
@@ -661,4 +662,147 @@ a.przycisk {
 .quiz-zapisz {
   padding-top: var(--section-gap);
   border-top: 1px solid var(--kamien2);
+}
+
+/* Tabela końcowa zakończonej gry; cały wiersz prowadzi do historii gracza */
+.tabela-wynikow {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 3px solid var(--zloto);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela-wynikow th {
+  text-align: left;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--kamien2);
+}
+
+.tabela-wynikow td {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--kamien2);
+}
+
+.tabela-wynikow tr {
+  position: relative;
+}
+
+.tabela-wynikow tbody tr:hover td {
+  background: var(--kamien);
+}
+
+.tabela-wynikow .liczba {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabela-wynikow .tw-miejsce {
+  width: 4.5em;
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+.tabela-wynikow .nick a {
+  color: var(--piana);
+  font-weight: var(--w-black);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.tabela-wynikow .nick a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.tabela-wynikow tbody tr:hover .nick a,
+.tabela-wynikow .nick a:focus-visible {
+  color: var(--zloto);
+}
+
+.tabela-wynikow tr.lider .nick a {
+  color: var(--zloto);
+}
+
+@media (max-width: 559px) {
+  .tabela-wynikow .na-szerokim {
+    display: none;
+  }
+}
+
+/* Historia gracza: pytanie po pytaniu */
+.historia > li {
+  align-items: flex-start;
+  padding: 14px 0 14px 12px;
+  border-left: 4px solid var(--kamien2);
+}
+
+.historia > li.historia-dobrze {
+  border-left-color: var(--chmiel);
+}
+
+.historia > li.historia-zle {
+  border-left-color: var(--czerwien);
+}
+
+.historia-nr {
+  min-width: 1.6em;
+}
+
+.historia-odp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 6px;
+}
+
+.historia-litera {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-round);
+  border: 2px solid var(--kamien2);
+  font-size: var(--fs-xxs);
+  font-weight: var(--w-black);
+}
+
+.historia-dobrze .historia-litera {
+  background: var(--chmiel);
+  border-color: var(--chmiel);
+  color: var(--na-chmielu);
+}
+
+.historia-zle .historia-litera {
+  border-color: var(--czerwien);
+  color: var(--czerwien);
+}
+
+.historia-czas {
+  color: var(--szary);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.historia-punkty {
+  flex: none;
+  min-width: 3.5em;
+  text-align: right;
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+  color: var(--szary);
+}
+
+.historia-dobrze .historia-punkty {
+  color: var(--chmiel);
+}
+
+.historia-nawigacja {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
