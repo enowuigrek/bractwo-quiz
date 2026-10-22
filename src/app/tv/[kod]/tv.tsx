@@ -3,8 +3,9 @@
 
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { fazaTeraz, komunikatBledu, pobierzStan, sekundy, useCzasSerwera, useNasluch } from "@/lib/gra/nasluch";
-import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
+import type { StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { PodiumTv, RankingTv } from "./ranking";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
@@ -28,6 +29,7 @@ export function Tv({ kod, qr, adres }: Props) {
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<string[]>([]);
   const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
+  const [odpowiedzi, ustawOdpowiedzi] = useState<WierszOdpowiedzi[]>([]);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [blad, ustawBlad] = useState<string | null>(null);
 
@@ -40,7 +42,12 @@ export function Tv({ kod, qr, adres }: Props) {
         if (error) throw error;
         ustawGraczy(data as string[]);
       }
-      if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "koniec") {
+      if (stan.faza === "odpowiedzi") {
+        const { data, error } = await supabase().rpc("odpowiedzi_zadania", { p_kod: kod });
+        if (error) throw error;
+        ustawOdpowiedzi(data as WierszOdpowiedzi[]);
+      }
+      if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {
         const { data, error } = await supabase().rpc("ranking", { p_kod: kod });
         if (error) throw error;
         ustawRanking(data as WierszRankingu[]);
@@ -79,8 +86,12 @@ export function Tv({ kod, qr, adres }: Props) {
               <Poczekalnia stan={stan} gracze={gracze} qr={qr} adres={adres} />
             ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
               <Pytanie stan={stan} teraz={teraz} />
+            ) : stan.faza === "odpowiedzi" ? (
+              <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
             ) : stan.faza === "ranking" ? (
               <RankingTv stan={stan} ranking={ranking} />
+            ) : stan.faza === "tabela" ? (
+              <TabelaTv stan={stan} ranking={ranking} />
             ) : (
               <Koniec stan={stan} ranking={ranking} />
             )}

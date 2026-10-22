@@ -155,10 +155,11 @@ export function Rozgrywka({
     );
   }
 
-  // faza `wynik`
+  // faza `wynik` albo `odpowiedzi` (TV pokazuje wtedy, kto jak odpowiedział)
   const poprawna = z.dane.poprawna;
-  const ocena = mojaZBazy && moj?.faza === "wynik" ? mojaZBazy : null;
-  const gotowe = moj && moj.zadanie_nr === z.nr && moj.faza === "wynik";
+  const poWyniku = moj?.faza === "wynik" || moj?.faza === "odpowiedzi";
+  const ocena = mojaZBazy && poWyniku ? mojaZBazy : null;
+  const gotowe = moj && moj.zadanie_nr === z.nr && poWyniku;
 
   return (
     <>

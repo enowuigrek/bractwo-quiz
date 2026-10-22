@@ -22,8 +22,10 @@ const NAZWY: Record<FazaWidoczna, string> = {
   przygotuj: "Odliczanie",
   pytanie: "Pytanie trwa",
   wynik: "Wynik",
+  odpowiedzi: "Odpowiedzi graczy",
   ranking: "Ranking",
   podium: "Podium",
+  tabela: "Tabela wyników",
   koniec: "Gra zakończona",
 };
 
@@ -167,7 +169,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </section>
       )}
 
-      {z && faza !== "poczekalnia" && faza !== "koniec" && faza !== "podium" && (
+      {z && faza !== "poczekalnia" && faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
         <section className="karta" style={{ marginTop: 18 }}>
           <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
             <span>
@@ -251,7 +253,22 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </button>
         )}
 
+        {/* po pytaniu: wynik → odpowiedzi → ranking → następne; każdy krok można pominąć */}
         {faza === "wynik" && (
+          <>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
+              Pokaż odpowiedzi graczy
+            </button>
+            <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
+              Pokaż ranking
+            </button>
+            <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+              {nastepne.napis}
+            </button>
+          </>
+        )}
+
+        {faza === "odpowiedzi" && (
           <>
             <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("ranking")}>
               Pokaż ranking
@@ -263,20 +280,48 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         )}
 
         {faza === "ranking" && (
-          <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-            {nastepne.napis}
+          <>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+              {nastepne.napis}
+            </button>
+            <button className="przycisk" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
+              Wróć do odpowiedzi graczy
+            </button>
+          </>
+        )}
+
+        {/* po ostatnim pytaniu obok podium jest pełna tabela */}
+        {stan.ostatnie_zadanie && (faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
+          <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
+            Pokaż pełną tabelę
           </button>
         )}
 
         {faza === "podium" && (
-          <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
-            Zakończ grę
-          </button>
+          <>
+            <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
+              Pokaż pełną tabelę
+            </button>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
+              Zakończ grę
+            </button>
+          </>
+        )}
+
+        {faza === "tabela" && (
+          <>
+            <button className="przycisk" disabled={wysylam} onClick={() => akcja("podium")}>
+              Pokaż podium
+            </button>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
+              Zakończ grę
+            </button>
+          </>
         )}
 
         {faza === "koniec" && <p className="pomocniczy">Gra zakończona. Piwu Cześć!</p>}
 
-        {faza !== "koniec" && faza !== "podium" && (
+        {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
           <button
             className="przycisk-cichy"
             style={{ marginTop: 24 }}

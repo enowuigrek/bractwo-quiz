@@ -27,8 +27,8 @@ Ustaw grę z 4–5 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami, jedno z
 | 6 | Pilot: Pokaż wynik | TV: poprawna na zielono, słupki, najszybszy. Telefon: „Dobrze! +… pkt” albo „Niestety źle”, miejsce. |
 | 7 | Jeden gracz nie odpowiada, a jeden blokuje ekran telefonu w trakcie pytania | Po odblokowaniu telefon dogania grę. Bez odpowiedzi jest „Brak odpowiedzi”. |
 | 8 | Pilot: Pokaż wynik, zanim minie czas | Pyta o potwierdzenie i kończy pytanie. |
-| 9 | Pilot: Pokaż ranking | Przetasowanie, „+zdobyte”, strzałki. Telefon: miejsce i zmiana. |
-| 10 | Ostatnie pytanie → Pokaż podium → Zakończ grę | Podium wjeżdża 3 → 2 → 1, na końcu podziękowanie. |
+| 9 | Pilot: Pokaż odpowiedzi graczy, potem Pokaż ranking | TV: zielona ramka z dobrymi od najszybszego, czerwona ze złymi, przy każdym odpowiedź i czas, na dole bez odpowiedzi. Potem ranking: przetasowanie, „+zdobyte”, strzałki. Telefon: miejsce i zmiana. |
+| 10 | Ostatnie pytanie → Pokaż podium → Pokaż pełną tabelę → Zakończ grę | Podium wjeżdża 3 → 2 → 1. Tabela: wszyscy gracze z punktami. Na końcu podziękowanie. |
 | 11 | Wyłącz na chwilę Wi‑Fi na TV | W rogu „Brak połączenia, ponawiam…”, a po powrocie sieci TV dogania grę sam. |
 | 12 | Pytanie z zaznaczonym „Bez limitu czasu” | TV, telefon i pilot pokazują „Bez limitu”, bez paska czasu. Po ostatniej odpowiedzi: „Wszyscy odpowiedzieli”. „Pokaż wynik”, zanim wszyscy odpowiedzą, pyta o potwierdzenie. Poprawna = 1000 pkt. |
 

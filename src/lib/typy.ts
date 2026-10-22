@@ -29,7 +29,7 @@ export type Zadanie = {
   dane: DaneWybor;
 };
 
-export type Faza = "poczekalnia" | "pytanie" | "wynik" | "ranking" | "podium" | "koniec";
+export type Faza = "poczekalnia" | "pytanie" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
 
 export type Sesja = {
   id: string;
@@ -51,8 +51,10 @@ export const NAZWY_FAZ: Record<Faza, string> = {
   poczekalnia: "poczekalnia",
   pytanie: "pytanie",
   wynik: "wynik",
+  odpowiedzi: "odpowiedzi",
   ranking: "ranking",
   podium: "podium",
+  tabela: "tabela",
   koniec: "zakończona",
 };
 

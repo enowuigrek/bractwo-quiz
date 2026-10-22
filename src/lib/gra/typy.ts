@@ -1,7 +1,16 @@
 // Odpowiedzi funkcji gry (RPC) tak, jak widzą je przeglądarki.
 
 /** Faza widziana przez klientów: `przygotuj` to `pytanie` przed `faza_od`. */
-export type FazaWidoczna = "poczekalnia" | "przygotuj" | "pytanie" | "wynik" | "ranking" | "podium" | "koniec";
+export type FazaWidoczna =
+  | "poczekalnia"
+  | "przygotuj"
+  | "pytanie"
+  | "wynik"
+  | "odpowiedzi"
+  | "ranking"
+  | "podium"
+  | "tabela"
+  | "koniec";
 
 export type ZadanieWidoczne = {
   id: string;
@@ -46,7 +55,7 @@ export type PilotStan = StanSesji & {
   ostatnie_zadanie: boolean;
 };
 
-export type AkcjaPilota = "nastepne" | "wynik" | "ranking" | "podium" | "koniec";
+export type AkcjaPilota = "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
 
 export type Dolaczenie = { token: string; nick: string; powrot: boolean };
 
@@ -66,6 +75,18 @@ export type MojWynik = {
   punkty: number;
   miejsce: number;
   liczba_graczy: number;
+};
+
+/**
+ * Wiersz funkcji `odpowiedzi_zadania` (od fazy `wynik`): kto i jak odpowiedział na bieżące zadanie.
+ * Kolejność z bazy: dobre od najszybszej, złe od najszybszej, bez odpowiedzi (`poprawna` = null).
+ */
+export type WierszOdpowiedzi = {
+  nick: string;
+  dane: { odpowiedz?: number } | null;
+  poprawna: boolean | null;
+  czas_ms: number | null;
+  punkty: number | null;
 };
 
 /** Wiersz funkcji `ranking`. `poprzednie_miejsce` i `zdobyte` dotyczą ostatniego jawnego pytania. */

@@ -39,7 +39,7 @@ export function Gracz({ kod }: { kod: string }) {
           const nowy = data as MojWynik;
           ustawMoj(nowy);
           // zmiana miejsca i punkty za ostatnie pytanie są tylko w rankingu (nick w grze jest unikalny)
-          if (nowy.faza === "ranking" || nowy.faza === "podium" || nowy.faza === "koniec") {
+          if (nowy.faza === "ranking" || nowy.faza === "podium" || nowy.faza === "tabela" || nowy.faza === "koniec") {
             const r = await supabase().rpc("ranking", { p_kod: kod });
             if (r.data) ustawMojWiersz((r.data as WierszRankingu[]).find((w) => w.nick === nowy.nick) ?? null);
           }
@@ -260,14 +260,21 @@ function WGrze({
     );
   }
 
-  if (stan.faza === "ranking" || stan.faza === "podium") {
+  if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "tabela") {
+    const poGrze = stan.faza !== "ranking";
     return (
       <>
         <p className="nadtytul">{ja.nick}</p>
-        <h1>{stan.faza === "podium" ? "Koniec quizu!" : "Ranking"}</h1>
+        <h1>{poGrze ? "Koniec quizu!" : "Ranking"}</h1>
         {moj && <Miejsce moj={moj} />}
         {stan.faza === "ranking" && mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
-        <p>{stan.faza === "podium" ? "Na telewizorze podium. Brawa dla najlepszych!" : "Patrz na telewizor."}</p>
+        <p>
+          {stan.faza === "podium"
+            ? "Na telewizorze podium. Brawa dla najlepszych!"
+            : stan.faza === "tabela"
+              ? "Na telewizorze pełna tabela wyników."
+              : "Patrz na telewizor."}
+        </p>
       </>
     );
   }

@@ -39,8 +39,10 @@ Kod sesji to krótki, czytelny ciąg (np. `PORT`), który da się też wpisać r
 ## Przebieg sesji (maszyna stanów)
 
 ```
-poczekalnia → przygotuj (3 s) → pytanie (czas) → wynik → ranking → [następne zadanie | podium] → koniec
+poczekalnia → przygotuj (3 s) → pytanie (czas) → wynik → [odpowiedzi] → [ranking] → [następne zadanie | podium ⇄ tabela] → koniec
 ```
+
+`odpowiedzi` i `ranking` prowadzący może pominąć. Po ostatnim pytaniu obok podium jest `tabela`: pełna lista graczy z punktami.
 
 Stan trzymamy w jednym wierszu `sesje` (`faza`, `zadanie_nr`, `faza_od`, `faza_do`). Zmienia go wyłącznie prowadzący przez funkcję w bazie. TV i telefony subskrybują ten wiersz przez Realtime i same rysują to, co trzeba.
 
@@ -87,6 +89,10 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - Niżej tytuł quizu i okazja („Dzień Porteru”), jeśli jest ustawiona.
 - Grafika sesji (`sesje.grafika_url`), jeśli ją dodano.
 - **Duży kod QR**, czytelny z każdego miejsca w lokalu, a obok kod gry do wpisania ręcznie i adres. Do tego lista graczy, którzy już dołączyli.
+
+**Po pytaniu:** wynik (poprawna na zielono, słupki, najszybszy), potem **odpowiedzi graczy**. W nagłówku treść pytania. Zielona ramka „Dobrze” z graczami od najszybszego (numer, nick, odpowiedź, czas), pod nią czerwona ramka „Źle” (nick, odpowiedź, czas), a na dole szara linia „Bez odpowiedzi”. Przy wielu graczach wiersze idą w 2–3 kolumnach, od góry do dołu, a od 17 graczy w gęstszym układzie. Potem ranking całej gry.
+
+**Po grze:** podium albo **tabela wyników** (wszyscy gracze: miejsce, nick, punkty, w 1–3 kolumnach, lider w złotej ramce). Pilot przełącza między nimi w obie strony.
 
 **Panel admina:** logo Bractwa w lewym górnym rogu z dopiskiem „panel”, wylogowanie po prawej, pod spodem nawigacja (gry, quizy, lokale). Strona główna dla graczy ma tylko logo i pole na kod.
 
@@ -212,6 +218,14 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 - **Pytanie bez limitu czasu** (pole „Bez limitu czasu” przy czasie): `zadania.czas_s = null`, a w trakcie pytania `sesje.faza_do` jest puste. Pytanie kończy się, gdy odpowiedzą wszyscy (baza ustawia wtedy `faza_do`, tak jak przy pytaniach na czas) albo gdy prowadzący kliknie „Pokaż wynik”. Pilot pyta wtedy o potwierdzenie, jeśli nie wszyscy odpowiedzieli. Bez bonusu za szybkość: poprawna odpowiedź = 1000 pkt. TV i telefon zamiast zegara i paska czasu pokazują „Bez limitu”, a po ostatniej odpowiedzi „Wszyscy odpowiedzieli”. Migracja `20261022141218_bez_limitu_czasu`, sprawdzona SQL-em w wycofanej transakcji.
 - **Okno potwierdzenia zamiast `window.confirm`:** `src/components/okno.tsx`. W panelu `PrzyciskPotwierdz`, na pilocie `usePotwierdzenie()`. W aplikacji nie zostało już żadne okno przeglądarki.
 - Sprawdzone na localhost (1280 px): lista quizów z dymkiem, nowy quiz, edycja nagłówka, pytanie z powtórzeniem i bez limitu, okno przy usuwaniu (Esc anuluje), „Zapisz quiz” wraca do listy, usunięcie quizu z listy. **Nie sprawdzone na żywo:** pytanie bez limitu na TV, telefonie i pilocie w prawdziwej grze (scenariusz w `docs/TEST.md`, punkt 12).
+
+### Nowe ekrany TV: odpowiedzi graczy i tabela wyników (22.10)
+
+- Nowe fazy `odpowiedzi` i `tabela` (migracja `20261022142232_odpowiedzi_i_tabela`). Przejścia w `pilot_akcja`: `odpowiedzi` z `wynik` albo `ranking`, `ranking` z `wynik` albo `odpowiedzi`, `podium` i `tabela` z `wynik`/`odpowiedzi`/`ranking` oraz nawzajem z siebie, `nastepne` także z `odpowiedzi`.
+- `odpowiedzi_zadania(kod)`: kto i jak odpowiedział na bieżące zadanie (nick, `dane`, `poprawna`, `czas_ms`, `punkty`). Zdradza poprawną, więc do fazy `wynik` zwraca pustą listę. `wewn.odslania_poprawna` obejmuje nowe fazy.
+- Pilot po wyniku: „Pokaż odpowiedzi graczy” (złoty), „Pokaż ranking”, następne pytanie / podium. Po ostatnim pytaniu dochodzi „Pokaż pełną tabelę”. Na podium: „Pokaż pełną tabelę” i „Zakończ grę”, w tabeli: „Pokaż podium” i „Zakończ grę”.
+- Telefon: w `odpowiedzi` dalej pokazuje swój wynik pytania, a w `tabela` to samo co na podium.
+- Sprawdzone: SQL-em w wycofanej transakcji (kolejność, pusta lista w trakcie pytania jako `anon`, niedozwolone przejście odrzucone) oraz na żywo na localhost z tymczasową grą (14 graczy): ekran odpowiedzi i tabela na TV w 1920×1080, przyciski pilota w 375 px i przejście „Pokaż odpowiedzi graczy”. Tymczasowa gra i quiz są usunięte. Nie sprawdzone: 25–30 graczy (gęsty układ) i telefon gracza w nowych fazach.
 
 ### Wybór miasta i lokalu (ustalone po dniu 1)
 
