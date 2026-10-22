@@ -679,3 +679,69 @@ html:has(.kolumna) {
 .fanfara-opis strong {
   color: var(--piana);
 }
+
+/* Karta nagrody na telefonie: do pokazania obsłudze. Mieniący się obrys i żywy zegar utrudniają podrobienie zrzutem */
+.karta-nagrody {
+  position: relative;
+  margin: 0 0 var(--section-gap);
+  padding: 20px var(--card-pad);
+  text-align: center;
+  background: var(--kamien);
+  border-radius: var(--r-card);
+  border: 3px solid transparent;
+  background-image: linear-gradient(var(--kamien), var(--kamien)),
+    linear-gradient(120deg, var(--zloto), var(--zloto-blask), var(--bursztyn), var(--zloto));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 100% 100%, 300% 300%;
+  animation: mienienie 3s linear infinite, wjazd-werdyktu 0.7s var(--ease-wjazd) 0.8s both;
+}
+
+@keyframes mienienie {
+  to {
+    background-position: 0 0, 300% 0;
+  }
+}
+
+.karta-nagrody p {
+  margin: 0;
+}
+
+.karta-nagrody-etykieta {
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--szary);
+}
+
+.karta-nagrody-nazwa {
+  margin-top: 6px !important;
+  font-size: 26px;
+  font-weight: var(--w-black);
+  line-height: 1.2;
+  color: var(--zloto);
+}
+
+.karta-nagrody-instrukcja {
+  margin-top: 10px !important;
+  font-size: var(--fs-body);
+}
+
+.karta-nagrody-dowod {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin-top: 14px !important;
+  padding-top: 12px;
+  border-top: 1px solid var(--kamien2);
+  font-size: var(--fs-small);
+  color: var(--szary);
+}
+
+.karta-nagrody-zegar {
+  font-variant-numeric: tabular-nums;
+  color: var(--piana);
+  font-weight: var(--w-black);
+}

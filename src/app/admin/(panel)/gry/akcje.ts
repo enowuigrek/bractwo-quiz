@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import type { StanFormularza } from "@/lib/typy";
+import type { Nagroda, StanFormularza } from "@/lib/typy";
 import { LIMITY } from "../quizy/limity";
 
 const MAX_OKAZJA = 80;
@@ -34,6 +34,19 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     return { blad: "Limit graczy musi być liczbą od 1 do 500." };
   }
 
+  // nagrody: tylko 1. miejsce albo pierwsza trójka, każde miejsce z własną instrukcją odbioru
+  const ileNagrod = dane.get("nagrody") === "3" ? 3 : dane.get("nagrody") === "1" ? 1 : 0;
+  const nagrody: Nagroda[] = [];
+  for (let m = 1; m <= ileNagrod; m++) {
+    const nagroda = String(dane.get(`nagroda_${m}`) ?? "").trim().replace(/\s+/g, " ");
+    const instrukcja = String(dane.get(`instrukcja_${m}`) ?? "").trim().replace(/\s+/g, " ");
+    if (!nagroda) return { blad: `Wpisz nagrodę za ${m}. miejsce.` };
+    if (nagroda.length > LIMITY.nagroda || instrukcja.length > LIMITY.instrukcja) {
+      return { blad: `Nagroda za ${m}. miejsce jest za długa.` };
+    }
+    nagrody.push({ miejsce: m as Nagroda["miejsce"], nagroda, instrukcja: instrukcja || null });
+  }
+
   const [{ data: lokal }, { count: pytania }] = await Promise.all([
     db.from("lokale").select("id").eq("id", lokal_id).maybeSingle(),
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
@@ -55,7 +68,17 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   const { data, error } = await db
     .from("sesje")
-    .insert({ lokal_id, quiz_id, okazja: okazja || null, tryb, czas_s, bonus_czas, max_graczy, grafika_url })
+    .insert({
+      lokal_id,
+      quiz_id,
+      okazja: okazja || null,
+      tryb,
+      czas_s,
+      bonus_czas,
+      max_graczy,
+      grafika_url,
+      nagrody: nagrody.length ? nagrody : null,
+    })
     .select("id")
     .single();
   if (error) {

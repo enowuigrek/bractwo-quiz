@@ -229,7 +229,15 @@ function WGrze({
   // podium, tabela i koniec to jeden ekran, żeby medal i konfetti nie startowały od nowa przy przejściach
   if (stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {
     return (
-      <KoniecGracza faza={stan.faza} fazaOd={stan.faza_od} przesuniecie={przesuniecie} moj={moj} nick={ja.nick} />
+      <KoniecGracza
+        faza={stan.faza}
+        fazaOd={stan.faza_od}
+        przesuniecie={przesuniecie}
+        moj={moj}
+        nick={ja.nick}
+        kod={stan.kod}
+        nagrody={stan.nagrody}
+      />
     );
   }
 

@@ -1071,3 +1071,18 @@
     box-shadow: 0 0 80px rgba(227, 172, 63, 0.8);
   }
 }
+
+/* Nagroda pod nickiem na podium */
+.tv-stopien-nagroda {
+  margin: -8px 0 16px;
+  padding: 6px 18px;
+  border: 2px solid var(--zloto);
+  border-radius: var(--r-pill);
+  color: var(--zloto);
+  font-size: 26px;
+  font-weight: var(--w-black);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

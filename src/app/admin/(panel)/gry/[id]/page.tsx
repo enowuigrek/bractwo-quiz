@@ -70,6 +70,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,
               gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",
               `graczy: ${gracze ?? 0}/${gra.max_graczy}`,
+              gra.nagrody?.length ? `nagrody: ${gra.nagrody.map((n) => `${n.miejsce}. ${n.nagroda}`).join(", ")}` : null,
             ]
               .filter(Boolean)
               .join(" · ")}

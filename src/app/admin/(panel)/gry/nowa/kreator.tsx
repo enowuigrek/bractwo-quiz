@@ -26,6 +26,7 @@ export function Kreator({ lokale, quizy }: Props) {
   const [quiz, setQuiz] = useState("");
   const [czas, setCzas] = useState<string>(String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
+  const [ileNagrod, setIleNagrod] = useState(0);
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
@@ -147,6 +148,57 @@ export function Kreator({ lokale, quizy }: Props) {
                 : "Z bonusem poprawna odpowiedź daje 500–1000 pkt zależnie od czasu, bez niego zawsze 1000."}
             </p>
           </div>
+
+          <fieldset>
+            <legend>Nagrody</legend>
+            <div className="wybor-czasu">
+              {[
+                { ile: 0, napis: "bez nagród" },
+                { ile: 1, napis: "za 1. miejsce" },
+                { ile: 3, napis: "za pierwszą trójkę" },
+              ].map((o) => (
+                <label key={o.ile} className={`wybor-czasu-opcja${ileNagrod === o.ile ? " wybrana" : ""}`}>
+                  <input
+                    type="radio"
+                    name="nagrody"
+                    value={o.ile}
+                    checked={ileNagrod === o.ile}
+                    onChange={() => setIleNagrod(o.ile)}
+                  />
+                  {o.napis}
+                </label>
+              ))}
+            </div>
+            {ileNagrod > 0 && (
+              <div className="nagrody-pola">
+                {Array.from({ length: ileNagrod }, (_, i) => i + 1).map((m) => (
+                  <div key={m} className="nagroda-pole">
+                    <span className="krok-nr">{m}.</span>
+                    <div>
+                      <input
+                        name={`nagroda_${m}`}
+                        className="pole"
+                        placeholder={m === 1 ? "Nagroda, np. Piwo z kija gratis" : "Nagroda"}
+                        aria-label={`Nagroda za ${m}. miejsce`}
+                        maxLength={LIMITY.nagroda}
+                        required
+                      />
+                      <input
+                        name={`instrukcja_${m}`}
+                        className="pole pole-male"
+                        placeholder="Jak odebrać (opcjonalnie), np. Pokaż ten ekran barmanowi"
+                        aria-label={`Jak odebrać nagrodę za ${m}. miejsce`}
+                        maxLength={LIMITY.instrukcja}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <p className="podpowiedz">
+                  Nagroda pokaże się na podium na TV, a zwycięzca zobaczy ją na telefonie razem z instrukcją.
+                </p>
+              </div>
+            )}
+          </fieldset>
 
           <div className="wiersz-pol">
             <div>

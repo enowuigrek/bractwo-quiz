@@ -1,5 +1,9 @@
 // Odpowiedzi funkcji gry (RPC) tak, jak widzą je przeglądarki.
 
+import type { Nagroda } from "../typy";
+
+export type { Nagroda };
+
 /** Faza widziana przez klientów: `przygotuj` to `pytanie` przed `faza_od`. */
 export type FazaWidoczna =
   | "poczekalnia"
@@ -36,6 +40,8 @@ export type StanSesji = {
   okazja: string | null;
   grafika_url: string | null;
   bonus_czas: boolean;
+  /** Nagrody za miejsca (null: bez nagród). Nie są tajne. */
+  nagrody: Nagroda[] | null;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
   quiz: { tytul: string; liczba_zadan: number } | null;

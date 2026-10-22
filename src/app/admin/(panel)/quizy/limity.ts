@@ -11,6 +11,8 @@ export const LIMITY = {
   /** Do wyboru przy uruchamianiu gry; `null` = bez limitu. */
   czasyGry: [10, 20, 30, 45, null] as (number | null)[],
   domyslnyCzas: 20,
+  nagroda: 80,
+  instrukcja: 160,
 } as const;
 
 /** „1 pytanie”, „3 pytania”, „5 pytań”. */

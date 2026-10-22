@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { odslonaPodiumS } from "@/lib/gra/podium";
-import type { MojWynik } from "@/lib/gra/typy";
+import type { MojWynik, Nagroda } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { Miejsce } from "./rozgrywka";
 
@@ -15,14 +15,17 @@ type Props = {
   przesuniecie: number;
   moj: MojWynik | null;
   nick: string;
+  kod: string;
+  nagrody: Nagroda[] | null;
 };
 
 /**
  * Koniec quizu na telefonie. Na podium miejsce odsłania się razem ze stopniem na TV
  * (wcześniej „werble”), a pierwsza trójka dostaje medal i konfetti.
  */
-export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick }: Props) {
+export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagrody }: Props) {
   const miejsce = moj?.miejsce ?? null;
+  const nagroda = nagrody?.find((n) => n.miejsce === miejsce) ?? null;
   const [odslonieto, ustawOdslonieto] = useState(faza !== "podium");
   const wystrzelone = useRef(false);
 
@@ -69,6 +72,7 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick }: Props) {
             {miejsce}. miejsce z {moj.liczba_graczy} · <strong>{moj.punkty.toLocaleString("pl-PL")} pkt</strong>
           </p>
         </div>
+        {nagroda && <KartaNagrody nagroda={nagroda} nick={nick} kod={kod} />}
         {podziekowanie}
       </>
     );
@@ -88,5 +92,36 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick }: Props) {
       </p>
       {podziekowanie}
     </>
+  );
+}
+
+/** Żywy zegar (sekundy) na karcie nagrody: zrzut ekranu od razu widać po zatrzymanym czasie. */
+function useZegar() {
+  const [teraz, ustawTeraz] = useState<Date | null>(null);
+  useEffect(() => {
+    const tik = () => ustawTeraz(new Date());
+    tik();
+    const zegar = setInterval(tik, 1000);
+    return () => clearInterval(zegar);
+  }, []);
+  return teraz;
+}
+
+/** Karta nagrody do pokazania obsłudze: nagroda, instrukcja, nick, kod gry i żywy zegar. */
+function KartaNagrody({ nagroda, nick, kod }: { nagroda: Nagroda; nick: string; kod: string }) {
+  const teraz = useZegar();
+  return (
+    <section className="karta-nagrody" aria-label="Twoja nagroda">
+      <p className="karta-nagrody-etykieta">Twoja nagroda</p>
+      <p className="karta-nagrody-nazwa">{nagroda.nagroda}</p>
+      {nagroda.instrukcja && <p className="karta-nagrody-instrukcja">{nagroda.instrukcja}</p>}
+      <p className="karta-nagrody-dowod">
+        <span>{nick}</span>
+        <span>gra {kod}</span>
+        <span className="karta-nagrody-zegar">
+          {teraz?.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+        </span>
+      </p>
+    </section>
   );
 }

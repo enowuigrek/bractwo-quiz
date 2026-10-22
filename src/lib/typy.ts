@@ -31,6 +31,9 @@ export type Zadanie = {
   dane: DaneWybor;
 };
 
+/** Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”. */
+export type Nagroda = { miejsce: 1 | 2 | 3; nagroda: string; instrukcja: string | null };
+
 export type Faza = "poczekalnia" | "pytanie" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
 
 export type Sesja = {
@@ -44,6 +47,8 @@ export type Sesja = {
   bonus_czas: boolean;
   /** Czas na odpowiedź w s, jeden dla wszystkich pytań; `null`: bez limitu. */
   czas_s: number | null;
+  /** Nagrody za miejsca; `null`: bez nagród. */
+  nagrody: Nagroda[] | null;
   max_graczy: number;
   faza: Faza;
   zadanie_nr: number;

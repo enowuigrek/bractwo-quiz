@@ -313,6 +313,7 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
           odRazu={koniec}
           // początek podium w zegarze tego urządzenia: TV i telefony odsłaniają miejsca razem
           start={stan.faza_od ? Date.parse(stan.faza_od) - przesuniecie : null}
+          nagrody={stan.nagrody}
         />
       ) : (
         <div className="tv-srodek">

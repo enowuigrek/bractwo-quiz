@@ -247,6 +247,16 @@ Na później (POMYSLY.md): własne plansze na ekranie lokalu dodawane w panelu; 
 - Panel: nawigacja **Quizy · Rozgrywki · ▶ Uruchom quiz · ⚙ (lokale)**. Adresy zostały (`/admin/gry`, `/admin/lokale`), zmieniły się tylko nazwy. Kreator gry ma czas w pigułkach 10/20/30/45 s / bez limitu, a bonus przy „bez limitu” jest wyłączony. Strona gry: „Prowadź z tego telefonu” (pilot w tej samej karcie), „Przekaż prowadzącemu” (QR pod rozwijanym nagłówkiem), karta ekranu lokalu z ostrzeżeniem, gdy w lokalu trwa inna gra. Pilot ma link „← Panel obsługi”.
 - Sprawdzone: SQL w wycofanej transakcji (adresy, ekran lokalu jako `anon`, czas 10 s, 747 pkt po 5 s, ekran po końcu gry) i na localhost: plansze, poczekalnia, automatyczne przełączenie ekranu Piwiarni w Alejach po uruchomieniu gry z kreatora (30 s), pilot ze startem i oknem potwierdzenia, powrót do plansz po usunięciu gry, lokale z adresem i QR, `/tv/umvw` → `/ekran/UMVW`, `/ekran`. Testowa gra GHNV jest usunięta. Nie sprawdzone: telefon gracza w nowej poczekalni i Realtime na produkcji (lokalnie mogło zadziałać odpytywanie co 5 s).
 
+### Nagrody, selfie i nowe typy pytań (ustalone 22.10)
+
+1. **Nagrody** (ustawienie rozgrywki w kreatorze): bez nagród / tylko 1. miejsce / pierwsza trójka. Każde nagradzane miejsce ma własną nazwę nagrody i własną, opcjonalną instrukcję odbioru (np. „Pokaż ten ekran barmanowi”). Na telefonie nagradzanego gracza pod medalem jest karta nagrody z instrukcją, nickiem, kodem gry i żywym zegarem (trudniej podrobić zrzut ekranu). Na TV nagroda jest pod nickiem na podium.
+2. **Selfie przy dołączaniu** (opcjonalne): przedni aparat, telefon sam przycina i zmniejsza zdjęcie, zapis przez serwer z tokenem gracza. Zdjęcie w kółku przy nicku (poczekalnia, ranking, odpowiedzi, podium, telefon), a bez zdjęcia kółko z pierwszą literą. Prowadzący może usunąć zdjęcie z pilota. Zdjęcia znikają same po 7 dniach, a historia gry zostaje bez nich.
+3. **Nowe typy pytań:** wielokrotny wybór, kolejność (stukanie po kolei z „Cofnij”), łączenie w pary (stuknij lewy, potem prawy). Punktacja częściowa: ułamek poprawności razy punkty pytania (z bonusem za szybkość). W wielokrotnym wyborze błędnie zaznaczone odejmują.
+
+Kolejność: nagrody → selfie → typy pytań, każda rzecz osobno wypchnięta.
+
+**Nagrody ✅ (migracja `20261022160506_nagrody`):** `sesje.nagrody` jsonb (null albo `[{miejsce, nagroda, instrukcja}]`, 1–3 pozycje), zwracane w `stan_sesji`. W kreatorze jest wybór „bez nagród / za 1. miejsce / za pierwszą trójkę”, a przy każdym miejscu nagroda i opcjonalna instrukcja. TV pokazuje nagrodę w złotej pigułce pod punktami na podium. Telefon pokazuje kartę nagrody z mieniącą się ramką, nickiem, kodem gry i tykającym zegarem. Przy remisie obaj gracze widzą nagrodę za to miejsce, a o wydaniu decyduje obsługa. Sprawdzone na localhost z tymczasową grą KRBN (usunięta): telefon zwycięzcy, podium na TV, pola w kreatorze.
+
 ### Fanfary na podium (22.10)
 
 - **TV:** gdy wjeżdża zwycięzca, konfetti wybucha z obu dolnych rogów i przez 6 s pada złoty deszcz (`canvas-confetti`, kolory z design systemu, wyłączone przy `prefers-reduced-motion`). Nad zwycięzcą jest napis „Zwycięzca”, a jego stopień pulsuje blaskiem. Na końcu gry jest krótszy wybuch.

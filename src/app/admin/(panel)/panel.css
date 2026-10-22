@@ -897,3 +897,31 @@ a.przycisk {
     display: none;
   }
 }
+
+/* Nagrody w kreatorze gry: przy każdym miejscu nagroda i instrukcja odbioru */
+.nagrody-pola {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.nagroda-pole {
+  display: grid;
+  grid-template-columns: 2em 1fr;
+  align-items: start;
+  gap: 8px;
+}
+
+.nagroda-pole .krok-nr {
+  padding-top: 14px;
+}
+
+.nagroda-pole > div {
+  display: grid;
+  gap: 6px;
+}
+
+.pole.pole-male {
+  font-size: var(--fs-small);
+  padding: 10px 14px;
+}
