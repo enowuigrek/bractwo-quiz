@@ -22,7 +22,7 @@ Zasady:
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.
 - `/api/keepalive` (Vercel Cron raz dziennie) trzyma bazę obudzoną i łączy się z Realtime, żeby istniały partycje `realtime.messages`. Nie usuwaj części z Realtime. Lista przed eventem i scenariusz testu są w `docs/TEST.md`.
 - Domena `bractwopiwne.pl` jest w Hostido, a poczta w Google Workspace. Rekordów MX nie ruszamy.
-- Na razie działamy pod adresem `*.vercel.app`, a `quiz.bractwopiwne.pl` podepniemy na końcu. Nigdzie nie wpisuj domeny na sztywno: linki i kody QR buduj z adresu bieżącego żądania (albo `NEXT_PUBLIC_SITE_URL`), żeby zmiana domeny nie wymagała zmian w kodzie.
+- Aplikacja działa pod `https://quiz.bractwopiwne.pl`: rekord A `quiz` → `76.76.21.21` w strefie DNS na hostingu Hostido (DirectAdmin konta host367070 → Zarządzanie DNS, nie w panelu domeny), certyfikat wystawia i odnawia Vercel. Nigdzie nie wpisuj domeny na sztywno: linki i kody QR buduj z adresu bieżącego żądania (albo `NEXT_PUBLIC_SITE_URL`), żeby zmiana domeny nie wymagała zmian w kodzie.
 
 ## Koniec etapu
 

@@ -114,7 +114,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | 3 ✅ | sesja na żywo: dołączanie graczy, poczekalnia na TV z QR, pilot |
 | 4 ✅ | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
 | 5 ✅ | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
-| 6 ✅ (część po twojej stronie) | deploy ✅, keepalive ✅, checklista testu ✅ ([TEST.md](TEST.md)); do zrobienia przez ciebie: domena `quiz.bractwopiwne.pl` w Vercelu + CNAME w Hostido, `CRON_SECRET`, test z kilkoma telefonami |
+| 6 ✅ | deploy ✅, keepalive ✅, checklista testu ✅ ([TEST.md](TEST.md)), domena `quiz.bractwopiwne.pl` ✅ (22.10, rekord A w Hostido), `CRON_SECRET` ✅; zostaje test z kilkoma telefonami |
 | 7 | poprawki po teście, bufor |
 
 **Poza MVP:** wszystko z [POMYSLY.md](POMYSLY.md).
@@ -289,6 +289,13 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - **Ekran lokalu po grze:** na pilocie po końcu „Pokaż plansze na ekranie lokalu” (`ekran_zwolniony`), bez tego plansze wracają same po 10 minutach. Przez 6 godzin po grze plansze mają dodatkową: „Zwycięzcy ostatniego quizu” z pierwszą trójką (gracze z punktami).
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
+
+### Domena, strona główna i „Jak to działa” (22.10)
+
+- **Domena ✅:** `https://quiz.bractwopiwne.pl` działa. Rekord A `quiz` → `76.76.21.21` jest w strefie DNS na hostingu Hostido (konto host367070, DirectAdmin → Zarządzanie DNS). Panel domeny zostaje na „Przekierowanie na serwery DNS”, a MX Google są nietknięte. Certyfikat Let's Encrypt wystawił Vercel (`vercel certs issue`, sam się nie wystawił po dodaniu rekordu), `http://` przekierowuje na `https://`.
+- **Strona główna:** pole na kod gry („Grasz?”), lista ekranów lokali z logami i linkami `/ekran/<adres>` (ISR co 5 minut), a dla prowadzących „Panel obsługi” i „Jak to działa?”.
+- **`/jak-to-dziala`:** opis całości dla prowadzących i obsługi (do przeczytania przez Zbyszka przed testem): cztery ekrany, wieczór krok po kroku, punkty, rodzaje pytań, nagrody, uczciwość, co robić przy awariach i lista do testu.
+- **Favicon:** logo Bractwa z bractwopiwne.pl (`src/app/icon.png`, `apple-icon.png`) zamiast ikony Next.js.
 
 ### Poprawki po trzecim teście (22.10)
 
