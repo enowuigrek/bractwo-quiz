@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePotwierdzenie } from "@/components/okno";
 import { odslonaPodiumS } from "@/lib/gra/podium";
 /* eslint-disable @next/next/no-img-element -- selfie z bucketu Supabase w medalu */
 import type { MojWynik, Nagroda } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
+import { komunikatBledu } from "@/lib/gra/nasluch";
+import { supabase } from "@/lib/supabase/przegladarka";
 import { Miejsce } from "./rozgrywka";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
@@ -17,6 +20,7 @@ type Props = {
   moj: MojWynik | null;
   nick: string;
   kod: string;
+  token: string;
   nagrody: Nagroda[] | null;
   /** Selfie gracza: na podium pokazuje się w medalu. */
   zdjecie: string | null;
@@ -26,7 +30,7 @@ type Props = {
  * Koniec quizu na telefonie. Na podium miejsce odsłania się razem ze stopniem na TV
  * (wcześniej „werble”), a pierwsza trójka dostaje medal i konfetti.
  */
-export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagrody, zdjecie }: Props) {
+export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token, nagrody, zdjecie }: Props) {
   const miejsce = moj?.miejsce ?? null;
   const nagroda = nagrody?.find((n) => n.miejsce === miejsce) ?? null;
   const [odslonieto, ustawOdslonieto] = useState(faza !== "podium");
@@ -84,7 +88,9 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, nagro
             {miejsce}. miejsce z {moj.liczba_graczy} · <strong>{moj.punkty.toLocaleString("pl-PL")} pkt</strong>
           </p>
         </div>
-        {nagroda && <KartaNagrody nagroda={nagroda} nick={nick} kod={kod} />}
+        {nagroda && (
+          <KartaNagrody nagroda={nagroda} nick={nick} kod={kod} token={token} odebrana={moj.nagroda_odebrana} />
+        )}
         {podziekowanie}
       </>
     );
@@ -119,9 +125,49 @@ function useZegar() {
   return teraz;
 }
 
-/** Karta nagrody do pokazania obsłudze: nagroda, instrukcja, nick, kod gry i żywy zegar. */
-function KartaNagrody({ nagroda, nick, kod }: { nagroda: Nagroda; nick: string; kod: string }) {
+const godzina = (iso: string) => new Date(iso).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+
+/**
+ * Karta nagrody do pokazania obsłudze: nagroda, instrukcja, nick, kod gry i żywy zegar.
+ * Po wydaniu nagrody barman klika „Potwierdź odbiór”: karta zmienia się w „ODEBRANA o …”,
+ * więc tym samym ekranem nie da się odebrać drugi raz.
+ */
+function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; token: string; odebrana: string | null }) {
+  const { nagroda, nick, kod, token } = props;
   const teraz = useZegar();
+  const [odebrana, ustawOdebrana] = useState(props.odebrana);
+  const [blad, ustawBlad] = useState<string | null>(null);
+  const [potwierdz, okno] = usePotwierdzenie();
+
+  async function odbierz() {
+    const tak = await potwierdz(
+      "Kliknij dopiero przy barze, gdy dostaniesz nagrodę. Potem karta pokaże „Odebrana” i nie da się jej użyć drugi raz.",
+      { tak: "Nagroda wydana" },
+    );
+    if (!tak) return;
+    const { data, error } = await supabase().rpc("odbierz_nagrode", { p_token: token });
+    if (error) {
+      ustawBlad(komunikatBledu(error));
+      return;
+    }
+    ustawOdebrana((data as { odebrana: string }).odebrana);
+  }
+
+  const widocznaOdebrana = odebrana ?? props.odebrana;
+  if (widocznaOdebrana) {
+    return (
+      <section className="karta-nagrody odebrana" aria-label="Nagroda odebrana">
+        <p className="karta-nagrody-etykieta">Twoja nagroda</p>
+        <p className="karta-nagrody-nazwa">{nagroda.nagroda}</p>
+        <p className="karta-nagrody-pieczatka">Odebrana o {godzina(widocznaOdebrana)}</p>
+        <p className="karta-nagrody-dowod">
+          <span>{nick}</span>
+          <span>gra {kod}</span>
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="karta-nagrody" aria-label="Twoja nagroda">
       <p className="karta-nagrody-etykieta">Twoja nagroda</p>
@@ -134,6 +180,15 @@ function KartaNagrody({ nagroda, nick, kod }: { nagroda: Nagroda; nick: string; 
           {teraz?.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
         </span>
       </p>
+      <button type="button" className="przycisk-zdjecie karta-nagrody-odbior" onClick={() => void odbierz()}>
+        Potwierdź odbiór (klika barman)
+      </button>
+      {blad && (
+        <p className="blad" role="alert" style={{ marginTop: 8 }}>
+          {blad}
+        </p>
+      )}
+      {okno}
     </section>
   );
 }

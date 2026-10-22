@@ -867,3 +867,35 @@ html:has(.kolumna) {
 .autor a {
   color: var(--szary);
 }
+
+/* Odbiór nagrody: przycisk dla barmana i „pieczątka” po odbiorze */
+.karta-nagrody-odbior {
+  margin-top: 14px;
+  width: 100%;
+}
+
+.karta-nagrody.odebrana {
+  animation: none;
+  background-image: none;
+  border-color: var(--kamien2);
+  opacity: 0.85;
+}
+
+.karta-nagrody.odebrana .karta-nagrody-nazwa {
+  color: var(--szary);
+  text-decoration: line-through;
+}
+
+.karta-nagrody-pieczatka {
+  display: inline-block;
+  margin-top: 12px !important;
+  padding: 6px 14px;
+  border: 3px solid var(--czerwien);
+  border-radius: var(--r-pole);
+  color: var(--czerwien);
+  font-size: 22px;
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transform: rotate(-4deg);
+}

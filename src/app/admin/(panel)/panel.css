@@ -925,3 +925,49 @@ a.przycisk {
   font-size: var(--fs-small);
   padding: 10px 14px;
 }
+
+/* Pasek nawigacji: na telefonie przewija się w poziomie, więc dajemy zapas na obwódkę aktywnej ⚙.
+   Na komputerze nic nie przycinamy (dymek „Ustawienia” i obwódka mieszczą się w całości). */
+.panel-nawigacja {
+  padding: 3px 4px;
+}
+
+@media (min-width: 960px) {
+  .panel-nawigacja {
+    overflow: visible;
+  }
+}
+
+/* dymek przy ⚙ pod ikoną: nad nią jest już górna krawędź strony */
+.panel-nawigacja [data-podpis]::after {
+  bottom: auto;
+  top: calc(100% + 8px);
+  transform: translate(-50%, -4px);
+}
+
+.panel-nawigacja [data-podpis]:hover::after,
+.panel-nawigacja [data-podpis]:focus-visible::after {
+  transform: translate(-50%, 0);
+}
+
+/* Telefon: zakładki po lewej, „Uruchom” i ⚙ dosunięte do prawej. Na komputerze całość stoi przy prawej. */
+@media (max-width: 959px) {
+  .panel-nawigacja {
+    gap: 2px;
+    scrollbar-width: none;
+  }
+
+  .panel-nawigacja a {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .panel-nawigacja a.nawigacja-start {
+    margin-left: auto;
+    padding: 8px 12px;
+  }
+
+  .panel-nawigacja a.nawigacja-ustawienia {
+    margin-left: 6px;
+  }
+}

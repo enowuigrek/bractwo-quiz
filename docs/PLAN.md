@@ -255,6 +255,12 @@ Na później (POMYSLY.md): własne plansze na ekranie lokalu dodawane w panelu; 
 
 Kolejność: nagrody → selfie → typy pytań, każda rzecz osobno wypchnięta.
 
+**Odbiór nagrody ✅ (migracja `20261022162708_odbior_nagrody`):** `gracze.nagroda_odebrana`, funkcja `odbierz_nagrode(token)`: tylko po podium i tylko dla nagradzanego miejsca, drugie kliknięcie nic nie zmienia. Na karcie nagrody jest przycisk „Potwierdź odbiór (klika barman)” z oknem potwierdzenia, a po odbiorze nagroda jest przekreślona i ma pieczątkę „ODEBRANA O 18:28” (także po odświeżeniu). Sprawdzone na localhost z tymczasową grą FHCK (usunięta): odbiór zwycięzcy i odmowa dla gracza bez nagrody.
+
+**Nawigacja (poprawka 22.10):** kolejność Rozgrywki, Quizy. Na telefonie zakładki po lewej, „▶ Uruchom” i ⚙ po prawej. Na komputerze pasek nie przycina dymka „Ustawienia” (pokazuje się pod ikoną) ani obwódki ⚙.
+
+**Typy pytań, baza ✅ (migracja `20261022162605_typy_pytan`):** `wewn.ocena(typ, dane, odpowiedź)` zwraca 0..1 dla `wybor`, `wielokrotny`, `kolejnosc` i `pary`, ze ścisłym sprawdzaniem odpowiedzi (`wewn.indeksy_ok`). `odpowiedzi.ocena`, punkty = punkty pytania × ocena, rozkład także dla wielokrotnego wyboru, a ekran odpowiedzi sortuje po ocenie. Sprawdzone SQL-em. Edytor, telefon i TV dla nowych typów są w toku.
+
 **Kranoprzejęcie ✅ (migracja `20261022162137_browar`):** opcjonalna nazwa i logo gościnnego browaru przy grze (`sesje.browar_nazwa`, `browar_logo_url`, w `stan_sesji` jako `browar`). TV: logo po znaku „×” obok logo Bractwa i lokalu we wszystkich nagłówkach, a w poczekalni napis „Kranoprzejęcie: …”. Telefon: nazwa w formularzu dołączania. Logo znika z magazynu razem z grą. Podpis „Aplikacja: lukasznowak.dev” jest drobno w rogu planszy i ekranu końca na TV oraz pod podziękowaniem na telefonie (link). „Dzięki za grę” pod medalem jest wyśrodkowane.
 
 **Nagrody ✅ (migracja `20261022160506_nagrody`):** `sesje.nagrody` jsonb (null albo `[{miejsce, nagroda, instrukcja}]`, 1–3 pozycje), zwracane w `stan_sesji`. W kreatorze jest wybór „bez nagród / za 1. miejsce / za pierwszą trójkę”, a przy każdym miejscu nagroda i opcjonalna instrukcja. TV pokazuje nagrodę w złotej pigułce pod punktami na podium. Telefon pokazuje kartę nagrody z mieniącą się ramką, nickiem, kodem gry i tykającym zegarem. Przy remisie obaj gracze widzą nagrodę za to miejsce, a o wydaniu decyduje obsługa. Sprawdzone na localhost z tymczasową grą KRBN (usunięta): telefon zwycięzcy, podium na TV, pola w kreatorze.

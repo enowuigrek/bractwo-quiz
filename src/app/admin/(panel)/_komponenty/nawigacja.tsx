@@ -6,8 +6,8 @@ import { IkonaUstawienia } from "./ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
 const POZYCJE = [
-  { href: "/admin/quizy", tekst: "Quizy" },
   { href: "/admin/gry", tekst: "Rozgrywki" },
+  { href: "/admin/quizy", tekst: "Quizy" },
 ] as const;
 
 export function Nawigacja() {

@@ -253,6 +253,7 @@ function WGrze({
         moj={moj}
         nick={ja.nick}
         kod={stan.kod}
+        token={ja.token}
         nagrody={stan.nagrody}
         zdjecie={moj?.zdjecie ?? null}
       />

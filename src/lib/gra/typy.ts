@@ -83,7 +83,9 @@ export type MojWynik = {
   faza: FazaWidoczna;
   zadanie_nr: number;
   /** `poprawna` i `punkty` dopiero od fazy `wynik`. */
-  odpowiedz: { dane: { odpowiedz?: number }; czas_ms: number; poprawna?: boolean; punkty?: number } | null;
+  odpowiedz: { dane: { odpowiedz?: number }; czas_ms: number; poprawna?: boolean; punkty?: number; ocena?: number } | null;
+  /** Kiedy obsługa potwierdziła odbiór nagrody (null: jeszcze nie). */
+  nagroda_odebrana: string | null;
   punkty: number;
   miejsce: number;
   liczba_graczy: number;
