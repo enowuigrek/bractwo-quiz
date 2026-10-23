@@ -1307,3 +1307,10 @@ html:has(.kolumna) {
   color: var(--zloto);
   text-align: center;
 }
+
+/* Po wyniku pytania o kolejność: ułożenie gracza jednym wierszem pod właściwą kolejnością */
+.odp-twoja-kolejnosc {
+  margin: 8px 0 0;
+  font-size: var(--fs-xs);
+  color: var(--szary);
+}

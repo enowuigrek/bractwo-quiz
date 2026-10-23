@@ -59,7 +59,7 @@ function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null })
         </span>
       ))}
       {z.typ !== "wielokrotny" && (
-        <span className="tv-odpowiedzi-tekst">{ulamek(o.ocena ?? 0, liczbaCzesci(z.typ, z.dane))} na miejscu</span>
+        <span className="tv-odpowiedzi-tekst">{ulamek(o.ocena ?? 0, liczbaCzesci(z.typ, z.dane))}</span>
       )}
       {o.punkty ? <span className="tv-odpowiedzi-tekst">+{o.punkty}</span> : null}
     </>

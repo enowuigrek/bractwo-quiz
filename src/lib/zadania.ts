@@ -9,7 +9,10 @@ export type TypZadania = (typeof TYPY_ZADAN)[number];
 export type DaneWybor = { odpowiedzi: string[]; poprawna: number };
 /** Kilka poprawnych (indeksy). Odpowiedź gracza: `{ odpowiedzi: [0, 2] }`. */
 export type DaneWielokrotny = { odpowiedzi: string[]; poprawna: number[] };
-/** Elementy pomieszane do pokazania, `poprawna` = indeksy we właściwej kolejności. Odpowiedź: `{ kolejnosc: [..] }`. */
+/**
+ * Elementy pomieszane do pokazania, `poprawna` = indeksy we właściwej kolejności. Odpowiedź: `{ kolejnosc: [..] }`.
+ * Ocena: część dobrze ułożonych par sąsiadów (n − 1 par), patrz `wewn.ocena`.
+ */
 export type DaneKolejnosc = { elementy: string[]; poprawna: number[] };
 /** `prawe` pomieszane, `poprawna[i]` = indeks prawego dla i-tego lewego. Odpowiedź: `{ pary: [..] }`. */
 export type DanePary = { lewe: string[]; prawe: string[]; poprawna: number[] };
@@ -87,10 +90,10 @@ export function ulamek(ocena: number, n: number): string {
   return `${Math.round(ocena * n)}/${n}`;
 }
 
-/** Liczba części pytania (do „3/4”): poprawne w wielokrotnym, elementy, pary. */
+/** Liczba części pytania (do „3/4”): poprawne w wielokrotnym, pary sąsiadów w kolejności (n − 1), pary. */
 export function liczbaCzesci(typ: TypZadania, dane: DaneWidoczne): number {
   if (typ === "wielokrotny") return Array.isArray(dane.poprawna) ? dane.poprawna.length : 1;
-  if (typ === "kolejnosc") return dane.elementy?.length ?? 1;
+  if (typ === "kolejnosc") return Math.max(1, (dane.elementy?.length ?? 2) - 1);
   if (typ === "pary") return dane.lewe?.length ?? 1;
   return 1;
 }

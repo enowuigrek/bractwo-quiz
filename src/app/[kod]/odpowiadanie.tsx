@@ -275,26 +275,28 @@ export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowie
   }
   if (z.typ === "kolejnosc" && Array.isArray(p)) {
     const el = z.dane.elementy ?? [];
+    const twoja = moja?.kolejnosc ?? null;
+    // para sąsiadów (i, i+1) jest dobra, gdy u gracza element p[i+1] stoi tuż za p[i] (tak liczy `wewn.ocena`)
+    const dobraPara = (i: number) => !!twoja && i + 1 < p.length && twoja[twoja.indexOf(p[i]) + 1] === p[i + 1];
     return (
-      <ol className="odp-lista">
-        {p.map((idx, pozycja) => {
-          const twoja = moja?.kolejnosc?.[pozycja];
-          const trafiona = twoja === idx;
-          return (
-            <li key={pozycja}>
-              {/* pokazujemy właściwą kolejność; przy pomyłce dopisek, co gracz tu ułożył */}
-              <div className={`odp${trafiona ? " poprawna" : moja ? " nietrafiona" : ""}`}>
-                <span className="odp-litera">{pozycja + 1}</span>
-                <span className="odp-tekst">
-                  {el[idx]}
-                  {moja && !trafiona && twoja !== undefined && <span className="odp-twoja">Ty: {el[twoja]}</span>}
-                </span>
-                {moja && <span className={trafiona ? "ok" : "zle"}>{trafiona ? "✓" : "✗"}</span>}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+      <>
+        <ol className="odp-lista">
+          {p.map((idx, pozycja) => {
+            // zielony element ma przynajmniej jednego dobrego sąsiada
+            const dobry = dobraPara(pozycja) || (pozycja > 0 && dobraPara(pozycja - 1));
+            return (
+              <li key={pozycja}>
+                <div className={`odp${dobry ? " poprawna" : twoja ? " nietrafiona" : ""}`}>
+                  <span className="odp-litera">{pozycja + 1}</span>
+                  <span className="odp-tekst">{el[idx]}</span>
+                  {twoja && <span className={dobry ? "ok" : "zle"}>{dobry ? "✓" : "✗"}</span>}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        {twoja && <p className="odp-twoja-kolejnosc">Twoja kolejność: {twoja.map((i) => el[i]).join(" → ")}</p>}
+      </>
     );
   }
   if (z.typ === "pary" && Array.isArray(p)) {
