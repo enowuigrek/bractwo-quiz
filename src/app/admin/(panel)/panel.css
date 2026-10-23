@@ -1053,7 +1053,7 @@ a.przycisk {
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border-radius: var(--r-btn-sm);
+  border-radius: var(--r-card);
   background: var(--kamien);
   border: 1px solid var(--kamien2);
   margin-bottom: 8px;
