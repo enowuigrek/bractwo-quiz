@@ -1521,8 +1521,15 @@
   position: absolute;
   bottom: -40px;
   border-radius: 50%;
-  border: 2px solid rgba(227, 172, 63, 0.42);
-  background: radial-gradient(circle at 32% 30%, rgba(251, 231, 161, 0.4), rgba(227, 172, 63, 0.06) 60%);
+  /* bąbelek bez obręczy: jasny odblask u góry, miękko gasnący ku brzegom */
+  border: 1px solid rgba(227, 172, 63, 0.12);
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(251, 231, 161, 0.45) 0%,
+    rgba(227, 172, 63, 0.14) 35%,
+    rgba(227, 172, 63, 0.04) 70%,
+    transparent 100%
+  );
   opacity: 0;
   will-change: transform, opacity;
   animation-name: babel;
