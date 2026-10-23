@@ -14,6 +14,13 @@ export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
 type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[] };
 
 /** Uruchamianie gry krokami: miasto → lokal → quiz, potem szczegóły. */
+/** Data (RRRR-MM-DD, pusta: dziś) i godzina (GG:MM) w czasie lokalnym jako ISO. */
+function isoStartu(data: string, godzina: string): string {
+  const dzien = data || new Date().toLocaleDateString("sv-SE");
+  const czas = new Date(`${dzien}T${godzina}`);
+  return Number.isNaN(czas.getTime()) ? "" : czas.toISOString();
+}
+
 export function Kreator({ lokale, quizy }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
@@ -27,9 +34,10 @@ export function Kreator({ lokale, quizy }: Props) {
   const [czas, setCzas] = useState<string>(String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
   const [ileNagrod, setIleNagrod] = useState(0);
-  // godzina startu z pola `datetime-local` (czas lokalny przeglądarki), do serwera idzie jako ISO
-  const [start, setStart] = useState("");
-  const startIso = start ? new Date(start).toISOString() : "";
+  // start: osobno data i godzina (czas lokalny przeglądarki); bez daty to dziś. Do serwera idzie ISO.
+  const [dataStartu, setDataStartu] = useState("");
+  const [godzinaStartu, setGodzinaStartu] = useState("");
+  const startIso = godzinaStartu ? isoStartu(dataStartu, godzinaStartu) : "";
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
@@ -181,7 +189,7 @@ export function Kreator({ lokale, quizy }: Props) {
                       <input
                         name={`nagroda_${m}`}
                         className="pole"
-                        placeholder={m === 1 ? "Nagroda, np. Lane Piwo gratis" : "Nagroda"}
+                        placeholder={m === 1 ? "np. Lane Piwo gratis" : "Nagroda"}
                         aria-label={`Nagroda za ${m}. miejsce`}
                         maxLength={LIMITY.nagroda}
                         required
@@ -189,7 +197,7 @@ export function Kreator({ lokale, quizy }: Props) {
                       <input
                         name={`instrukcja_${m}`}
                         className="pole pole-male"
-                        placeholder="Jak odebrać (opcjonalnie), np. Pokaż ten ekran barmanowi"
+                        placeholder="Jak odebrać, np. przy barze"
                         aria-label={`Jak odebrać nagrodę za ${m}. miejsce`}
                         maxLength={LIMITY.instrukcja}
                       />
@@ -203,20 +211,36 @@ export function Kreator({ lokale, quizy }: Props) {
             )}
           </fieldset>
 
-          <div>
-            <label htmlFor="start">Godzina startu (opcjonalnie)</label>
-            <input
-              id="start"
-              type="datetime-local"
-              className="pole"
-              value={start}
-              onChange={(e) => setStart(e.target.value)}
-            />
+          <fieldset>
+            <legend>Start quizu (opcjonalnie)</legend>
+            <div className="wiersz-pol start-pola">
+              <div>
+                <label htmlFor="start_data">Data</label>
+                <input
+                  id="start_data"
+                  type="date"
+                  className="pole"
+                  value={dataStartu}
+                  onChange={(e) => setDataStartu(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="start_godzina">Godzina</label>
+                <input
+                  id="start_godzina"
+                  type="time"
+                  className="pole"
+                  value={godzinaStartu}
+                  onChange={(e) => setGodzinaStartu(e.target.value)}
+                />
+              </div>
+            </div>
             <input type="hidden" name="planowany_start" value={startIso} />
             <p className="podpowiedz">
-              Potrzebna do zapowiedzi: ekran lokalu pokaże godzinę i odliczanie, a prowadzący widzi je na pilocie.
+              Potrzebny do zapowiedzi: ekran lokalu pokaże godzinę i odliczanie, a prowadzący widzi je na pilocie. Bez
+              daty quiz jest dziś.
             </p>
-          </div>
+          </fieldset>
 
           <div className="wiersz-pol">
             <div>
@@ -240,7 +264,7 @@ export function Kreator({ lokale, quizy }: Props) {
             <input
               name="browar_nazwa"
               className="pole"
-              placeholder="Nazwa gościnnego browaru"
+              placeholder="Nazwa browaru"
               aria-label="Nazwa gościnnego browaru"
               maxLength={80}
             />
@@ -248,7 +272,7 @@ export function Kreator({ lokale, quizy }: Props) {
               name="browar_instagram"
               className="pole"
               style={{ marginTop: 10 }}
-              placeholder="Instagram browaru (opcjonalnie), np. @browar"
+              placeholder="Instagram, np. @browar"
               aria-label="Instagram browaru"
               maxLength={60}
             />

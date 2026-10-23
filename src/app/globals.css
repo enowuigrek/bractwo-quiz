@@ -63,6 +63,7 @@ h1 {
 
 .pole {
   width: 100%;
+  min-width: 0;
   font: inherit;
   font-size: var(--fs-input);
   color: var(--piana);
@@ -70,6 +71,22 @@ h1 {
   border: 2px solid var(--kamien2);
   border-radius: var(--r-pole);
   padding: 14px;
+}
+
+/* iOS daje polom daty i godziny własną szerokość i wysokość: wyrównujemy je do zwykłych pól */
+input.pole[type="date"],
+input.pole[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-width: 0;
+  min-height: calc(1.25em + 32px);
+  text-align: left;
+}
+
+.pole::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.25em;
 }
 
 .pole:focus {

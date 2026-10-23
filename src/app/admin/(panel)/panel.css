@@ -328,6 +328,11 @@ a.przycisk {
   gap: 12px;
 }
 
+/* kolumny siatki mogą się zwężać (inaczej szerokie pola, np. daty na iOS, rozpychają wiersz) */
+.wiersz-pol > * {
+  min-width: 0;
+}
+
 .przelacznik {
   display: flex !important;
   align-items: center;
