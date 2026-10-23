@@ -700,6 +700,13 @@ html:has(.kolumna) {
   animation: gasniecie-ekranu 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
+/* Na telefonie błysk nie dotyka górnej i dolnej krawędzi: Safari bierze z nich kolor pasków przeglądarki
+   i po białym błysku zostawały jasne paski. Krawędzie zostają czarne, a „kreska” i tak jest na środku. */
+.werble:not(.duzy) .werble-blysk {
+  inset: 18% 0;
+  box-shadow: 0 0 40px 12px rgba(255, 250, 240, 0.6);
+}
+
 @keyframes gasniecie-ekranu {
   0% {
     opacity: 0.95;
@@ -1541,6 +1548,17 @@ html:has(.kolumna) {
   display: grid;
   gap: 8px;
   margin-top: 18px;
+}
+
+/* „Udostępnij wynik” i „Pobierz na pamiątkę” obok siebie */
+.udostepnij-przyciski {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.udostepnij-przyciski .przycisk {
+  padding-inline: 10px;
 }
 
 /* podziękowanie z oddechem pod przyciskiem (i pod kontami do oznaczenia) */
@@ -2462,36 +2480,6 @@ html:has(.kolumna) {
   }
   to {
     transform: rotate(186deg);
-  }
-}
-
-/* pęknięta szybka: rysy od miejsca uderzenia, z krótkim błyskiem przy pęknięciu */
-.pijany-szybka {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.pijany-rysa {
-  fill: rgba(255, 255, 255, 0.85);
-  stroke: rgba(255, 255, 255, 0.75);
-  stroke-width: 0.45;
-  fill-opacity: 0.9;
-  filter: drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.9));
-  animation: pekniecie 0.35s ease-out both;
-}
-
-.pijany-rysa polyline {
-  fill: none;
-}
-
-@keyframes pekniecie {
-  from {
-    opacity: 0;
-    stroke-width: 2;
   }
 }
 

@@ -7,7 +7,7 @@ export const EFEKTY_PIJANE = {
   drzenie: "pytanie drży",
   odwrocone_kolory: "✓ czerwone, ✗ zielone",
   pion: "przyciski jeden nad drugim",
-  samoklik: "„Fałsz” maleje i znika, „Prawda” klika się sama, ekran pęka",
+  samoklik: "„Fałsz” maleje i znika, „Prawda” klika się sama",
   mgla: "pytanie we mgle",
   ucieczka: "przyciski uciekają",
   obrot: "pytanie do góry nogami",

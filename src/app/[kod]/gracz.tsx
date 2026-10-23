@@ -394,7 +394,7 @@ function WGrze({
   }
 
   if (stan.faza === "pijany") {
-    return <PijanyFinal stan={stan} teraz={teraz} />;
+    return <PijanyFinal stan={stan} teraz={teraz} token={ja.token} />;
   }
 
   if (stan.faza === "werble") {

@@ -282,11 +282,16 @@ export async function udostepnij(blob: Blob, nazwa: string, tekstPosta: string):
       if ((e as Error).name === "AbortError") return "anulowano";
     }
   }
+  pobierz(blob, nazwa);
+  return "pobrano";
+}
+
+/** Pobiera grafikę jako plik (na iPhonie trafia do Plików, na Androidzie do Pobranych). */
+export function pobierz(blob: Blob, nazwa: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = nazwa;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
-  return "pobrano";
 }

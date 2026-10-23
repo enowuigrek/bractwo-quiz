@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- grafiki pytań z bucketu Supabase */
 
 import { useEffect, useState } from "react";
+import { Werble } from "@/components/werble";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import type { PytanieSerii, StanSesji, ZapisOdpowiedzi, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
@@ -97,18 +98,10 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   const teraz_ = pytania.find((p) => !odpowiedziane.includes(p.id));
   const ktore = odpowiedziane.length + 1;
 
+  // koniec pytań albo czasu: bez „Gotowe!”, który mignąłby zwycięzcy i zdradził koniec. Zwykle od razu
+  // ciemny ekran werbli; w pijanym finale sam pasek, z którego płynnie wychodzi „pytanie 15/14”
   if (!teraz_ || zostalo <= 0) {
-    return (
-      <>
-        {pasek}
-        <div className="werdykt czesciowo">
-          <span className="werdykt-tytul">{teraz_ ? "Koniec czasu!" : "Gotowe!"}</span>
-          <span className="pomocniczy">
-            Odpowiedzi: {odpowiedziane.length} z {pytania.length}. Czekamy na resztę.
-          </span>
-        </div>
-      </>
-    );
+    return stan.pijany_final ? pasek : <Werble />;
   }
 
   async function odpowiedz(dane: DaneOdpowiedzi) {

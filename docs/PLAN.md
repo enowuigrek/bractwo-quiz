@@ -2,15 +2,17 @@
 
 Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
-## Stan na 23.10 (noc): od czego zacząć
+## Stan na 23.10 (późna noc): od czego zacząć
 
-Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są niżej w „Ustaleniach z realizacji”, a najnowsze zmiany w ostatnich sekcjach z 23.10 („Pijany finał” i „Kibicowanie w finale” na samym końcu).
+Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są niżej w „Ustaleniach z realizacji”, a najnowsze zmiany w ostatnich sekcjach z 23.10 („Pijany finał”, „Kibicowanie w finale”, „Główny i obsługa…”, „Po teście pijanego finału” na samym końcu).
 
-**Co działa (produkcja `https://quiz.bractwopiwne.pl`, ostatnie wdrożenie: kibicowanie w finale, 23.10 w nocy):**
-- **Panel** (`/admin`, jedno hasło): lokale z logo i adresem ekranu, quizy z etapami (szablony quizu „Klasyczny pub quiz” i „Bez etapów”, szablony etapów, plan liczby pytań), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas na odpowiedź domyślnie „bez limitu”, nagrody ze zdjęciem przerabianym przez AI, przełącznik „Pijany finał” z polem „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź z godziną), pytania pijanego finału (Quizy → „Pijany finał: pytania”), historia gier, oznaczanie odbioru nagrody, grafika podium do social mediów.
+> **Dla sesji, która zaczynała „Pijany finał” (na drugim koncie):** ten etap jest **skończony i wdrożony**, razem ze wszystkim, co Łukasz dorzucał w trakcie (ukryty tryb, 15/14, zegar, koniec po ostatnim pytaniu, dwa poziomy panelu, kibicowanie). Nic z tego nie trzeba dokańczać. Zacznij od „Następny krok” niżej.
+
+**Co działa (produkcja `https://quiz.bractwopiwne.pl`, ostatnie wdrożenie: poprawki po teście pijanego finału, 23.10 późno w nocy):**
+- **Panel** (`/admin`, dwa hasła: główny widzi wszystko, obsługa bez rzeczy „tylko dla mnie” i bez pijanego finału): lokale z logo i adresem ekranu, quizy z etapami (szablony quizu „Klasyczny pub quiz” i „Bez etapów”, szablony etapów, plan liczby pytań), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas na odpowiedź domyślnie „bez limitu”, nagrody ze zdjęciem przerabianym przez AI, przełącznik „Pijany finał” z polem „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź z godziną), pytania pijanego finału (Quizy → „Pijany finał: pytania”), historia gier, oznaczanie odbioru nagrody, grafika podium do social mediów.
 - **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`): plansze lokalu bez gry, zapowiedź z odliczaniem, poczekalnia z QR i nagrodami, plansza etapu z animacją telefonu (jak odpowiadać), pytanie z odliczaniem 3 s, wynik z rozkładem, odpowiedzi graczy (przy szacowaniu oś), ranking jako **wyścig po piwo** (szklanka nalewa się z pytaniami, do 12 graczy, powyżej tabela), finał trójki jako **seria** na żywo (trzy drogi do szklanki) z **dymkami okrzyków kibiców** i licznikiem dopingu 📣, w trybie „Pijany finał” chaos pod nagłówkiem finału, **werble** po finale, podium ze zdjęciami nagród, tabela, koniec. Logo Bractwa w nagłówku po prawej. Ekran sam przeładowuje się po wdrożeniu (poza pytaniem, serią i pijanym finałem).
-- **Telefon gracza** (`/<kod>`): nick i selfie przed dołączeniem, odpowiadanie na wszystkie typy, w serii płaskie koła ✓/✗ w stałym miejscu, od połowy finału utrudnienia, kibic w finale wybiera finalistę i stuka hasła („Dawaj [awatar]!”), finalista na podium widzi „Kibicowało Ci X osób”, pijany finał udający dalszą serię (pytanie 15/14…), ranking ze szklanką, medal i karta nagrody z pieczątką „Odebrana”, udostępnianie wyniku.
-- **Pilot** (`/pilot/<kod>?t=…`): start, następne, wynik, odpowiedzi, ranking, start etapu i serii, „Zakończ serię wcześniej”, w pijanym finale zwycięzca z podium, odliczanie i „Zakończ i pokaż werble”, „Pokaż podium” po werblach, tabela, koniec, lista graczy z QR powrotu.
+- **Telefon gracza** (`/<kod>`): nick i selfie przed dołączeniem, odpowiadanie na wszystkie typy, w serii płaskie koła ✓/✗ w stałym miejscu, od połowy finału utrudnienia, kibic w finale wybiera finalistę i stuka hasła („Dawaj [awatar]!”), finalista na podium widzi „Kibicowało Ci X osób”, pijany finał udający dalszą serię (pytanie 15/14…), ranking ze szklanką, medal i karta nagrody z pieczątką „Odebrana”, udostępnianie wyniku i „Pobierz na pamiątkę” (ta sama grafika do pobrania).
+- **Pilot** (`/pilot/<kod>?t=…`, przyciski zawsze na górze, „Zakończ grę” na dole): start, następne, wynik, odpowiedzi, ranking, start etapu i serii, „Zakończ serię wcześniej”, w pijanym finale zwycięzca z podium, odliczanie i „Zakończ i pokaż werble”, „Pokaż podium” po werblach, tabela, koniec, lista graczy z QR powrotu.
 
 **Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (tu „walka o finał”: 3 najlepszych przechodzi) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (90 s, nic nie liczy, gracze o tym nie wiedzą) → werble → podium (pokazuje prowadzący).
 
@@ -30,6 +32,8 @@ Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są ni�
 - Przeróbka selfie AI wyłączona (nie wyświetlała się na produkcji), opis w `docs/POMYSLY.md`.
 - Kibicowanie sprawdzone na localhost (kibice z SQL i jeden telefon w przeglądarce), ale nie z kilkunastoma telefonami naraz: przy wielu kibicach TV odświeża stan po każdym okrzyku (jedno `stan_sesji` na okrzyk, zdarzenia zlewają się w `useNasluch`).
 - Test na żywo: spotkanie Kręgu w środę 28.10.
+- Hasło główne: Łukasz ustawił `ADMIN_HASLO_GLOWNE` na Vercelu, ale prawdopodobnie tak samo jak `ADMIN_HASLO`. Wtedy każdy z tym hasłem jest głównym. Hasło główne musi być inne (instrukcja w sekcji „Po teście pijanego finału”).
+- Białe paski Safari przy werblach: poprawione na ślepo (błysk nie dotyka krawędzi), do sprawdzenia na iPhonie.
 
 **Następny krok:** test na żywo 28.10 (lista w `docs/TEST.md`), potem poprawki po teście. Pomysły na dalej w `docs/POMYSLY.md`.
 
@@ -553,6 +557,16 @@ Pomysł Łukasza z 23.10.
 - Utrudnienia w finale bez zapowiedzi: zniknęło „· utrudnienie!” z paska na telefonie (seria i pijany finał) i „Od połowy pytań utrudnienia” z planszy finału (TV i telefon). Demo prawda/fałsz na planszy etapu to te same okrągłe przyciski co na telefonie (zielony ✓, czerwony ✗), bez kafli z napisami.
 - Lampa błyskowa przy selfie: zdjęcie robi systemowy aparat (`<input type="file" capture="user">`), a jego ustawień (także błysku) strona nie dostaje. Jedyna droga to własny podgląd z kamery (`getUserMedia`, przednia kamera nie ma błysku); zapisane w `docs/POMYSLY.md`.
 - Sprawdzone na localhost (`start-test-hasla` ma oba hasła testowe): stare ciasteczko działa jako obsługa, obsługa bez pijanego finału i bez strony jego pytań, quiz testowy główny „tylko dla mnie” niewidoczny dla obsługi (lista i 404), pilot z przyciskami na górze. Quiz i gra testowa usunięte w panelu.
+
+### Po teście pijanego finału (23.10, późna noc) ✅
+
+Uwagi Łukasza po grze na telefonie, wszystko wdrożone:
+- **Koniec pijanego finału:** bez ekranu „Gotowe! Odpowiedzi: 22 z 14”. Kto pierwszy dojdzie do końca pytań, gasi wszystkim ekrany: telefon od razu pokazuje werble i woła `zakoncz_pijany(token)` (migracja `20261023193351_pijany_koniec_gracza`), baza przechodzi w `werble`. Po czasie albo przyciskiem pilota tak jak wcześniej.
+- **Koniec prawdziwej serii na telefonie:** zamiast „Gotowe!” (mignął zwycięzcy i zdradzał koniec) zwykle od razu ciemny ekran werbli, a przy pijanym finale sam pasek czasu, z którego płynnie wychodzi „pytanie 15/14”.
+- **Pęknięcia szybki wyłączone** (słabo wyglądały): bez SVG i stylów, samoklik zostaje. Kod jest w historii gita (commit b9a1d4a).
+- **Werble a Safari:** po białym błysku na iPhonie paski przeglądarki u góry i u dołu robiły się jasne (Safari bierze ich kolor z krawędzi strony). Na telefonie błysk nie dotyka już krawędzi (`.werble:not(.duzy) .werble-blysk`). Do sprawdzenia na iPhonie.
+- **„Pobierz na pamiątkę”** obok „Udostępnij wynik” na końcu gry: ta sama grafika, prosto do pobrania (`pobierz` w `src/lib/grafika-wyniku.ts`; na iPhonie trafia do Plików, do Zdjęć zapisuje się przez „Udostępnij” → „Zapisz obraz”).
+- **Hasła panelu:** `ADMIN_HASLO_GLOWNE` musi być inne niż `ADMIN_HASLO`. Gdy są takie same, każdy z tym hasłem loguje się jako główny. Zmiana: `npx vercel@54.20.1 env rm ADMIN_HASLO_GLOWNE production`, potem `npx vercel@54.20.1 env add ADMIN_HASLO_GLOWNE production` z nowym hasłem i nowe wdrożenie (zmienne wchodzą dopiero z kolejnym wdrożeniem). Zalogowani zostają w swojej roli do wylogowania (ciasteczko 30 dni); żeby wylogować wszystkich, zmień `ADMIN_SEKRET`.
 
 ## Zadania dla ciebie (dzień 0)
 
