@@ -10,7 +10,8 @@ export function bezResetu(akcja: (dane: FormData) => void) {
     action: akcja,
     onSubmit(e: FormEvent<HTMLFormElement>) {
       e.preventDefault();
-      const dane = new FormData(e.currentTarget);
+      // z klikniętym przyciskiem (name/value), gdy formularz ma kilka przycisków wysyłki
+      const dane = new FormData(e.currentTarget, (e.nativeEvent as SubmitEvent).submitter);
       startTransition(() => akcja(dane));
     },
   };

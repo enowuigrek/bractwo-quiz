@@ -15,6 +15,7 @@ import {
 } from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
 import { GraczePilota } from "./gracze";
 
@@ -97,6 +98,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
   const teraz = useCzasSerwera(przesuniecie, liczy);
+  const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
@@ -256,10 +258,30 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </p>
         )}
 
+      {/* zapowiedź: godzina i odliczanie jak na TV; start i tak klika prowadzący */}
+      {faza === "poczekalnia" && stan.planowany_start && doZapowiedzi !== null && (
+        <p className="pilot-start">
+          <span>
+            Start o <strong>{godzinaStartu(stan.planowany_start)}</strong> ·{" "}
+            <span className="gra-kod">{opisOdliczania(doZapowiedzi)}</span>
+          </span>
+          {!stan.poczekalnia_otwarta && (
+            <span className="pomocniczy">
+              Na ekranie lokalu jest zapowiedź z odliczaniem. Gracze dołączą po otwarciu poczekalni.
+            </span>
+          )}
+        </p>
+      )}
+
       <section style={{ marginTop: "var(--section-gap)", display: "grid", gap: 12 }}>
+        {faza === "poczekalnia" && !stan.poczekalnia_otwarta && (
+          <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("otworz")}>
+            Otwórz poczekalnię (QR na TV)
+          </button>
+        )}
         {faza === "poczekalnia" && (
           <button
-            className="przycisk zloty"
+            className={`przycisk${stan.poczekalnia_otwarta ? " zloty" : ""}`}
             disabled={wysylam || liczba === 0}
             onClick={() =>
               akcja(

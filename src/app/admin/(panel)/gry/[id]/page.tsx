@@ -66,6 +66,16 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
             {[
               gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
               gra.okazja,
+              gra.planowany_start
+                ? `start ${new Date(gra.planowany_start).toLocaleString("pl-PL", {
+                    timeZone: "Europe/Warsaw",
+                    day: "numeric",
+                    month: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}`
+                : null,
+              !gra.poczekalnia_otwarta && trwa ? "zapowiedź (poczekalnia zamknięta)" : null,
               gra.browar_nazwa ? `kranoprzejęcie: ${gra.browar_nazwa}` : null,
               gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
               gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,
@@ -128,7 +138,10 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               {linki.ekranLokalu ? (
                 <>
                   <p className="pomocniczy" style={{ marginTop: 0 }}>
-                    Ekran lokalu {gra.lokale?.nazwa} przełączy się na tę grę sam. Jeśli TV nie ma go w zakładkach, otwórz:
+                    {gra.poczekalnia_otwarta
+                      ? `Ekran lokalu ${gra.lokale?.nazwa} przełączy się na tę grę sam.`
+                      : `Ekran lokalu ${gra.lokale?.nazwa} pokazuje zapowiedź z odliczaniem. QR pojawi się, gdy otworzysz poczekalnię na pilocie.`}{" "}
+                    Jeśli TV nie ma go w zakładkach, otwórz:
                   </p>
                   <LinkDoSkopiowania url={linki.ekranLokalu} />
                   {!!inneGry?.length && (

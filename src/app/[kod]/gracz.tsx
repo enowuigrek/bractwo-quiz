@@ -8,6 +8,7 @@ import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useKoniecPytania, 
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
+import { godzinaStartu } from "@/lib/gra/zapowiedz";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { ZdjecieGracza } from "./zdjecie-gracza";
@@ -144,6 +145,16 @@ export function Gracz({ kod }: { kod: string }) {
           <>
             <h1>Ta gra już się skończyła</h1>
             <p className="pomocniczy">Piwu Cześć! Do zobaczenia na kolejnym quizie.</p>
+          </>
+        ) : !stan.poczekalnia_otwarta ? (
+          <>
+            {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
+            <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
+            <p className="pomocniczy">
+              Zapisy jeszcze nie ruszyły
+              {stan.planowany_start ? ` (start o ${godzinaStartu(stan.planowany_start)})` : ""}. Gdy na telewizorze
+              pojawi się kod QR, zeskanuj go albo odśwież tę stronę.
+            </p>
           </>
         ) : (
           <>

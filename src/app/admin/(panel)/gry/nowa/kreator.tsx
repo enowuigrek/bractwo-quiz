@@ -27,6 +27,9 @@ export function Kreator({ lokale, quizy }: Props) {
   const [czas, setCzas] = useState<string>(String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
   const [ileNagrod, setIleNagrod] = useState(0);
+  // godzina startu z pola `datetime-local` (czas lokalny przeglądarki), do serwera idzie jako ISO
+  const [start, setStart] = useState("");
+  const startIso = start ? new Date(start).toISOString() : "";
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
@@ -200,6 +203,21 @@ export function Kreator({ lokale, quizy }: Props) {
             )}
           </fieldset>
 
+          <div>
+            <label htmlFor="start">Godzina startu (opcjonalnie)</label>
+            <input
+              id="start"
+              type="datetime-local"
+              className="pole"
+              value={start}
+              onChange={(e) => setStart(e.target.value)}
+            />
+            <input type="hidden" name="planowany_start" value={startIso} />
+            <p className="podpowiedz">
+              Potrzebna do zapowiedzi: ekran lokalu pokaże godzinę i odliczanie, a prowadzący widzi je na pilocie.
+            </p>
+          </div>
+
           <div className="wiersz-pol">
             <div>
               <label htmlFor="max_graczy">Limit graczy</label>
@@ -226,11 +244,19 @@ export function Kreator({ lokale, quizy }: Props) {
               aria-label="Nazwa gościnnego browaru"
               maxLength={80}
             />
+            <input
+              name="browar_instagram"
+              className="pole"
+              style={{ marginTop: 10 }}
+              placeholder="Instagram browaru (opcjonalnie), np. @browar"
+              aria-label="Instagram browaru"
+              maxLength={60}
+            />
             <div style={{ marginTop: 10 }}>
               <PoleGrafiki
                 nazwa="browar_logo"
                 etykieta="Logo browaru"
-                podpowiedz="Pokaże się na TV obok logo Bractwa i lokalu. Najlepiej z przezroczystym tłem, do 5 MB."
+                podpowiedz="Pokaże się na TV obok logo lokalu. Najlepiej z przezroczystym tłem, do 5 MB."
               />
             </div>
           </fieldset>
@@ -242,9 +268,25 @@ export function Kreator({ lokale, quizy }: Props) {
           />
 
           <KomunikatFormularza stan={stan} />
-          <button type="submit" className="przycisk zloty" disabled={trwa}>
-            {trwa ? "Uruchamiam…" : "Uruchom grę"}
-          </button>
+          <div className="kreator-przyciski">
+            <button type="submit" name="start_tryb" value="teraz" className="przycisk zloty" disabled={trwa}>
+              {trwa ? "Zapisuję…" : "Uruchom grę"}
+            </button>
+            <button
+              type="submit"
+              name="start_tryb"
+              value="zapowiedz"
+              className="przycisk"
+              disabled={trwa || !startIso}
+              title={startIso ? undefined : "Najpierw ustaw godzinę startu"}
+            >
+              Zapowiedz na ekranie lokalu
+            </button>
+          </div>
+          <p className="podpowiedz">
+            „Uruchom grę” od razu pokazuje na TV kod QR. „Zapowiedz” pokazuje na ekranie lokalu godzinę i odliczanie, a QR
+            pojawi się, gdy prowadzący otworzy poczekalnię na pilocie.
+          </p>
         </>
       )}
     </form>

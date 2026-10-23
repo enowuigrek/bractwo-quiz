@@ -996,3 +996,10 @@ a.przycisk {
   color: var(--zloto);
   border-color: var(--zloto);
 }
+
+/* Kreator gry: „Uruchom grę” i „Zapowiedz na ekranie lokalu” obok siebie */
+.kreator-przyciski {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

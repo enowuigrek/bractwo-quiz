@@ -1314,3 +1314,19 @@ html:has(.kolumna) {
   font-size: var(--fs-xs);
   color: var(--szary);
 }
+
+/* Pilot: godzina zapowiedzianego startu i odliczanie */
+.pilot-start {
+  display: grid;
+  gap: 4px;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-card);
+  background: var(--kamien);
+}
+
+.pilot-start .pomocniczy {
+  margin: 0;
+  font-size: var(--fs-xs);
+}

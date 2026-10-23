@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import type { WierszRankingu } from "@/lib/gra/typy";
+import { godzinaStartu, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Loga } from "./tv";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
@@ -12,16 +13,25 @@ const ZMIANA_MS = 10_000;
 /** Ostatni quiz w lokalu (z `ekran_lokalu`, do 6 godzin po końcu): pierwsza trójka. */
 export type OstatniQuiz = { tytul: string; okazja: string | null; podium: WierszRankingu[] };
 
-type Props = { lokal: { nazwa: string; logo_url: string | null }; ostatnia: OstatniQuiz | null };
+type Props = {
+  lokal: { nazwa: string; logo_url: string | null };
+  ostatnia: OstatniQuiz | null;
+  /** Zapowiedziany quiz: godzina na pierwszej planszy, odliczanie na każdej. */
+  zapowiedz?: Zapowiedz | null;
+  /** Różnica zegara TV względem serwera (ms). */
+  przesuniecie?: number;
+};
 
 /** Kolejność na planszy: 2., 1., 3. */
 const STOPNIE = [1, 0, 2];
 
 /**
  * Ekran lokalu, gdy nie ma gry: plansze zmieniane co 10 s. Po quizie dochodzi plansza z jego podium.
- * Własne plansze z panelu (zapowiedzi, grafiki) są w POMYSLY.md.
+ * Zapowiedziany quiz ma godzinę na pierwszej planszy i odliczanie na każdej, a przy kranoprzejęciu
+ * u góry jest lokal × browar (Bractwo ma wtedy swoją osobną planszę).
  */
-export function Plansze({ lokal, ostatnia }: Props) {
+export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }: Props) {
+  const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   const liczbaPlansz = ostatnia ? 4 : 3;
   const [licznik, ustawLicznik] = useState(0);
   useEffect(() => {
@@ -33,7 +43,31 @@ export function Plansze({ lokal, ostatnia }: Props) {
   return (
     <div className="plansze">
       <div key={nr} className="plansza">
-        {nr === 0 && (
+        {nr === 0 && zapowiedz && (
+          <div className="plansza-srodek plansza-zapowiedz">
+            <div className="plansza-loga">
+              {!zapowiedz.browar && (
+                <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo-duze" />
+              )}
+              <Loga lokal={lokal} browar={zapowiedz.browar} />
+            </div>
+            <p className="tv-okazja">
+              {[zapowiedz.browar && `Kranoprzejęcie: ${zapowiedz.browar.nazwa}`, zapowiedz.okazja]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            <h1 className="plansza-tytul">{zapowiedz.tytul ?? "Quiz Bractwa Piwnego"}</h1>
+            {zapowiedz.planowany_start && doStartu !== null && (
+              <p className="plansza-start">
+                <span>
+                  Start o <strong>{godzinaStartu(zapowiedz.planowany_start)}</strong>
+                </span>
+                <span className="plansza-odliczanie">{opisOdliczania(doStartu)}</span>
+              </p>
+            )}
+          </div>
+        )}
+        {nr === 0 && !zapowiedz && (
           <div className="plansza-srodek">
             <div className="plansza-loga">
               <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo-duze" />
@@ -85,6 +119,12 @@ export function Plansze({ lokal, ostatnia }: Props) {
           </div>
         )}
       </div>
+      {/* odliczanie do zapowiedzianego quizu na każdej planszy poza pierwszą (tam jest duże) */}
+      {nr !== 0 && zapowiedz?.planowany_start && doStartu !== null && (
+        <p className="plansze-zapowiedz">
+          Quiz o <strong>{godzinaStartu(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}
+        </p>
+      )}
       {/* plansze 1 i 3 nie mają dużego logo Bractwa, więc dostają małe w rogu */}
       {(nr === 1 || nr === 3) && <img src="/loga/bractwo.svg" alt="" className="logo-bractwo tv-bractwo-rog" />}
       <ol className="plansze-kropki" aria-hidden>

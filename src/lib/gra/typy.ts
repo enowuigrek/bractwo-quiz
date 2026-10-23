@@ -44,9 +44,13 @@ export type StanSesji = {
   /** Nagrody za miejsca (null: bez nagród). Nie są tajne. */
   nagrody: Nagroda[] | null;
   /** Gościnny browar (kranoprzejęcie): logo obok Bractwa i lokalu. */
-  browar: { nazwa: string; logo_url: string | null } | null;
+  browar: { nazwa: string; logo_url: string | null; instagram?: string | null } | null;
+  /** Zapowiedź: planowana godzina startu (null: bez zapowiedzi). */
+  planowany_start: string | null;
+  /** Fałsz: gra zapowiedziana, TV pokazuje godzinę i odliczanie zamiast QR, dołączać jeszcze nie można. */
+  poczekalnia_otwarta: boolean;
   max_graczy: number;
-  lokal: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
+  lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
   quiz: { tytul: string; liczba_zadan: number } | null;
   faza: FazaWidoczna;
   faza_od: string | null;
@@ -70,7 +74,16 @@ export type PilotStan = StanSesji & {
 /** Wiersz `pilot_gracze`: token służy do QR, którym gracz wraca do gry na innym telefonie. */
 export type GraczPilota = { nick: string; zdjecie: string | null; token: string; punkty: number; odpowiedzial: boolean };
 
-export type AkcjaPilota = "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec" | "plansze";
+export type AkcjaPilota =
+  | "otworz"
+  | "nastepne"
+  | "wynik"
+  | "odpowiedzi"
+  | "ranking"
+  | "podium"
+  | "tabela"
+  | "koniec"
+  | "plansze";
 
 /** Wiersz `lista_graczy`: nick i adres selfie (null: bez zdjęcia). */
 export type GraczNaLiscie = { nick: string; zdjecie: string | null };

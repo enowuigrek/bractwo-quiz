@@ -7,6 +7,8 @@ export type Lokal = {
   logo_url: string | null;
   /** Stały adres ekranu lokalu: /ekran/<adres_ekranu>. */
   adres_ekranu: string;
+  /** Konto na Instagramie (bez @), do oznaczania przy udostępnianiu wyników. */
+  instagram?: string | null;
 };
 
 export type Quiz = {
@@ -52,6 +54,10 @@ export type Sesja = {
   /** Gościnny browar przy grze (kranoprzejęcie), opcjonalny. */
   browar_nazwa: string | null;
   browar_logo_url: string | null;
+  browar_instagram: string | null;
+  /** Zapowiedź: planowana godzina startu i czy poczekalnia (QR, dołączanie) jest już otwarta. */
+  planowany_start: string | null;
+  poczekalnia_otwarta: boolean;
   max_graczy: number;
   faza: Faza;
   zadanie_nr: number;

@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
+import { kontoInstagram } from "@/lib/instagram";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Nagroda, StanFormularza } from "@/lib/typy";
 import { LIMITY } from "../quizy/limity";
@@ -54,11 +55,19 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
 
+  // zapowiedź: godzina startu (ISO z przeglądarki), poczekalnia zamknięta do otwarcia na pilocie
+  const zapowiedz = dane.get("start_tryb") === "zapowiedz";
+  const startPole = String(dane.get("planowany_start") ?? "");
+  const planowany_start = startPole && !Number.isNaN(Date.parse(startPole)) ? new Date(startPole).toISOString() : null;
+  if (zapowiedz && !planowany_start) return { blad: "Do zapowiedzi ustaw godzinę startu." };
+
   // gościnny browar (kranoprzejęcie): nazwa wymagana, gdy jest logo
   const browar_nazwa = String(dane.get("browar_nazwa") ?? "").trim().replace(/\s+/g, " ") || null;
   const browarLogo = plikZFormularza(dane, "browar_logo");
   if (browarLogo && !browar_nazwa) return { blad: "Podaj nazwę browaru do logo." };
   if (browar_nazwa && browar_nazwa.length > 80) return { blad: "Nazwa browaru może mieć najwyżej 80 znaków." };
+  const browar_instagram = kontoInstagram(dane.get("browar_instagram"));
+  if (browar_instagram === false) return { blad: "Instagram browaru: sama nazwa konta, np. @browar." };
 
   const grafika = plikZFormularza(dane, "grafika");
   for (const plik of [grafika, browarLogo]) {
@@ -89,6 +98,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       nagrody: nagrody.length ? nagrody : null,
       browar_nazwa,
       browar_logo_url,
+      browar_instagram: browar_nazwa ? browar_instagram : null,
+      planowany_start,
+      poczekalnia_otwarta: !zapowiedz,
     })
     .select("id")
     .single();

@@ -16,6 +16,8 @@ import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from 
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
+import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
+import { Plansze } from "./plansze";
 import { PodiumTv, RankingTv } from "./ranking";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
@@ -101,8 +103,11 @@ export function Tv({ kod, qr, host }: Props) {
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
 
+  // zapowiedziana gra: zamiast poczekalni z QR plansze z godziną i odliczaniem (jak na ekranie lokalu)
+  const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
+
   return (
-    <Scena>
+    <Scena bezLogoWRogu={zapowiedz}>
       {!stan ? (
         <div className="tv-srodek">
           <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
@@ -110,8 +115,20 @@ export function Tv({ kod, qr, host }: Props) {
       ) : (
         // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
         <div key={kluczEkranu(stan)} className="tv-ekran">
-          {stan.faza === "poczekalnia" ? (
-            <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} />
+          {zapowiedz ? (
+            <Plansze
+              lokal={stan.lokal ?? { nazwa: "", logo_url: null }}
+              ostatnia={null}
+              przesuniecie={przesuniecie}
+              zapowiedz={{
+                planowany_start: stan.planowany_start,
+                tytul: stan.quiz?.tytul ?? null,
+                okazja: stan.okazja,
+                browar: stan.browar,
+              }}
+            />
+          ) : stan.faza === "poczekalnia" ? (
+            <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
           ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
             <Pytanie stan={stan} teraz={teraz} />
           ) : stan.faza === "odpowiedzi" ? (
@@ -166,13 +183,16 @@ function Poczekalnia({
   gracze,
   qr,
   host,
+  przesuniecie,
 }: {
   stan: StanSesji;
   gracze: GraczNaLiscie[];
   qr: string;
   host: string;
+  przesuniecie: number;
 }) {
   const druzyny = stan.tryb === "druzyny";
+  const doStartu = useDoStartu(stan.planowany_start, przesuniecie);
   return (
     <div className="poczekalnia">
       <header className="tv-naglowek">
@@ -195,6 +215,11 @@ function Poczekalnia({
         <section className="tv-prawa">
           {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
           <h1 className="tv-tytul-quizu">{stan.quiz?.tytul ?? "Quiz"}</h1>
+          {stan.planowany_start && doStartu !== null && (
+            <p className="tv-start">
+              Start o <strong>{godzinaStartu(stan.planowany_start)}</strong> · {opisOdliczania(doStartu)}
+            </p>
+          )}
           {stan.grafika_url && <img src={stan.grafika_url} alt="" className="tv-grafika" />}
 
           <div className="tv-gracze">

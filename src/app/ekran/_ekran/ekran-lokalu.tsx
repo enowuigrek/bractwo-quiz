@@ -2,8 +2,9 @@
 
 import QRCode from "qrcode";
 import { useCallback, useEffect, useState } from "react";
-import { useNasluchTematu } from "@/lib/gra/nasluch";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { przesuniecieZegara, useNasluchTematu } from "@/lib/gra/nasluch";
+import type { Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
 
@@ -23,12 +24,17 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   const [kod, ustawKod] = useState<string | null>(null);
   const [qr, ustawQr] = useState<{ kod: string; svg: string } | null>(null);
   const [ostatnia, ustawOstatnia] = useState<OstatniQuiz | null>(null);
+  const [zapowiedz, ustawZapowiedz] = useState<Zapowiedz | null>(null);
+  const [przesuniecie, ustawPrzesuniecie] = useState(0);
 
   const pobierz = useCallback(async () => {
+    const wyslano = Date.now();
     const { data, error } = await supabase().rpc("ekran_lokalu", { p_adres: adres });
     // chwilowy błąd sieci: zostaje to, co już widać
     if (error) return;
-    const d = data as { kod: string | null; ostatnia: OstatniQuiz | null };
+    const d = data as { kod: string | null; ostatnia: OstatniQuiz | null; zapowiedz: Zapowiedz | null; teraz: string };
+    ustawPrzesuniecie(przesuniecieZegara(d.teraz, wyslano, Date.now()));
+    ustawZapowiedz(d.zapowiedz);
     ustawKod(d.kod);
     ustawOstatnia(d.ostatnia?.podium.length ? d.ostatnia : null);
   }, [adres]);
@@ -56,7 +62,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   }
   return (
     <Scena bezLogoWRogu>
-      <Plansze lokal={lokal} ostatnia={ostatnia} />
+      <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
     </Scena>
   );
 }

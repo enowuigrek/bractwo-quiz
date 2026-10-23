@@ -18,7 +18,7 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
   const { id } = await params;
   const db = supabaseAdmin();
   const [{ data: lokal }, { data: wszystkie }] = await Promise.all([
-    db.from("lokale").select("id, nazwa, miasto, logo_url, adres_ekranu").eq("id", id).maybeSingle<Lokal>(),
+    db.from("lokale").select("id, nazwa, miasto, logo_url, adres_ekranu, instagram").eq("id", id).maybeSingle<Lokal>(),
     db.from("lokale").select("miasto"),
   ]);
   if (!lokal) notFound();

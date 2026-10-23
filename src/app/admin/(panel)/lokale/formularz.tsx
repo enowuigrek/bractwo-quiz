@@ -43,6 +43,19 @@ export function FormularzLokalu({ lokal, miasta }: Props) {
           ))}
         </datalist>
       </div>
+      <div>
+        <label htmlFor="instagram">Instagram lokalu (opcjonalnie)</label>
+        <input
+          id="instagram"
+          name="instagram"
+          className="pole"
+          defaultValue={lokal?.instagram ? `@${lokal.instagram}` : ""}
+          placeholder="@nazwa_konta"
+          maxLength={60}
+          autoComplete="off"
+        />
+        <p className="podpowiedz">Gracze zobaczą je przy grafice z wynikiem, żeby oznaczyć lokal w relacji.</p>
+      </div>
       {lokal && (
         <div>
           <label htmlFor="adres_ekranu">Adres ekranu lokalu</label>

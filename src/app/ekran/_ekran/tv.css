@@ -1393,3 +1393,76 @@
   letter-spacing: 0.04em;
   color: var(--zloto);
 }
+
+/* Zapowiedź quizu na planszach: godzina startu i odliczanie */
+.plansza-start {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 60px;
+  font-weight: var(--w-black);
+}
+
+/* zapowiedź ma więcej treści: mniejsze loga i odstępy, żeby nie wejść na kropki */
+.plansza-zapowiedz {
+  gap: 18px;
+}
+
+.plansza-zapowiedz .plansza-loga .tv-logo-bractwo-duze {
+  height: 260px;
+}
+
+.plansza-zapowiedz .plansza-loga .tv-logo-lokalu,
+.plansza-zapowiedz .plansza-loga .tv-logo-browaru {
+  width: 280px;
+  height: 280px;
+}
+
+.plansza-zapowiedz .plansza-tytul {
+  font-size: 96px !important;
+}
+
+.plansza-start strong {
+  color: var(--zloto);
+}
+
+.plansza-odliczanie {
+  padding: 8px 36px;
+  border: 3px solid var(--zloto);
+  border-radius: var(--r-pill);
+  font-size: 52px;
+  font-variant-numeric: tabular-nums;
+  color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.plansze-zapowiedz {
+  position: absolute;
+  top: -24px;
+  right: 0;
+  margin: 0;
+  padding: 10px 28px;
+  border: 2px solid var(--zloto);
+  border-radius: var(--r-pill);
+  background: rgba(227, 172, 63, 0.1);
+  font-size: 32px;
+  font-weight: var(--w-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.plansze-zapowiedz strong {
+  color: var(--zloto);
+}
+
+/* Poczekalnia zapowiedzianej gry: godzina startu i odliczanie pod tytułem */
+.tv-start {
+  margin: 12px 0 0;
+  font-size: 40px;
+  font-weight: var(--w-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.tv-start strong {
+  color: var(--zloto);
+}

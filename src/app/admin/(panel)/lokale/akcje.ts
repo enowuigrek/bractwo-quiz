@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { adresZNazwy, FORMAT_ADRESU_EKRANU, MAX_ADRES_EKRANU } from "@/lib/adres-ekranu";
+import { kontoInstagram } from "@/lib/instagram";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
@@ -38,7 +39,10 @@ export async function zapiszLokal(
     stareLogo = data.logo_url;
   }
 
-  const zmiany: Record<string, unknown> = { nazwa, miasto };
+  const instagram = kontoInstagram(dane.get("instagram"));
+  if (instagram === false) return { blad: "Instagram: sama nazwa konta, np. @piwiarnia." };
+
+  const zmiany: Record<string, unknown> = { nazwa, miasto, instagram };
 
   if (id) {
     // adres ekranu poprawia się tylko ręcznie (zakładka na TV musi dalej działać)
