@@ -26,6 +26,7 @@ const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 const NAZWY: Record<FazaWidoczna, string> = {
   poczekalnia: "Poczekalnia",
   etap: "Plansza etapu",
+  seria: "Seria trwa",
   przygotuj: "Odliczanie",
   pytanie: "Pytanie trwa",
   wynik: "Wynik",
@@ -99,7 +100,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
 
-  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
+  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria";
   const teraz = useCzasSerwera(przesuniecie, liczy);
   const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
@@ -230,9 +231,35 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </section>
       )}
 
+      {/* seria: postęp każdego grającego na żywo (TV pokazuje go na drogach do szklanki) */}
+      {faza === "seria" && etap && (
+        <section className="karta" style={{ marginTop: 18 }}>
+          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+            <span>
+              {etap.nazwa} · seria {etap.liczba_pytan} pyt.
+            </span>
+            <span className="gra-kod">
+              {stan.faza_od && teraz < Date.parse(stan.faza_od)
+                ? `start za ${Math.max(0, Math.ceil((Date.parse(stan.faza_od) - teraz) / 1000))} s`
+                : stan.faza_do
+                  ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s`
+                  : ""}
+            </span>
+          </p>
+          <ol className="pilot-odpowiedzi">
+            {(stan.seria ?? []).map((g) => (
+              <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
+                {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       {z &&
         faza !== "poczekalnia" &&
         faza !== "etap" &&
+        faza !== "seria" &&
         faza !== "koniec" &&
         faza !== "podium" &&
         faza !== "tabela" && (
@@ -380,10 +407,24 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             Otwórz poczekalnię (QR na TV)
           </button>
         )}
+        {faza === "seria" && (
+          <button
+            className="przycisk"
+            disabled={wysylam}
+            onClick={() =>
+              akcja("wynik", "Zakończyć serię teraz? Kto nie skończył, dostaje punkty tylko za to, co zdążył.", {
+                tak: "Zakończ serię",
+              })
+            }
+          >
+            Zakończ serię wcześniej
+          </button>
+        )}
+
         {faza === "etap" && (
           <>
             <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
-              Start etapu (pierwsze pytanie)
+              {etap?.seria ? "Start serii" : "Start etapu (pierwsze pytanie)"}
             </button>
             {z && (
               <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
@@ -445,30 +486,46 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           ))}
 
         {/* po pytaniu: wynik → odpowiedzi → ranking → następne; każdy krok można pominąć */}
-        {faza === "wynik" && (
-          <>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
-              Pokaż odpowiedzi graczy
-            </button>
-            <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
-              Pokaż ranking
-            </button>
-            <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-              {nastepne.napis}
-            </button>
-          </>
-        )}
+        {/* po ostatnim pytaniu bez rankingu: od razu podium (odpowiedzi graczy można jeszcze pokazać) */}
+        {faza === "wynik" &&
+          (stan.ostatnie_zadanie ? (
+            <>
+              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
+                Pokaż podium
+              </button>
+              <button className="przycisk" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
+                Pokaż odpowiedzi graczy
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
+                Pokaż odpowiedzi graczy
+              </button>
+              <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
+                Pokaż ranking
+              </button>
+              <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                {nastepne.napis}
+              </button>
+            </>
+          ))}
 
-        {faza === "odpowiedzi" && (
-          <>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("ranking")}>
-              Pokaż ranking
+        {faza === "odpowiedzi" &&
+          (stan.ostatnie_zadanie ? (
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
+              Pokaż podium
             </button>
-            <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-              {nastepne.napis}
-            </button>
-          </>
-        )}
+          ) : (
+            <>
+              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("ranking")}>
+                Pokaż ranking
+              </button>
+              <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                {nastepne.napis}
+              </button>
+            </>
+          ))}
 
         {faza === "ranking" && (
           <>

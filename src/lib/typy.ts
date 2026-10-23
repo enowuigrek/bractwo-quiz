@@ -44,6 +44,8 @@ export type Etap = {
   /** null: czas z ustawień gry. */
   czas_s: number | null;
   finalowy: boolean;
+  /** Seria: wszystkie pytania naraz, każdy we własnym tempie, `czas_s` na całą serię (domyślnie 60 s). */
+  seria: boolean;
   /** Ile pytań ma mieć etap (z szablonu quizu), null: bez planu. */
   plan_pytan: number | null;
   /** Rodzaj podsuwany przy dodawaniu pytania do etapu. */

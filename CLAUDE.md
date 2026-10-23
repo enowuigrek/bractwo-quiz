@@ -17,6 +17,7 @@ Zasady:
 - Next.js 16 różni się od starszych wersji (np. `proxy` zamiast `middleware`). Przed pisaniem kodu sprawdzaj dokumentację w `node_modules/next/dist/docs/` (patrz `AGENTS.md`).
 - Zapytanie `supabase().rpc(…)` rusza dopiero po `await` albo `.then()`. Samo `void supabase().rpc(…)` nic nie wysyła.
 - Projekt nie ma konfiguracji Prettiera. Jeśli formatujesz, to `npx prettier --print-width 120`, bo domyślne 80 kolumn przestawia cały plik.
+- Nie pytamy o piwa i browary koncernów (Żywiec, Tyskie, Lech itd.), tylko o style, historię i browary rzemieślnicze.
 - Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime.
 - Next nie uruchomi drugiego `next dev` w tym samym katalogu. Gdy jakiś już działa, podgląd otwieraj konfiguracją `dev-dzialajacy` z `.claude/launch.json`.
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.

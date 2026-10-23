@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
+import { OdpowiedziSzacowania } from "./szacowanie";
 import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/lib/zadania";
 
 /**
@@ -103,6 +104,23 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
   const zle = odpowiedzi.filter((o) => o.poprawna === null || (o.poprawna === false && !((o.ocena ?? 0) > 0)));
   const gesto = odpowiedzi.length > 16;
   const liczba = stan.quiz?.liczba_zadan ?? "?";
+
+  // szacowanie: oś z graczami wokół poprawnej liczby zamiast ramek dobrze / częściowo / źle
+  if (z?.typ === "szacowanie") {
+    return (
+      <MotionConfig reducedMotion="user">
+        <div className="tv-odpowiedzi">
+          <header className="tv-ranking-gora tv-odpowiedzi-gora">
+            <h1>{z.tresc}</h1>
+            <p className="tv-okazja">
+              Pytanie {z.lp}/{liczba}
+            </p>
+          </header>
+          <OdpowiedziSzacowania z={z} odpowiedzi={odpowiedzi} />
+        </div>
+      </MotionConfig>
+    );
+  }
 
   return (
     <MotionConfig reducedMotion="user">

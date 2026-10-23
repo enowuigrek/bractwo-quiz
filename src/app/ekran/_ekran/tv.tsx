@@ -19,6 +19,7 @@ import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
 import { napisMnoznika } from "@/lib/etapy";
 import { rozmycie, useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { EtapTv } from "./etap";
+import { SeriaTv } from "./seria";
 import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
@@ -114,7 +115,7 @@ export function Tv({ kod, qr, host }: Props) {
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
   useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
 
-  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
+  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria";
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
 
@@ -145,6 +146,8 @@ export function Tv({ kod, qr, host }: Props) {
             />
           ) : stan.faza === "poczekalnia" ? (
             <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
+          ) : stan.faza === "seria" ? (
+            <SeriaTv stan={stan} teraz={teraz} />
           ) : stan.faza === "etap" ? (
             <EtapTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
           ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (

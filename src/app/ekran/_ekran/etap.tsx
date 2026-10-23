@@ -50,9 +50,29 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             )}
             <motion.ul className="tv-etap-cechy" {...wejscie(3)}>
               {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
-              <li>{e.czas_s ? `${e.czas_s} s na odpowiedź` : "Bez limitu czasu"}</li>
+              <li>
+                {e.seria
+                  ? `${e.czas_s ?? 60} s na całą serię`
+                  : e.czas_s
+                    ? `${e.czas_s} s na odpowiedź`
+                    : "Bez limitu czasu"}
+              </li>
+              {e.seria && <li className="zloty">Seria: każdy we własnym tempie</li>}
               <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>
             </motion.ul>
+            {/* zapowiedź finału: w etapie przed nim gracze walczą o miejsce w trójce */}
+            {e.final_po_etapie ? (
+              <motion.p className="tv-etap-walka" {...wejscie(4)}>
+                🏆 Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału
+                {stan.liczba_graczy > 3 ? `, ${stan.liczba_graczy - 3} odpada i kibicuje` : ""}.
+              </motion.p>
+            ) : (
+              e.final_dalej && (
+                <motion.p className="tv-etap-zapowiedz" {...wejscie(4)}>
+                  Na końcu quizu finał: grają w nim tylko 3 najlepsi.
+                </motion.p>
+              )
+            )}
             {stan.finalisci && (
               <motion.div className="tv-etap-final" {...wejscie(4)}>
                 <p className="tv-etykieta">W finale grają</p>
@@ -66,7 +86,9 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                   ))}
                 </ul>
                 <p className="tv-podpowiedz">
-                  Reszta kibicuje. Telefony pokażą pytania, ale odpowiadają tylko finaliści.
+                  {e.seria
+                    ? "Reszta kibicuje: na ekranie widać na żywo, kto jest bliżej piwa."
+                    : "Reszta kibicuje. Telefony pokażą pytania, ale odpowiadają tylko finaliści."}
                 </p>
                 {stan.nagrody?.[0] && (
                   <p className="tv-etap-nagroda">

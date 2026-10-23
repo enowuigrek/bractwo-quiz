@@ -55,6 +55,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       mnoznik: szablon.mnoznik,
       czas_s: szablon.czas_s,
       finalowy: szablon.finalowy,
+      seria: szablon.seria,
       plan_pytan: pytania,
       typ_domyslny: typDomyslny(szablon),
     });
@@ -373,6 +374,7 @@ type PolaEtapu = {
   mnoznik: number;
   czas_s: number | null;
   finalowy: boolean;
+  seria: boolean;
   plan_pytan: number | null;
   typ_domyslny: string | null;
 };
@@ -400,6 +402,7 @@ function odczytajEtap(dane: FormData): { blad: string } | PolaEtapu {
     mnoznik,
     czas_s,
     finalowy: dane.get("finalowy") === "1",
+    seria: dane.get("seria") === "1",
     plan_pytan,
     typ_domyslny: czyTypZadania(typ) ? typ : null,
   };

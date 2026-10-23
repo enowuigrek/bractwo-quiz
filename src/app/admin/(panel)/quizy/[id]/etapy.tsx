@@ -17,7 +17,7 @@ import { IkonaEdytuj } from "../../_komponenty/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { dodajEtap, zapiszEtap } from "../akcje";
 
-type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy" | "plan_pytan" | "typ_domyslny">;
+type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy" | "seria" | "plan_pytan" | "typ_domyslny">;
 
 const PUSTY: Pola = {
   nazwa: "",
@@ -25,6 +25,7 @@ const PUSTY: Pola = {
   mnoznik: 1,
   czas_s: null,
   finalowy: false,
+  seria: false,
   plan_pytan: null,
   typ_domyslny: null,
 };
@@ -73,6 +74,7 @@ function FormularzEtapu({
                     mnoznik: s.mnoznik,
                     czas_s: s.czas_s,
                     finalowy: s.finalowy,
+                    seria: s.seria,
                     typ_domyslny: typDomyslny(s),
                     plan_pytan: pola.plan_pytan ?? 3,
                   })
@@ -138,7 +140,7 @@ function FormularzEtapu({
                 checked={pola.czas_s === c}
                 onChange={() => zmien({ czas_s: c })}
               />
-              {c === null ? "jak w grze" : `${c} s`}
+              {c === null ? (pola.seria ? "60 s (seria)" : "jak w grze") : `${c} s`}
             </label>
           ))}
         </div>
@@ -156,6 +158,19 @@ function FormularzEtapu({
           onChange={(e) => zmien({ plan_pytan: e.target.value ? Number(e.target.value) : null })}
         />
       </div>
+      <label className="pole-wyboru">
+        <input
+          type="checkbox"
+          name="seria"
+          value="1"
+          checked={pola.seria}
+          onChange={(e) => zmien({ seria: e.target.checked })}
+        />
+        <span>
+          <strong>Seria:</strong> wszystkie pytania etapu naraz, każdy odpowiada we własnym tempie, bez wyniku po każdym
+          pytaniu. Czas wyżej to czas na całą serię (puste: 60 s). TV pokazuje na żywo, kto jest bliżej piwa.
+        </span>
+      </label>
       <label className="pole-wyboru">
         <input
           type="checkbox"
@@ -241,8 +256,11 @@ export function NaglowekEtapu({
         </h3>
         <p className="etap-znaczki">
           <span className="znaczek aktywny">punkty {napisMnoznika(etap.mnoznik)}</span>
-          <span className="znaczek">{etap.czas_s ? `${etap.czas_s} s` : "czas jak w grze"}</span>
+          <span className="znaczek">
+            {etap.seria ? `${etap.czas_s ?? 60} s na serię` : etap.czas_s ? `${etap.czas_s} s` : "czas jak w grze"}
+          </span>
           {etap.finalowy && <span className="znaczek aktywny">finał trójki</span>}
+          {etap.seria && <span className="znaczek aktywny">seria</span>}
           <span className={`znaczek${etap.plan_pytan && pytan >= etap.plan_pytan ? " aktywny" : ""}`}>
             pytania {pytan}
             {etap.plan_pytan ? ` z ${etap.plan_pytan}` : ""}

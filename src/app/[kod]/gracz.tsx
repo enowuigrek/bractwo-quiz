@@ -12,6 +12,7 @@ import { godzinaStartu } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { EtapGracza } from "./etap";
 import { MojWyscig } from "./moj-wyscig";
+import { SeriaGracza } from "./seria";
 import { PrzerobkaAwatara } from "./przerobka-awatara";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
@@ -39,6 +40,8 @@ export function Gracz({ kod }: { kod: string }) {
   const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
   const [moj, ustawMoj] = useState<MojWynik | null>(null);
   const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
+  // punkty 3. miejsca: w etapie przed finałem telefon mówi, ile brakuje do finałowej trójki
+  const [punktyTrzeciego, ustawPunktyTrzeciego] = useState<number | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [usuniety, ustawUsuniety] = useState(false);
   // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
@@ -81,6 +84,7 @@ export function Gracz({ kod }: { kod: string }) {
             if (r.data) {
               const wiersze = r.data as WierszRankingu[];
               ustawMojWiersz(wiersze.find((w) => w.nick === nowy.nick) ?? null);
+              ustawPunktyTrzeciego([...wiersze].sort((a, b) => b.punkty - a.punkty)[2]?.punkty ?? null);
             }
           }
         }
@@ -198,6 +202,7 @@ export function Gracz({ kod }: { kod: string }) {
         gracze={gracze}
         moj={moj}
         mojWiersz={mojWiersz}
+        punktyTrzeciego={punktyTrzeciego}
         przesuniecie={przesuniecie}
         odswiez={pobierz}
       />
@@ -309,6 +314,7 @@ function WGrze({
   gracze,
   moj,
   mojWiersz,
+  punktyTrzeciego,
   przesuniecie,
   odswiez,
 }: {
@@ -317,10 +323,11 @@ function WGrze({
   gracze: GraczNaLiscie[];
   moj: MojWynik | null;
   mojWiersz: WierszRankingu | null;
+  punktyTrzeciego: number | null;
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
-  const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie";
+  const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "seria";
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, liczy, stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
@@ -385,6 +392,10 @@ function WGrze({
     );
   }
 
+  if (stan.faza === "seria") {
+    return <SeriaGracza stan={stan} ja={ja} teraz={teraz} />;
+  }
+
   if (stan.faza === "etap") {
     return <EtapGracza stan={stan} nick={ja.nick} />;
   }
@@ -400,6 +411,21 @@ function WGrze({
         <h1>Ranking</h1>
         {moj && <Miejsce moj={moj} />}
         {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
+        {/* etap przed finałem: walka o miejsce w trójce */}
+        {mojWiersz && stan.etap?.final_po_etapie && stan.liczba_graczy > 3 && (
+          <p className="etap-uwaga">
+            {mojWiersz.miejsce <= 3 ? (
+              <>
+                🏆 Jesteś w <strong>finałowej trójce</strong>. Utrzymaj miejsce do końca etapu!
+              </>
+            ) : (
+              <>
+                🏆 Do finału wchodzi 3 najlepszych. Do 3. miejsca brakuje Ci{" "}
+                <strong>{Math.max(1, (punktyTrzeciego ?? 0) - mojWiersz.punkty + 1)} pkt</strong>.
+              </>
+            )}
+          </p>
+        )}
         {/* TV pokazuje wyścig: na telefonie własny tor i szklanka */}
         {mojWiersz && stan.widok_rankingu === "wyscig" && (
           <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />

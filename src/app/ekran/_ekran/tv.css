@@ -1521,6 +1521,7 @@
 .tv-smuga {
   position: absolute;
   top: -30vh;
+  left: 0;
   width: 22vw;
   height: 170vh;
   transform-origin: 50% 0;
@@ -1535,42 +1536,56 @@
   /* gaśnie ku dołowi, jakby światło rozpraszało się w sali */
   mask-image: linear-gradient(180deg, #000 0%, #000 35%, transparent 90%);
   filter: blur(18px);
-  will-change: transform, opacity;
-  animation: smuga 48s ease-in-out infinite alternate;
+  will-change: transform, translate, opacity;
+  /* kołysanie (transform) i wędrówka przez cały ekran w pętli (translate) */
+  animation:
+    smuga 48s ease-in-out infinite alternate,
+    smuga-wedruje 90s linear infinite;
 }
 
 .tv-smuga-1 {
-  left: 8vw;
   rotate: -22deg;
+  animation-delay: 0s, -10s;
 }
 
 .tv-smuga-2 {
-  left: 46vw;
   width: 15vw;
   rotate: 8deg;
-  animation-duration: 63s;
-  animation-delay: -20s;
+  animation-duration: 63s, 72s;
+  animation-delay: -20s, -40s;
 }
 
 .tv-smuga-3 {
-  left: 74vw;
   width: 26vw;
   rotate: 24deg;
-  animation-duration: 71s;
-  animation-delay: -45s;
+  animation-duration: 71s, 110s;
+  animation-delay: -45s, -75s;
 }
 
 @keyframes smuga {
   0% {
     transform: rotate(-9deg);
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
   }
   100% {
     transform: rotate(9deg);
-    opacity: 0.6;
+  }
+}
+
+/* z lewej za ekranem na prawo za ekran; na brzegach gaśnie, więc powrót na start nie razi */
+@keyframes smuga-wedruje {
+  0% {
+    translate: -35vw 0;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    translate: 115vw 0;
+    opacity: 0;
   }
 }
 
@@ -1818,7 +1833,7 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 420px;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 80px;
   align-items: center;
   margin-top: 24px;
@@ -2242,158 +2257,93 @@
   margin-left: 6px;
 }
 
-/* Finał wyścigu: trzy drewniane drogi zbiegają się pod szklanką na środku */
-.wyscig-final {
+/* Finał (drogi.tsx): równe drewniane drogi z lewej zbiegają się pod szklanką po prawej */
+.drogi-finalu {
   position: relative;
   flex: 1;
   width: 1760px;
   height: 780px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
-.wyscig-final-drogi {
+.drogi-finalu-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
-.wyscig-final-brzeg {
+.drogi-finalu-brzeg {
   stroke: rgba(227, 172, 63, 0.55);
-  stroke-width: 118;
   stroke-linecap: round;
 }
 
-.wyscig-final-droga {
-  stroke: url(#lada-final);
-  stroke-width: 104;
+.drogi-finalu-droga {
+  stroke: url(#lada-drogi);
   stroke-linecap: round;
 }
 
-.wyscig-final-szklanka {
+.drogi-finalu-szklanka {
   position: absolute;
-  left: 880px;
-  top: 545px;
-  width: 215px;
-  translate: -50% -100%;
+  left: 1560px;
+  top: 430px;
+  width: 250px;
+  translate: -50% -50%;
 }
 
-.wyscig-final-szklanka .wyscig-szklanka-opis {
+.drogi-finalu-szklanka .wyscig-szklanka-opis,
+.drogi-finalu-szklanka .wyscig-szklanka-nagroda {
   display: none;
 }
 
-.wyscig-final-gracz {
+.drogi-finalu-gracz {
   position: absolute;
   z-index: 2;
   translate: -50% -50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 
-.wyscig-final-gracz .awatar {
+.drogi-finalu-gracz .awatar {
   border: 4px solid var(--piana);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
 }
 
-.wyscig-final-gracz.lider .awatar {
+.drogi-finalu-gracz.lider .awatar {
   border-color: var(--zloto);
   box-shadow: var(--glow-lg);
 }
 
-.wyscig-final-podpis {
+/* podpis nad awatarem, żeby nie zasłaniał sąsiednich dróg */
+.drogi-finalu-podpis {
   position: absolute;
-  top: 50%;
-  left: calc(100% + 14px);
-  translate: 0 -50%;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   white-space: nowrap;
-  padding: 6px 18px;
-  border-radius: 18px;
+  padding: 4px 16px;
+  border-radius: 16px;
   background: rgba(0, 0, 0, 0.75);
-  font-size: 34px;
+  font-size: 30px;
   font-weight: var(--w-black);
+  line-height: 1.15;
 }
 
-.wyscig-final-gracz.z-lewej .wyscig-final-podpis {
-  left: auto;
-  right: calc(100% + 14px);
-  align-items: flex-end;
-}
-
-.wyscig-final-gracz.lider .wyscig-final-podpis {
+.drogi-finalu-gracz.lider .drogi-finalu-podpis {
   color: var(--zloto);
 }
 
-.wyscig-final-punkty {
+.drogi-finalu-punkty {
   display: flex;
   gap: 10px;
   align-items: baseline;
-  font-size: 30px;
+  font-size: 26px;
   color: var(--piana);
   font-variant-numeric: tabular-nums;
-}
-
-/* Prawda / fałsz na TV: dwa wysokie kafle */
-.tv-odp-pf .tv-odp {
-  min-height: 300px;
-  justify-content: center;
-  font-size: 72px;
-}
-
-.tv-odp-pf .tv-odp-litera {
-  width: 110px;
-  height: 110px;
-  font-size: 60px;
-}
-
-/* Bąbelki w piwie: wznoszą się od dna do powierzchni, lekko kołysząc się na boki */
-.wyscig-babelki {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.wyscig-babelki span {
-  position: absolute;
-  bottom: 8%;
-  width: var(--r);
-  height: var(--r);
-  margin-left: calc(var(--r) / -2);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(255, 244, 210, 0.45) 55%, transparent 72%);
-  box-shadow: 0 0 3px rgba(255, 250, 230, 0.5);
-  opacity: 0;
-  animation: babel-w-piwie var(--t) linear var(--d) infinite;
-}
-
-@keyframes babel-w-piwie {
-  0% {
-    transform: translate(0, 0) scale(0.6);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.9;
-  }
-  50% {
-    transform: translate(var(--w), -82cqw) scale(0.85);
-  }
-  92% {
-    opacity: 0.85;
-  }
-  100% {
-    transform: translate(0, -165cqw) scale(1);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wyscig-babelki span {
-    animation: none;
-  }
 }
 
 /* Zdjęcie nagrody (bez tła): przy szklance w wyścigu, w finale, na podium i na planszy finału */
@@ -2414,10 +2364,6 @@
   color: var(--piana);
   font-size: 32px;
   font-weight: var(--w-black);
-}
-
-.wyscig-final-szklanka .wyscig-szklanka-nagroda {
-  display: none;
 }
 
 .tv-stopien-zdjecie {
@@ -2469,4 +2415,255 @@
   height: 120px;
   object-fit: contain;
   filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.4));
+}
+
+/* Odpowiedzi w szacowaniu: oś z poprawną liczbą na środku, gracze tam, gdzie strzelali */
+.tv-os-odp {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.tv-os-odp-pole {
+  position: relative;
+  height: 620px;
+}
+
+.tv-os-odp-linia {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, transparent, var(--kamien3, #34414e) 8%, var(--kamien3, #34414e) 92%, transparent);
+}
+
+.tv-os-odp-strona {
+  position: absolute;
+  top: 0;
+  font-size: 24px;
+  font-weight: var(--w-black);
+  color: var(--szary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tv-os-odp-strona.lewa {
+  left: 0;
+}
+
+.tv-os-odp-strona.prawa {
+  right: 0;
+}
+
+.tv-os-odp-poprawna {
+  position: absolute;
+  top: 9%;
+  bottom: 3%;
+  width: 6px;
+  margin-left: -3px;
+  background: linear-gradient(180deg, transparent, var(--zloto) 15%, var(--zloto) 85%, transparent);
+  box-shadow: var(--glow-lg);
+  animation: odslona 0.8s var(--ease-wjazd) both;
+}
+
+.tv-os-odp-poprawna span {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% -100%;
+  padding: 8px 24px;
+  border-radius: var(--r-pill);
+  background: var(--zloto);
+  color: var(--na-zlocie);
+  font-size: 48px;
+  font-weight: var(--w-black);
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* gracz: awatar na osi, cienka kreska do podpisu w swoim rzędzie (--rzad: 0 najbliżej osi) */
+.tv-os-odp-gracz {
+  position: absolute;
+  top: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  animation: odslona 0.5s var(--ease-wjazd) both;
+}
+
+.tv-os-odp-gracz .awatar {
+  border: 3px solid var(--piana);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+}
+
+.tv-os-odp-gracz.najblizej .awatar {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-lg);
+}
+
+.tv-os-odp-kreska {
+  position: absolute;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  height: calc(50% + 18px + var(--rzad) * 82px);
+  background: rgba(244, 236, 216, 0.35);
+}
+
+.tv-os-odp-gracz.nad .tv-os-odp-kreska {
+  bottom: 50%;
+}
+
+.tv-os-odp-gracz.pod .tv-os-odp-kreska {
+  top: 50%;
+}
+
+.tv-os-odp-podpis {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  width: 230px;
+  display: grid;
+  justify-items: center;
+  padding: 6px 10px;
+  border-radius: 14px;
+  background: rgba(18, 23, 29, 0.92);
+  border: 1px solid var(--kamien2);
+  font-size: 26px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* od krawędzi awatara: rząd 0 tuż nad (pod) nim, kolejne co 82 px */
+.tv-os-odp-gracz.nad .tv-os-odp-podpis {
+  bottom: calc(100% + 18px + var(--rzad) * 82px);
+}
+
+.tv-os-odp-gracz.pod .tv-os-odp-podpis {
+  top: calc(100% + 18px + var(--rzad) * 82px);
+}
+
+.tv-os-odp-podpis strong {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--w-black);
+}
+
+.tv-os-odp-podpis em {
+  font-style: normal;
+  color: var(--chmiel);
+  font-weight: var(--w-black);
+}
+
+.tv-os-odp-gracz.najblizej .tv-os-odp-podpis {
+  border-color: var(--zloto);
+}
+
+.tv-os-odp-dol {
+  margin: 0;
+  font-size: 34px;
+  font-weight: var(--w-semibold);
+}
+
+/* Pary: telefon poziomo. Na początku każdej pętli obraca się z pionu, żeby było widać, że trzeba go obrócić. */
+.demo.poziomo .demo-ekran {
+  width: 700px;
+  height: 380px;
+}
+
+.demo.poziomo .demo-telefon {
+  animation: obrot-telefonu 5.2s ease-in-out both;
+}
+
+@keyframes obrot-telefonu {
+  0%,
+  6% {
+    transform: rotate(-90deg) scale(0.72);
+  }
+  16%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.demo.poziomo .demo-tresc {
+  top: 22px;
+}
+
+.demo-obroc {
+  color: var(--zloto) !important;
+  font-weight: var(--w-black);
+}
+
+/* Zapowiedź finału: na planszy etapu przed finałem i kreska pod 3. torem w wyścigu */
+.tv-etap-walka {
+  margin: 32px 0 0;
+  padding: 18px 28px;
+  border-radius: var(--r-card);
+  border: 3px solid var(--zloto);
+  background: rgba(227, 172, 63, 0.1);
+  box-shadow: var(--glow-md);
+  font-size: 40px;
+  font-weight: var(--w-black);
+  max-width: 1150px;
+}
+
+.tv-etap-walka strong {
+  color: var(--zloto);
+}
+
+.tv-etap-zapowiedz {
+  margin: 28px 0 0;
+  font-size: 34px;
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+}
+
+.wyscig-strefa-finalu {
+  margin: 0;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-top: 3px dashed var(--zloto);
+  color: var(--zloto);
+  font-size: 20px;
+  font-weight: var(--w-black);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding-top: 6px;
+}
+
+/* Seria na TV: zegar w nagłówku, odliczanie przed startem na planszy */
+.tv-seria .tv-ranking-gora {
+  align-items: center;
+}
+
+.tv-seria .tv-zegar {
+  margin-left: auto;
+}
+
+.tv-seria-start {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.tv-seria {
+  position: relative;
 }

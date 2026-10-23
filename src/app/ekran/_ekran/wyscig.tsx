@@ -1,11 +1,13 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- grafiki z /public/grafiki skalowane CSS-em na scenie 1920×1080 */
 
+import { Fragment } from "react";
 import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { naTrasie } from "@/lib/gra/wyscig";
 import { DNO, POD_PIANA, poziom } from "@/lib/gra/szklanka";
+import { DrogiFinalu } from "./drogi";
 import { Licznik } from "./ranking";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
@@ -27,7 +29,12 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const liderPrzed = Math.max(0, ...wiersze.map((w) => w.punkty - w.zdobyte));
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   const odstep = wiersze.length > 8 ? 6 : 12;
-  const tor = Math.min(92, Math.floor((700 - (wiersze.length - 1) * odstep) / Math.max(1, wiersze.length)));
+  // etap przed finałem: kreska „strefa finału” pod 3. miejscem (zabiera trochę wysokości torów)
+  const strefaFinalu = !!stan.etap?.final_po_etapie && wiersze.length > 3;
+  const tor = Math.min(
+    92,
+    Math.floor((700 - (strefaFinalu ? 34 : 0) - (wiersze.length - 1) * odstep) / Math.max(1, wiersze.length)),
+  );
   const ruch = (i: number) => ({ delay: START_S + i * 0.08, duration: RUCH_S, ease: [0.22, 1, 0.36, 1] as const });
   const etap = stan.etap;
   // zdjęcie nagrody za 1. miejsce stoi przy szklance na mecie: „gracie o to”
@@ -56,7 +63,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
       <MotionConfig reducedMotion="user">
         <div className="tv-wyscig">
           {naglowek}
-          <FinalWyscigu wiersze={finalisci} lp={lp} n={n} nagroda={nagroda} />
+          <FinalWyscigu wiersze={finalisci} lp={lp} n={n} />
         </div>
       </MotionConfig>
     );
@@ -73,7 +80,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
               const przed = naTrasie(w.punkty - w.zdobyte, liderPrzed, lp - 1, n) * 100;
               const teraz = naTrasie(w.punkty, lider, lp, n) * 100;
               const prowadzi = w.miejsce === 1 && w.punkty > 0;
-              return (
+              const wiersz = (
                 <div key={w.nick} className={`wyscig-wiersz${prowadzi ? " lider" : ""}`}>
                   <span className="wyscig-miejsce">{w.miejsce}.</span>
                   <span className="wyscig-nick">{w.nick}</span>
@@ -103,6 +110,15 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                   </span>
                 </div>
               );
+              // pod 3. torem: kto jest wyżej, wchodzi do finału
+              return strefaFinalu && i === 2 ? (
+                <Fragment key={w.nick}>
+                  {wiersz}
+                  <p className="wyscig-strefa-finalu">▲ ta trójka wchodzi do finału ▲</p>
+                </Fragment>
+              ) : (
+                wiersz
+              );
             })}
           </div>
 
@@ -118,91 +134,34 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   );
 }
 
-/**
- * Drogi finału w pikselach planszy 1760×780: start na dole, koniec tuż przed szklanką (nie pod nią,
- * żeby drogi nie przesłaniały szkła). Kolejność: 2., 1., 3. miejsce.
- */
-const DROGI = [
-  { od: { x: 150, y: 740 }, do: { x: 715, y: 590 } },
-  { od: { x: 880, y: 770 }, do: { x: 880, y: 640 } },
-  { od: { x: 1610, y: 740 }, do: { x: 1045, y: 590 } },
-];
-const NA_DRODZE = [1, 0, 2];
-const AWATAR_FINALU = 124;
-
-/** Finał trójki: lider jedzie środkiem z dołu, drugi z lewej po skosie, trzeci z prawej. */
-function FinalWyscigu({
-  wiersze,
-  lp,
-  n,
-  nagroda,
-}: {
-  wiersze: WierszRankingu[];
-  lp: number;
-  n: number;
-  nagroda: string | null;
-}) {
+/** Finał trójki w rankingu: równe drogi do szklanki, gracze w kolejności miejsc. */
+function FinalWyscigu({ wiersze, lp, n }: { wiersze: WierszRankingu[]; lp: number; n: number }) {
   const lider = Math.max(0, ...wiersze.map((w) => w.punkty));
   const liderPrzed = Math.max(0, ...wiersze.map((w) => w.punkty - w.zdobyte));
-  const punkt = (d: (typeof DROGI)[number], p: number) => ({
-    x: d.od.x + (d.do.x - d.od.x) * p,
-    y: d.od.y + (d.do.y - d.od.y) * p,
-  });
   return (
-    <div className="wyscig-final">
-      <svg className="wyscig-final-drogi" viewBox="0 0 1760 780" aria-hidden>
-        <defs>
-          <pattern id="lada-final" patternUnits="userSpaceOnUse" width="480" height="320">
-            <image href="/grafiki/lada.webp" width="480" height="320" preserveAspectRatio="xMidYMid slice" />
-          </pattern>
-          <radialGradient id="poswiata-final">
-            <stop offset="0" stopColor="#e3ac3f" stopOpacity="0.45" />
-            <stop offset="1" stopColor="#e3ac3f" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        {/* miękka poświata pod szklanką zamiast obręczy: nic nie przecina szkła */}
-        <ellipse cx={880} cy={540} rx={260} ry={70} fill="url(#poswiata-final)" />
-        {DROGI.map((d, i) => (
-          <g key={i}>
-            <line x1={d.od.x} y1={d.od.y} x2={d.do.x} y2={d.do.y} className="wyscig-final-brzeg" />
-            <line x1={d.od.x} y1={d.od.y} x2={d.do.x} y2={d.do.y} className="wyscig-final-droga" />
-          </g>
-        ))}
-      </svg>
-
-      <div className="wyscig-final-szklanka">
-        <Szklanka przed={n ? (lp - 1) / n : 0} teraz={n ? lp / n : 0} doKonca={Math.max(0, n - lp)} nagroda={nagroda} />
-      </div>
-
-      {wiersze.map((w, i) => {
-        const d = DROGI[NA_DRODZE[i] ?? i];
-        const a = punkt(d, naTrasie(w.punkty - w.zdobyte, liderPrzed, lp - 1, n));
-        const b = punkt(d, naTrasie(w.punkty, lider, lp, n));
-        return (
-          <motion.div
-            key={w.nick}
-            // podpis z zewnętrznej strony drogi (lewa droga: z lewej), żeby nie wchodził na szklankę
-            className={`wyscig-final-gracz${NA_DRODZE[i] === 0 ? " z-lewej" : ""}${
-              w.miejsce === 1 && w.punkty > 0 ? " lider" : ""
-            }`}
-            initial={{ left: a.x, top: a.y }}
-            animate={{ left: b.x, top: b.y }}
-            transition={{ delay: START_S + i * 0.15, duration: RUCH_S, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={AWATAR_FINALU} />
-            <span className="wyscig-final-podpis">
-              <span>
-                {w.miejsce}. {w.nick}
-              </span>
-              <span className="wyscig-final-punkty">
-                <Licznik wartosc={w.punkty} />
-                {w.zdobyte > 0 && <span className="wyscig-zdobyte">+{w.zdobyte}</span>}
-              </span>
+    <DrogiFinalu
+      opoznienie={START_S}
+      trwanie={RUCH_S}
+      szklanka={<Szklanka przed={n ? (lp - 1) / n : 0} teraz={n ? lp / n : 0} doKonca={Math.max(0, n - lp)} />}
+      gracze={wiersze.map((w) => ({
+        nick: w.nick,
+        zdjecie: w.zdjecie,
+        przed: naTrasie(w.punkty - w.zdobyte, liderPrzed, lp - 1, n),
+        teraz: naTrasie(w.punkty, lider, lp, n),
+        lider: w.miejsce === 1 && w.punkty > 0,
+        podpis: (
+          <>
+            <span>
+              {w.miejsce}. {w.nick}
             </span>
-          </motion.div>
-        );
-      })}
-    </div>
+            <span className="drogi-finalu-punkty">
+              <Licznik wartosc={w.punkty} />
+              {w.zdobyte > 0 && <span className="wyscig-zdobyte">+{w.zdobyte}</span>}
+            </span>
+          </>
+        ),
+      }))}
+    />
   );
 }
 
@@ -225,7 +184,7 @@ const BABELKI = Array.from({ length: 26 }, (_, i) => ({
   w: ((i % 3) - 1) * 6,
 }));
 
-function Szklanka({
+export function Szklanka({
   przed,
   teraz,
   doKonca,

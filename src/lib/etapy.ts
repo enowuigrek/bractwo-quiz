@@ -9,7 +9,7 @@ export const LIMITY_ETAPU = { nazwa: 60, opis: 240 } as const;
 export const MNOZNIKI = [1, 1.5, 2, 3] as const;
 
 /** Czasy etapu do wyboru; null = jak w ustawieniach gry. */
-export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45];
+export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45, 60, 90];
 
 /** „×1,5” */
 export function napisMnoznika(m: number): string {
@@ -23,6 +23,8 @@ export type SzablonEtapu = {
   mnoznik: number;
   czas_s: number | null;
   finalowy: boolean;
+  /** Seria: wszystkie pytania naraz, każdy we własnym tempie, `czas_s` na całą serię. */
+  seria: boolean;
   /** Jakie pytania tu pasują (podpowiedź w panelu). */
   typy: TypZadania[];
 };
@@ -36,6 +38,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     mnoznik: 1,
     czas_s: null,
     finalowy: false,
+    seria: false,
     typy: ["wybor"],
   },
   {
@@ -45,6 +48,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     mnoznik: 1,
     czas_s: 10,
     finalowy: false,
+    seria: false,
     typy: ["prawda_falsz"],
   },
   {
@@ -54,6 +58,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     mnoznik: 1.5,
     czas_s: null,
     finalowy: false,
+    seria: false,
     typy: ["wielokrotny"],
   },
   {
@@ -63,6 +68,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     mnoznik: 1.5,
     czas_s: null,
     finalowy: false,
+    seria: false,
     typy: ["szacowanie"],
   },
   {
@@ -72,6 +78,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     mnoznik: 2,
     czas_s: null,
     finalowy: false,
+    seria: false,
     typy: ["pary", "kolejnosc"],
   },
   {
@@ -81,16 +88,18 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     mnoznik: 2,
     czas_s: 45,
     finalowy: false,
+    seria: false,
     typy: ["wybor", "pary"],
   },
   {
     klucz: "final",
     nazwa: "Finał",
-    opis: "Grają tylko trzej najlepsi. Reszta kibicuje, a punkty są podwójne.",
+    opis: "Trzej najlepsi odpowiadają na serię pytań we własnym tempie. Na TV widać na żywo, kto jest bliżej piwa.",
     mnoznik: 2,
-    czas_s: null,
+    czas_s: 60,
     finalowy: true,
-    typy: ["kolejnosc", "pary"],
+    seria: true,
+    typy: ["prawda_falsz"],
   },
 ];
 

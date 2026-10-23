@@ -9,6 +9,7 @@ export type { Nagroda };
 export type FazaWidoczna =
   | "poczekalnia"
   | "etap"
+  | "seria"
   | "przygotuj"
   | "pytanie"
   | "wynik"
@@ -58,6 +59,12 @@ export type EtapWidoczny = {
   czas_s: number | null;
   /** Finał: odpowiadają tylko trzej najlepsi (`StanSesji.finalisci`). */
   finalowy: boolean;
+  /** Seria: wszystkie pytania naraz, każdy we własnym tempie; `czas_s` to czas na całą serię. */
+  seria: boolean;
+  /** Następny etap to finał trójki: po tym etapie 3 najlepszych wchodzi do finału. */
+  final_po_etapie: boolean;
+  /** Gdzieś dalej w quizie jest finał trójki. */
+  final_dalej: boolean;
   liczba_pytan: number;
   /** Rodzaje pytań w etapie, w kolejności pierwszego wystąpienia. */
   typy: TypZadania[];
@@ -86,6 +93,8 @@ export type StanSesji = {
   etap: EtapWidoczny | null;
   /** Finał trójki: kto odpowiada (null: wszyscy). */
   finalisci: GraczNaLiscie[] | null;
+  /** Faza `seria`: postęp grających na żywo (ile odpowiedzi, suma ocen dobrych odpowiedzi). */
+  seria: SeriaGracz[] | null;
   faza: FazaWidoczna;
   faza_od: string | null;
   faza_do: string | null;
@@ -120,6 +129,12 @@ export type GraczPilota = {
 
 export type AkcjaPilota =
   "otworz" | "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec" | "plansze";
+
+/** Gracz w trwającej serii (`StanSesji.seria`). */
+export type SeriaGracz = { nick: string; zdjecie: string | null; odpowiedzi: number; dobre: number };
+
+/** Pytanie serii z `seria_pytania` (bez rozwiązania). */
+export type PytanieSerii = Pick<ZadanieWidoczne, "id" | "nr" | "typ" | "tresc" | "grafika_url" | "dane">;
 
 /** Wiersz `lista_graczy`: nick i adres selfie (null: bez zdjęcia). */
 export type GraczNaLiscie = { nick: string; zdjecie: string | null };

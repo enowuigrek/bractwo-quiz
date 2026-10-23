@@ -149,7 +149,9 @@ export function useKoniecPytania(kod: string, stan: Pick<StanSesji, "faza" | "fa
   const ostatnio = useRef(0);
   const faza = stan ? fazaTeraz(stan, teraz).faza : null;
   // sekunda zapasu w bazie na opóźnione odpowiedzi
-  const poKoncu = faza === "pytanie" && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > 1100 : false;
+  // seria kończy się tak samo: po czasie całej serii
+  const poKoncu =
+    (faza === "pytanie" || faza === "seria") && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > 1100 : false;
   const [tik, ustawTik] = useState(0);
   useEffect(() => {
     if (!poKoncu) return;

@@ -22,11 +22,19 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
       {e.opis && <p className="etap-opis">{e.opis}</p>}
       <ul className="etap-cechy">
         {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
-        {e.czas_s && <li>{e.czas_s} s na odpowiedź</li>}
+        {e.czas_s && <li>{e.seria ? `${e.czas_s} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>}
+        {e.seria && <li className="zloty">Seria we własnym tempie</li>}
         {e.typy.map((t) => (
           <li key={t}>{NAZWY_TYPOW[t]}</li>
         ))}
       </ul>
+      {e.typy.includes("pary") && <p className="etap-uwaga">📱 Przy parach obróć telefon poziomo.</p>}
+      {e.final_po_etapie && (
+        <p className="etap-uwaga">
+          🏆 Po tym etapie <strong>3 najlepszych wchodzi do finału</strong>
+          {stan.liczba_graczy > 3 ? `, ${stan.liczba_graczy - 3} odpada i kibicuje` : ""}. Walcz o miejsce w trójce!
+        </p>
+      )}
       {stan.finalisci && (
         <section className="etap-final">
           <p className="etykieta">{kibic ? "Grają w finale" : "Jesteś w finale!"}</p>

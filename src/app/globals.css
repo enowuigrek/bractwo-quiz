@@ -1682,7 +1682,7 @@ html:has(.kolumna) {
 
 .moj-wyscig-szklanka {
   position: relative;
-  width: 132px;
+  width: 112px;
   display: grid;
   filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.35));
 }
@@ -1736,4 +1736,79 @@ html:has(.kolumna) {
   display: grid;
   gap: 6px;
   margin: 10px 0 0;
+}
+
+/* Pary: prośba o obrócenie telefonu w pionie, a w poziomie cała szerokość ekranu i ciaśniej w pionie */
+.obroc-telefon {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 22px var(--card-pad);
+  border-radius: var(--r-card);
+  border: 2px dashed var(--zloto);
+  text-align: center;
+}
+
+.obroc-telefon-ikona {
+  font-size: 56px;
+  line-height: 1;
+  animation: obroc-ikone 2.4s ease-in-out infinite;
+}
+
+.obroc-telefon strong {
+  font-size: var(--fs-h3);
+  color: var(--zloto);
+}
+
+@keyframes obroc-ikone {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+  45%,
+  80% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .kolumna:has(.pary-poziomo) {
+    max-width: none;
+    padding-top: 8px;
+  }
+
+  .kolumna:has(.pary-poziomo) .gra-naglowek,
+  .kolumna:has(.pary-poziomo) .gra-podpowiedz {
+    display: none;
+  }
+
+  .kolumna:has(.pary-poziomo) .gra-pytanie {
+    font-size: var(--fs-body);
+    margin-bottom: 8px;
+  }
+
+  .pary-poziomo .pary-siatka {
+    gap: 6px 72px;
+  }
+
+  .pary-poziomo .odp {
+    min-height: 46px;
+    padding: 6px 12px;
+  }
+}
+
+.etap-uwaga {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-pole);
+  background: var(--kamien);
+  border-left: 3px solid var(--zloto);
+  font-weight: var(--w-semibold);
+}
+
+.etap-uwaga strong {
+  color: var(--zloto);
 }

@@ -41,6 +41,11 @@ function palec(sciezka: Punkt[], t: number): { x: number; y: number; stuka: bool
 
 const SPOCZYNEK = { x: 300, y: 660 };
 
+/** Typy, przy których telefon trzyma się poziomo (ekran 700×380): pary nie mieszczą się w pionie. */
+const POZIOMO = { szer: 700, wys: 380 };
+const SPOCZYNEK_POZIOMO = { x: 620, y: 330 };
+const poziomy = (typ: TypZadania) => typ === "pary";
+
 /** Kafelek odpowiedzi na ekranie telefonu. */
 function Kafel({
   x,
@@ -203,58 +208,61 @@ function scena(typ: TypZadania, t: number): Scena {
       };
     }
     case "pary": {
+      // telefon poziomo (ekran 700×380): na początku pętli obraca się z pionu, potem łączenie
       const lewe = ["Stout", "Weizen", "IPA"];
       const prawe = ["Bawaria", "Anglia", "Irlandia"];
       // lewy i → prawy pary[i]; stuknięcia: lewy, potem prawy
       const pary = [2, 0, 1];
-      const chwile = [0.12, 0.38, 0.64];
-      const y = (i: number) => 170 + i * 130;
-      const lewySrodek = (i: number) => ({ x: 95, y: y(i) + 50 });
-      const prawySrodek = (i: number) => ({ x: 285, y: y(i) + 50 });
+      const chwile = [0.24, 0.45, 0.66];
+      const y = (i: number) => 86 + i * 92;
+      const lewySrodek = (i: number) => ({ x: 170, y: y(i) + 39 });
+      const prawySrodek = (i: number) => ({ x: 530, y: y(i) + 39 });
       const polaczona = (i: number) => poStuku(chwile[i] + 0.12);
       const kolor = (i: number) => (polaczona(i) ? (["para0", "para1", "para2"] as const)[i] : undefined);
       return {
         tresc: "Połącz styl z krajem.",
         elementy: (
           <>
-            <svg className="demo-linie" width={SZER} height={700} aria-hidden>
+            <svg className="demo-linie" width={POZIOMO.szer} height={POZIOMO.wys} aria-hidden>
               {pary.map(
                 (k, i) =>
                   polaczona(i) && (
-                    <line key={i} x1={170} y1={y(i) + 50} x2={210} y2={y(k) + 50} className={`demo-linia para${i}`} />
+                    <line key={i} x1={314} y1={y(i) + 39} x2={386} y2={y(k) + 39} className={`demo-linia para${i}`} />
                   ),
               )}
             </svg>
             {lewe.map((o, i) => (
-              <Kafel key={o} x={20} y={y(i)} w={150} h={100} znak={String(i + 1)} tekst={o} stan={kolor(i)} />
+              <Kafel key={o} x={24} y={y(i)} w={290} h={78} znak={String(i + 1)} tekst={o} stan={kolor(i)} />
             ))}
             {prawe.map((o, k) => {
               const i = pary.indexOf(k);
-              return <Kafel key={o} x={210} y={y(k)} w={150} h={100} znak={"ABC"[k]} tekst={o} stan={kolor(i)} />;
+              return <Kafel key={o} x={386} y={y(k)} w={290} h={78} znak={"ABC"[k]} tekst={o} stan={kolor(i)} />;
             })}
           </>
         ),
         sciezka: [
-          { t: 0, ...SPOCZYNEK },
+          { t: 0, ...SPOCZYNEK_POZIOMO },
+          { t: 0.16, ...SPOCZYNEK_POZIOMO },
           ...pary.flatMap((k, i) => [
             { t: chwile[i] - 0.05, ...lewySrodek(i) },
             { t: chwile[i], ...lewySrodek(i), stuk: true },
             { t: chwile[i] + 0.1, ...prawySrodek(k) },
             { t: chwile[i] + 0.12, ...prawySrodek(k), stuk: true },
           ]),
-          { t: 0.92, ...SPOCZYNEK },
+          { t: 0.92, ...SPOCZYNEK_POZIOMO },
         ],
       };
     }
     case "szacowanie": {
-      // suwak 1400–1700 jedzie z połowy do ok. 1516, potem „Zatwierdź”
+      // żartobliwe pytanie bez prawdziwej odpowiedzi (demo nie może zdradzać odpowiedzi z quizów):
+      // suwak 0–20 jedzie z połowy do 14, potem „Zatwierdź”
       const u = Math.min(1, Math.max(0, (t - 0.15) / 0.35));
       const e = u * u * (3 - 2 * u);
-      const v = 0.5 - 0.113 * e;
-      const liczba = Math.round(1400 + v * 300);
+      const v = 0.5 + 0.2 * e;
+      const liczba = Math.round(v * 20);
       const kciukX = 40 + v * 300;
       return {
-        tresc: "W którym roku ogłoszono Reinheitsgebot?",
+        tresc: "Ile kufli wypije dziś stolik nr 3?",
         elementy: (
           <>
             <p className="demo-liczba">{liczba}</p>
@@ -268,7 +276,7 @@ function scena(typ: TypZadania, t: number): Scena {
           { t: 0, ...SPOCZYNEK },
           { t: 0.12, x: 40 + 0.5 * 300, y: 430 },
           { t: 0.15, x: 40 + 0.5 * 300, y: 430 },
-          { t: 0.5, x: 40 + 0.387 * 300, y: 430 },
+          { t: 0.5, x: 40 + 0.7 * 300, y: 430 },
           { t: 0.58, x: SZER / 2, y: 625 },
           { t: 0.62, x: SZER / 2, y: 625, stuk: true },
           { t: 0.9, ...SPOCZYNEK },
@@ -285,8 +293,9 @@ export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
   const { tresc, elementy, sciezka } = scena(typ, t);
   const p = palec(sciezka, t);
   return (
-    <figure className="demo">
-      <div className="demo-telefon">
+    <figure className={`demo${poziomy(typ) ? " poziomo" : ""}`}>
+      {/* klucz: animacja obrotu startuje od nowa z każdą pętlą */}
+      <div key={nr} className="demo-telefon">
         <div className="demo-ekran">
           <p className="demo-tresc">{tresc}</p>
           {elementy}
@@ -296,6 +305,7 @@ export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
       <figcaption>
         <strong>{NAZWY_TYPOW[typ]}</strong>
         <span>{PODPOWIEDZI_TYPOW[typ]}</span>
+        {poziomy(typ) && <span className="demo-obroc">📱 Obróć telefon poziomo</span>}
       </figcaption>
     </figure>
   );
