@@ -60,6 +60,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                     : "Kto pierwszy, ten lepszy"}
               </li>
               {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
+              {e.seria && e.finalowy && <li>Od połowy pytań utrudnienia</li>}
               <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>
             </motion.ul>
             {/* o odpadaniu mówimy tylko w etapie tuż przed finałem: tu gracze walczą o miejsce w trójce */}

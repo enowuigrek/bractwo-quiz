@@ -436,6 +436,7 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - Przy parach nie ma już „trzymaj telefon pionowo” (zawsze jest pionowo).
 - Przyciski prawda/fałsz w serii: płaskie zielone i czerwone koła z samym czarnym ✓ i ✗ (napis tylko dla czytników ekranu), lekki cień, bez ramek. Pytanie ma zawsze miejsce na trzy linie, więc przyciski stoją w tym samym miejscu przy pytaniu w jednej i w dwóch liniach (sprawdzone na localhost: góra przycisków zawsze 250 px).
 - Pytanie w finale quizu o piwie: „mocniejszą wersję porteru” zamiast „portera” (migracja `20261023165833_porteru`).
+- **Utrudnienia w drugiej połowie finału** (`[kod]/seria.tsx`, style `.utrudnienie-*` w `globals.css`): od połowy pytań serii (przy 14 od 8.) każde pytanie robi co innego, po kolei: drży, przyciski zamieniają się miejscami (✗ z lewej), mgła, dryf, zanikanie, przyciski uciekają, kołysanie. Efekt zależy tylko od miejsca pytania w serii, a kolejność pytań jest wszystkim wspólna, więc każdy finalista ma przy tym samym pytaniu to samo. W pasku „utrudnienie!”, na planszy finału „Od połowy pytań utrudnienia”. Przy ograniczonym ruchu zostaje lekka mgła i zamiana. Sprawdzone na localhost (klasy i animacje przy pytaniach 7–14).
 
 ### Werble po finale, mniej napisów, szklanka dla Samsunga (23.10, wieczór) ✅
 

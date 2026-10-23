@@ -15,6 +15,22 @@ import {
 } from "./odpowiadanie";
 import { czyKibic, type Ja } from "./rozgrywka";
 
+/**
+ * Utrudnienia w drugiej połowie finału: każde pytanie od połowy coś robi, za każdym razem co innego.
+ * Efekt zależy tylko od miejsca pytania w serii (kolejność jest wszystkim wspólna), więc każdy finalista
+ * dostaje przy tym samym pytaniu to samo. Same efekty to CSS (`.utrudnienie-*` w globals.css).
+ */
+const UTRUDNIENIA = ["drzenie", "zamiana", "mgla", "dryf", "zanikanie", "ucieczka", "kolysanie"] as const;
+/** Te działają na przyciskach prawda/fałsz; przy innym rodzaju pytania zamiast nich drży treść. */
+const NA_PRZYCISKACH: readonly string[] = ["zamiana", "ucieczka"];
+
+function utrudnienie(nr: number, liczba: number, typ: string): string | null {
+  const polowa = Math.ceil(liczba / 2);
+  if (nr < polowa) return null;
+  const efekt = UTRUDNIENIA[(nr - polowa) % UTRUDNIENIA.length];
+  return typ !== "prawda_falsz" && NA_PRZYCISKACH.includes(efekt) ? "drzenie" : efekt;
+}
+
 /** Pytanie serii w kształcie, którego oczekują komponenty odpowiadania. */
 function jakoZadanie(p: PytanieSerii): ZadanieWidoczne {
   return { ...p, lp: 0, czas_s: null, podpowiedzi: [], liczba_podpowiedzi: 0, podpowiedzi_co_s: null };
@@ -60,8 +76,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
           <span>{e?.nazwa ?? "Seria"}</span>
         </p>
         <p className="gra-kibic">
-          Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj, kto pierwszy dobiegnie do
-          piwa!
+          Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj, kto pierwszy dobiegnie do piwa!
         </p>
       </>
     );
@@ -130,41 +145,46 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
 
   const z = jakoZadanie(teraz_);
   const wspolne = { z, wyslana: null, zablokowane: wysylam, onWyslij: (d: DaneOdpowiedzi) => void odpowiedz(d) };
+  // tylko w finale: od połowy pytań utrudnienia (numer pytania w serii, nie liczba odpowiedzi gracza)
+  const efekt = e?.finalowy ? utrudnienie(pytania.indexOf(teraz_), pytania.length, z.typ) : null;
 
   return (
     <>
       <p className="etykieta gra-pasek">
         <span>
           Seria · pytanie {ktore}/{pytania.length}
+          {efekt && <span className="seria-utrudnienie"> · utrudnienie!</span>}
         </span>
         <span className="gra-kod">{Math.ceil(zostalo / 1000)} s</span>
       </p>
       {pasek}
-      {/* miejsce na trzy linie: przyciski stoją w jednym miejscu, czy pytanie ma jedną linię, czy dwie */}
-      <h2 className="gra-pytanie seria-pytanie">{z.tresc}</h2>
-      {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
-      {z.typ === "prawda_falsz" ? (
-        <OdpowiedzPrawdaFalsz key={z.id} {...wspolne} okragle />
-      ) : z.typ === "szacowanie" ? (
-        <OdpowiedzLiczba key={z.id} {...wspolne} />
-      ) : z.typ === "wielokrotny" ? (
-        <OdpowiedzWielokrotna key={z.id} {...wspolne} />
-      ) : z.typ === "kolejnosc" ? (
-        <OdpowiedzKolejnosc key={z.id} {...wspolne} />
-      ) : z.typ === "pary" ? (
-        <OdpowiedzPary key={z.id} {...wspolne} />
-      ) : (
-        <ol className="odp-lista" key={z.id}>
-          {(z.dane.odpowiedzi ?? []).map((o, i) => (
-            <li key={i}>
-              <button className="odp" disabled={wysylam} onClick={() => void odpowiedz({ odpowiedz: i })}>
-                <span className="odp-litera">{LITERY[i]}</span>
-                <span className="odp-tekst">{o}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      )}
+      <div key={z.id} className={efekt ? `utrudnienie-${efekt}` : undefined}>
+        {/* miejsce na trzy linie: przyciski stoją w jednym miejscu, czy pytanie ma jedną linię, czy dwie */}
+        <h2 className="gra-pytanie seria-pytanie">{z.tresc}</h2>
+        {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
+        {z.typ === "prawda_falsz" ? (
+          <OdpowiedzPrawdaFalsz key={z.id} {...wspolne} okragle />
+        ) : z.typ === "szacowanie" ? (
+          <OdpowiedzLiczba key={z.id} {...wspolne} />
+        ) : z.typ === "wielokrotny" ? (
+          <OdpowiedzWielokrotna key={z.id} {...wspolne} />
+        ) : z.typ === "kolejnosc" ? (
+          <OdpowiedzKolejnosc key={z.id} {...wspolne} />
+        ) : z.typ === "pary" ? (
+          <OdpowiedzPary key={z.id} {...wspolne} />
+        ) : (
+          <ol className="odp-lista" key={z.id}>
+            {(z.dane.odpowiedzi ?? []).map((o, i) => (
+              <li key={i}>
+                <button className="odp" disabled={wysylam} onClick={() => void odpowiedz({ odpowiedz: i })}>
+                  <span className="odp-litera">{LITERY[i]}</span>
+                  <span className="odp-tekst">{o}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
       {blad && (
         <p className="blad" role="alert">
           {blad}

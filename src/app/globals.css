@@ -2100,3 +2100,132 @@ html:has(.kolumna) {
 .odp-pf.okragle .odp-pf-przycisk:not(:disabled):active {
   transform: scale(0.92);
 }
+
+/* Utrudnienia w drugiej połowie finału (seria.tsx): każde pytanie od połowy robi co innego */
+.seria-utrudnienie {
+  color: var(--zloto);
+}
+
+.utrudnienie-drzenie .seria-pytanie {
+  animation: drzenie-pytania 0.14s linear infinite;
+}
+
+@keyframes drzenie-pytania {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(1.5px, -1px);
+  }
+  50% {
+    transform: translate(-1px, 1.5px);
+  }
+  75% {
+    transform: translate(1px, 1px);
+  }
+  100% {
+    transform: translate(-1.5px, -0.5px);
+  }
+}
+
+/* przyciski zamienione miejscami: ✗ z lewej, ✓ z prawej (kolory i znaki zostają) */
+.utrudnienie-zamiana .odp-pf .prawda {
+  order: 2;
+}
+
+.utrudnienie-mgla .seria-pytanie {
+  animation: mgla-pytania 2.4s ease-in-out infinite;
+}
+
+@keyframes mgla-pytania {
+  0%,
+  100% {
+    filter: blur(0);
+  }
+  50% {
+    filter: blur(4px);
+  }
+}
+
+.utrudnienie-dryf .seria-pytanie {
+  animation: dryf-pytania 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes dryf-pytania {
+  from {
+    transform: translateX(-16px);
+  }
+  to {
+    transform: translateX(16px);
+  }
+}
+
+.utrudnienie-zanikanie .seria-pytanie {
+  animation: zanikanie-pytania 2s ease-in-out infinite;
+}
+
+@keyframes zanikanie-pytania {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.12;
+  }
+}
+
+/* przyciski uciekają: wolno krążą w przeciwne strony */
+.utrudnienie-ucieczka .odp-pf .prawda {
+  animation: ucieczka-w-lewo 1.7s ease-in-out infinite alternate;
+}
+
+.utrudnienie-ucieczka .odp-pf .falsz {
+  animation: ucieczka-w-prawo 1.7s ease-in-out infinite alternate;
+}
+
+@keyframes ucieczka-w-lewo {
+  from {
+    transform: translate(6px, -14px);
+  }
+  to {
+    transform: translate(-10px, 22px);
+  }
+}
+
+@keyframes ucieczka-w-prawo {
+  from {
+    transform: translate(-6px, 14px);
+  }
+  to {
+    transform: translate(10px, -22px);
+  }
+}
+
+.utrudnienie-kolysanie .seria-pytanie {
+  animation: kolysanie-pytania 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes kolysanie-pytania {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+/* przy ograniczonym ruchu bez migania: zostaje lekka mgła, zamiana i zwykłe przyciski */
+@media (prefers-reduced-motion: reduce) {
+  .utrudnienie-drzenie .seria-pytanie,
+  .utrudnienie-mgla .seria-pytanie,
+  .utrudnienie-dryf .seria-pytanie,
+  .utrudnienie-zanikanie .seria-pytanie,
+  .utrudnienie-ucieczka .odp-pf-przycisk,
+  .utrudnienie-kolysanie .seria-pytanie {
+    animation: none;
+  }
+
+  .utrudnienie-mgla .seria-pytanie {
+    filter: blur(2px);
+  }
+}
