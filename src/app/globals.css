@@ -36,10 +36,10 @@ a {
 .kolumna {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: var(--gutter) var(--gutter) 48px;
+  padding: var(--gutter) var(--gutter) 24px;
   padding-left: max(var(--gutter), env(safe-area-inset-left));
   padding-right: max(var(--gutter), env(safe-area-inset-right));
-  padding-bottom: max(48px, env(safe-area-inset-bottom));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
 
 h1 {
@@ -1322,6 +1322,11 @@ html:has(.kolumna) {
   margin-top: 18px;
 }
 
+/* podziękowanie z oddechem pod przyciskiem (i pod kontami do oznaczenia) */
+.udostepnij + .podziekowanie {
+  margin-top: 22px;
+}
+
 .udostepnij-konta {
   margin: 0;
   text-align: center;
@@ -1337,4 +1342,55 @@ html:has(.kolumna) {
 .udostepnij-konta .przycisk-zdjecie {
   margin-left: 6px;
   padding: 4px 12px;
+}
+
+/* Koniec gry z nagrodą: medal, karta, „Udostępnij”, podziękowanie i autor muszą zmieścić się na 375×667 */
+.fanfara.z-nagroda .medal {
+  width: 88px;
+  height: 88px;
+}
+
+.fanfara.z-nagroda .medal span {
+  font-size: 46px;
+}
+
+.fanfara.z-nagroda .fanfara-tytul {
+  font-size: 28px;
+}
+
+.fanfara.z-nagroda ~ .karta-nagrody {
+  margin-bottom: 0;
+  padding: 12px var(--card-pad);
+}
+
+.fanfara.z-nagroda ~ .karta-nagrody .karta-nagrody-instrukcja {
+  margin-top: 6px !important;
+}
+
+.fanfara.z-nagroda ~ .karta-nagrody .karta-nagrody-dowod {
+  margin-top: 8px !important;
+  padding-top: 8px;
+}
+
+.fanfara.z-nagroda ~ .udostepnij {
+  margin-top: 12px;
+}
+
+.fanfara.z-nagroda ~ .udostepnij .przycisk {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.fanfara.z-nagroda ~ .udostepnij + .podziekowanie {
+  margin-top: 14px;
+}
+
+/* autor jednym wierszem, gdy nad nim jest karta nagrody */
+.fanfara.z-nagroda ~ .autor {
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  margin-top: 10px;
+  padding-top: 8px;
 }
