@@ -79,6 +79,15 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const planowany_start = startPole && !Number.isNaN(Date.parse(startPole)) ? new Date(startPole).toISOString() : null;
   if (zapowiedz && !planowany_start) return { blad: "Do zapowiedzi ustaw godzinę startu." };
 
+  // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań
+  const pijany_final = dane.get("pijany_final") === "on";
+  const za_barem = pijany_final
+    ? String(dane.get("za_barem") ?? "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 40) || null
+    : null;
+
   // gościnny browar (kranoprzejęcie): nazwa wymagana, gdy jest logo
   const browar_nazwa =
     String(dane.get("browar_nazwa") ?? "")
@@ -122,6 +131,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       browar_instagram: browar_nazwa ? browar_instagram : null,
       planowany_start,
       poczekalnia_otwarta: !zapowiedz,
+      pijany_final,
+      za_barem,
     })
     .select("id")
     .single();

@@ -26,6 +26,7 @@ const NAZWY: Record<FazaWidoczna, string> = {
   poczekalnia: "Poczekalnia",
   etap: "Plansza etapu",
   seria: "Seria trwa",
+  pijany: "Pijany finał (nic nie liczy)",
   werble: "Werble przed podium",
   przygotuj: "Odliczanie",
   pytanie: "Pytanie trwa",
@@ -100,7 +101,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
 
-  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria";
+  const liczy =
+    stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria" || stan?.faza === "pijany";
   const teraz = useCzasSerwera(przesuniecie, liczy);
   const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
@@ -245,6 +247,29 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
               </li>
             ))}
           </ol>
+          {stan.pijany_final && (
+            <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+              Po serii zamiast werbli przyjdzie pijany finał (nic nie liczy), a po nim werble. Zwycięzcę zobaczysz tutaj
+              od razu.
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* pijany finał: wynik jest już ustalony i widzi go tylko prowadzący */}
+      {faza === "pijany" && (
+        <section className="karta" style={{ marginTop: 18 }}>
+          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+            <span>Pijany finał · nic się nie liczy</span>
+            <span className="gra-kod">
+              {stan.faza_do ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}
+            </span>
+          </p>
+          <PodiumPilota gracze={gracze} />
+          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+            Widzisz to tylko Ty. Gracze odpowiadają na pytania, które nic nie liczą, a TV i telefony wariują coraz
+            bardziej. Po czasie same przyjdą werble, a potem odsłaniasz podium.
+          </p>
         </section>
       )}
 
@@ -252,6 +277,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         faza !== "poczekalnia" &&
         faza !== "etap" &&
         faza !== "seria" &&
+        faza !== "pijany" &&
         faza !== "werble" &&
         faza !== "koniec" &&
         faza !== "podium" &&
@@ -511,6 +537,21 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </button>
         )}
 
+        {/* pijany finał kończy się sam po czasie; wcześniej tylko po potwierdzeniu, żeby nie uciąć zabawy */}
+        {faza === "pijany" && (
+          <button
+            className="przycisk zloty"
+            disabled={wysylam}
+            onClick={() =>
+              akcja("werble", "Gracze jeszcze odpowiadają. Zakończyć pijany finał i pokazać werble?", {
+                tak: "Pokaż werble",
+              })
+            }
+          >
+            Zakończ i pokaż werble
+          </button>
+        )}
+
         {/* po finale serią TV i telefony czekają w ciemności, aż prowadzący odsłoni podium */}
         {faza === "werble" && (
           <>
@@ -666,6 +707,34 @@ function RozwiazaniePilota({ z, poprawna }: { z: ZadanieWidoczne; poprawna: Pilo
             {o}
             {czyPoprawna(i) && <span className="ok"> ✓</span>}
             {z.rozklad && <span className="pilot-liczba">{z.rozklad[i] ?? 0}</span>}
+          </li>
+        ))}
+      </ol>
+    </>
+  );
+}
+
+/**
+ * Wynik w pijanym finale: pierwsza trójka z punktów `pilot_gracze` (po finale już się nie zmieniają).
+ * Miejsca jak w rankingu bazy: ten sam wynik to to samo miejsce.
+ */
+function PodiumPilota({ gracze }: { gracze: GraczPilota[] }) {
+  const podium = [...gracze]
+    .sort((a, b) => b.punkty - a.punkty || a.nick.localeCompare(b.nick, "pl"))
+    .map((g, _, l) => ({ ...g, miejsce: 1 + l.filter((x) => x.punkty > g.punkty).length }))
+    .filter((g) => g.miejsce <= 3);
+  const pierwsi = podium.filter((g) => g.miejsce === 1).map((g) => g.nick);
+  if (pierwsi.length === 0) return null;
+  return (
+    <>
+      <p style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 10px", color: "var(--zloto)" }}>
+        {pierwsi.length > 1 ? "Wygrywają" : "Wygrywa"}: {pierwsi.join(", ")}
+      </p>
+      <ol className="pilot-odpowiedzi">
+        {podium.map((g) => (
+          <li key={g.nick}>
+            <span className="pilot-litera">{g.miejsce}.</span>
+            {g.nick} · {g.punkty.toLocaleString("pl-PL")} pkt
           </li>
         ))}
       </ol>

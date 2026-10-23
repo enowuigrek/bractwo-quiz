@@ -2,66 +2,52 @@
 
 Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
-## Stan na 23.10 (wieczór): od czego zacząć
+## Stan na 23.10 (noc): od czego zacząć
 
-Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są niżej w „Ustaleniach z realizacji”, a najnowsze zmiany w trzech ostatnich sekcjach z 23.10.
+Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są niżej w „Ustaleniach z realizacji”, a najnowsze zmiany w ostatnich sekcjach z 23.10 („Pijany finał” na samym końcu).
 
-**Co działa (produkcja `https://quiz.bractwopiwne.pl`, ostatnie wdrożenie 9976557):**
-- **Panel** (`/admin`, jedno hasło): lokale z logo i adresem ekranu, quizy z etapami (szablony quizu i etapów, plan liczby pytań), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas na odpowiedź domyślnie „bez limitu”, nagrody ze zdjęciem przerabianym przez AI, kranoprzejęcie, zapowiedź z godziną), historia gier, oznaczanie odbioru nagrody, grafika podium do social mediów.
-- **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`): plansze lokalu bez gry, zapowiedź z odliczaniem, poczekalnia z QR i nagrodami, plansza etapu z animacją telefonu (jak odpowiadać), pytanie z odliczaniem 3 s, wynik z rozkładem, odpowiedzi graczy (przy szacowaniu oś), ranking jako **wyścig po piwo** (szklanka nalewa się z pytaniami, do 12 graczy, powyżej tabela), finał trójki jako **seria** na żywo (trzy drogi do szklanki), **werble** po finale, podium ze zdjęciami nagród, tabela, koniec. Logo Bractwa w nagłówku po prawej. Ekran sam przeładowuje się po wdrożeniu (poza pytaniem i serią).
-- **Telefon gracza** (`/<kod>`): nick i selfie przed dołączeniem, odpowiadanie na wszystkie typy, w serii płaskie koła ✓/✗ w stałym miejscu, od połowy finału utrudnienia, ranking ze szklanką, medal i karta nagrody z pieczątką „Odebrana”, udostępnianie wyniku.
-- **Pilot** (`/pilot/<kod>?t=…`): start, następne, wynik, odpowiedzi, ranking, start etapu i serii, „Zakończ serię wcześniej”, „Pokaż podium” po werblach, tabela, koniec, lista graczy z QR powrotu.
+**Co działa (produkcja `https://quiz.bractwopiwne.pl`, ostatnie wdrożenie: „Pijany finał”, 23.10 w nocy):**
+- **Panel** (`/admin`, jedno hasło): lokale z logo i adresem ekranu, quizy z etapami (szablony quizu „Klasyczny pub quiz” i „Bez etapów”, szablony etapów, plan liczby pytań), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas na odpowiedź domyślnie „bez limitu”, nagrody ze zdjęciem przerabianym przez AI, przełącznik „Pijany finał” z polem „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź z godziną), pytania pijanego finału (Quizy → „Pijany finał: pytania”), historia gier, oznaczanie odbioru nagrody, grafika podium do social mediów.
+- **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`): plansze lokalu bez gry, zapowiedź z odliczaniem, poczekalnia z QR i nagrodami, plansza etapu z animacją telefonu (jak odpowiadać), pytanie z odliczaniem 3 s, wynik z rozkładem, odpowiedzi graczy (przy szacowaniu oś), ranking jako **wyścig po piwo** (szklanka nalewa się z pytaniami, do 12 graczy, powyżej tabela), finał trójki jako **seria** na żywo (trzy drogi do szklanki), w trybie „Pijany finał” chaos pod nagłówkiem finału, **werble** po finale, podium ze zdjęciami nagród, tabela, koniec. Logo Bractwa w nagłówku po prawej. Ekran sam przeładowuje się po wdrożeniu (poza pytaniem, serią i pijanym finałem).
+- **Telefon gracza** (`/<kod>`): nick i selfie przed dołączeniem, odpowiadanie na wszystkie typy, w serii płaskie koła ✓/✗ w stałym miejscu, od połowy finału utrudnienia, pijany finał udający dalszą serię (pytanie 15/14…), ranking ze szklanką, medal i karta nagrody z pieczątką „Odebrana”, udostępnianie wyniku.
+- **Pilot** (`/pilot/<kod>?t=…`): start, następne, wynik, odpowiedzi, ranking, start etapu i serii, „Zakończ serię wcześniej”, w pijanym finale zwycięzca z podium, odliczanie i „Zakończ i pokaż werble”, „Pokaż podium” po werblach, tabela, koniec, lista graczy z QR powrotu.
 
-**Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (tu „walka o finał”: 3 najlepszych przechodzi) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → werble → podium (pokazuje prowadzący).
+**Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (tu „walka o finał”: 3 najlepszych przechodzi) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (90 s, nic nie liczy, gracze o tym nie wiedzą) → werble → podium (pokazuje prowadzący).
 
 **Najważniejsze pliki:**
-- Baza: `supabase/migrations/` (funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `ranking`, `wewn.zakoncz_serie`, `wewn.zamknij_serie_jesli_gotowe`). Ostatnie wersje funkcji są w najnowszych plikach, w których występują.
-- TV: `src/app/ekran/_ekran/` (`tv.tsx` rozdziela fazy, `wyscig.tsx`, `drogi.tsx`, `seria.tsx`, `etap.tsx`, `demo.tsx`, `ranking.tsx`, `odpowiedzi.tsx`, `szacowanie.tsx`, `plansze.tsx`, `logo.tsx`, `tv.css`).
-- Telefon: `src/app/[kod]/` (`gracz.tsx` rozdziela fazy, `rozgrywka.tsx`, `odpowiadanie.tsx`, `seria.tsx` z utrudnieniami, `etap.tsx`, `fanfara.tsx`, `moj-wyscig.tsx`).
-- Pilot: `src/app/pilot/[kod]/pilot.tsx`. Panel: `src/app/admin/(panel)/`.
-- Wspólne: `src/components/szklanka-piwa.tsx` (szklanka bez clip-path), `src/components/werble.tsx`, `src/lib/gra/` (typy, nasłuch z zapasowym odpytywaniem, szklanka, wyścig), `src/lib/etapy.ts` (szablony), `src/lib/ekran-tv.ts` (wygaszacz, OLED, samoczynne przeładowanie).
+- Baza: `supabase/migrations/` (funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `ranking`, `dokoncz_pytanie`, `pijane_pytania`, `wewn.zakoncz_serie`, `wewn.zamknij_serie_jesli_gotowe`). Ostatnie wersje funkcji są w najnowszych plikach, w których występują (`stan_sesji` i `pilot_akcja` zmienia ostatnio `20261023182659_pijany_final.sql` podmianą fragmentu, więc całą treść bierz z bazy: `select pg_get_functiondef(…)`).
+- TV: `src/app/ekran/_ekran/` (`tv.tsx` rozdziela fazy, `wyscig.tsx`, `drogi.tsx`, `seria.tsx`, `pijany.tsx`, `etap.tsx`, `demo.tsx`, `ranking.tsx`, `odpowiedzi.tsx`, `szacowanie.tsx`, `plansze.tsx`, `logo.tsx`, `tv.css`).
+- Telefon: `src/app/[kod]/` (`gracz.tsx` rozdziela fazy, `rozgrywka.tsx`, `odpowiadanie.tsx`, `seria.tsx` z utrudnieniami, `pijany.tsx`, `etap.tsx`, `fanfara.tsx`, `moj-wyscig.tsx`).
+- Pilot: `src/app/pilot/[kod]/pilot.tsx`. Panel: `src/app/admin/(panel)/` (pytania pijanego finału: `quizy/pijany-final/`).
+- Wspólne: `src/components/szklanka-piwa.tsx` (szklanka bez clip-path), `src/components/werble.tsx`, `src/lib/gra/` (typy, nasłuch z zapasowym odpytywaniem, szklanka, wyścig), `src/lib/etapy.ts` (szablony), `src/lib/pijany.ts` (przeszkadzacze pijanego finału), `src/lib/ekran-tv.ts` (wygaszacz, OLED, samoczynne przeładowanie).
 
 **Jak testować lokalnie:** zasady są w `CLAUDE.md` (sekcja o testach). W skrócie: `npm run build`, podgląd `start-test-hasla` (port 3100), gra testowa bez lokalu założona SQL-em, gracze i akcje pilota przez funkcje w SQL, na końcu usunięcie gry w panelu.
 
 **Otwarte i niepewne:**
 - Wygaszanie Samsunga w lokalu: nowe wideo czuwania (720p z dźwiękiem) nie było jeszcze sprawdzone na tym TV. Jeśli dalej gaśnie, ustawienia TV są w `docs/TEST.md`.
 - Bonus z czasu bez limitu (1000 → 500 przez 30/60 s) i odliczanie 3 s działają w bazie, ale nie były grane na kilku telefonach naraz.
+- Pijany finał sprawdzony na localhost (gracze z SQL, telefon i pilot w przeglądarce), ale nie na kilku prawdziwych telefonach naraz ani na Samsungu (latające awatary to pętla klatek i transformacje, powinny iść płynnie).
 - Przeróbka selfie AI wyłączona (nie wyświetlała się na produkcji), opis w `docs/POMYSLY.md`.
 - Test na żywo: spotkanie Kręgu w środę 28.10.
 
-**Następny krok:** tryb „Pijany finał” (niżej), po decyzjach Łukasza z listy „Do ustalenia”.
+**Następny krok:** kibicowanie w finale (niżej), po decyzjach Łukasza z listy „Do ustalenia”.
 
-## Następny etap: tryb „Pijany finał” (pomysł Łukasza z 23.10, do akceptacji)
+## Następny etap: kibicowanie w finale (pomysł Łukasza z 23.10, do akceptacji)
 
-**Idea:** przełącznik w kreatorze gry. Prawdziwy finał (seria) kończy się jak teraz i wynik jest już ustalony, ale gra jeszcze się nie kończy: przychodzi dogrywka pytań, które **nic nie liczą**. Pytania płynnie schodzą z piwa na filozofię i rzeczy coraz dziwniejsze, a utrudnienia rozkręcają się w chaos. Na końcu wszystko gaśnie jak teraz: werble i podium.
+**Idea:** gracze, którzy odpadli z finału, w czasie serii nie widzą pytań finalistów, tylko napis „Kibicuj”. Niech coś robią: wysyłają okrzyki, które pojawiają się na TV przy finaliście.
 
-**Przebieg:**
-1. Druga połowa prawdziwego finału: utrudnienia jak teraz. Jeśli tryb jest włączony, na TV awatary pod koniec zaczynają lekko drżeć.
-2. Ktoś dobiega do piwa: zamiast werbli nowa faza `pijany`. Pilot od razu widzi zwycięzcę i podium („Wygrał: …”), gracze nie wiedzą nic.
-3. TV: awatary cofają się od piwa, drogi spadają w dół ekranu, zostaje szklanka i awatary, które drżą, pulsują i odbijają się od krawędzi jak stary wygaszacz DVD. Z każdym pytaniem coraz mocniej.
-4. Telefony: kolejne pytania prawda/fałsz (8–10), każde z mocniejszym przeszkadzaczem:
-   - cały ekran faluje, z pytania na pytanie bardziej;
-   - ✓ i ✗ mają zamienione kolory;
-   - przyciski przeskakują w pion, jeden nad drugim;
-   - pytanie o osobę za barem: „Fałsz” maleje aż do zniknięcia, „Prawda” rośnie i sama się klika, a na ekranie wyskakuje pęknięta szybka.
-   Pod koniec wszyscy mają już „popękane” wyświetlacze.
-5. Po ostatnim pytaniu (albo przycisku na pilocie) wszystko gaśnie jak teraz: werble, „Pokaż podium”.
-
-**Pytania:** stała pula w kodzie, ze wstawkami (osoba za barem, lokal, okazja). Pierwsze o piwie, potem coraz dalej: „Piwo smakuje lepiej, gdy ktoś inny płaci”, „Czy kufel jest w połowie pełny?”, „Ten quiz trwa dłużej niż powinien”, „Czy na pewno to ty trzymasz ten telefon?”, „Podoba ci się dziś {osoba za barem}?”, „Jesteś pewien, że jesteś w {lokal}?”. Niepokojąco i zabawnie, ale bez wulgarności, bez zachęcania do picia na umór i bez koncernów. W kreatorze opcjonalne pole „Kto dziś stoi za barem”: bez niego tego pytania nie ma.
-
-**Jak zrobić (szacunek: ok. 1,5 dnia):**
-- Baza: `sesje.pijany_final bool`, `sesje.za_barem text`, faza `pijany`. `wewn.zakoncz_serie` przy włączonym trybie przechodzi w `pijany`, a nie w `werble`. Odpowiedzi w `pijany` nie trafiają do `odpowiedzi` ani rankingu (osobna funkcja `zapisz_odpowiedz_pijana`, która tylko liczy, ile osób kliknęło co, np. do napisu na TV „83% uważa, że kufel jest pełny”). Pilot: „Zakończ i pokaż werble”.
-- Telefon: `[kod]/pijany.tsx` z poziomem chaosu (numer pytania) i efektami w CSS (falowanie przez `transform`, bez `clip-path`), pęknięta szybka jako SVG na wierzchu.
-- TV: `ekran/_ekran/pijany.tsx`: spadające drogi, awatary odbijające się od krawędzi (`motion`), szklanka zostaje.
-- Przy ograniczonym ruchu: same zamiany i pęknięcia, bez falowania i latania.
-- Bezpieczeństwo gry: tryb domyślnie wyłączony, więc zwykła gra działa jak dziś. Wynik jest liczony przed trybem i tryb nie może go zmienić.
+**Propozycja:**
+- **Telefon kibica (faza `seria`):** trzy awatary finalistów (stuknięcie wybiera, komu kibicujesz) i 6–8 przycisków z hasłami. Stuknięcie hasła wysyła okrzyk. W haśle zamiast kropek stoi awatar wybranego finalisty: „Dawaj [awatar]!”, „[awatar], piwo czeka!”, „Biegnij, [awatar]!”, „Wierzę w [awatar]!”, „Jeszcze trochę, [awatar]!”, „[awatar] po złoto!”, „Nie zawiedź, [awatar]!”, „Gaz do dechy, [awatar]!”. Bez wulgarności i bez zachęcania do picia.
+- **TV:** okrzyk wyskakuje jako dymek nad drogą finalisty (z nickiem kibica, np. „Ania: Dawaj [B]!”), unosi się i znika po ok. 3 s. Kilka naraz, bez zasłaniania szklanki. Przy awatarze finalisty licznik dopingu (📣 12): widać, kto ma najgłośniejszych kibiców.
+- **Finalista** w trakcie serii nic z tego nie widzi na telefonie (nie przeszkadza w odpowiadaniu), najwyżej na końcu „Kibicowało Ci 7 osób”.
+- **Limit:** jeden okrzyk na 3 s na kibica (pilnuje baza), żeby nikt nie zaspamował TV.
+- **Technika:** tabela `okrzyki` (sesja, gracz, finalista, hasło, czas; znika razem z grą), funkcja `kibicuj(token, finalista, haslo)`: tylko w fazie `seria`, tylko gracz spoza finału, z limitem czasu; zdarzenie Broadcast `okrzyk`, a TV dociąga ostatnie okrzyki jak resztę gry (Broadcast + zapasowe odpytywanie). W pijanym finale kibice odpowiadają na pytania jak wszyscy, więc okrzyki są tylko w prawdziwej serii.
+- **Szacunek:** ok. pół dnia z testem.
 
 **Do ustalenia z Łukaszem:**
-1. Robimy przed testem 28.10 (ryzyko na żywo), czy po?
-2. Ile pytań w dogrywce i czy koniec po ostatnim pytaniu, czy tylko przyciskiem z pilota?
-3. Czy TV między pytaniami pokazuje zabawne „wyniki ankiety”, czy tylko chaos z awatarami?
-4. Samoklikające się „Prawda” i pęknięta szybka: OK, że ktoś na chwilę uwierzy, że ma zepsuty telefon?
-5. Drżące awatary pod koniec prawdziwego finału tylko w tym trybie, czy zawsze?
+1. Lista haseł: te wyżej czy inne? Na stałe w kodzie, czy do zmiany w panelu (jak pytania pijanego finału)?
+2. Licznik dopingu przy awatarze na TV i „Kibicowało Ci 7 osób” na telefonie finalisty: tak czy nie?
+3. Robimy przed testem 28.10, czy po?
 
 ## Ustalenia
 
@@ -104,10 +90,10 @@ Kod sesji to krótki, czytelny ciąg (np. `PORT`), który da się też wpisać r
 ```
 poczekalnia → [etap] → przygotuj (3 s) → pytanie (czas albo bez limitu) → wynik → [odpowiedzi] → [ranking]
             → następne pytanie | [etap] → … → etap finału → seria (3 s odliczania, czas na całą serię)
-            → werble → podium ⇄ tabela → koniec
+            → [pijany (90 s, tylko z trybem „Pijany finał”)] → werble → podium ⇄ tabela → koniec
 ```
 
-`etap` to plansza przed pierwszym pytaniem etapu (prowadzący startuje go z pilota). `odpowiedzi` i `ranking` prowadzący może pominąć. W fazie `seria` wszyscy finaliści odpowiadają we własnym tempie na wszystkie pytania etapu; seria kończy się, gdy ktoś dobiegnie do piwa (wszystkie dobrze), gdy wszyscy skończą albo minie czas. Po ostatniej serii są `werble` (TV i telefony gasną), a podium odsłania prowadzący. Quiz bez etapów po ostatnim pytaniu idzie od razu do podium. Obok podium jest `tabela`: pełna lista graczy z punktami.
+`etap` to plansza przed pierwszym pytaniem etapu (prowadzący startuje go z pilota). `odpowiedzi` i `ranking` prowadzący może pominąć. W fazie `seria` wszyscy finaliści odpowiadają we własnym tempie na wszystkie pytania etapu; seria kończy się, gdy ktoś dobiegnie do piwa (wszystkie dobrze), gdy wszyscy skończą albo minie czas. Po ostatniej serii są `werble` (TV i telefony gasną), a podium odsłania prowadzący. Przy włączonym trybie „Pijany finał” przed werblami jest `pijany`: 90 s dogrywki, która nic nie liczy (po czasie albo przyciskiem pilota przychodzą werble). Quiz bez etapów po ostatnim pytaniu idzie od razu do podium. Obok podium jest `tabela`: pełna lista graczy z punktami.
 
 `pytanie → wynik` dzieje się samo: gdy odpowiedzą wszyscy (w `zapisz_odpowiedz`) albo gdy minie czas (`dokoncz_pytanie`, które wołają TV, pilot i telefony; baza sama sprawdza zegar). Ręcznie prowadzący kończy tylko pytanie bez limitu albo wcześniej.
 
@@ -124,14 +110,15 @@ zadania       id, quiz_id, etap_id, nr, typ, tresc, grafika_url, czas_s, dane js
 sesje         id, kod, quiz_id, lokal_id, okazja, grafika_url, tryb, bonus_czas, czas_s, max_graczy (30),
               faza, zadanie_nr, faza_od, faza_do, host_token, nagrody jsonb, browar_*,
               planowany_start, poczekalnia_otwarta, ekran_zwolniony, finalisci uuid[], seria_etap,
-              widok_rankingu (już nieczytane, domyślnie 'wyscig'), utworzono
+              pijany_final, za_barem, widok_rankingu (już nieczytane, domyślnie 'wyscig'), utworzono
 gracze        id, sesja_id, nick, token, zdjecie_url, nagroda_odebrana, dolaczyl   unique(sesja_id, lower(nick))
 odpowiedzi    id, gracz_id, sesja_id, zadanie_id, dane jsonb, czas_ms, poprawna, ocena (0..1), punkty, utworzono
               unique(gracz_id, zadanie_id)
 przerobki_ai  id, sesja_id, rodzaj, utworzono   (licznik przeróbek selfie, funkcja wyłączona)
+pijane_pytania id, nr, tresc, efekt, utworzono   (pytania pijanego finału, wspólne dla wszystkich gier)
 ```
 
-Fazy (`sesje.faza`): poczekalnia, etap, seria, werble, pytanie, wynik, odpowiedzi, ranking, podium, tabela, koniec. Telefony i TV widzą też `przygotuj` (pytanie przed `faza_od`).
+Fazy (`sesje.faza`): poczekalnia, etap, seria, pijany, werble, pytanie, wynik, odpowiedzi, ranking, podium, tabela, koniec. Telefony i TV widzą też `przygotuj` (pytanie przed `faza_od`).
 
 `typ` + `dane jsonb` pozwala dokładać nowe rodzaje zadań (łączenie, kolejność, liczba) bez zmian w tabelach. Każdy typ ma w kodzie swój edytor, widok TV, widok gracza i funkcję oceniającą.
 
@@ -526,6 +513,20 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - Wideo czuwania od nowa: zwykłe MP4 1280×720 z cichą ścieżką AAC (8 s, 70 KB, nagrane w przeglądarce i przepakowane `avconvert`). Pierwsza wersja (128×72, bez dźwięku) nie powstrzymała wygaszania Samsunga. Do sprawdzenia na TV; ustawienia Samsunga w `docs/TEST.md`.
 - Pytania: w quizach Seriale i Filmy zniknął etap „Błyskawica”, a jego pojedyncze pytania prawda/fałsz (i cztery z Rozgrzewki Piwa) przeszły do finału serią (po 14 pytań, migracje `20261023161713_prawda_falsz_do_finalu`, `20261023161721_plan_finalu_14`). Stout w parach jest z Anglią (wywodzi się z londyńskiego porteru, Irlandia go rozsławiła). Etap może mieć 120 s. Quiz „Muzyka popularna” od Codexa jest w bazie (migracja `20261023161821_quiz_muzyka_popularna`) z poprawioną kolejnością albumów Taylor Swift i latami bez jednostki „rok”; nie ma etapów.
 - Sprawdzone na localhost (gra testowa, potem usunięta w panelu): kreator, wybór zdjęcia przed dołączeniem, wyścig z nową szklanką, plansza finału, odliczanie w nagłówku, okrągłe przyciski, koniec serii, gdy bot dobiegł do piwa, werble na TV, telefonie i pilocie, podium ze zdjęciem nagrody i pieczątka. **Nie sprawdzone:** przeróbka AI (płatna), wygaszanie na prawdziwym Samsungu, bonus z kolejności przy kilku telefonach naraz.
+
+### Pijany finał (23.10, noc) ✅
+
+Pomysł Łukasza z 23.10. Decyzje: robimy przed testem 28.10, 8 pytań do zmiany w panelu, zawsze „szklanka” (nie „kufel”), koniec sam po czasie albo przyciskiem pilota, na TV tylko chaos z awatarami (bez „wyników ankiety”), pęknięcia szybki znikają przy werblach, drżenie awatarów w finale tylko przy włączonym trybie. W trakcie pracy Łukasz dorzucił: tryb jest **ukryty przed graczami**.
+
+- **Baza** (migracja `20261023182659_pijany_final`): `sesje.pijany_final` (domyślnie wyłączony) i `sesje.za_barem`, faza `pijany`, tabela `pijane_pytania` (nr, treść, efekt) i funkcja `pijane_pytania(kod)` z podstawionymi wstawkami. `wewn.zakoncz_serie` przy włączonym trybie przechodzi po ostatniej serii w `pijany` na 90 s, `dokoncz_pytanie` po czasie daje werble, `pilot_akcja('werble')` kończy wcześniej. `stan_sesji` zwraca `pijany_final` i `za_barem`. Wynik jest ustalony przed dogrywką: jej odpowiedzi nigdzie nie idą.
+- **Ukryty tryb:** na telefonie i TV nigdzie nie ma napisu „Pijany finał”. Telefon wygląda jak dalsza seria: „Seria · pytanie 15/14 · utrudnienie!”, sekundy i pasek czasu dogrywki, na końcu „Gotowe! Odpowiedzi: 22 z 14. Czekamy na resztę.” Pytania dostają wszyscy, także kibice. TV ma ten sam nagłówek co seria (`NaglowekSerii` w `ekran/_ekran/seria.tsx`), a zegar liczy 90 s dogrywki. Nazwę trybu widzą tylko panel i pilot.
+- **Pytania** wspólne dla wszystkich gier, w panelu: Quizy → „Pijany finał: pytania” (treść, przeszkadzacz, kolejność, do 20 pytań). Wstawki `{za_barem}` (bez imienia z kreatora to pytanie odpada) i `{lokal}` (gra bez lokalu: „tym barze”).
+- **Telefon** (`[kod]/pijany.tsx`, style `.pijany` i `.efekt-*` w `globals.css`): cały ekran faluje coraz mocniej, każde pytanie ma swój przeszkadzacz (drżenie, zamienione kolory ✓/✗, przyciski w pionie, mgła, uciekające przyciski, pytanie do góry nogami, wszystko naraz). Przy pytaniu o osobę za barem „Fałsz” maleje i znika, „Prawda” rośnie i klika się sama, a szybka pęka (SVG nad ekranem; pęka też przy „wszystko naraz”). Pęknięcia znikają przy werblach. Przy ograniczonym ruchu zostają zamiany i pęknięcia, bez falowania i latania.
+- **TV** (`ekran/_ekran/pijany.tsx`): przy włączonym trybie awatary w drugiej połowie serii drżą coraz mocniej (`--drzenie`, od połowy drogi lidera albo czasu). Seria przechodzi w dogrywkę bez nowego ekranu: awatary stoją tam, gdzie TV ostatnio widział serię (bez ostatniego kroku zwycięzcy, więc nic nie zdradza), cofają się od szklanki, drogi spadają w dół (`PlanszaDrog` w `drogi.tsx`), a potem awatary latają jak wygaszacz DVD, drżą, pulsują i widzą podwójnie, coraz mocniej przez 90 s. Szklanka się kołysze. Położenia liczy pętla klatek (`requestAnimationFrame`), więc odświeżanie stanu niczego nie zrywa. Po przeładowaniu TV finaliści startują z połowy drogi.
+- **Pilot:** w serii dopisek, że potem przyjdzie pijany finał; w dogrywce „Wygrywa: …”, podium z punktami (z `pilot_gracze`), odliczanie i „Zakończ i pokaż werble” z potwierdzeniem.
+- Pod werblami zostało samo „Wynik za chwilę.” (bez „Kto pierwszy dopadł piwa?”).
+- Szablony nowego quizu: tylko „Klasyczny pub quiz” (bez czasu w opisie) i „Bez etapów”, w ramkach z `--r-card` zamiast pigułek. Zniknęły szablony quizu „Krótki” i „Degustacja” oraz szablon etapu „Błyskawica” (prawda/fałsz jest już tylko w finale). Etap „Degustacja na ślepo” został w szablonach etapów.
+- Sprawdzone na localhost (`next start`, gra JHSW bez lokalu, gracze z SQL, potem usunięta w panelu): drżenie przy liderze 11/14, przejście w dogrywkę bez zdradzenia zwycięzcy, cofanie, spadające drogi, lot awatarów, telefon kibica i finalisty przez wszystkie 8 pytań (15/14…22/14, samoklik z „Kasia”, pęknięcia, „22 z 14”), koniec po czasie i przyciskiem z pilota, werble z nowym napisem, podium zgodne z pilotem, kreator i szablony quizu. **Nie sprawdzone:** kilka prawdziwych telefonów naraz, płynność lotu na Samsungu.
 
 ## Zadania dla ciebie (dzień 0)
 

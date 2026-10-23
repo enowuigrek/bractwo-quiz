@@ -1107,7 +1107,7 @@ a.przycisk {
   gap: 4px;
   margin: 0;
   padding: 12px 14px;
-  border-radius: var(--r-btn-sm);
+  border-radius: var(--r-card);
   border: 2px solid var(--kamien2);
   background: var(--kamien);
   cursor: pointer;

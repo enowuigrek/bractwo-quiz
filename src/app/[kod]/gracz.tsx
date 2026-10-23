@@ -14,6 +14,7 @@ import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { MojWyscig } from "./moj-wyscig";
+import { PijanyFinal } from "./pijany";
 import { SeriaGracza } from "./seria";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
@@ -328,7 +329,7 @@ function WGrze({
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
-  const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "seria";
+  const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "seria" || stan.faza === "pijany";
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, liczy, stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
@@ -390,6 +391,10 @@ function WGrze({
 
   if (stan.faza === "seria") {
     return <SeriaGracza stan={stan} ja={ja} teraz={teraz} />;
+  }
+
+  if (stan.faza === "pijany") {
+    return <PijanyFinal stan={stan} teraz={teraz} />;
   }
 
   if (stan.faza === "werble") {

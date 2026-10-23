@@ -35,6 +35,7 @@ export function Kreator({ lokale, quizy }: Props) {
   const [czas, setCzas] = useState<string>(LIMITY.domyslnyCzas === null ? "bez" : String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
   const [ileNagrod, setIleNagrod] = useState(0);
+  const [pijany, setPijany] = useState(false);
   // start: osobno data i godzina (czas lokalny przeglądarki); bez daty to dziś. Do serwera idzie ISO.
   const [dataStartu, setDataStartu] = useState("");
   const [godzinaStartu, setGodzinaStartu] = useState("");
@@ -190,6 +191,32 @@ export function Kreator({ lokale, quizy }: Props) {
                   Nagroda pokaże się na podium na TV, a zwycięzca zobaczy ją na telefonie razem z instrukcją. Zdjęcie nagrody
                   (przerobione w stylu Bractwa) stoi też przy szklance w wyścigu i na planszy finału.
                 </p>
+              </div>
+            )}
+          </fieldset>
+
+          <fieldset>
+            <legend>Pijany finał</legend>
+            <label className="przelacznik">
+              <input
+                type="checkbox"
+                name="pijany_final"
+                checked={pijany}
+                onChange={(e) => setPijany(e.target.checked)}
+              />{" "}
+              po finale dogrywka „Pijany finał”
+            </label>
+            <p className="podpowiedz">
+              Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze dostają jeszcze kilka pytań, które nic
+              nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał trwa
+              dalej (pytanie 15/14…). Potem werble i podium. Działa w quizie z finałem serią. Pytania zmieniasz
+              w Quizy → Pijany finał.
+            </p>
+            {pijany && (
+              <div style={{ marginTop: 10 }}>
+                <label htmlFor="za_barem">Kto dziś stoi za barem (opcjonalnie)</label>
+                <input id="za_barem" name="za_barem" className="pole" placeholder="np. Kasia" maxLength={40} />
+                <p className="podpowiedz">Do pytania z {"{za_barem}"}. Bez imienia to pytanie odpada.</p>
               </div>
             )}
           </fieldset>

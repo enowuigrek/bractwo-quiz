@@ -149,9 +149,11 @@ export function useKoniecPytania(kod: string, stan: Pick<StanSesji, "faza" | "fa
   const ostatnio = useRef(0);
   const faza = stan ? fazaTeraz(stan, teraz).faza : null;
   // sekunda zapasu w bazie na opóźnione odpowiedzi
-  // seria kończy się tak samo: po czasie całej serii
+  // seria i pijany finał kończą się tak samo: po czasie całej fazy
   const poKoncu =
-    (faza === "pytanie" || faza === "seria") && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > 1100 : false;
+    (faza === "pytanie" || faza === "seria" || faza === "pijany") && stan?.faza_do
+      ? teraz - Date.parse(stan.faza_do) > 1100
+      : false;
   const [tik, ustawTik] = useState(0);
   useEffect(() => {
     if (!poKoncu) return;

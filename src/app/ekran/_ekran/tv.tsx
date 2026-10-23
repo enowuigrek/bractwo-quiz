@@ -13,7 +13,7 @@ import {
 import { Awatar } from "@/components/awatar";
 import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
-import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
+import type { GraczNaLiscie, SeriaGracz, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
 import { napisMnoznika } from "@/lib/etapy";
@@ -21,6 +21,7 @@ import { rozmycie, useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
+import { PijanyTv, type GraczPijany } from "./pijany";
 import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
@@ -86,14 +87,16 @@ export function Tv({ kod, qr, host }: Props) {
   const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
   const [odpowiedzi, ustawOdpowiedzi] = useState<WierszOdpowiedzi[]>([]);
+  // ostatni stan serii widziany na tym TV: stąd awatary ruszają w pijanym finale (baza nie wydaje już serii)
+  const [ostatniaSeria, ustawOstatniaSerie] = useState<ZapamietanaSeria | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [blad, ustawBlad] = useState<string | null>(null);
 
   const pobierz = useCallback(async () => {
     try {
       const { stan, przesuniecie } = await pobierzStan(kod);
-      // lista nicków potrzebna tylko w poczekalni
-      if (stan.faza === "poczekalnia") {
+      // lista nicków w poczekalni, a w pijanym finale bez finału trójki: kto lata po ekranie
+      if (stan.faza === "poczekalnia" || (stan.faza === "pijany" && !stan.finalisci)) {
         const { data, error } = await supabase().rpc("lista_graczy", {
           p_kod: kod,
         });
@@ -112,6 +115,9 @@ export function Tv({ kod, qr, host }: Props) {
         if (error) throw error;
         ustawRanking(data as WierszRankingu[]);
       }
+      if (stan.faza === "seria" && stan.seria) {
+        ustawOstatniaSerie({ etap: stan.etap?.id ?? null, gracze: stan.seria });
+      }
       ustawStan(stan);
       ustawPrzesuniecie(przesuniecie);
       ustawBlad(null);
@@ -123,12 +129,13 @@ export function Tv({ kod, qr, host }: Props) {
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
   useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
 
-  const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria";
+  const liczy =
+    stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria" || stan?.faza === "pijany";
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
 
   // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację)
-  useNowaWersja(!stan || !["przygotuj", "pytanie", "seria", "werble", "podium"].includes(stan.faza));
+  useNowaWersja(!stan || !["przygotuj", "pytanie", "seria", "pijany", "werble", "podium"].includes(stan.faza));
 
   // zapowiedziana gra: zamiast poczekalni z QR plansze z godziną i odliczaniem (jak na ekranie lokalu)
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
@@ -161,6 +168,13 @@ export function Tv({ kod, qr, host }: Props) {
             <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
           ) : stan.faza === "seria" ? (
             <SeriaTv stan={stan} teraz={teraz} />
+          ) : stan.faza === "pijany" ? (
+            <PijanyTv
+              stan={stan}
+              teraz={teraz}
+              przesuniecie={przesuniecie}
+              gracze={graczePijani(stan, ostatniaSeria, gracze)}
+            />
           ) : stan.faza === "etap" ? (
             <EtapTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
           ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
@@ -505,8 +519,31 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   );
 }
 
+type ZapamietanaSeria = { etap: string | null; gracze: SeriaGracz[] };
+
+/**
+ * Kto lata w pijanym finale i skąd rusza: z miejsc, na których TV ostatnio widział serię (bez ostatniego
+ * kroku zwycięzcy, bo seria kończy się razem z nim, więc nic nie zdradza). Po przeładowaniu TV
+ * finaliści (albo wszyscy) startują z połowy drogi.
+ */
+function graczePijani(stan: StanSesji, seria: ZapamietanaSeria | null, gracze: GraczNaLiscie[]): GraczPijany[] {
+  const n = Math.max(1, stan.etap?.liczba_pytan ?? 1);
+  if (seria && seria.etap === (stan.etap?.id ?? null)) {
+    const najlepszy = Math.max(0, ...seria.gracze.map((g) => g.dobre));
+    return seria.gracze.map((g) => ({
+      nick: g.nick,
+      zdjecie: g.zdjecie,
+      start: Math.min(1, g.dobre / n),
+      lider: g.dobre > 0 && g.dobre === najlepszy,
+    }));
+  }
+  return (stan.finalisci ?? gracze).map((g) => ({ nick: g.nick, zdjecie: g.zdjecie, start: 0.5, lider: false }));
+}
+
 function kluczEkranu(stan: StanSesji): string {
   if (stan.faza === "etap") return `etap:${stan.etap?.id ?? ""}`;
+  // seria przechodzi w pijany finał bez wejścia nowego ekranu: te same drogi i awatary, potem chaos
+  if (stan.faza === "seria" || stan.faza === "pijany") return `seria:${stan.etap?.id ?? ""}`;
   const pytanie = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik";
   return `${pytanie ? "pytanie" : stan.faza}:${stan.zadanie?.nr ?? 0}`;
 }

@@ -10,6 +10,8 @@ export type FazaWidoczna =
   | "poczekalnia"
   | "etap"
   | "seria"
+  /** Tryb „Pijany finał”: po finale dogrywka bez punktów z chaosem na ekranach (src/lib/pijany.ts). */
+  | "pijany"
   /** Po finale serią: ekrany gasną i czekają, aż prowadzący pokaże podium. */
   | "werble"
   | "przygotuj"
@@ -88,6 +90,10 @@ export type StanSesji = {
   poczekalnia_otwarta: boolean;
   /** Ranking po pytaniu na TV: tabela albo wyścig (src/lib/gra/wyscig.ts). */
   widok_rankingu: "tabela" | "wyscig";
+  /** Tryb „Pijany finał” włączony w kreatorze gry. */
+  pijany_final: boolean;
+  /** Kto dziś stoi za barem (wstawka {za_barem} w pytaniach pijanego finału). */
+  za_barem: string | null;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
   quiz: { tytul: string; liczba_zadan: number; liczba_etapow: number } | null;
@@ -130,7 +136,7 @@ export type GraczPilota = {
 };
 
 export type AkcjaPilota =
-  "otworz" | "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec" | "plansze";
+  "otworz" | "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "werble" | "podium" | "tabela" | "koniec" | "plansze";
 
 /** Gracz w trwającej serii (`StanSesji.seria`). */
 export type SeriaGracz = { nick: string; zdjecie: string | null; odpowiedzi: number; dobre: number };

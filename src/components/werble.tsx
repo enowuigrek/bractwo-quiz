@@ -9,7 +9,7 @@ export function Werble({ duzy = false }: { duzy?: boolean }) {
       <div className="werble-tresc">
         <Kropki />
         <p className="werble-tytul">Werble…</p>
-        <p className="werble-podpis">Kto pierwszy dopadł piwa? Wynik za chwilę.</p>
+        <p className="werble-podpis">Wynik za chwilę.</p>
       </div>
     </div>
   );

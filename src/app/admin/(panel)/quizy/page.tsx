@@ -72,9 +72,13 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         !error && <p className="lista-pusta">Nie ma jeszcze żadnego quizu.</p>
       )}
 
-      <p className="panel-sekcja">
+      <p className="panel-sekcja" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         <Link href="/admin/quizy/nowy" className="przycisk zloty">
           Nowy quiz
+        </Link>
+        {/* pytania dogrywki „Pijany finał”, wspólne dla wszystkich gier */}
+        <Link href="/admin/quizy/pijany-final" className="przycisk">
+          Pijany finał: pytania
         </Link>
       </p>
     </main>

@@ -2229,3 +2229,182 @@ html:has(.kolumna) {
     filter: blur(2px);
   }
 }
+
+/* Panel: pytania pijanego finału (treść i przeszkadzacz w jednym wierszu, na telefonie pod sobą) */
+.pijane-pytanie {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .pijane-pytanie {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Pijany finał na telefonie ([kod]/pijany.tsx): cały ekran faluje tym mocniej, im dalej (--poziom 0..1),
+   a każde pytanie ma swój przeszkadzacz (.efekt-*). Same transformacje i filtry, bez clip-path. */
+.pijany {
+  --poziom: 0;
+  animation: falowanie-pijane 3.2s ease-in-out infinite;
+  transform-origin: 50% 40%;
+}
+
+@keyframes falowanie-pijane {
+  0%,
+  100% {
+    transform: skewX(calc(var(--poziom) * -7deg - 0.5deg)) translateX(calc(var(--poziom) * -10px))
+      rotate(calc(var(--poziom) * -2deg));
+  }
+  50% {
+    transform: skewX(calc(var(--poziom) * 7deg + 0.5deg)) translateX(calc(var(--poziom) * 10px))
+      rotate(calc(var(--poziom) * 2deg));
+  }
+}
+
+/* przeszkadzacze pytań */
+.efekt-drzenie .pijany-pytanie,
+.efekt-chaos .pijany-pytanie {
+  animation: drzenie-pytania 0.1s linear infinite;
+}
+
+.efekt-odwrocone_kolory .pijane-przyciski .prawda,
+.efekt-chaos .pijane-przyciski .prawda {
+  background: var(--czerwien);
+}
+
+.efekt-odwrocone_kolory .pijane-przyciski .falsz,
+.efekt-chaos .pijane-przyciski .falsz {
+  background: var(--chmiel);
+}
+
+/* jeden nad drugim */
+.efekt-pion .pijane-przyciski,
+.efekt-chaos .pijane-przyciski {
+  grid-template-columns: 1fr;
+}
+
+/* „Fałsz” maleje aż do zniknięcia, „Prawda” rośnie (i za chwilę klika się sama) */
+.efekt-samoklik .pijane-przyciski .falsz {
+  animation: znikanie-falszu 2.8s ease-in forwards;
+}
+
+.efekt-samoklik .pijane-przyciski .prawda {
+  animation: rosniecie-prawdy 3s ease-in-out forwards;
+  z-index: 1;
+}
+
+@keyframes znikanie-falszu {
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes rosniecie-prawdy {
+  to {
+    transform: scale(1.45) translateX(28%);
+  }
+}
+
+.efekt-mgla .pijany-pytanie,
+.efekt-chaos .pijane-przyciski {
+  animation: mgla-pijana 1.8s ease-in-out infinite;
+}
+
+@keyframes mgla-pijana {
+  0%,
+  100% {
+    filter: blur(1px);
+  }
+  50% {
+    filter: blur(7px);
+  }
+}
+
+.efekt-ucieczka .pijane-przyciski .prawda {
+  animation: ucieczka-pijana-lewo 1.1s ease-in-out infinite alternate;
+}
+
+.efekt-ucieczka .pijane-przyciski .falsz {
+  animation: ucieczka-pijana-prawo 1.3s ease-in-out infinite alternate;
+}
+
+@keyframes ucieczka-pijana-lewo {
+  from {
+    transform: translate(10px, -30px) rotate(-8deg);
+  }
+  to {
+    transform: translate(-14px, 44px) rotate(10deg);
+  }
+}
+
+@keyframes ucieczka-pijana-prawo {
+  from {
+    transform: translate(-12px, 40px) rotate(6deg);
+  }
+  to {
+    transform: translate(14px, -34px) rotate(-10deg);
+  }
+}
+
+/* do góry nogami, lekko się bujając */
+.efekt-obrot .pijany-pytanie {
+  animation: obrot-pijany 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes obrot-pijany {
+  from {
+    transform: rotate(174deg);
+  }
+  to {
+    transform: rotate(186deg);
+  }
+}
+
+/* pęknięta szybka: rysy od miejsca uderzenia, z krótkim błyskiem przy pęknięciu */
+.pijany-szybka {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.pijany-rysa {
+  fill: rgba(255, 255, 255, 0.85);
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 0.45;
+  fill-opacity: 0.9;
+  filter: drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.9));
+  animation: pekniecie 0.35s ease-out both;
+}
+
+.pijany-rysa polyline {
+  fill: none;
+}
+
+@keyframes pekniecie {
+  from {
+    opacity: 0;
+    stroke-width: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pijany,
+  .efekt-drzenie .pijany-pytanie,
+  .efekt-chaos .pijany-pytanie,
+  .efekt-mgla .pijany-pytanie,
+  .efekt-chaos .pijane-przyciski,
+  .efekt-ucieczka .pijane-przyciski .odp-pf-przycisk,
+  .efekt-obrot .pijany-pytanie {
+    animation: none;
+  }
+
+  .efekt-obrot .pijany-pytanie {
+    transform: rotate(180deg);
+  }
+}

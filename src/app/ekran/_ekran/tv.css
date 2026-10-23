@@ -2690,3 +2690,190 @@
 .tv-seria {
   position: relative;
 }
+
+/* Seria w trybie „Pijany finał”: im bliżej końca, tym mocniej drżą awatary (--drzenie 0..1, seria.tsx) */
+.tv-seria.drzy .drogi-finalu-gracz .awatar {
+  animation: drzenie-awatara 0.14s linear infinite;
+}
+
+@keyframes drzenie-awatara {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: calc(var(--drzenie) * 4px) calc(var(--drzenie) * -3px);
+  }
+  50% {
+    translate: calc(var(--drzenie) * -3px) calc(var(--drzenie) * 3px);
+  }
+  75% {
+    translate: calc(var(--drzenie) * 3px) calc(var(--drzenie) * 2px);
+  }
+}
+
+/* Pijany finał na TV (pijany.tsx): drogi spadają, awatary latają jak wygaszacz DVD, drżą, pulsują i widzą
+   podwójnie, szklanka się kołysze. Wszystko rośnie z --poziom (0..1 przez całą fazę). Same transformacje,
+   bez clip-path (Samsung). */
+.tv-pijany {
+  --poziom: 0;
+  animation: czkawka-tv 0.8s ease-out both;
+}
+
+/* wejście w tryb: ekran podskakuje jak po czkawce */
+@keyframes czkawka-tv {
+  0% {
+    translate: 0 -18px;
+  }
+  25% {
+    translate: 0 12px;
+  }
+  50% {
+    translate: 0 -6px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+.tv-pijany .tv-ranking-gora h1 {
+  transform-origin: 30% 60%;
+  animation: kiwanie-tytulu 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes kiwanie-tytulu {
+  from {
+    rotate: calc(var(--poziom) * -4deg - 1deg);
+  }
+  to {
+    rotate: calc(var(--poziom) * 4deg + 1deg);
+  }
+}
+
+/* cała plansza faluje, coraz mocniej */
+.tv-pijany .drogi-finalu {
+  animation: falowanie-tv 5s ease-in-out infinite;
+}
+
+@keyframes falowanie-tv {
+  0%,
+  100% {
+    transform: skewX(calc(var(--poziom) * -5deg)) rotate(calc(var(--poziom) * -1.2deg));
+  }
+  50% {
+    transform: skewX(calc(var(--poziom) * 5deg)) rotate(calc(var(--poziom) * 1.2deg));
+  }
+}
+
+/* drogi po kolei spadają w dół ekranu, każda z innym przechyłem (--i, --obrot z drogi.tsx) */
+.drogi-finalu-svg.spadaja .drogi-finalu-pas {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translateY(1100px) rotate(var(--obrot));
+  opacity: 0;
+  transition:
+    transform 1.5s cubic-bezier(0.5, 0, 0.9, 0.4) calc(var(--i) * 0.18s),
+    opacity 0.4s ease-in calc(1.1s + var(--i) * 0.18s);
+}
+
+.tv-pijany .drogi-finalu-szklanka {
+  transform-origin: 50% 90%;
+  animation: kolysanie-szklanki 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes kolysanie-szklanki {
+  from {
+    rotate: calc(var(--poziom) * -12deg - 2deg);
+  }
+  to {
+    rotate: calc(var(--poziom) * 12deg + 2deg);
+  }
+}
+
+/* położenie ustawia pętla klatek (transform), tu tylko punkt odniesienia */
+.pijany-gracz {
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.pijany-drzenie {
+  animation: drzenie-pijane 0.13s linear infinite;
+  animation-delay: calc(var(--i) * -0.05s);
+}
+
+@keyframes drzenie-pijane {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: calc(var(--poziom) * 7px + 1px) calc(var(--poziom) * -5px);
+  }
+  50% {
+    translate: calc(var(--poziom) * -6px - 1px) calc(var(--poziom) * 5px + 1px);
+  }
+  75% {
+    translate: calc(var(--poziom) * 5px) calc(var(--poziom) * 4px - 1px);
+  }
+}
+
+.pijany-awatar {
+  position: relative;
+  display: grid;
+  animation: pulsowanie-pijane 1.4s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.45s);
+}
+
+/* właściwy awatar nad bladym drugim */
+.pijany-awatar > .awatar {
+  position: relative;
+}
+
+@keyframes pulsowanie-pijane {
+  from {
+    scale: 0.96;
+    rotate: calc(var(--poziom) * -16deg - 3deg);
+  }
+  to {
+    scale: calc(1.08 + var(--poziom) * 0.42);
+    rotate: calc(var(--poziom) * 16deg + 3deg);
+  }
+}
+
+/* podwójne widzenie */
+.pijany-duch {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  opacity: calc(0.2 + var(--poziom) * 0.35);
+  animation: duch-pijany 1.9s ease-in-out infinite alternate;
+}
+
+@keyframes duch-pijany {
+  from {
+    translate: calc(var(--poziom) * -34px - 6px) calc(var(--poziom) * -4px);
+  }
+  to {
+    translate: calc(var(--poziom) * 34px + 6px) calc(var(--poziom) * 8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-seria.drzy .drogi-finalu-gracz .awatar,
+  .tv-pijany,
+  .tv-pijany .tv-ranking-gora h1,
+  .tv-pijany .drogi-finalu,
+  .tv-pijany .drogi-finalu-szklanka,
+  .pijany-drzenie,
+  .pijany-awatar,
+  .pijany-duch {
+    animation: none;
+  }
+
+  /* drogi znikają bez spadania */
+  .drogi-finalu-svg.spadaja .drogi-finalu-pas {
+    transform: none;
+    transition: opacity 0.8s ease-in;
+  }
+}

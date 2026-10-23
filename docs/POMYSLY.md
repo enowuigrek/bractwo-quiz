@@ -36,10 +36,11 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 - Efekt „piany” przy wejściu nowego gracza do poczekalni (złoty blask na liderze rankingu już jest).
 - Odliczanie jako napełniający się kufel zamiast paska.
 - Dźwięki (start, koniec czasu, werble po finale, fanfara przy podium) z wyciszeniem na pilocie. Teraz TV jest cicha, a werble to sam obraz.
+- **Pijany finał, „wyniki ankiety”:** zliczanie odpowiedzi z dogrywki i zabawne napisy na TV (np. „83% uważa, że szklanka jest pełna”). Od 23.10 TV pokazuje w dogrywce tylko chaos z awatarami, a odpowiedzi nigdzie nie idą.
 
 ## Organizacyjne
 
-- Szablony quizów z gotowymi pytaniami (np. „Dzień Porteru”), które kopiuje się przed eventem. (Szablony z samymi etapami i liczbą pytań są od 23.10.)
+- Szablony quizów z gotowymi pytaniami (np. „Dzień Porteru”), które kopiuje się przed eventem. (Szablony z samymi etapami i liczbą pytań są od 23.10: „Klasyczny pub quiz” i „Bez etapów”. „Krótki” i „Degustacja” zniknęły z kreatora 23.10 i mogą wrócić, gdy będą potrzebne.)
 - Biblioteka pytań wspólna dla wszystkich quizów, z tagami (style, historia, chmiele).
 - Tryb próbny („na sucho”), który nie zapisuje wyników.
 - **Zmiana nicku** przez gracza przed startem quizu.

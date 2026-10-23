@@ -42,16 +42,6 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     typy: ["wybor"],
   },
   {
-    klucz: "blyskawica",
-    nazwa: "Błyskawica",
-    opis: "Prawda czy fałsz? Mało czasu, nie zastanawiaj się długo.",
-    mnoznik: 1,
-    czas_s: 10,
-    finalowy: false,
-    seria: false,
-    typy: ["prawda_falsz"],
-  },
-  {
     klucz: "kilka",
     nazwa: "Kilka dobrych",
     opis: "Dobrych odpowiedzi może być kilka. Zaznacz wszystkie, za złe tracisz część punktów pytania.",
@@ -121,34 +111,12 @@ export const SZABLONY_QUIZU: SzablonQuizu[] = [
   {
     klucz: "klasyczny",
     nazwa: "Klasyczny pub quiz",
-    opis: "Ok. 45 minut: od łatwych pytań do finału trójki.",
+    opis: "Etapy od łatwych pytań do finału trójki.",
     etapy: [
       { szablon: "rozgrzewka", pytania: 6 },
-      { szablon: "blyskawica", pytania: 4 },
       { szablon: "kilka", pytania: 3 },
       { szablon: "szacowanie", pytania: 3 },
       { szablon: "laczenie", pytania: 3 },
-      { szablon: "final", pytania: 2 },
-    ],
-  },
-  {
-    klucz: "krotki",
-    nazwa: "Krótki",
-    opis: "Ok. 20 minut, np. jako przerywnik wieczoru.",
-    etapy: [
-      { szablon: "rozgrzewka", pytania: 5 },
-      { szablon: "blyskawica", pytania: 4 },
-      { szablon: "final", pytania: 2 },
-    ],
-  },
-  {
-    klucz: "degustacja",
-    nazwa: "Degustacja",
-    opis: "Z etapem na ślepo: lokal podaje deskę próbek.",
-    etapy: [
-      { szablon: "rozgrzewka", pytania: 4 },
-      { szablon: "degustacja", pytania: 4 },
-      { szablon: "szacowanie", pytania: 2 },
       { szablon: "final", pytania: 2 },
     ],
   },

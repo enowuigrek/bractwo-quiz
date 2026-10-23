@@ -35,13 +35,15 @@ Do szybkiego testu podstaw: quiz z 3–4 pytaniami (jedno z grafiką, jedno z 6 
 | 13 | Ranking po pytaniu | Wyścig po piwo: awatary jadą po torach, szklanka dolewa się po każdym pytaniu (na TV i na telefonie). Przy ponad 12 graczach tabela. |
 | 14 | Etap przed finałem | Plansza „Walka o finał: 3 najlepszych”, telefon „Do 3. miejsca brakuje Ci X pkt”, w wyścigu kreska pod 3. torem. |
 | 15 | Finał (seria) | Plansza finału z finalistami i nagrodą. Start: „Start za 3” w nagłówku, drogi widać. Finaliści klikają koła ✓/✗ we własnym tempie, na TV jadą do szklanki (bez numerów pytań), reszta kibicuje. Od połowy pytań utrudnienia: drżenie, zamiana przycisków, mgła, dryf, zanikanie, uciekające przyciski, kołysanie. |
-| 16 | Ktoś odpowie dobrze na wszystko | Seria kończy się od razu: TV gaśnie z błyskiem, telefony robią się czarne, po chwili „Werble…” z kropkami. Pilot: „Pokaż podium”. |
+| 16 | Ktoś odpowie dobrze na wszystko (gra bez „Pijanego finału”) | Seria kończy się od razu: TV gaśnie z błyskiem, telefony robią się czarne, po chwili „Werble…” z kropkami i „Wynik za chwilę.” Pilot: „Pokaż podium”. |
 | 17 | Podium i nagroda | Podium wjeżdża 3 → 2 → 1 ze zdjęciem nagrody. Telefon zwycięzcy: karta nagrody, „Potwierdź odbiór”, potem pieczątka „Odebrana”. |
+| 18 | Gra z „Pijanym finałem” (kreator, najlepiej z imieniem osoby za barem), ktoś dobiega do piwa | Pod koniec serii awatary na TV drżą. Potem nigdzie nie ma napisu „Pijany finał”: TV dalej ma nagłówek finału, awatary cofają się od szklanki, drogi spadają, awatary latają i drżą coraz mocniej. Telefony (wszyscy, też kibice): „Seria · pytanie 15/14 · utrudnienie!” i dalej, ekran faluje, pytanie o osobę za barem klika się samo i pęka szybka, na końcu „Odpowiedzi: 22 z 14”. Pilot: „Wygrywa: …”, podium z punktami, odliczanie 90 s, „Zakończ i pokaż werble”. Po czasie albo przycisku werble i podium jak zwykle. |
 
 Do zanotowania po teście (dzień 7):
 - czy bonus za szybkość jest sprawiedliwy (z limitem i bez),
 - czy czasy pytań, 3 s odliczania i 120 s na finał pasują,
 - czy utrudnienia w finale nie są za mocne (albo za słabe),
+- pijany finał: jak ludzie reagują, czy ktoś zauważył „15/14”, czy 90 s to nie za długo i czy latające awatary idą płynnie na Samsungu,
 - czy telewizor dalej się wygasza (wideo czuwania 720p z dźwiękiem, ustawienia Samsunga wyżej),
 - czy coś na TV jest za małe z końca sali,
 - błędy i dziwne zachowania: kiedy, na jakim telefonie i w jakiej przeglądarce.
