@@ -321,8 +321,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
 
       {/* rodzaj następnego pytania zawsze: rodzaje się mieszają, prowadzący uprzedza graczy przed startem */}
+      {/* przy etapach niepotrzebne: plansza etapu na TV sama pokazuje, jak odpowiadać */}
       {stan.nastepne_typ &&
-        !stan.nastepny_etap &&
+        !stan.quiz?.liczba_etapow &&
         (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
           <p className="pilot-zapowiedz" role="status">
             <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed

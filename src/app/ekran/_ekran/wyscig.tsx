@@ -30,7 +30,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const ruch = (i: number) => ({ delay: START_S + i * 0.08, duration: RUCH_S, ease: [0.22, 1, 0.36, 1] as const });
   const etap = stan.etap;
   // zdjęcie nagrody za 1. miejsce stoi przy szklance na mecie: „gracie o to”
-  const nagroda = stan.nagrody?.find((x) => x.miejsce === 1)?.zdjecie ?? null;
+  // szklanka na mecie to główna nagroda: pod nią jej nazwa (zdjęcia nagród są na starcie i na podium)
+  const nagroda = stan.nagrody?.find((x) => x.miejsce === 1)?.nagroda ?? null;
   // z etapu na etap szklanka jest bliżej: większa, a tory krótsze (bez etapów jak dotąd)
   const blisko = etap ? (etap.nr - 1) / Math.max(1, etap.liczba - 1) : 0.4;
   const szklanka = Math.round(240 + 200 * blisko);
@@ -65,10 +66,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
       <div className="tv-wyscig">
         {naglowek}
 
-        <div
-          className="wyscig-plansza"
-          style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka + (nagroda ? MIEJSCE_NA_NAGRODE : 0)}px` }}
-        >
+        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
           <div className="wyscig-tory" style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}>
             {wiersze.map((w, i) => {
               const przed = naTrasie(w.punkty - w.zdobyte, liderPrzed, lp - 1, n) * 100;
@@ -220,9 +218,6 @@ const poziom = (cz: number) => DNO - (DNO - GORA) * cz;
 /** Szklanka zwęża się ku dołowi: odstęp piany od boków obrazka na danym poziomie. */
 const bok = (y: number) => 6 + Math.max(0, y - 35) * 0.18;
 
-/** O tyle szersza jest kolumna szklanki, gdy obok stoi zdjęcie nagrody (żeby nie wchodziło na punkty). */
-const MIEJSCE_NA_NAGRODE = 170;
-
 /** Pełna szklanka: piana z grafiki kończy się mniej więcej tu (procent wysokości), bąbelki tylko niżej. */
 const POD_PIANA = 24;
 
@@ -247,7 +242,7 @@ function Szklanka({
   przed: number;
   teraz: number;
   doKonca: number;
-  /** Zdjęcie nagrody za 1. miejsce (bez tła), stoi obok szklanki. */
+  /** Nazwa nagrody za 1. miejsce: o nią toczy się wyścig. */
   nagroda?: string | null;
 }) {
   const nalewanie = { delay: START_S, duration: RUCH_S + 0.6, ease: [0.22, 1, 0.36, 1] as const };
@@ -262,7 +257,7 @@ function Szklanka({
   });
   const babelkiOd = (cz: number) => (cz >= 1 ? POD_PIANA : Math.min(DNO, poziom(cz) + 2));
   return (
-    <div className={`wyscig-szklanka${nagroda ? " z-nagroda" : ""}`} aria-hidden>
+    <div className="wyscig-szklanka" aria-hidden>
       <div className="wyscig-szklo">
         {/* pusta szklanka bez piany z grafiki: piana tworzy się dopiero na nalewanym piwie */}
         <img
@@ -304,10 +299,9 @@ function Szklanka({
         <motion.div className="wyscig-piana" initial={piana(przed)} animate={piana(teraz)} transition={nalewanie} />
       </div>
       {nagroda && (
-        <span className="wyscig-nagroda">
-          <img src={nagroda} alt="" />
-          <span>Nagroda</span>
-        </span>
+        <p className="wyscig-szklanka-nagroda">
+          Gracie o: <strong>{nagroda}</strong>
+        </p>
       )}
       <p className="wyscig-szklanka-opis">{doKonca ? `jeszcze ${doKonca} ${pytan(doKonca)}` : "Nalane!"}</p>
     </div>

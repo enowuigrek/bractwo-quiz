@@ -245,6 +245,20 @@ function Poczekalnia({
           )}
           {stan.grafika_url && <img src={stan.grafika_url} alt="" className="tv-grafika" />}
 
+          {/* nagrody widać na starcie: tu ze zdjęciami, potem tylko nazwa przy szklance i podium */}
+          {stan.nagrody && (
+            <ul className="tv-nagrody-start">
+              {stan.nagrody.map((n) => (
+                <li key={n.miejsce}>
+                  {n.zdjecie && <img src={n.zdjecie} alt="" />}
+                  <span>
+                    <strong>{n.miejsce}.</strong> {n.nagroda}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
           <div className="tv-gracze">
             <p className="tv-etykieta">
               {druzyny ? "Drużyny" : "Gracze"}{" "}

@@ -2382,50 +2382,23 @@
   position: relative;
 }
 
-/* kolumna szklanki jest szersza o miejsce na nagrodę (MIEJSCE_NA_NAGRODE w wyscig.tsx) */
-.wyscig-szklanka.z-nagroda {
-  padding-left: 170px;
+.wyscig-szklanka-nagroda {
+  margin: 14px 0 0;
+  font-size: 26px;
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  text-align: center;
 }
 
-.wyscig-nagroda {
-  position: absolute;
-  left: 0;
-  bottom: 40px;
-  width: 160px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  z-index: 3;
-}
-
-.wyscig-nagroda img {
-  width: 100%;
-  max-width: none;
-  height: auto;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 22px rgba(227, 172, 63, 0.45));
-}
-
-.wyscig-nagroda span {
-  padding: 4px 14px;
-  border-radius: var(--r-pill);
-  background: var(--zloto);
-  color: var(--na-zlocie);
-  font-size: 24px;
+.wyscig-szklanka-nagroda strong {
+  display: block;
+  color: var(--piana);
+  font-size: 32px;
   font-weight: var(--w-black);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
-.wyscig-final-szklanka .wyscig-szklanka.z-nagroda {
-  padding-left: 0;
-}
-
-.wyscig-final-szklanka .wyscig-nagroda {
-  left: auto;
-  right: -105%;
-  bottom: 0;
-  width: 85%;
+.wyscig-final-szklanka .wyscig-szklanka-nagroda {
+  display: none;
 }
 
 .tv-stopien-zdjecie {
@@ -2447,6 +2420,34 @@
 .tv-etap-nagroda img {
   width: 130px;
   height: 130px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.4));
+}
+
+/* Nagrody w poczekalni (start quizu): zdjęcia bez tła z nazwą i miejscem */
+.tv-nagrody-start {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: flex;
+  gap: 36px;
+}
+
+.tv-nagrody-start li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 32px;
+  font-weight: var(--w-black);
+}
+
+.tv-nagrody-start strong {
+  color: var(--zloto);
+}
+
+.tv-nagrody-start img {
+  width: 120px;
+  height: 120px;
   object-fit: contain;
   filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.4));
 }
