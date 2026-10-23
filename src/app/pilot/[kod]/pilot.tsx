@@ -15,6 +15,7 @@ import {
 } from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { MAX_W_WYSCIGU } from "@/lib/gra/wyscig";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
 import { GraczePilota } from "./gracze";
@@ -125,6 +126,19 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         <p className="pomocniczy">{bladSieci ?? "Łączę z grą…"}</p>
       </>
     );
+  }
+
+  async function ustawWidok(widok: PilotStan["widok_rankingu"]) {
+    if (wysylam || !token || stan?.widok_rankingu === widok) return;
+    ustawWysylam(true);
+    ustawBladAkcji(null);
+    const { data, error } = await supabase().rpc("pilot_widok", { p_kod: kod, p_host_token: token, p_widok: widok });
+    ustawWysylam(false);
+    if (error) {
+      ustawBladAkcji(komunikatBledu(error));
+      return;
+    }
+    ustawStan(data as PilotStan);
   }
 
   async function akcja(a: AkcjaPilota, pytanie?: string, opcje?: OpcjePotwierdzenia) {
@@ -271,6 +285,34 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </span>
           )}
         </p>
+      )}
+
+      {/* ranking po pytaniu: tabela albo wyścig; wyścig tylko, gdy gracze mieszczą się na torach */}
+      {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
+        <div className="pilot-widok" role="group" aria-label="Ranking po pytaniu na TV">
+          <span className="pomocniczy">Ranking na TV:</span>
+          <button
+            type="button"
+            className={`pilot-widok-opcja${stan.widok_rankingu === "tabela" ? " wybrana" : ""}`}
+            aria-pressed={stan.widok_rankingu === "tabela"}
+            disabled={wysylam}
+            onClick={() => void ustawWidok("tabela")}
+          >
+            Tabela
+          </button>
+          <button
+            type="button"
+            className={`pilot-widok-opcja${stan.widok_rankingu === "wyscig" ? " wybrana" : ""}`}
+            aria-pressed={stan.widok_rankingu === "wyscig"}
+            disabled={wysylam || stan.liczba_graczy > MAX_W_WYSCIGU}
+            onClick={() => void ustawWidok("wyscig")}
+          >
+            Wyścig
+          </button>
+          {stan.liczba_graczy > MAX_W_WYSCIGU && (
+            <span className="pomocniczy">Wyścig mieści {MAX_W_WYSCIGU} graczy, więc zostaje tabela.</span>
+          )}
+        </div>
       )}
 
       <section style={{ marginTop: "var(--section-gap)", display: "grid", gap: 12 }}>

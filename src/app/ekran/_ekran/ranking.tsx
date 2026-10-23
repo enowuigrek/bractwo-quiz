@@ -15,7 +15,7 @@ const PRZETASOWANIE_MS = 1600;
 const ruch = { type: "spring", stiffness: 140, damping: 22 } as const;
 
 /** Liczba, która płynnie dolicza do nowej wartości. */
-function Licznik({ wartosc }: { wartosc: number }) {
+export function Licznik({ wartosc }: { wartosc: number }) {
   const [widoczna, ustawWidoczna] = useState(wartosc);
   const poprzednia = useRef(wartosc);
   useEffect(() => {

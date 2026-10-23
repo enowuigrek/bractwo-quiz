@@ -24,7 +24,7 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 
 ## Animacje i ekran TV
 
-- **Wyścig zamiast tabeli (do przemyślenia, pomysł z 23.10):** trasa na TV, po której jadą awatary graczy według punktów. Meta nie może być stałą liczbą punktów (nikt by nie dojechał albo wszyscy naraz), więc trasa jest postępem quizu albo pozycja to punkty względem maksimum możliwego po danym pytaniu. Szczegóły w rozmowie z 23.10.
+- **Więcej wyglądów wyścigu** (pierwszy, „Wyścig do nalewaka”, jest od 23.10): np. beczki toczące się po ladzie, kufle przesuwane po barze. Wybór w ustawieniach rozgrywki, a przy dużej liczbie graczy tylko tabela.
 
 - Na podium anioł i diabeł z nagłówka Szabli mogą „wręczać” miejsca (spójność z design systemem). Samo podium jest od dnia 5.
 - Efekt „piany” przy wejściu nowego gracza do poczekalni (złoty blask na liderze rankingu już jest).

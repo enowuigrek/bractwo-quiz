@@ -290,6 +290,14 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
+### Wyścig zamiast tabeli (23.10)
+
+- Migracja `20261023085944_widok_rankingu`: `sesje.widok_rankingu` (`tabela` domyślnie albo `wyscig`), funkcja `pilot_widok` (odmawia wyścigu przy więcej niż 12 graczach), pole w `stan_sesji`, zmiana rozsyła `stan`.
+- Pilot: „Ranking na TV: Tabela / Wyścig” przez całą grę (poza podium i końcem). Przy więcej niż 12 graczach „Wyścig” jest wyszarzony z dopiskiem, a TV wraca do tabeli, gdyby ktoś dołączył po wyborze. Tabela zostaje bez zmian.
+- Zasada (`src/lib/gra/wyscig.ts`): meta to koniec quizu. Po pytaniu lp z n lider jest na lp/n trasy, reszta proporcjonalnie do swoich punktów. Na końcu lider stoi na mecie, nikt jej nie przekracza.
+- Wygląd „Wyścig do nalewaka” (`wyscig.tsx`): każdy gracz ma szklaną rurę napełnianą piwem z bąbelkami i pianą, awatar jedzie na czole piany, na mecie szachownicowa linia i złoty nalewak. Najpierw stan sprzed pytania, po chwili piwo dolewa się do nowego, punkty doliczają się z „+zdobyte”. Tory w kolejności miejsc, przy 9–12 graczach ciaśniej.
+- Sprawdzone na localhost z grą NHXP (6, 12 i 13 graczy, usunięta). Do przemyślenia: na początku quizu tory są prawie puste (po 2/14 lider ma 14% trasy). Kolejne wyglądy torów do wyboru w ustawieniach rozgrywki są w POMYSLY.md.
+
 ### Telewizor OLED bez wygaszacza (23.10)
 
 - **Ruchome tło** wszystkich ekranów `/ekran` (`tlo.tsx`): ciepłe plamy światła jak od świec, które wolno dryfują, i złote bąbelki unoszące się jak w kuflu. Słabe, żeby nie przeszkadzało w czytaniu, na samych transformacjach CSS. Ruch na całym ekranie dodatkowo pomaga OLED-om.

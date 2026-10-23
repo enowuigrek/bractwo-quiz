@@ -1571,3 +1571,157 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Wyścig do nalewaka (wyscig.tsx): tory jak szklane rury napełniane piwem, meta z nalewakiem */
+.tv-wyscig {
+  display: flex;
+  flex-direction: column;
+}
+
+.wyscig-tory {
+  --kolumna-punktow: 210px;
+  --odstep: 24px;
+  position: relative;
+  display: grid;
+  gap: 12px;
+  margin-top: 200px;
+}
+
+.wyscig-wiersz {
+  display: grid;
+  grid-template-columns: 70px 280px minmax(0, 1fr) var(--kolumna-punktow);
+  align-items: center;
+  gap: var(--odstep);
+  height: var(--tor);
+}
+
+.wyscig-miejsce {
+  font-size: calc(var(--tor) * 0.5);
+  font-weight: var(--w-black);
+  color: var(--szary);
+  text-align: right;
+}
+
+.wyscig-nick {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: calc(var(--tor) * 0.46);
+  font-weight: var(--w-black);
+}
+
+/* szklana rura: ciemne wnętrze, jasny refleks u góry */
+.wyscig-rura {
+  position: relative;
+  height: 72%;
+  border-radius: var(--r-pill);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 40%),
+    rgba(244, 236, 216, 0.04);
+  border: 2px solid rgba(244, 236, 216, 0.14);
+}
+
+/* piwo: bursztyn z bąbelkami, które płyną w górę, i pianą na czele */
+.wyscig-piwo {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--r-pill);
+  background:
+    radial-gradient(circle, rgba(255, 248, 220, 0.55) 1.5px, transparent 2.5px) 0 0 / 26px 18px,
+    radial-gradient(circle, rgba(255, 248, 220, 0.35) 1px, transparent 2px) 13px 9px / 26px 18px,
+    linear-gradient(180deg, #f6c75a 0%, #e3ac3f 45%, #a8741a 100%);
+  box-shadow: 0 0 24px rgba(227, 172, 63, 0.35);
+  animation: babelki-w-rurze 3s linear infinite;
+}
+
+.wyscig-piwo::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  right: -6px;
+  bottom: -10%;
+  width: calc(var(--tor) * 0.45);
+  border-radius: var(--r-pill);
+  background: radial-gradient(ellipse at 40% 40%, #fffdf5 0%, #f4ecd8 55%, rgba(244, 236, 216, 0.7) 100%);
+}
+
+@keyframes babelki-w-rurze {
+  to {
+    background-position:
+      0 -18px,
+      13px -9px,
+      0 0;
+  }
+}
+
+.wyscig-jezdziec {
+  position: absolute;
+  top: 50%;
+  translate: -50% -50%;
+  z-index: 2;
+}
+
+.wyscig-jezdziec .awatar {
+  border: 3px solid var(--piana);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.wyscig-punkty {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 10px;
+  font-size: calc(var(--tor) * 0.44);
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+}
+
+.wyscig-zdobyte {
+  font-size: 0.6em;
+  color: var(--chmiel);
+}
+
+.wyscig-wiersz.lider .wyscig-miejsce,
+.wyscig-wiersz.lider .wyscig-nick {
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.wyscig-wiersz.lider .wyscig-jezdziec .awatar {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-lg);
+}
+
+/* meta: linia na końcu rur (przed kolumną punktów), nad nią nalewak */
+.wyscig-meta {
+  position: absolute;
+  top: -196px;
+  bottom: -10px;
+  right: calc(var(--kolumna-punktow) + var(--odstep));
+  width: 0;
+  pointer-events: none;
+}
+
+.wyscig-nalewak {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  max-width: none;
+  height: 188px;
+  translate: -50% 0;
+  filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.45));
+}
+
+.wyscig-linia {
+  position: absolute;
+  top: 190px;
+  bottom: 0;
+  left: 0;
+  width: 14px;
+  translate: -50% 0;
+  background: repeating-conic-gradient(var(--zloto) 0 25%, #111 0 50%) 0 0 / 14px 14px;
+  border-radius: 3px;
+  opacity: 0.85;
+}

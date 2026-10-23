@@ -1394,3 +1394,41 @@ html:has(.kolumna) {
   margin-top: 10px;
   padding-top: 8px;
 }
+
+/* Pilot: wybór rankingu na TV (tabela / wyścig) */
+.pilot-widok {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pilot-widok .pomocniczy {
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+.pilot-widok-opcja {
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-pill);
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: border-color 0.35s var(--ease-std), background 0.35s var(--ease-std);
+}
+
+.pilot-widok-opcja.wybrana {
+  border-color: var(--zloto);
+  background: rgba(227, 172, 63, 0.14);
+  color: var(--zloto);
+}
+
+.pilot-widok-opcja:disabled:not(.wybrana) {
+  opacity: 0.4;
+  cursor: default;
+}

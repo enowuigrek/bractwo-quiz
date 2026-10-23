@@ -20,6 +20,8 @@ import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { Plansze } from "./plansze";
 import { TloTv } from "./tlo";
+import { WyscigTv } from "./wyscig";
+import { MAX_W_WYSCIGU } from "@/lib/gra/wyscig";
 import { PodiumTv, RankingTv } from "./ranking";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
@@ -142,7 +144,12 @@ export function Tv({ kod, qr, host }: Props) {
           ) : stan.faza === "odpowiedzi" ? (
             <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
           ) : stan.faza === "ranking" ? (
-            <RankingTv stan={stan} ranking={ranking} />
+            // wyścig, gdy wybrał go prowadzący i gracze mieszczą się na torach; inaczej tabela
+            stan.widok_rankingu === "wyscig" && ranking.length > 0 && ranking.length <= MAX_W_WYSCIGU ? (
+              <WyscigTv stan={stan} ranking={ranking} />
+            ) : (
+              <RankingTv stan={stan} ranking={ranking} />
+            )
           ) : stan.faza === "tabela" ? (
             <TabelaTv stan={stan} ranking={ranking} />
           ) : (

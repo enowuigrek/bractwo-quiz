@@ -49,6 +49,8 @@ export type StanSesji = {
   planowany_start: string | null;
   /** Fałsz: gra zapowiedziana, TV pokazuje godzinę i odliczanie zamiast QR, dołączać jeszcze nie można. */
   poczekalnia_otwarta: boolean;
+  /** Ranking po pytaniu na TV: tabela albo wyścig (src/lib/gra/wyscig.ts). */
+  widok_rankingu: "tabela" | "wyscig";
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
   quiz: { tytul: string; liczba_zadan: number } | null;
