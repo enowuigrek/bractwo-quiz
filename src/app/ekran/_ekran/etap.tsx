@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
 import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
@@ -67,6 +68,14 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                 <p className="tv-podpowiedz">
                   Reszta kibicuje. Telefony pokażą pytania, ale odpowiadają tylko finaliści.
                 </p>
+                {stan.nagrody?.[0] && (
+                  <p className="tv-etap-nagroda">
+                    {stan.nagrody[0].zdjecie && <img src={stan.nagrody[0].zdjecie} alt="" />}
+                    <span>
+                      Gracie o: <strong className="tv-zloto">{stan.nagrody[0].nagroda}</strong>
+                    </span>
+                  </p>
+                )}
               </motion.div>
             )}
           </section>

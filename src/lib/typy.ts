@@ -50,8 +50,11 @@ export type Etap = {
   typ_domyslny: TypZadania | null;
 };
 
-/** Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”. */
-export type Nagroda = { miejsce: 1 | 2 | 3; nagroda: string; instrukcja: string | null };
+/**
+ * Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”.
+ * `zdjecie`: zdjęcie nagrody z bucketu (`grafiki/nagrody/…`), zwykle przerobione przez AI, do pokazania na TV.
+ */
+export type Nagroda = { miejsce: 1 | 2 | 3; nagroda: string; instrukcja: string | null; zdjecie?: string | null };
 
 export type Faza = "poczekalnia" | "pytanie" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
 

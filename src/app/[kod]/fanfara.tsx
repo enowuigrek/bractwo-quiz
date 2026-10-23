@@ -171,10 +171,10 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
   const [potwierdz, okno] = usePotwierdzenie();
 
   async function odbierz() {
-    const tak = await potwierdz(
-      "Kliknij dopiero po odebraniu nagrody. Karta zmieni się wtedy w „Odebrana”.",
-      { tak: "Odebrana", nie: "Jeszcze nie" },
-    );
+    const tak = await potwierdz("Kliknij dopiero po odebraniu nagrody. Karta zmieni się wtedy w „Odebrana”.", {
+      tak: "Odebrana",
+      nie: "Jeszcze nie",
+    });
     if (!tak) return;
     const { data, error } = await supabase().rpc("odbierz_nagrode", { p_token: token });
     if (error) {
@@ -202,7 +202,10 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
   return (
     <section className="karta-nagrody" aria-label="Twoja nagroda">
       <p className="karta-nagrody-etykieta">Twoja nagroda</p>
-      <p className="karta-nagrody-nazwa">{nagroda.nagroda}</p>
+      <p className="karta-nagrody-nazwa">
+        {nagroda.zdjecie && <img src={nagroda.zdjecie} alt="" className="karta-nagrody-zdjecie" />}
+        {nagroda.nagroda}
+      </p>
       {nagroda.instrukcja && <p className="karta-nagrody-instrukcja">{nagroda.instrukcja}</p>}
       <p className="karta-nagrody-dowod">
         <span>{nick}</span>

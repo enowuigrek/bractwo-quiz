@@ -27,6 +27,8 @@ Etapy z planszą, mnożnikiem i finałem trójki są od 23.10 (PLAN.md). Na pó�
 
 ## Animacje i ekran TV
 
+- **Selfie finalistów i podium przerobione przez AI** (jak zdjęcia nagród, od 23.10): tylko 3 zdjęcia na grę, za zgodą gracza, pokazywane w finale i na podium.
+
 - **Więcej wyglądów wyścigu** (teraz jest „Wyścig po piwo” ze szklanką na mecie): np. beczki toczące się po ladzie, kufle przesuwane po barze. Wybór w ustawieniach rozgrywki, a przy dużej liczbie graczy tylko tabela.
 
 - Na podium anioł i diabeł z nagłówka Szabli mogą „wręczać” miejsca (spójność z design systemem). Samo podium jest od dnia 5.

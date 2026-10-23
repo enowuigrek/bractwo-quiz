@@ -122,7 +122,8 @@ export function Tv({ kod, qr, host }: Props) {
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
 
   return (
-    <Scena bezLogoWRogu={zapowiedz}>
+    // na planszy etapu logo w rogu zasłaniało podpis pod telefonem z animacją
+    <Scena bezLogoWRogu={zapowiedz || stan?.faza === "etap"}>
       {!stan ? (
         <div className="tv-srodek">
           <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>

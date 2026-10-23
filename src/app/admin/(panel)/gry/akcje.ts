@@ -17,7 +17,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   const lokal_id = String(dane.get("lokal_id") ?? "");
   const quiz_id = String(dane.get("quiz_id") ?? "");
-  const okazja = String(dane.get("okazja") ?? "").trim().replace(/\s+/g, " ");
+  const okazja = String(dane.get("okazja") ?? "")
+    .trim()
+    .replace(/\s+/g, " ");
   const tryb = dane.get("tryb") === "druzyny" ? "druzyny" : "solo";
   // czas na odpowiedź dla wszystkich pytań; bez limitu nie ma od czego liczyć bonusu
   const czasPole = String(dane.get("czas_s") ?? "");
@@ -39,13 +41,27 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const ileNagrod = dane.get("nagrody") === "3" ? 3 : dane.get("nagrody") === "1" ? 1 : 0;
   const nagrody: Nagroda[] = [];
   for (let m = 1; m <= ileNagrod; m++) {
-    const nagroda = String(dane.get(`nagroda_${m}`) ?? "").trim().replace(/\s+/g, " ");
-    const instrukcja = String(dane.get(`instrukcja_${m}`) ?? "").trim().replace(/\s+/g, " ");
+    const nagroda = String(dane.get(`nagroda_${m}`) ?? "")
+      .trim()
+      .replace(/\s+/g, " ");
+    const instrukcja = String(dane.get(`instrukcja_${m}`) ?? "")
+      .trim()
+      .replace(/\s+/g, " ");
     if (!nagroda) return { blad: `Wpisz nagrodę za ${m}. miejsce.` };
     if (nagroda.length > LIMITY.nagroda || instrukcja.length > LIMITY.instrukcja) {
       return { blad: `Nagroda za ${m}. miejsce jest za długa.` };
     }
-    nagrody.push({ miejsce: m as Nagroda["miejsce"], nagroda, instrukcja: instrukcja || null });
+    // zdjęcie tylko z naszego bucketu (wysłane przez /api/nagroda)
+    const zdjecie = String(dane.get(`nagroda_zdjecie_${m}`) ?? "");
+    const naszeZdjecie = zdjecie.startsWith(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/grafiki/nagrody/`,
+    );
+    nagrody.push({
+      miejsce: m as Nagroda["miejsce"],
+      nagroda,
+      instrukcja: instrukcja || null,
+      ...(naszeZdjecie ? { zdjecie } : {}),
+    });
   }
 
   const [{ data: lokal }, { count: pytania }] = await Promise.all([
@@ -62,7 +78,10 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   if (zapowiedz && !planowany_start) return { blad: "Do zapowiedzi ustaw godzinę startu." };
 
   // gościnny browar (kranoprzejęcie): nazwa wymagana, gdy jest logo
-  const browar_nazwa = String(dane.get("browar_nazwa") ?? "").trim().replace(/\s+/g, " ") || null;
+  const browar_nazwa =
+    String(dane.get("browar_nazwa") ?? "")
+      .trim()
+      .replace(/\s+/g, " ") || null;
   const browarLogo = plikZFormularza(dane, "browar_logo");
   if (browarLogo && !browar_nazwa) return { blad: "Podaj nazwę browaru do logo." };
   if (browar_nazwa && browar_nazwa.length > 80) return { blad: "Nazwa browaru może mieć najwyżej 80 znaków." };

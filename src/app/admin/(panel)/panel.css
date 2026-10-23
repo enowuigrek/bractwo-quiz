@@ -1206,3 +1206,70 @@ a.przycisk {
   flex-wrap: wrap;
   gap: 12px;
 }
+
+/* Zdjęcie nagrody w kreatorze: przycisk, czekanie na przeróbkę, wybór przeróbka / oryginał */
+.zdjecie-nagrody {
+  margin-top: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.zdjecie-nagrody-trwa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.zdjecie-nagrody-trwa img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--r-btn-sm);
+  animation: pulsuj 1.4s ease-in-out infinite;
+}
+
+@keyframes pulsuj {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.zdjecie-nagrody-wybor {
+  display: flex;
+  gap: 10px;
+}
+
+.zdjecie-nagrody-opcja {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 6px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  color: var(--szary);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-btn-sm);
+  cursor: pointer;
+}
+
+.zdjecie-nagrody-opcja img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  background: repeating-conic-gradient(#1c232b 0% 25%, #141a20 0% 50%) 50% / 16px 16px;
+  border-radius: 6px;
+}
+
+.zdjecie-nagrody-opcja.wybrana {
+  border-color: var(--zloto);
+  color: var(--zloto);
+}
+
+.zdjecie-nagrody-akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

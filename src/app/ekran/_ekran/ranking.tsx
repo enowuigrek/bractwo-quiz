@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
 import { animate, AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -105,7 +106,9 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
             </AnimatePresence>
           </ol>
         )}
-        {reszta > 0 && <p className="tv-ranking-reszta">…i jeszcze {reszta} w grze. Swoje miejsce masz na telefonie.</p>}
+        {reszta > 0 && (
+          <p className="tv-ranking-reszta">…i jeszcze {reszta} w grze. Swoje miejsce masz na telefonie.</p>
+        )}
       </div>
     </MotionConfig>
   );
@@ -147,10 +150,13 @@ export function PodiumTv({
     // TV włączone długo po wjeździe zwycięzcy: bez fanfary
     if (za < -10) return;
     let przerwij: (() => void) | undefined;
-    const zegar = setTimeout(() => {
-      wybuchKonfetti();
-      przerwij = deszczKonfetti(6000);
-    }, Math.max(0, za) * 1000);
+    const zegar = setTimeout(
+      () => {
+        wybuchKonfetti();
+        przerwij = deszczKonfetti(6000);
+      },
+      Math.max(0, za) * 1000,
+    );
     return () => {
       clearTimeout(zegar);
       przerwij?.();
@@ -175,6 +181,13 @@ export function PodiumTv({
               <span className="tv-stopien-nick">{w.nick}</span>
               <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
               {/* nagroda według miejsca (przy remisie obaj gracze mają tę samą) */}
+              {nagrody?.find((n) => n.miejsce === w.miejsce)?.zdjecie && (
+                <img
+                  src={nagrody.find((n) => n.miejsce === w.miejsce)?.zdjecie ?? ""}
+                  alt=""
+                  className="tv-stopien-zdjecie"
+                />
+              )}
               {nagrody?.find((n) => n.miejsce === w.miejsce) && (
                 <span className="tv-stopien-nagroda">{nagrody.find((n) => n.miejsce === w.miejsce)?.nagroda}</span>
               )}
@@ -194,7 +207,8 @@ export function PodiumTv({
         >
           {dalej.map((w) => (
             <li key={w.nick}>
-              <span className="tv-zloto">{w.miejsce}.</span> {w.nick} <span className="tv-podpowiedz">{w.punkty.toLocaleString("pl-PL")}</span>
+              <span className="tv-zloto">{w.miejsce}.</span> {w.nick}{" "}
+              <span className="tv-podpowiedz">{w.punkty.toLocaleString("pl-PL")}</span>
             </li>
           ))}
         </motion.ol>

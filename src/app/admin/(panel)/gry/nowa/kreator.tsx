@@ -8,6 +8,7 @@ import { PoleGrafiki } from "../../_komponenty/grafika";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { LIMITY } from "../../quizy/limity";
 import { uruchomGre } from "../akcje";
+import { ZdjecieNagrody } from "./zdjecie-nagrody";
 
 export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
 
@@ -201,11 +202,13 @@ export function Kreator({ lokale, quizy }: Props) {
                         aria-label={`Jak odebrać nagrodę za ${m}. miejsce`}
                         maxLength={LIMITY.instrukcja}
                       />
+                      <ZdjecieNagrody miejsce={m} />
                     </div>
                   </div>
                 ))}
                 <p className="podpowiedz">
-                  Nagroda pokaże się na podium na TV, a zwycięzca zobaczy ją na telefonie razem z instrukcją.
+                  Nagroda pokaże się na podium na TV, a zwycięzca zobaczy ją na telefonie razem z instrukcją. Zdjęcie nagrody
+                  (przerobione w stylu Bractwa) stoi też przy szklance w wyścigu i na planszy finału.
                 </p>
               </div>
             )}

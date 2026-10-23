@@ -2371,3 +2371,77 @@
     animation: none;
   }
 }
+
+/* Zdjęcie nagrody (bez tła): przy szklance w wyścigu, w finale, na podium i na planszy finału */
+.wyscig-szklanka {
+  position: relative;
+}
+
+/* kolumna szklanki jest szersza o miejsce na nagrodę (MIEJSCE_NA_NAGRODE w wyscig.tsx) */
+.wyscig-szklanka.z-nagroda {
+  padding-left: 170px;
+}
+
+.wyscig-nagroda {
+  position: absolute;
+  left: 0;
+  bottom: 40px;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 3;
+}
+
+.wyscig-nagroda img {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 22px rgba(227, 172, 63, 0.45));
+}
+
+.wyscig-nagroda span {
+  padding: 4px 14px;
+  border-radius: var(--r-pill);
+  background: var(--zloto);
+  color: var(--na-zlocie);
+  font-size: 24px;
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wyscig-final-szklanka .wyscig-szklanka.z-nagroda {
+  padding-left: 0;
+}
+
+.wyscig-final-szklanka .wyscig-nagroda {
+  left: auto;
+  right: -105%;
+  bottom: 0;
+  width: 85%;
+}
+
+.tv-stopien-zdjecie {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.8));
+}
+
+.tv-etap-nagroda {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0 0;
+  font-size: 36px;
+  font-weight: var(--w-black);
+}
+
+.tv-etap-nagroda img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.4));
+}

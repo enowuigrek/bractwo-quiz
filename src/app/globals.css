@@ -1657,3 +1657,12 @@ html:has(.kolumna) {
   font-size: var(--fs-body);
   font-weight: var(--w-semibold);
 }
+
+/* Zdjęcie nagrody na karcie zwycięzcy (bez tła, przerobione w panelu) */
+.karta-nagrody-zdjecie {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin: 0 auto 4px;
+}
