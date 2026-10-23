@@ -5,6 +5,7 @@ import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { naTrasie } from "@/lib/gra/wyscig";
+import { DNO, POD_PIANA, poziom } from "@/lib/gra/szklanka";
 import { Licznik } from "./ranking";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
@@ -207,19 +208,10 @@ function FinalWyscigu({
 
 /**
  * Szklanka na mecie: pusta to blady zarys grafiki, a pełna nalewa się od dołu (przycięcie od góry),
- * z pasem piany na powierzchni piwa. `GORA` i `DNO`: gdzie w grafice zaczyna się piana i gdzie kończy
- * się piwo (procent wysokości obrazka).
+ * z pasem piany na powierzchni piwa. Poziomy w grafice: src/lib/gra/szklanka.ts.
  */
-const GORA = 1;
-const DNO = 92;
-
-/** Poziom piwa w procentach wysokości obrazka (od góry). */
-const poziom = (cz: number) => DNO - (DNO - GORA) * cz;
 /** Szklanka zwęża się ku dołowi: odstęp piany od boków obrazka na danym poziomie. */
 const bok = (y: number) => 6 + Math.max(0, y - 35) * 0.18;
-
-/** Pełna szklanka: piana z grafiki kończy się mniej więcej tu (procent wysokości), bąbelki tylko niżej. */
-const POD_PIANA = 24;
 
 /**
  * Bąbelki w piwie: stałe położenia i tempo (bez losowania, żeby nie skakały przy odświeżeniu),

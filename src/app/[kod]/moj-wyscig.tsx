@@ -3,11 +3,7 @@
 
 import { useEffect, useState } from "react";
 
-/** Poziom piwa w grafice szklanki (procent wysokości od góry): jak `GORA` i `DNO` w ekran/_ekran/wyscig.tsx. */
-const GORA = 1;
-const DNO = 92;
-const POD_PIANA = 24;
-const poziom = (cz: number) => DNO - (DNO - GORA) * cz;
+import { POD_PIANA, poziom } from "@/lib/gra/szklanka";
 
 function pytan(n: number): string {
   if (n === 1) return "pytanie";
