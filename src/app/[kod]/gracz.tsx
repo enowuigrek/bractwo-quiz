@@ -5,7 +5,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { Werble } from "@/components/werble";
-import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useKoniecPytania, useNasluch } from "@/lib/gra/nasluch";
+import {
+  komunikatBledu,
+  pamiec,
+  pobierzStan,
+  useCzasSerwera,
+  useKoniecPytania,
+  useNasluch,
+  zZegarem,
+} from "@/lib/gra/nasluch";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
@@ -329,9 +337,8 @@ function WGrze({
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
-  const liczy = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "seria" || stan.faza === "pijany";
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
-  const teraz = useCzasSerwera(przesuniecie, liczy, stan.faza === "przygotuj" ? 100 : 250);
+  const teraz = useCzasSerwera(przesuniecie, zZegarem(stan.faza), stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
 
   // podium, tabela i koniec to jeden ekran, żeby medal i konfetti nie startowały od nowa przy przejściach

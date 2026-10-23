@@ -1082,12 +1082,6 @@ a.przycisk {
   margin-bottom: 8px;
 }
 
-.etap-pusty {
-  color: var(--szary);
-  font-size: var(--fs-small);
-  padding: 4px 0 8px;
-}
-
 /* Szacowanie w edytorze pytania: pola liczb w dwóch kolumnach */
 .pola-liczby {
   display: grid;

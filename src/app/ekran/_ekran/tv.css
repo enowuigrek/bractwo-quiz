@@ -2725,13 +2725,6 @@
   color: var(--zloto);
 }
 
-.tv-etap-zapowiedz {
-  margin: 28px 0 0;
-  font-size: 34px;
-  font-weight: var(--w-semibold);
-  color: var(--szary);
-}
-
 .wyscig-strefa-finalu {
   margin: 0;
   height: 22px;

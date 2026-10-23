@@ -112,6 +112,15 @@ export async function pobierzStan(kod: string): Promise<{ stan: StanSesji; przes
   return { stan, przesuniecie: przesuniecieZegara(stan.teraz, wyslano, odebrano) };
 }
 
+/**
+ * Fazy z zegarem na ekranie (odliczanie, pytanie, seria, pijany finał): TV, pilot i telefon odświeżają wtedy
+ * czas serwera kilka razy na sekundę, a po `faza_do` proszą bazę o następną fazę (`useKoniecPytania`).
+ * Nowa faza z czasem trafia tylko tutaj.
+ */
+export function zZegarem(faza: FazaWidoczna | null | undefined): boolean {
+  return faza === "przygotuj" || faza === "pytanie" || faza === "seria" || faza === "pijany";
+}
+
 /** Bieżący czas serwera, odświeżany co `coIleMs`, gdy `aktywny`. */
 export function useCzasSerwera(przesuniecie: number, aktywny: boolean, coIleMs = 250): number {
   const [teraz, ustawTeraz] = useState(() => Date.now() + przesuniecie);
@@ -149,11 +158,8 @@ export function useKoniecPytania(kod: string, stan: Pick<StanSesji, "faza" | "fa
   const ostatnio = useRef(0);
   const faza = stan ? fazaTeraz(stan, teraz).faza : null;
   // sekunda zapasu w bazie na opóźnione odpowiedzi
-  // seria i pijany finał kończą się tak samo: po czasie całej fazy
-  const poKoncu =
-    (faza === "pytanie" || faza === "seria" || faza === "pijany") && stan?.faza_do
-      ? teraz - Date.parse(stan.faza_do) > 1100
-      : false;
+  // seria i pijany finał kończą się tak samo: po czasie całej fazy (`przygotuj` jest wtedy już `pytaniem`)
+  const poKoncu = zZegarem(faza) && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > 1100 : false;
   const [tik, ustawTik] = useState(0);
   useEffect(() => {
     if (!poKoncu) return;

@@ -4,8 +4,8 @@
 
 1. Na `/api/keepalive` (adres aplikacji + `/api/keepalive`) ma być `"ok": true` i `"realtime": "SUBSCRIBED"`. Jeśli jest ustawiony `CRON_SECRET`, bez nagłówka dostaniesz 401. Wtedy sprawdź w Vercelu: Project → Settings → Cron Jobs → Run.
 2. W panelu: quiz ma wszystkie pytania, poprawne odpowiedzi są zaznaczone, a grafiki się wczytują.
-3. W panelu: uruchom grę (miasto → lokal → quiz, okazja, czas na odpowiedź, nagrody). Bonus za szybkość jest zawsze, drużyn już nie ma.
-4. Jeśli telewizor ma otwarty ekran od wczoraj, a w międzyczasie było wdrożenie: ekran sam się przeładuje w ciągu minuty (poza pytaniem i serią). Dla pewności odśwież go raz ręcznie.
+3. W panelu: uruchom grę (miasto → lokal → quiz, okazja, czas na odpowiedź, nagrody). Bonus za szybkość jest zawsze, drużyn już nie ma. Widoczność i „Pijany finał” są tylko po zalogowaniu hasłem głównym; gra głównego jest domyślnie „tylko dla mnie”, więc obsługa nie zobaczy jej w panelu (pilot i TV działają normalnie).
+4. Jeśli telewizor ma otwarty ekran od wczoraj, a w międzyczasie było wdrożenie: ekran sam się przeładuje w ciągu minuty (poza pytaniem, serią i pijanym finałem). Dla pewności odśwież go raz ręcznie.
 
 ## Na miejscu (30 min przed)
 

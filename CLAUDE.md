@@ -22,7 +22,7 @@ Zasady:
 - Nie pytamy o piwa i browary koncernów (Żywiec, Tyskie, Lech itd.), tylko o style, historię i browary rzemieślnicze.
 - Panel ma dwa poziomy (od 23.10): `ADMIN_HASLO_GLOWNE` = główny (Łukasz, widzi wszystko), `ADMIN_HASLO` = obsługa (nie widzi quizów i gier `tylko_glowny` ani „Pijanego finału”). Każda nowa strona albo akcja panelu z quizem lub grą sprawdza dostęp (`wymagajQuizu`, `wymagajGry`, `widoczne(rola)` z `src/lib/admin-dostep.ts`), a uprawnienia pytamy funkcjami z `src/lib/admin.ts`, nie porównaniem ról. Lokalnie `start-test-hasla` ma oba hasła testowe. Oba hasła muszą być różne: przy takich samych każdy loguje się jako główny.
 - Tryb „Pijany finał” jest ukryty przed graczami: na telefonie i TV nigdy nie piszemy „pijany finał” (telefon udaje dalszą serię z numeracją 15/14…, TV trzyma nagłówek finału). Nazwę trybu widzą tylko panel i pilot.
-- Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime.
+- Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime. Nowa faza z zegarem (`faza_do`) trafia do `zZegarem` w tym samym pliku, a nowa faza w ogóle także do typów (`FazaWidoczna`), `sesje_faza_check` w bazie i rozdzielaczy faz w `tv.tsx`, `gracz.tsx` i `pilot.tsx`.
 - Next nie uruchomi drugiego `next dev` w tym samym katalogu. Gdy jakiś już działa, podgląd otwieraj konfiguracją `dev-dzialajacy` z `.claude/launch.json`.
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.
 - OpenAI (`OPENAI_API_KEY`) przerabia tylko zdjęcia nagród (`/api/nagroda`: tylko zalogowany panel, limit 40 dziennie). Przeróbka selfie graczy jest wyłączona (23.10, nie działała na produkcji). Każde wywołanie kosztuje, więc nowe użycia API OpenAI zawsze z limitem i nigdy bez wyraźnej prośby użytkownika w aplikacji.
@@ -40,6 +40,7 @@ Zasady:
 - Telefon testowy wraca do gracza linkiem `/<kod>#powrot=<token>` (po zmianie samego hasha przeładuj stronę). Na koniec zakończ grę i usuń ją w panelu (Gry → gra → Usuń grę), bo MCP nie usuwa danych.
 - Nie ruszaj gier, które Łukasz akurat prowadzi: przed testem sprawdź `select kod, faza, lokal_id from sesje where faza <> 'koniec'`.
 - Zrzut TV w panelu przeglądarki: widok 1920×1080, a obraz bierz `zoom`-em (pierwszy zwykły zrzut bywa czarny albo pomniejszony).
+- Gdy panel przeglądarki jest ukryty, strona działa jak karta w tle: minutniki i klatki animacji mocno zwalniają. Ruch i czasy (np. samoklik, lot awatarów) mierz przy widocznym panelu albo sprawdzaj stanem w bazie, a nie czekaniem w skrypcie.
 - Jakie urządzenie ma użytkownik (np. przeglądarka TV), widać w logach Supabase: `query_logs` na `edge_logs` z `log_attributes['request.headers.user_agent']`.
 
 ## Koniec etapu

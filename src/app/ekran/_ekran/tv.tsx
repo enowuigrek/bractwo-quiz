@@ -9,6 +9,7 @@ import {
   useCzasSerwera,
   useKoniecPytania,
   useNasluch,
+  zZegarem,
 } from "@/lib/gra/nasluch";
 import { Awatar } from "@/components/awatar";
 import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
@@ -130,9 +131,7 @@ export function Tv({ kod, qr, host }: Props) {
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz", "okrzyk"]);
   useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
 
-  const liczy =
-    stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria" || stan?.faza === "pijany";
-  const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
+  const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza), stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
 
   // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację)

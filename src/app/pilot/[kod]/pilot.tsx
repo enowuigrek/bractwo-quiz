@@ -12,6 +12,7 @@ import {
   useCzasSerwera,
   useKoniecPytania,
   useNasluch,
+  zZegarem,
 } from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
@@ -101,9 +102,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
 
-  const liczy =
-    stan?.faza === "przygotuj" || stan?.faza === "pytanie" || stan?.faza === "seria" || stan?.faza === "pijany";
-  const teraz = useCzasSerwera(przesuniecie, liczy);
+  const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza));
   const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();

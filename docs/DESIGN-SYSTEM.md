@@ -93,6 +93,8 @@ Zmienione 19.10 i jeszcze raz 22.10 na prośbę Łukasza: duże zaokrąglenia z 
 | `--r-pill` | 999 | pasek postępu, znaczki, nicki |
 | `--r-round` | 50% | medal, kółka z literami |
 
+Karty do wyboru (np. szablony nowego quizu) to karty, więc `--r-card`, a nie pigułki: duże ramki z `999px` wyglądały jak zabawkowe kapsuły (poprawka 23.10).
+
 ## Przyciski (Bractwo Quiz)
 
 Pigułki **wypełnione kolorem zależnym od rodzaju**, bez samych obramówek:
@@ -103,6 +105,10 @@ Pigułki **wypełnione kolorem zależnym od rodzaju**, bez samych obramówek:
 - `.ikona`: okrągły przycisk z samą ikoną (kosz, strzałki), 40×40,
 - `.przycisk-cichy`: sam tekst, dla akcji pobocznych.
 Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole`, bo tekst bywa wielowierszowy.
+
+**Pilot (Quiz).** Przyciski akcji zawsze od razu pod nagłówkiem, nad kartą pytania, odpowiedziami i listą graczy, żeby nie uciekały w dół, gdy lista rośnie. „Zakończ grę” (niebezpieczny) osobno na samym dole strony, z dala od zwykłych akcji.
+
+**Koniec gry na telefonie (Quiz).** „Udostępnij wynik” (złoty) i „Pobierz na pamiątkę” (zwykły) obok siebie, po połowie szerokości. Obie dają tę samą grafikę 1080×1920.
 
 ## Linki do skopiowania
 
@@ -122,13 +128,22 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Fanfara podium (Quiz).** Konfetti w kolorach złoto, złoto jasne, blask, piana, chmiel, bursztyn. Medale na telefonie: 160 px, kolor `--zloto` / `--srebro` / `--braz` z jasnym refleksem, wjazd z obrotem 1 s (`--ease-wjazd`). Przed odsłoną trzy skaczące złote kropki i pulsujący napis „Werble…”.
 
-**Werble po finale (Quiz, `components/werble.tsx`).** Ekran gaśnie jak wyłączany telewizor: biały błysk zapada się w poziomą kreskę i punkt (0.9 s), potem czerń, a po 1.8 s przez 3 s wolno wchodzi „Werble…” złotem z poświatą, nad nim trzy złote kropki skaczące na zmianę (18 px na telefonie, 38 px na TV). Zwykły bęben w SVG był za brzydki, kropki zostały.
+**Werble po finale (Quiz, `components/werble.tsx`).** Ekran gaśnie jak wyłączany telewizor: biały błysk zapada się w poziomą kreskę i punkt (0.9 s), potem czerń, a po 1.8 s przez 3 s wolno wchodzi „Werble…” złotem z poświatą i podpisem „Wynik za chwilę.”, nad nim trzy złote kropki skaczące na zmianę (18 px na telefonie, 38 px na TV). Zwykły bęben w SVG był za brzydki, kropki zostały. Na telefonie błysk nie dotyka górnej i dolnej krawędzi (18% od każdej), bo Safari bierze kolor pasków przeglądarki z krawędzi strony i po białym błysku zostawały jasne paski. Ten sam ciemny ekran pokazuje się od razu, gdy gracz skończy serię albo pijany finał, zamiast „Gotowe!”, które zdradzało koniec.
 
 **Szklanka piwa (Quiz, `components/szklanka-piwa.tsx`).** Grafika `public/grafiki/szklanka.webp`. Pusta szklanka to blady zarys tej samej grafiki (szarość, 16%), z brzegiem jako jasna elipsa i mgiełką szkła w jej tylnej połowie. Piwo rośnie od dna, a na nim leży piana: elipsa od ścianki do ścianki (powierzchnia lekko z góry), jaśniejszy wierzch z pęcherzykami i cienka warstwa piany pod nim. Pełna szklanka ma czapę piany z grafiki. Bąbelki unoszą się tylko w nalanym piwie. Bez `clip-path` (TV Samsunga go nie stosuje).
 
-**Prawda / fałsz w serii (Quiz).** Dwa płaskie koła pod kciuki, `min(40vw, 160px)`: `--chmiel` z czarnym ✓ i `--czerwien` z czarnym ✗, bez ramek i bez napisów (napis tylko w `aria-label`), lekki cień pod spodem. Pytanie ma zawsze miejsce na trzy linie, więc koła nie skaczą. Poza serią prawda/fałsz to dwa wysokie kafle z ramką i napisem.
+**Prawda / fałsz w serii (Quiz).** Dwa płaskie koła pod kciuki, `min(40vw, 160px)`: `--chmiel` z czarnym ✓ i `--czerwien` z czarnym ✗, bez ramek i bez napisów (napis tylko w `aria-label`), lekki cień pod spodem. Pytanie ma zawsze miejsce na trzy linie, więc koła nie skaczą. Te same koła są w demo na planszy finału na TV (`.demo-kolo`). Poza serią prawda/fałsz to dwa wysokie kafle z ramką i napisem.
 
-**Utrudnienia w finale (Quiz).** Od połowy pytań serii każde pytanie inaczej: drżenie (0.14 s), zamiana kół miejscami, mgła (rozmycie do 4 px), dryf na boki (±16 px), zanikanie (do 12%), uciekające koła, kołysanie (±4°). W pasku złoty dopisek „utrudnienie!”.
+**Utrudnienia w finale (Quiz).** Od połowy pytań serii każde pytanie inaczej: drżenie (0.14 s), zamiana kół miejscami, mgła (rozmycie do 4 px), dryf na boki (±16 px), zanikanie (do 12%), uciekające koła, kołysanie (±4°). **Bez zapowiedzi:** nigdzie nie piszemy „utrudnienie”, ani w pasku, ani na planszy finału. Dziwne rzeczy mają się po prostu dziać.
+
+**Liczby pytań (Quiz).** Gracze i TV widzą sam numer („Pytanie 8”), bez sumy („8/31”) i bez „jeszcze N pytań” pod szklanką; sumę widzi tylko pilot. Wyjątek to seria finału na telefonie („Seria · pytanie 3/14”), bo pijany finał ciągnie tę numerację dalej (15/14).
+
+**Pijany finał (Quiz, ukryty tryb).** Gracze nie mogą się zorientować, że to dogrywka: na telefonie i TV nigdy nie piszemy „pijany finał”, zostaje wygląd serii (nagłówek, pasek, koła), tylko coraz bardziej się psuje.
+- Telefon: cały ekran faluje (`skewX` + `translateX` + `rotate`, rośnie z `--poziom` 0..1 co pytanie), a każde pytanie ma swój przeszkadzacz: drżenie, zamienione kolory kół, koła jedno nad drugim, mgła, uciekające koła, pytanie do góry nogami, „Fałsz” znika i „Prawda” klika się sama, „wszystko naraz” (koła obok siebie na zmianę rosną do 122% i tracą ostrość, kolory zamienione, pytanie drży). Zegar wariuje jak na TV.
+- TV: ten sam nagłówek co w serii, ale cały kołysze się coraz mocniej i delikatnie traci ostrość. Zegar najpierw liczy w dół, potem w górę, potem zmienia kierunek, a pod koniec miga przypadkowymi liczbami i znika (`visibility: hidden`, żeby nagłówek nie skakał). Awatary po 6 s powoli cofają się od szklanki, w 18. sekundzie drogi po kolei spadają w dół ekranu (każda 3 s, z przechyłem), od 24. awatary latają jak wygaszacz DVD: drżą, pulsują (do +50%), widzą podwójnie (blady drugi awatar obok) i lekko się rozmywają. Szklanka zostaje i się kołysze. Rozmycie tylko na małych elementach, nigdy na całej planszy (Samsung).
+- Przy ograniczonym ruchu: same zamiany kolorów i układu, bez falowania i latania.
+
+**Okrzyki kibiców (Quiz).** Hasło z awatarem finalisty w miejscu kropek (`components/haslo-kibica.tsx`, hasła w `lib/gra/okrzyki.ts`): „Dawaj [awatar]!”, „[awatar], piwo czeka!”. Na telefonie kibica wybór finalisty (awatary) i przyciski z hasłami; na TV dymek nad drogą finalisty z nickiem kibica, unosi się i znika po 3,5 s, a pod nickiem finalisty licznik 📣, który podskakuje przy każdym okrzyku.
 
 **Pieczątka „Odebrana” (Quiz).** Na karcie nagrody po odbiorze: `--czerwien`, podwójna ramka (4 px + wewnętrzna 2 px), obrót −7°, przetarcia z maski szumu SVG (`feTurbulence`), wjazd jak odbicie (od skali 1.8).
 
