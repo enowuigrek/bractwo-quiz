@@ -29,7 +29,39 @@ Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są ni�
 - Przeróbka selfie AI wyłączona (nie wyświetlała się na produkcji), opis w `docs/POMYSLY.md`.
 - Test na żywo: spotkanie Kręgu w środę 28.10.
 
-**Następny krok:** Łukasz ma nowy pomysł do omówienia. Jeśli wejdzie do planu, dopisujemy go tutaj i w harmonogramie.
+**Następny krok:** tryb „Pijany finał” (niżej), po decyzjach Łukasza z listy „Do ustalenia”.
+
+## Następny etap: tryb „Pijany finał” (pomysł Łukasza z 23.10, do akceptacji)
+
+**Idea:** przełącznik w kreatorze gry. Prawdziwy finał (seria) kończy się jak teraz i wynik jest już ustalony, ale gra jeszcze się nie kończy: przychodzi dogrywka pytań, które **nic nie liczą**. Pytania płynnie schodzą z piwa na filozofię i rzeczy coraz dziwniejsze, a utrudnienia rozkręcają się w chaos. Na końcu wszystko gaśnie jak teraz: werble i podium.
+
+**Przebieg:**
+1. Druga połowa prawdziwego finału: utrudnienia jak teraz. Jeśli tryb jest włączony, na TV awatary pod koniec zaczynają lekko drżeć.
+2. Ktoś dobiega do piwa: zamiast werbli nowa faza `pijany`. Pilot od razu widzi zwycięzcę i podium („Wygrał: …”), gracze nie wiedzą nic.
+3. TV: awatary cofają się od piwa, drogi spadają w dół ekranu, zostaje szklanka i awatary, które drżą, pulsują i odbijają się od krawędzi jak stary wygaszacz DVD. Z każdym pytaniem coraz mocniej.
+4. Telefony: kolejne pytania prawda/fałsz (8–10), każde z mocniejszym przeszkadzaczem:
+   - cały ekran faluje, z pytania na pytanie bardziej;
+   - ✓ i ✗ mają zamienione kolory;
+   - przyciski przeskakują w pion, jeden nad drugim;
+   - pytanie o osobę za barem: „Fałsz” maleje aż do zniknięcia, „Prawda” rośnie i sama się klika, a na ekranie wyskakuje pęknięta szybka.
+   Pod koniec wszyscy mają już „popękane” wyświetlacze.
+5. Po ostatnim pytaniu (albo przycisku na pilocie) wszystko gaśnie jak teraz: werble, „Pokaż podium”.
+
+**Pytania:** stała pula w kodzie, ze wstawkami (osoba za barem, lokal, okazja). Pierwsze o piwie, potem coraz dalej: „Piwo smakuje lepiej, gdy ktoś inny płaci”, „Czy kufel jest w połowie pełny?”, „Ten quiz trwa dłużej niż powinien”, „Czy na pewno to ty trzymasz ten telefon?”, „Podoba ci się dziś {osoba za barem}?”, „Jesteś pewien, że jesteś w {lokal}?”. Niepokojąco i zabawnie, ale bez wulgarności, bez zachęcania do picia na umór i bez koncernów. W kreatorze opcjonalne pole „Kto dziś stoi za barem”: bez niego tego pytania nie ma.
+
+**Jak zrobić (szacunek: ok. 1,5 dnia):**
+- Baza: `sesje.pijany_final bool`, `sesje.za_barem text`, faza `pijany`. `wewn.zakoncz_serie` przy włączonym trybie przechodzi w `pijany`, a nie w `werble`. Odpowiedzi w `pijany` nie trafiają do `odpowiedzi` ani rankingu (osobna funkcja `zapisz_odpowiedz_pijana`, która tylko liczy, ile osób kliknęło co, np. do napisu na TV „83% uważa, że kufel jest pełny”). Pilot: „Zakończ i pokaż werble”.
+- Telefon: `[kod]/pijany.tsx` z poziomem chaosu (numer pytania) i efektami w CSS (falowanie przez `transform`, bez `clip-path`), pęknięta szybka jako SVG na wierzchu.
+- TV: `ekran/_ekran/pijany.tsx`: spadające drogi, awatary odbijające się od krawędzi (`motion`), szklanka zostaje.
+- Przy ograniczonym ruchu: same zamiany i pęknięcia, bez falowania i latania.
+- Bezpieczeństwo gry: tryb domyślnie wyłączony, więc zwykła gra działa jak dziś. Wynik jest liczony przed trybem i tryb nie może go zmienić.
+
+**Do ustalenia z Łukaszem:**
+1. Robimy przed testem 28.10 (ryzyko na żywo), czy po?
+2. Ile pytań w dogrywce i czy koniec po ostatnim pytaniu, czy tylko przyciskiem z pilota?
+3. Czy TV między pytaniami pokazuje zabawne „wyniki ankiety”, czy tylko chaos z awatarami?
+4. Samoklikające się „Prawda” i pęknięta szybka: OK, że ktoś na chwilę uwierzy, że ma zepsuty telefon?
+5. Drżące awatary pod koniec prawdziwego finału tylko w tym trybie, czy zawsze?
 
 ## Ustalenia
 
