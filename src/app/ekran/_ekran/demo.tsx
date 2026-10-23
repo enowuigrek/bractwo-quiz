@@ -41,10 +41,8 @@ function palec(sciezka: Punkt[], t: number): { x: number; y: number; stuka: bool
 
 const SPOCZYNEK = { x: 300, y: 660 };
 
-/** Typy, przy których telefon trzyma się poziomo (ekran 700×380): pary nie mieszczą się w pionie. */
-const POZIOMO = { szer: 700, wys: 380 };
-const SPOCZYNEK_POZIOMO = { x: 620, y: 330 };
-const poziomy = (typ: TypZadania) => typ === "pary";
+/** Pary też pokazujemy na pionowym ekranie telefonu (380×700). */
+const PIONOWO = { szer: 380, wys: 700 };
 
 /** Kafelek odpowiedzi na ekranie telefonu. */
 function Kafel({
@@ -208,48 +206,48 @@ function scena(typ: TypZadania, t: number): Scena {
       };
     }
     case "pary": {
-      // telefon poziomo (ekran 700×380): na początku pętli obraca się z pionu, potem łączenie
-      const lewe = ["Stout", "Weizen", "IPA"];
-      const prawe = ["Bawaria", "Anglia", "Irlandia"];
+      // Łączenie par w dwóch kolumnach na pionowym ekranie telefonu.
+      const lewe = ["Pilzner", "Weizen", "Grodziskie"];
+      const prawe = ["Polska", "Czechy", "Niemcy"];
       // lewy i → prawy pary[i]; stuknięcia: lewy, potem prawy
-      const pary = [2, 0, 1];
-      const chwile = [0.24, 0.45, 0.66];
-      const y = (i: number) => 86 + i * 92;
-      const lewySrodek = (i: number) => ({ x: 170, y: y(i) + 39 });
-      const prawySrodek = (i: number) => ({ x: 530, y: y(i) + 39 });
+      const pary = [1, 2, 0];
+      const chwile = [0.18, 0.4, 0.62];
+      const y = (i: number) => 250 + i * 126;
+      const lewySrodek = (i: number) => ({ x: 98, y: y(i) + 39 });
+      const prawySrodek = (i: number) => ({ x: 282, y: y(i) + 39 });
       const polaczona = (i: number) => poStuku(chwile[i] + 0.12);
       const kolor = (i: number) => (polaczona(i) ? (["para0", "para1", "para2"] as const)[i] : undefined);
       return {
         tresc: "Połącz styl z krajem.",
         elementy: (
           <>
-            <svg className="demo-linie" width={POZIOMO.szer} height={POZIOMO.wys} aria-hidden>
+            <svg className="demo-linie" width={PIONOWO.szer} height={PIONOWO.wys} aria-hidden>
               {pary.map(
                 (k, i) =>
                   polaczona(i) && (
-                    <line key={i} x1={314} y1={y(i) + 39} x2={386} y2={y(k) + 39} className={`demo-linia para${i}`} />
+                    <line key={i} x1={184} y1={y(i) + 39} x2={196} y2={y(k) + 39} className={`demo-linia para${i}`} />
                   ),
               )}
             </svg>
             {lewe.map((o, i) => (
-              <Kafel key={o} x={24} y={y(i)} w={290} h={78} znak={String(i + 1)} tekst={o} stan={kolor(i)} />
+              <Kafel key={o} x={12} y={y(i)} w={172} h={78} znak={String(i + 1)} tekst={o} stan={kolor(i)} />
             ))}
             {prawe.map((o, k) => {
               const i = pary.indexOf(k);
-              return <Kafel key={o} x={386} y={y(k)} w={290} h={78} znak={"ABC"[k]} tekst={o} stan={kolor(i)} />;
+              return <Kafel key={o} x={196} y={y(k)} w={172} h={78} znak={"ABC"[k]} tekst={o} stan={kolor(i)} />;
             })}
           </>
         ),
         sciezka: [
-          { t: 0, ...SPOCZYNEK_POZIOMO },
-          { t: 0.16, ...SPOCZYNEK_POZIOMO },
+          { t: 0, ...SPOCZYNEK },
+          { t: 0.12, ...SPOCZYNEK },
           ...pary.flatMap((k, i) => [
-            { t: chwile[i] - 0.05, ...lewySrodek(i) },
+            { t: chwile[i] - 0.045, ...lewySrodek(i) },
             { t: chwile[i], ...lewySrodek(i), stuk: true },
-            { t: chwile[i] + 0.1, ...prawySrodek(k) },
-            { t: chwile[i] + 0.12, ...prawySrodek(k), stuk: true },
+            { t: chwile[i] + 0.04, ...prawySrodek(k) },
+            { t: chwile[i] + 0.085, ...prawySrodek(k), stuk: true },
           ]),
-          { t: 0.92, ...SPOCZYNEK_POZIOMO },
+          { t: 0.9, ...SPOCZYNEK },
         ],
       };
     }
@@ -293,8 +291,7 @@ export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
   const { tresc, elementy, sciezka } = scena(typ, t);
   const p = palec(sciezka, t);
   return (
-    <figure className={`demo${poziomy(typ) ? " poziomo" : ""}`}>
-      {/* klucz: animacja obrotu startuje od nowa z każdą pętlą */}
+    <figure className="demo">
       <div key={nr} className="demo-telefon">
         <div className="demo-ekran">
           <p className="demo-tresc">{tresc}</p>
@@ -305,7 +302,7 @@ export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
       <figcaption>
         <strong>{NAZWY_TYPOW[typ]}</strong>
         <span>{PODPOWIEDZI_TYPOW[typ]}</span>
-        {poziomy(typ) && <span className="demo-obroc">📱 Obróć telefon poziomo</span>}
+        {typ === "pary" && <span className="demo-pionowy">📱 Trzymaj telefon pionowo</span>}
       </figcaption>
     </figure>
   );

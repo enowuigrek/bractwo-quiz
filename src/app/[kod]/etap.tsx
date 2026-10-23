@@ -28,7 +28,9 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
           <li key={t}>{NAZWY_TYPOW[t]}</li>
         ))}
       </ul>
-      {e.typy.includes("pary") && <p className="etap-uwaga">📱 Przy parach obróć telefon poziomo.</p>}
+      {e.typy.includes("pary") && (
+        <p className="etap-uwaga">📱 Telefon trzymaj pionowo. Wybierz element z lewej kolumny, a potem pasujący z prawej.</p>
+      )}
       {e.final_po_etapie && (
         <p className="etap-uwaga">
           🏆 Po tym etapie <strong>3 najlepszych wchodzi do finału</strong>

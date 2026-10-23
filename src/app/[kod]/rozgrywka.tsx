@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- grafiki pytań z bucketu Supabase */
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { sekundy } from "@/lib/czas";
 import { napisMnoznika } from "@/lib/etapy";
 import { rozmycie } from "@/lib/gra/dodatki";
@@ -26,20 +26,6 @@ const POWODY: Record<Exclude<ZapisOdpowiedzi, { przyjeta: true }>["powod"], stri
   juz_odpowiedziano: "Twoja odpowiedź jest już zapisana.",
   kibic: "W finale odpowiadają tylko finaliści.",
 };
-
-/** Telefon trzymany pionowo (pary wygodnie łączy się tylko poziomo). */
-function subskrybujObrot(zmiana: () => void) {
-  const zapytanie = window.matchMedia("(orientation: portrait)");
-  zapytanie.addEventListener("change", zmiana);
-  return () => zapytanie.removeEventListener("change", zmiana);
-}
-function usePionowo(): boolean {
-  return useSyncExternalStore(
-    subskrybujObrot,
-    () => window.matchMedia("(orientation: portrait)").matches,
-    () => true,
-  );
-}
 
 /** Finał trójki, a ten gracz nie jest w trójce: patrzy i kibicuje. */
 export function czyKibic(stan: StanSesji, nick: string): boolean {
@@ -69,9 +55,6 @@ export function Rozgrywka({
   odswiez: () => Promise<void>;
 }) {
   const [wyslana, ustawWyslana] = useState<Wyslana | null>(null);
-  const pionowo = usePionowo();
-  // „nie mogę obrócić” (blokada obrotu): pary w pionie, ciaśniej
-  const [paryWPionie, ustawParyWPionie] = useState(false);
   const [wysylam, ustawWysylam] = useState(false);
   const [blad, ustawBlad] = useState<{
     zadanieId: string;
@@ -221,28 +204,13 @@ export function Rozgrywka({
             onWyslij={(d) => void odpowiedz(d)}
           />
         ) : z.typ === "pary" ? (
-          pionowo && !paryWPionie && moja === null ? (
-            <div className="obroc-telefon" role="status">
-              <span className="obroc-telefon-ikona" aria-hidden>
-                📱
-              </span>
-              <strong>Obróć telefon poziomo</strong>
-              <span className="pomocniczy">Pary łączy się wygodniej, gdy obie kolumny mają dużo miejsca.</span>
-              <button type="button" className="przycisk-cichy" onClick={() => ustawParyWPionie(true)}>
-                Nie mogę obrócić, pokaż w pionie
-              </button>
-            </div>
-          ) : (
-            <div className="pary-poziomo">
-              <OdpowiedzPary
-                key={z.id}
-                z={z}
-                wyslana={moja}
-                zablokowane={czasMinal || wysylam}
-                onWyslij={(d) => void odpowiedz(d)}
-              />
-            </div>
-          )
+          <OdpowiedzPary
+            key={z.id}
+            z={z}
+            wyslana={moja}
+            zablokowane={czasMinal || wysylam}
+            onWyslij={(d) => void odpowiedz(d)}
+          />
         ) : (
           <ol className="odp-lista">
             {(z.dane.odpowiedzi ?? []).map((o, i) => {

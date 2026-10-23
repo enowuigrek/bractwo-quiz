@@ -2575,32 +2575,7 @@
   font-weight: var(--w-semibold);
 }
 
-/* Pary: telefon poziomo. Na początku każdej pętli obraca się z pionu, żeby było widać, że trzeba go obrócić. */
-.demo.poziomo .demo-ekran {
-  width: 700px;
-  height: 380px;
-}
-
-.demo.poziomo .demo-telefon {
-  animation: obrot-telefonu 5.2s ease-in-out both;
-}
-
-@keyframes obrot-telefonu {
-  0%,
-  6% {
-    transform: rotate(-90deg) scale(0.72);
-  }
-  16%,
-  100% {
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-.demo.poziomo .demo-tresc {
-  top: 22px;
-}
-
-.demo-obroc {
+.demo-pionowy {
   color: var(--zloto) !important;
   font-weight: var(--w-black);
 }

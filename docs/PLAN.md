@@ -414,14 +414,14 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - Na planszy etapu nie ma logo Bractwa w rogu (zasłaniało podpis pod telefonem z animacją).
 - Finał wyścigu: drogi kończą się przed szklanką, a pod nią jest miękka poświata zamiast obręczy, żeby nic nie zasłaniało szkła.
 
-### Finał jako seria, zapowiedź finału, pary poziomo (23.10) ✅
+### Finał jako seria, zapowiedź finału, pary w pionie (23.10) ✅
 
 - Etap „seria” (migracja `20261023124502_seria`: `etapy.seria`, `sesje.seria_etap`, faza `seria`): wszystkie pytania etapu naraz, każdy odpowiada we własnym tempie, bez wyniku po pytaniu. Czas etapu to czas na całą serię (domyślnie 60 s). Punkty: 500–1000 za dobrą zależnie od czasu od startu serii, razy mnożnik. Telefon bierze pytania z `seria_pytania` (dopiero po starcie, bez rozwiązań) i zapisuje przez `zapisz_odpowiedz_serii`. Seria kończy się, gdy wszyscy grający odpowiedzą na wszystko albo minie czas (`dokoncz_pytanie` sprawdza też serię); po ostatnim etapie od razu podium, bez rankingu. Pilot: „Start serii”, postęp graczy i „Zakończ serię wcześniej”.
-- Finał w quizach testowych to seria 8 pytań prawda/fałsz (60 s, ×2). Pary i kolejność z dawnego finału przeszły do etapu „Połącz i ułóż” (w quizie Piwo nowy etap). Szablon etapu „Finał” to teraz seria prawda/fałsz.
+- Finał w testowych quizach Piwo i Gry to seria 10 pytań prawda/fałsz (120 s, ×2). Pary i kolejność z dawnego finału przeszły do etapu „Połącz i ułóż” (w quizie Piwo nowy etap). Szablon etapu „Finał” to teraz seria prawda/fałsz.
 - TV w serii: równe drewniane drogi z lewej zbiegają się pod pełną szklanką z pianą (`drogi.tsx`), każda dobra odpowiedź to krok (na żywo, po każdej odpowiedzi), u góry zegar, przed startem odliczanie. Ten sam układ dróg w rankingu po finale (zamiast dwóch skośnych i krótkiej środkowej).
 - Zapowiedź finału: w etapie przed finałem plansza („Walka o finał: 3 najlepszych wchodzi do finału, N odpada”), telefon („Do 3. miejsca brakuje Ci X pkt” albo „Jesteś w finałowej trójce”) i kreska „ta trójka wchodzi do finału” pod 3. torem wyścigu. Wcześniejsze plansze mówią, że na końcu jest finał trójki (migracja `20261023123729_zapowiedz_finalu`).
 - Po ostatnim pytaniu pilot ma od razu „Pokaż podium” (bez „Pokaż ranking”).
-- Pary na telefonie poziomo: w pionie prośba „Obróć telefon poziomo” (z „Nie mogę obrócić”), w poziomie pary na całą szerokość. Demo na planszy etapu obraca telefon i mówi to samo; telefon na planszy etapu z parami też.
+- Pary na telefonie działają w pionie, w dwóch kolumnach. Plansza etapu i demonstracja pokazują instrukcję bez obracania telefonu.
 - Szacowanie: ekran odpowiedzi to oś przybliżona do strzałów, z poprawną liczbą na złotej kresce i graczami tam, gdzie strzelali (za mało z lewej, za dużo z prawej), z liczbą i punktami. Demo na planszy ma żartobliwe pytanie, żeby nie zdradzać odpowiedzi z quizów.
 - Bez pytań o koncerny: pytania o Żywiec zamienione na rok pierwszego pilznera (1842) i Reinheitsgebot (1516).
 - Smugi światła w tle wędrują przez cały ekran w pętli (70–110 s), oprócz kołysania.
