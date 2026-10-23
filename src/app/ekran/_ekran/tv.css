@@ -1572,26 +1572,33 @@
   object-fit: cover;
 }
 
-/* Wyścig do nalewaka (wyscig.tsx): tory jak szklane rury napełniane piwem, meta z nalewakiem */
+/* Wyścig po piwo (wyscig.tsx): tory na barowej ladzie, na mecie szklanka napełniana z każdym pytaniem */
 .tv-wyscig {
   display: flex;
   flex-direction: column;
 }
 
+.wyscig-plansza {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: center;
+  gap: 32px;
+  margin-top: 28px;
+}
+
 .wyscig-tory {
-  --kolumna-punktow: 210px;
-  --odstep: 24px;
-  position: relative;
   display: grid;
   gap: 12px;
-  margin-top: 200px;
+  align-content: center;
 }
 
 .wyscig-wiersz {
   display: grid;
-  grid-template-columns: 70px 280px minmax(0, 1fr) var(--kolumna-punktow);
+  grid-template-columns: 64px 260px minmax(0, 1fr) 190px;
   align-items: center;
-  gap: var(--odstep);
+  gap: 20px;
   height: var(--tor);
 }
 
@@ -1611,48 +1618,44 @@
   font-weight: var(--w-black);
 }
 
-/* szklana rura: ciemne wnętrze, jasny refleks u góry */
-.wyscig-rura {
+/* lada: ciemne drewno z grafiki, przyciemnione, z jasną krawędzią od strony gracza */
+.wyscig-lada {
   position: relative;
-  height: 72%;
-  border-radius: var(--r-pill);
+  height: 74%;
+  border-radius: 10px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 40%),
-    rgba(244, 236, 216, 0.04);
-  border: 2px solid rgba(244, 236, 216, 0.14);
+    linear-gradient(180deg, rgba(255, 220, 160, 0.12), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.45)),
+    url("/grafiki/lada.webp") center / cover,
+    #2b1a0b;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 160, 0.25),
+    0 6px 18px rgba(0, 0, 0, 0.6);
 }
 
-/* piwo: bursztyn z bąbelkami, które płyną w górę, i pianą na czele */
-.wyscig-piwo {
-  position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: var(--r-pill);
-  background:
-    radial-gradient(circle, rgba(255, 248, 220, 0.55) 1.5px, transparent 2.5px) 0 0 / 26px 18px,
-    radial-gradient(circle, rgba(255, 248, 220, 0.35) 1px, transparent 2px) 13px 9px / 26px 18px,
-    linear-gradient(180deg, #f6c75a 0%, #e3ac3f 45%, #a8741a 100%);
-  box-shadow: 0 0 24px rgba(227, 172, 63, 0.35);
-  animation: babelki-w-rurze 3s linear infinite;
-}
-
-.wyscig-piwo::after {
+/* meta: złota linia na końcu lady, przy szklance */
+.wyscig-lada::after {
   content: "";
   position: absolute;
-  top: -10%;
-  right: -6px;
-  bottom: -10%;
-  width: calc(var(--tor) * 0.45);
-  border-radius: var(--r-pill);
-  background: radial-gradient(ellipse at 40% 40%, #fffdf5 0%, #f4ecd8 55%, rgba(244, 236, 216, 0.7) 100%);
+  top: -6px;
+  bottom: -6px;
+  right: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--zloto);
+  box-shadow: var(--glow-md);
 }
 
-@keyframes babelki-w-rurze {
-  to {
-    background-position:
-      0 -18px,
-      13px -9px,
-      0 0;
-  }
+.wyscig-trasa {
+  position: absolute;
+  inset: 0 calc(var(--tor) * 0.45 + 6px);
+}
+
+/* smuga za graczem: złoto gasnące ku startowi */
+.wyscig-slad {
+  position: absolute;
+  inset: 25% auto 25% 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(227, 172, 63, 0), rgba(227, 172, 63, 0.55));
 }
 
 .wyscig-jezdziec {
@@ -1664,7 +1667,7 @@
 
 .wyscig-jezdziec .awatar {
   border: 3px solid var(--piana);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
 }
 
 .wyscig-punkty {
@@ -1693,35 +1696,51 @@
   box-shadow: var(--glow-lg);
 }
 
-/* meta: linia na końcu rur (przed kolumną punktów), nad nią nalewak */
-.wyscig-meta {
+/* szklanka: pusta przygaszona pod spodem, pełna nalewana od dołu */
+.wyscig-szklanka {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-self: stretch;
+  align-content: center;
+}
+
+/* poświata na całości: na samym nalewanym obrazku przycięcie ucięłoby ją do prostokąta */
+.wyscig-szklo {
+  position: relative;
+  width: 100%;
+  display: grid;
+  filter: drop-shadow(0 0 36px rgba(227, 172, 63, 0.4));
+}
+
+.wyscig-szklo img {
+  grid-area: 1 / 1;
+  width: 100%;
+  max-width: none;
+  height: auto;
+}
+
+/* pusta szklanka: blady, szklany zarys tej samej grafiki */
+.wyscig-szklanka-pusta {
+  filter: grayscale(1) brightness(1.3) contrast(0.7);
+  opacity: 0.16;
+}
+
+/* piana na powierzchni nalewanego piwa */
+.wyscig-piana {
   position: absolute;
-  top: -196px;
-  bottom: -10px;
-  right: calc(var(--kolumna-punktow) + var(--odstep));
-  width: 0;
+  height: 26px;
+  translate: 0 -55%;
+  border-radius: 50% / 40%;
+  background: radial-gradient(ellipse at 50% 60%, #fffaf0 0%, #f4ecd8 55%, rgba(244, 236, 216, 0.6) 80%, transparent 100%);
+  filter: blur(1px);
   pointer-events: none;
 }
 
-.wyscig-nalewak {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 150px;
-  max-width: none;
-  height: 188px;
-  translate: -50% 0;
-  filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.45));
-}
-
-.wyscig-linia {
-  position: absolute;
-  top: 190px;
-  bottom: 0;
-  left: 0;
-  width: 14px;
-  translate: -50% 0;
-  background: repeating-conic-gradient(var(--zloto) 0 25%, #111 0 50%) 0 0 / 14px 14px;
-  border-radius: 3px;
-  opacity: 0.85;
+.wyscig-szklanka-opis {
+  margin: 12px 0 0;
+  font-size: 30px;
+  font-weight: var(--w-black);
+  color: var(--zloto);
+  text-align: center;
 }
