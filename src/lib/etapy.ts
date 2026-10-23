@@ -86,7 +86,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     nazwa: "Finał",
     opis: "Trzej najlepsi odpowiadają na serię pytań we własnym tempie. Na TV widać na żywo, kto jest bliżej piwa.",
     mnoznik: 2,
-    czas_s: 60,
+    czas_s: 120,
     finalowy: true,
     seria: true,
     typy: ["prawda_falsz"],
@@ -117,7 +117,7 @@ export const SZABLONY_QUIZU: SzablonQuizu[] = [
       { szablon: "kilka", pytania: 3 },
       { szablon: "szacowanie", pytania: 3 },
       { szablon: "laczenie", pytania: 3 },
-      { szablon: "final", pytania: 2 },
+      { szablon: "final", pytania: 14 },
     ],
   },
   {
