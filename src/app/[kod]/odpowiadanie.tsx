@@ -52,7 +52,7 @@ export function OdpowiedzWielokrotna({ z, wyslana, zablokowane, onWyslij }: Prop
   );
 }
 
-/** Kolejność: stukaj elementy po kolei, każdy dostaje numer. „Cofnij” zdejmuje ostatni. */
+/** Kolejność: stukaj elementy po kolei, każdy dostaje numer. Stuknięcie ponumerowanego zdejmuje go, a dalsze numery się przesuwają. */
 export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij }: Props) {
   const elementy = z.dane.elementy ?? [];
   const [ulozenie, ustaw] = useState<number[]>([]);
@@ -68,8 +68,8 @@ export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij }: Props)
             <li key={i}>
               <button
                 className={`odp${nr >= 0 ? " wybrana" : ""}`}
-                disabled={koniec || nr >= 0}
-                onClick={() => ustaw((u) => [...u, i])}
+                disabled={koniec}
+                onClick={() => ustaw((u) => (u.includes(i) ? u.filter((j) => j !== i) : [...u, i]))}
               >
                 <span className={`odp-litera${nr >= 0 ? " odp-numer" : ""}`}>{nr >= 0 ? nr + 1 : "·"}</span>
                 <span className="odp-tekst">{e}</span>
@@ -79,35 +79,34 @@ export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij }: Props)
         })}
       </ol>
       {!wyslana && (
-        <div className="odp-akcje">
-          <button
-            className="przycisk"
-            disabled={koniec || ulozenie.length === 0}
-            onClick={() => ustaw((u) => u.slice(0, -1))}
-          >
-            Cofnij
-          </button>
-          <button
-            className="przycisk zloty"
-            disabled={koniec || !komplet}
-            onClick={() => onWyslij({ kolejnosc: ulozenie })}
-          >
-            Zatwierdź
-          </button>
-        </div>
+        <button
+          className="przycisk zloty odp-zatwierdz"
+          disabled={koniec || !komplet}
+          onClick={() => onWyslij({ kolejnosc: ulozenie })}
+        >
+          Zatwierdź
+        </button>
       )}
     </>
   );
 }
 
-/** Pary: stuknij lewy, potem prawy. Para dostaje wspólny numer; stuknięcie sparowanego rozłącza. */
 /** Kolory par: takie same jak `.para-0` … `.para-5` w globals.css. */
 const KOLORY_PAR = ["#e3ac3f", "#8fb63a", "#6fa8dc", "#e2735a", "#c39bd3", "#f4ecd8"];
 
 type Linia = { x1: number; y1: number; x2: number; y2: number; kolor: string };
 
+/** „Kabelek” jak w mapach myśli: krótko poziomo, łuk do drugiej strony, znów poziomo. */
+function kabelek({ x1, y1, x2, y2 }: Linia): string {
+  const prosto = Math.min(6, (x2 - x1) / 5);
+  const a = x1 + prosto;
+  const b = x2 - prosto;
+  const srodek = (a + b) / 2;
+  return `M ${x1} ${y1} H ${a} C ${srodek} ${y1}, ${srodek} ${y2}, ${b} ${y2} H ${x2}`;
+}
+
 /**
- * Kreski między połączonymi parami: od prawej krawędzi lewego kafelka do lewej krawędzi prawego.
+ * Kabelki między połączonymi parami: od prawej krawędzi lewego kafelka do lewej krawędzi prawego.
  * Pozycje mierzymy z DOM po każdej zmianie par i przy zmianie rozmiaru siatki.
  */
 function useLiniePar(polaczone: (number | null)[]) {
@@ -151,6 +150,7 @@ function useLiniePar(polaczone: (number | null)[]) {
   return { siatka, linie };
 }
 
+/** Pary: stuknij lewy, potem prawy. Para dostaje wspólny numer i kolor; stuknięcie sparowanego rozłącza. */
 export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   const lewe = z.dane.lewe ?? [];
   const prawe = z.dane.prawe ?? [];
@@ -164,7 +164,7 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   function stuknijLewy(i: number) {
     if (pary[i] !== null) {
       ustawPary((p) => p.map((x, j) => (j === i ? null : x)));
-      ustawAktywny(i);
+      ustawAktywny(null);
       return;
     }
     ustawAktywny((a) => (a === i ? null : i));
@@ -187,7 +187,7 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
         <svg className="pary-linie" aria-hidden>
           {linie.map((l, i) => (
             <g key={i} stroke={l.kolor} fill={l.kolor}>
-              <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} strokeWidth={3} strokeLinecap="round" />
+              <path d={kabelek(l)} fill="none" strokeWidth={3} strokeLinecap="round" />
               <circle cx={l.x1} cy={l.y1} r={4} />
               <circle cx={l.x2} cy={l.y2} r={4} />
             </g>

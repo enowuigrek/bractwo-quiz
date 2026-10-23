@@ -39,7 +39,7 @@ Kod sesji to krótki, czytelny ciąg (np. `PORT`), który da się też wpisać r
 ## Przebieg sesji (maszyna stanów)
 
 ```
-poczekalnia → przygotuj (3 s) → pytanie (czas) → wynik → [odpowiedzi] → [ranking] → [następne zadanie | podium ⇄ tabela] → koniec
+poczekalnia → przygotuj (5 s) → pytanie (czas) → wynik → [odpowiedzi] → [ranking] → [następne zadanie | podium ⇄ tabela] → koniec
 ```
 
 `odpowiedzi` i `ranking` prowadzący może pominąć. Po ostatnim pytaniu obok podium jest `tabela`: pełna lista graczy z punktami.
@@ -71,7 +71,7 @@ Okazja („Dzień Porteru”) i grafika są przypięte do **sesji**, a nie do qu
 
 - **Nikt nie widzi poprawnej odpowiedzi przed czasem.** Tabela `zadania` jest niedostępna publicznie. Gracze i TV dostają pytanie przez funkcję, która zwraca tylko **bieżące** zadanie i **bez** pola `poprawna`, dopóki faza nie przejdzie na `wynik`.
 - **Czas liczy serwer.** `zapisz_odpowiedz(token, zadanie, dane)` to funkcja w Postgresie. Bierze `now()`, odrzuca odpowiedzi po `faza_do`, sama ocenia i liczy punkty. Telefon nie ma tu nic do powiedzenia.
-- **Wszyscy startują razem.** Faza `przygotuj` trwa 3 s, a `faza_od` pytania jest znane z wyprzedzeniem. Telefony przy wejściu mierzą różnicę swojego zegara względem serwera i odsłaniają pytanie w tym samym momencie, niezależnie od opóźnienia sieci.
+- **Wszyscy startują razem.** Faza `przygotuj` trwa 5 s (od 23.10, wcześniej 3 s), a `faza_od` pytania jest znane z wyprzedzeniem. Telefony przy wejściu mierzą różnicę swojego zegara względem serwera i odsłaniają pytanie w tym samym momencie, niezależnie od opóźnienia sieci.
 - **Punkty:** poprawna = 500 + (bonus) 500 × (1 − czas/limit), zła = 0. Przy wyłączonym bonusie poprawna = 1000. Pytanie bez limitu czasu nie ma bonusu: poprawna = 1000.
 - **Gracz** dostaje losowy token w `localStorage`. Po odświeżeniu strony wraca do gry z tym samym nickiem.
 - **Pilot:** każda akcja prowadzącego wymaga `host_token`.
@@ -125,7 +125,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 - **Next.js 16.4** (Turbopack). `cacheComponents` wyłączone: panel i tak jest dynamiczny, a gra działa po stronie klienta na Realtime. Middleware nazywa się teraz `proxy` (`src/proxy.ts`).
 - **Migracja:** `supabase/migrations/20261018160010_schemat.sql`. Funkcje pomocnicze siedzą w schemacie `wewn`, którego API nie wystawia. Przeglądarka ma dostęp tylko do funkcji: `stan_sesji`, `gracze_sesji`, `dolacz`, `zapisz_odpowiedz`, `moj_wynik`, `ranking`, `pilot_stan`, `pilot_akcja`.
-- **Faza `przygotuj` nie jest zapisywana w bazie.** `pilot_akcja('nastepne')` ustawia fazę `pytanie` z `faza_od = teraz + 3 s`, a `stan_sesji` zwraca `przygotuj`, dopóki `faza_od` nie minie. Dzięki temu baza nie potrzebuje timera.
+- **Faza `przygotuj` nie jest zapisywana w bazie.** `pilot_akcja('nastepne')` ustawia fazę `pytanie` z `faza_od = teraz + 5 s` (do 23.10: 3 s), a `stan_sesji` zwraca `przygotuj`, dopóki `faza_od` nie minie. Dzięki temu baza nie potrzebuje timera.
 - **Realtime przez Broadcast z bazy** (`realtime.send`, temat `sesja:<KOD>`, zdarzenia `stan`, `gracz`, `odpowiedz`) zamiast subskrypcji tabeli. W zdarzeniach nie ma nic tajnego, a klient po `stan` woła `stan_sesji`.
 - **Kod gry** to 4 litery bez I i O. Jest unikalny tylko wśród gier, które się nie skończyły, więc `PORT` może wrócić na kolejny Dzień Porteru.
 - **`zapisz_odpowiedz` nie mówi, czy odpowiedź jest poprawna.** Ocena i punkty wychodzą przez `moj_wynik` dopiero od fazy `wynik`. Odpowiedź przyjmujemy do 1 s po `faza_do` (opóźnienie sieci), a czas ucinamy do limitu.
@@ -289,6 +289,14 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - **Ekran lokalu po grze:** na pilocie po końcu „Pokaż plansze na ekranie lokalu” (`ekran_zwolniony`), bez tego plansze wracają same po 10 minutach. Przez 6 godzin po grze plansze mają dodatkową: „Zwycięzcy ostatniego quizu” z pierwszą trójką (gracze z punktami).
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
+
+### Poprawki 23.10: odznaczanie, kabelki, pilot, 5 s odliczania
+
+- **Kolejność i pary:** ponowne stuknięcie zaznaczonego elementu odznacza go, tak jak w „Kilka odpowiedzi”. W kolejności dalsze numery się przesuwają, a przycisku „Cofnij” już nie ma. W parach stuknięcie połączonego lewego albo prawego rozłącza parę.
+- **Pary:** zamiast prostych kresek „kabelki” jak w mapach myśli: krótko poziomo, łuk, znów poziomo (ścieżka SVG z krzywą Béziera). Kolumny są dalej od siebie (44 px).
+- **Pilot:** zapowiedź rodzaju następnego pytania przy każdym pytaniu, także zwykłym. „Zakończ pytanie wcześniej” i „Zakończ grę” to zwykłe przyciski (wcześniej wyglądały jak tekst).
+- **Odliczanie przed pytaniem trwa 5 s** (migracja `20261023060006_odliczanie_5_sekund`, `pilot_akcja`).
+- Sprawdzone na localhost (gra XTFD, usunięta): odliczanie od 5, odznaczanie w kolejności z przesunięciem numerów, kabelki i rozłączanie pary, zapowiedź na pilocie.
 
 ### Zapowiedź rodzaju pytania i kreski w parach (22.10)
 

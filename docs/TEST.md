@@ -34,7 +34,7 @@ Ustaw quiz z 3–4 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami. Czas na
 
 Do zanotowania po teście (dzień 7):
 - czy bonus za szybkość jest sprawiedliwy (przełącznik przy uruchamianiu gry),
-- czy czasy pytań i 3 s odliczania pasują,
+- czy czasy pytań i 5 s odliczania pasują,
 - czy coś na TV jest za małe z końca sali,
 - błędy i dziwne zachowania: kiedy, na jakim telefonie i w jakiej przeglądarce.
 

@@ -247,10 +247,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       )}
       {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
 
-      {/* inny rodzaj pytania niż zwykłe A–D (albo powrót do A–D): prowadzący uprzedza graczy przed startem */}
+      {/* rodzaj następnego pytania zawsze: rodzaje się mieszają, prowadzący uprzedza graczy przed startem */}
       {stan.nastepne_typ &&
-        (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") &&
-        (stan.nastepne_typ !== "wybor" || (z && z.typ !== "wybor")) && (
+        (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
           <p className="pilot-zapowiedz" role="status">
             <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed
             startem: „{PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”.
@@ -295,7 +294,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
               </p>
               {doKonca > 0 && (
                 <button
-                  className="przycisk-cichy"
+                  className="przycisk"
                   disabled={wysylam}
                   onClick={() =>
                     akcja("wynik", "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?", {
@@ -401,7 +400,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
         {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
           <button
-            className="przycisk-cichy"
+            className="przycisk niebezpieczny"
             style={{ marginTop: 24 }}
             disabled={wysylam}
             onClick={() =>

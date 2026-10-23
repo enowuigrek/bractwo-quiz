@@ -227,7 +227,7 @@ function Poczekalnia({
   );
 }
 
-/** Przygotuj (odliczanie 3 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
+/** Przygotuj (odliczanie 5 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
 function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
