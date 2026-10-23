@@ -120,7 +120,17 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Podpis ikony (Quiz).** Przyciski z samą ikoną (ołówek, kosz, strzałki) mają `data-podpis="Edytuj"`. Po najechaniu albo fokusie z klawiatury nad przyciskiem pojawia się dymek: 13/600, tło `--kamien3`, obrys `--kamien2`, radius `--r-pole`. Zamiast atrybutu `title`, bo systemowy dymek nie pasuje do wyglądu.
 
-**Fanfara podium (Quiz).** Konfetti w kolorach złoto, złoto jasne, blask, piana, chmiel, bursztyn. Medale na telefonie: 160 px, kolor `--zloto` / `--srebro` / `--braz` z jasnym refleksem, wjazd z obrotem 1 s (`--ease-wjazd`). Przed odsłoną pulsujący napis „Werble…”.
+**Fanfara podium (Quiz).** Konfetti w kolorach złoto, złoto jasne, blask, piana, chmiel, bursztyn. Medale na telefonie: 160 px, kolor `--zloto` / `--srebro` / `--braz` z jasnym refleksem, wjazd z obrotem 1 s (`--ease-wjazd`). Przed odsłoną trzy skaczące złote kropki i pulsujący napis „Werble…”.
+
+**Werble po finale (Quiz, `components/werble.tsx`).** Ekran gaśnie jak wyłączany telewizor: biały błysk zapada się w poziomą kreskę i punkt (0.9 s), potem czerń, a po 1.8 s przez 3 s wolno wchodzi „Werble…” złotem z poświatą, nad nim trzy złote kropki skaczące na zmianę (18 px na telefonie, 38 px na TV). Zwykły bęben w SVG był za brzydki, kropki zostały.
+
+**Szklanka piwa (Quiz, `components/szklanka-piwa.tsx`).** Grafika `public/grafiki/szklanka.webp`. Pusta szklanka to blady zarys tej samej grafiki (szarość, 16%), z brzegiem jako jasna elipsa i mgiełką szkła w jej tylnej połowie. Piwo rośnie od dna, a na nim leży piana: elipsa od ścianki do ścianki (powierzchnia lekko z góry), jaśniejszy wierzch z pęcherzykami i cienka warstwa piany pod nim. Pełna szklanka ma czapę piany z grafiki. Bąbelki unoszą się tylko w nalanym piwie. Bez `clip-path` (TV Samsunga go nie stosuje).
+
+**Prawda / fałsz w serii (Quiz).** Dwa płaskie koła pod kciuki, `min(40vw, 160px)`: `--chmiel` z czarnym ✓ i `--czerwien` z czarnym ✗, bez ramek i bez napisów (napis tylko w `aria-label`), lekki cień pod spodem. Pytanie ma zawsze miejsce na trzy linie, więc koła nie skaczą. Poza serią prawda/fałsz to dwa wysokie kafle z ramką i napisem.
+
+**Utrudnienia w finale (Quiz).** Od połowy pytań serii każde pytanie inaczej: drżenie (0.14 s), zamiana kół miejscami, mgła (rozmycie do 4 px), dryf na boki (±16 px), zanikanie (do 12%), uciekające koła, kołysanie (±4°). W pasku złoty dopisek „utrudnienie!”.
+
+**Pieczątka „Odebrana” (Quiz).** Na karcie nagrody po odbiorze: `--czerwien`, podwójna ramka (4 px + wewnętrzna 2 px), obrót −7°, przetarcia z maski szumu SVG (`feTurbulence`), wjazd jak odbicie (od skali 1.8).
 
 **Pole z błędem (Quiz).** Ramka w `--czerwien` (np. powtórzona odpowiedź), a pod polem komunikat `.blad`.
 
@@ -162,7 +172,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 - Wjazdy: `cubic-bezier(.2,.9,.25,1.1)`, z lekkim przestrzeleniem.
 - Wszystkie animacje mają wyłączenie w `prefers-reduced-motion: reduce`.
-- Tło ekranów TV (Quiz) nie jest martwą czernią: na czarnym `--bg` bardzo wolno dryfują dwie, trzy ciepłe plamy światła jak od świec (złoto 11%, bursztyn 7%, 70–110 s), a z dołu unoszą się złote bąbelki jak w kuflu (22 sztuki, 16–30 s). Tylko transformacje i przezroczystość, tekst zawsze czytelny.
+- Tło ekranów TV (Quiz) nie jest martwą czernią: na czarnym `--bg` bardzo wolno dryfują trzy ciepłe plamy światła jak od świec (złoto 11%, bursztyn 7%, 70–110 s) i trzy szerokie smugi światła z góry, które kołyszą się i wędrują przez ekran. Bąbelki są tylko w szklance wyścigu. Tylko transformacje i przezroczystość, tekst zawsze czytelny. W werblach tło gaśnie do czerni (wideo czuwania gra dalej).
+- Logo Bractwa na ekranach gry TV jest w nagłówku po prawej (76 px), nie w rogu sceny.
 
 **Baner / stopka maila.** Proporcje ok. 5:2. Tło grafitowe z ukośnymi liśćmi chmielu ton na tonie. Białe logo u góry z lewej, kolumna kontaktów u góry z prawej, szyszka chmielu w prawym dolnym rogu, która wychodzi poza kadr. Nagłówek jubileuszowy (zwężony) siedzi u dołu z lewej. Złota tu nie ma: na grafikach drukowanych marka jest monochromatyczna, a jedynym kolorem jest zieleń chmielu.
 

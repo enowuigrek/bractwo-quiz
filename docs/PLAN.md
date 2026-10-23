@@ -2,12 +2,42 @@
 
 Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
+## Stan na 23.10 (wieczór): od czego zacząć
+
+Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są niżej w „Ustaleniach z realizacji”, a najnowsze zmiany w trzech ostatnich sekcjach z 23.10.
+
+**Co działa (produkcja `https://quiz.bractwopiwne.pl`, ostatnie wdrożenie 9976557):**
+- **Panel** (`/admin`, jedno hasło): lokale z logo i adresem ekranu, quizy z etapami (szablony quizu i etapów, plan liczby pytań), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas na odpowiedź domyślnie „bez limitu”, nagrody ze zdjęciem przerabianym przez AI, kranoprzejęcie, zapowiedź z godziną), historia gier, oznaczanie odbioru nagrody, grafika podium do social mediów.
+- **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`): plansze lokalu bez gry, zapowiedź z odliczaniem, poczekalnia z QR i nagrodami, plansza etapu z animacją telefonu (jak odpowiadać), pytanie z odliczaniem 3 s, wynik z rozkładem, odpowiedzi graczy (przy szacowaniu oś), ranking jako **wyścig po piwo** (szklanka nalewa się z pytaniami, do 12 graczy, powyżej tabela), finał trójki jako **seria** na żywo (trzy drogi do szklanki), **werble** po finale, podium ze zdjęciami nagród, tabela, koniec. Logo Bractwa w nagłówku po prawej. Ekran sam przeładowuje się po wdrożeniu (poza pytaniem i serią).
+- **Telefon gracza** (`/<kod>`): nick i selfie przed dołączeniem, odpowiadanie na wszystkie typy, w serii płaskie koła ✓/✗ w stałym miejscu, od połowy finału utrudnienia, ranking ze szklanką, medal i karta nagrody z pieczątką „Odebrana”, udostępnianie wyniku.
+- **Pilot** (`/pilot/<kod>?t=…`): start, następne, wynik, odpowiedzi, ranking, start etapu i serii, „Zakończ serię wcześniej”, „Pokaż podium” po werblach, tabela, koniec, lista graczy z QR powrotu.
+
+**Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (tu „walka o finał”: 3 najlepszych przechodzi) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → werble → podium (pokazuje prowadzący).
+
+**Najważniejsze pliki:**
+- Baza: `supabase/migrations/` (funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `ranking`, `wewn.zakoncz_serie`, `wewn.zamknij_serie_jesli_gotowe`). Ostatnie wersje funkcji są w najnowszych plikach, w których występują.
+- TV: `src/app/ekran/_ekran/` (`tv.tsx` rozdziela fazy, `wyscig.tsx`, `drogi.tsx`, `seria.tsx`, `etap.tsx`, `demo.tsx`, `ranking.tsx`, `odpowiedzi.tsx`, `szacowanie.tsx`, `plansze.tsx`, `logo.tsx`, `tv.css`).
+- Telefon: `src/app/[kod]/` (`gracz.tsx` rozdziela fazy, `rozgrywka.tsx`, `odpowiadanie.tsx`, `seria.tsx` z utrudnieniami, `etap.tsx`, `fanfara.tsx`, `moj-wyscig.tsx`).
+- Pilot: `src/app/pilot/[kod]/pilot.tsx`. Panel: `src/app/admin/(panel)/`.
+- Wspólne: `src/components/szklanka-piwa.tsx` (szklanka bez clip-path), `src/components/werble.tsx`, `src/lib/gra/` (typy, nasłuch z zapasowym odpytywaniem, szklanka, wyścig), `src/lib/etapy.ts` (szablony), `src/lib/ekran-tv.ts` (wygaszacz, OLED, samoczynne przeładowanie).
+
+**Jak testować lokalnie:** zasady są w `CLAUDE.md` (sekcja o testach). W skrócie: `npm run build`, podgląd `start-test-hasla` (port 3100), gra testowa bez lokalu założona SQL-em, gracze i akcje pilota przez funkcje w SQL, na końcu usunięcie gry w panelu.
+
+**Otwarte i niepewne:**
+- Wygaszanie Samsunga w lokalu: nowe wideo czuwania (720p z dźwiękiem) nie było jeszcze sprawdzone na tym TV. Jeśli dalej gaśnie, ustawienia TV są w `docs/TEST.md`.
+- Bonus z czasu bez limitu (1000 → 500 przez 30/60 s) i odliczanie 3 s działają w bazie, ale nie były grane na kilku telefonach naraz.
+- Przeróbka selfie AI wyłączona (nie wyświetlała się na produkcji), opis w `docs/POMYSLY.md`.
+- Test na żywo: spotkanie Kręgu w środę 28.10.
+
+**Następny krok:** Łukasz ma nowy pomysł do omówienia. Jeśli wejdzie do planu, dopisujemy go tutaj i w harmonogramie.
+
 ## Ustalenia
 
 | Temat | Decyzja |
 |---|---|
-| Gracze | indywidualnie; opcjonalny **tryb drużynowy**, w którym drużyna = jeden telefon, a nick = nazwa drużyny |
-| Punkty | za poprawność + bonus za szybkość; jeśli w testach wyjdzie niesprawiedliwie, wyłączamy bonus przełącznikiem |
+| Gracze | indywidualnie (od 23.10 kreator nie ma trybu drużynowego; `tryb = 'druzyny'` zostaje w bazie dla starszych gier) |
+| Punkty | za poprawność + bonus za szybkość, zawsze włączony; limit czasu tylko odlicza, po ilu sekundach nie da się odpowiedzieć |
+| Etapy | quiz dzieli się na etapy z planszą, mnożnikiem i własnym czasem; ostatni to finał trójki jako seria |
 | Telefon gracza | pokazuje pełną treść pytania i odpowiedzi |
 | Prowadzący | pilot na telefonie, obraz na TV w przeglądarce |
 | Liczba graczy | maks. 30 na sesję (ustawiane w bazie, łatwo zmienić) |
@@ -16,7 +46,7 @@ Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-
 | Repo | `enowuigrek/bractwo-quiz`, publiczne (portfolio) |
 | Konta | Vercel i Supabase na `l.nowak@bractwopiwne.pl`, kod na prywatnym GitHubie |
 | Test | testowy quiz na spotkaniu Kręgu (śr. 28.10) |
-| Domena | `quiz.bractwopiwne.pl` (CNAME w Hostido, MX nietknięte) |
+| Domena | `quiz.bractwopiwne.pl` (rekord A `76.76.21.21` w strefie DNS hostingu Hostido, MX nietknięte) |
 
 ## Stack
 
@@ -29,20 +59,23 @@ Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-
 
 | Adres | Kto | Co robi |
 |---|---|---|
-| `/admin` | obsługa (hasło) | lokale, quizy, zadania, uruchamianie sesji |
-| `/tv/[kod]` | telewizor | poczekalnia z QR → pytanie z odliczaniem → wynik → ranking → podium |
-| `/pilot/[kod]?t=…` | prowadzący | start, następne, pokaż wynik, pokaż ranking, zakończ; podgląd „odpowiedziało 12/18” |
-| `/[kod]` | gracz | nick → odpowiedź → „poprawnie / źle, +740 pkt, 4. miejsce” |
+| `/admin` | obsługa (hasło) | lokale, quizy z etapami, zadania, uruchamianie gry, historia, odbiór nagród |
+| `/ekran/[adres]` | telewizor w lokalu (zakładka na stałe) | plansze lokalu, zapowiedź, a gdy w lokalu ruszy gra, sam przechodzi na nią |
+| `/tv/[kod]` | telewizor | poczekalnia z QR → plansza etapu → pytanie z odliczaniem → wynik → odpowiedzi → wyścig → … → seria finału → werble → podium |
+| `/pilot/[kod]?t=…` | prowadzący | start, następne, wynik, odpowiedzi, ranking, start etapu i serii, podium, tabela, koniec; podgląd „odpowiedziało 12/18” |
+| `/[kod]` | gracz | nick (+ selfie) → odpowiedzi → „dobrze / źle, +740 pkt, 4. miejsce”, szklanka wyścigu, medal i nagroda |
 
 Kod sesji to krótki, czytelny ciąg (np. `PORT`), który da się też wpisać ręcznie. Link do pilota zawiera tajny token. Admin otwiera go jako QR na ekranie po uruchomieniu sesji, prowadzący go skanuje i ma pilota.
 
 ## Przebieg sesji (maszyna stanów)
 
 ```
-poczekalnia → przygotuj (5 s) → pytanie (czas) → wynik → [odpowiedzi] → [ranking] → [następne zadanie | podium ⇄ tabela] → koniec
+poczekalnia → [etap] → przygotuj (3 s) → pytanie (czas albo bez limitu) → wynik → [odpowiedzi] → [ranking]
+            → następne pytanie | [etap] → … → etap finału → seria (3 s odliczania, czas na całą serię)
+            → werble → podium ⇄ tabela → koniec
 ```
 
-`odpowiedzi` i `ranking` prowadzący może pominąć. Po ostatnim pytaniu obok podium jest `tabela`: pełna lista graczy z punktami.
+`etap` to plansza przed pierwszym pytaniem etapu (prowadzący startuje go z pilota). `odpowiedzi` i `ranking` prowadzący może pominąć. W fazie `seria` wszyscy finaliści odpowiadają we własnym tempie na wszystkie pytania etapu; seria kończy się, gdy ktoś dobiegnie do piwa (wszystkie dobrze), gdy wszyscy skończą albo minie czas. Po ostatniej serii są `werble` (TV i telefony gasną), a podium odsłania prowadzący. Quiz bez etapów po ostatnim pytaniu idzie od razu do podium. Obok podium jest `tabela`: pełna lista graczy z punktami.
 
 `pytanie → wynik` dzieje się samo: gdy odpowiedzą wszyscy (w `zapisz_odpowiedz`) albo gdy minie czas (`dokoncz_pytanie`, które wołają TV, pilot i telefony; baza sama sprawdza zegar). Ręcznie prowadzący kończy tylko pytanie bez limitu albo wcześniej.
 
@@ -51,17 +84,22 @@ Stan trzymamy w jednym wierszu `sesje` (`faza`, `zadanie_nr`, `faza_od`, `faza_d
 ## Model danych
 
 ```
-lokale      id, nazwa, miasto, logo_url
-quizy       id, tytul, opis, utworzono
-zadania     id, quiz_id, nr, typ, tresc, grafika_url, czas_s, dane jsonb
-            dane dla typu 'wybor': { odpowiedzi: [..], poprawna: 2 }
-sesje       id, kod, quiz_id, lokal_id, okazja, grafika_url,
-            tryb ('solo'|'druzyny'), bonus_czas bool, max_graczy (30),
-            faza, zadanie_nr, faza_od, faza_do, host_token, utworzono
-gracze      id, sesja_id, nick, token, dolaczyl     unique(sesja_id, lower(nick))
-odpowiedzi  id, gracz_id, sesja_id, zadanie_id, dane jsonb,
-            czas_ms, poprawna bool, punkty, utworzono   unique(gracz_id, zadanie_id)
+lokale        id, nazwa, miasto, logo_url, adres_ekranu, instagram, utworzono
+quizy         id, tytul, opis, utworzono
+etapy         id, quiz_id, nr, nazwa, opis, mnoznik, czas_s, finalowy, seria, plan_pytan, typ_domyslny
+zadania       id, quiz_id, etap_id, nr, typ, tresc, grafika_url, czas_s, dane jsonb
+              dane dla typu 'wybor': { odpowiedzi: [..], poprawna: 2 } (pozostałe typy: src/lib/zadania.ts)
+sesje         id, kod, quiz_id, lokal_id, okazja, grafika_url, tryb, bonus_czas, czas_s, max_graczy (30),
+              faza, zadanie_nr, faza_od, faza_do, host_token, nagrody jsonb, browar_*,
+              planowany_start, poczekalnia_otwarta, ekran_zwolniony, finalisci uuid[], seria_etap,
+              widok_rankingu (już nieczytane, domyślnie 'wyscig'), utworzono
+gracze        id, sesja_id, nick, token, zdjecie_url, nagroda_odebrana, dolaczyl   unique(sesja_id, lower(nick))
+odpowiedzi    id, gracz_id, sesja_id, zadanie_id, dane jsonb, czas_ms, poprawna, ocena (0..1), punkty, utworzono
+              unique(gracz_id, zadanie_id)
+przerobki_ai  id, sesja_id, rodzaj, utworzono   (licznik przeróbek selfie, funkcja wyłączona)
 ```
+
+Fazy (`sesje.faza`): poczekalnia, etap, seria, werble, pytanie, wynik, odpowiedzi, ranking, podium, tabela, koniec. Telefony i TV widzą też `przygotuj` (pytanie przed `faza_od`).
 
 `typ` + `dane jsonb` pozwala dokładać nowe rodzaje zadań (łączenie, kolejność, liczba) bez zmian w tabelach. Każdy typ ma w kodzie swój edytor, widok TV, widok gracza i funkcję oceniającą.
 
@@ -94,7 +132,9 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 **Po pytaniu:** wynik (poprawna na zielono, słupki, najszybszy), potem **odpowiedzi graczy**. W nagłówku treść pytania. Zielona ramka „Dobrze” z graczami od najszybszego (numer, nick, odpowiedź, czas), pod nią czerwona ramka „Źle” (nick, odpowiedź, czas), a na dole szara linia „Bez odpowiedzi”. Przy wielu graczach wiersze idą w 2–3 kolumnach, od góry do dołu, a od 17 graczy w gęstszym układzie. Potem ranking całej gry.
 
-**Po grze:** podium albo **tabela wyników** (wszyscy gracze: miejsce, nick, punkty, w 1–3 kolumnach, lider w złotej ramce). Pilot przełącza między nimi w obie strony.
+**Ranking po pytaniu:** wyścig po piwo (tory na barowej ladzie, szklanka na mecie nalewa się z każdym pytaniem, z etapu na etap jest bliżej), przy ponad 12 graczach tabela. W finale trzy równe drogi zbiegają się pod szklanką.
+
+**Po grze:** podium (zdjęcie i nazwa nagrody przy stopniu, tytuł quizu na dole) albo **tabela wyników** (wszyscy gracze: miejsce, nick, punkty, w 1–3 kolumnach, lider w złotej ramce). Pilot przełącza między nimi w obie strony. Logo Bractwa jest w nagłówkach ekranów po prawej, nie w rogu.
 
 **Panel admina:** logo Bractwa w lewym górnym rogu z dopiskiem „panel”, wylogowanie po prawej, pod spodem nawigacja (gry, quizy, lokale). Strona główna dla graczy ma tylko logo i pole na kod.
 
@@ -115,7 +155,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 | 4 ✅ | pytanie → odpowiedzi → ocena → wynik; synchronizacja czasu |
 | 5 ✅ | ranking z animacją przetasowań, podium, dopieszczenie ekranu TV |
 | 6 ✅ | deploy ✅, keepalive ✅, checklista testu ✅ ([TEST.md](TEST.md)), domena `quiz.bractwopiwne.pl` ✅ (22.10, rekord A w Hostido), `CRON_SECRET` ✅; zostaje test z kilkoma telefonami |
-| 7 | poprawki po teście, bufor |
+| 7 ✅ | poprawki po testach (22–23.10): etapy, finał jako seria, wyścig po piwo, werble, nagrody, utrudnienia; zostaje test na żywo 28.10 |
 
 **Poza MVP:** wszystko z [POMYSLY.md](POMYSLY.md).
 

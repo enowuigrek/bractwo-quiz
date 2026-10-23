@@ -4,7 +4,8 @@
 
 1. Na `/api/keepalive` (adres aplikacji + `/api/keepalive`) ma być `"ok": true` i `"realtime": "SUBSCRIBED"`. Jeśli jest ustawiony `CRON_SECRET`, bez nagłówka dostaniesz 401. Wtedy sprawdź w Vercelu: Project → Settings → Cron Jobs → Run.
 2. W panelu: quiz ma wszystkie pytania, poprawne odpowiedzi są zaznaczone, a grafiki się wczytują.
-3. W panelu: uruchom grę (miasto → lokal → quiz, okazja, tryb, bonus za szybkość).
+3. W panelu: uruchom grę (miasto → lokal → quiz, okazja, czas na odpowiedź, nagrody). Bonus za szybkość jest zawsze, drużyn już nie ma.
+4. Jeśli telewizor ma otwarty ekran od wczoraj, a w międzyczasie było wdrożenie: ekran sam się przeładuje w ciągu minuty (poza pytaniem i serią). Dla pewności odśwież go raz ręcznie.
 
 ## Na miejscu (30 min przed)
 
@@ -15,13 +16,13 @@
 
 ## Scenariusz testu (kilka telefonów, ok. 15 min)
 
-Ustaw quiz z 3–4 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami. Czas na odpowiedź wybierasz przy uruchamianiu gry (do testu krótki, 10 s; drugą grę puść „bez limitu”).
+Do szybkiego testu podstaw: quiz z 3–4 pytaniami (jedno z grafiką, jedno z 6 odpowiedziami), czas 10 s, a drugą grę „bez limitu”. Do pełnego testu: quiz „Piwo - quiz testowy” (etapy i finał), tabela niżej.
 
 | # | Co zrobić | Czego oczekiwać |
 |---|---|---|
 | 1 | Gracze skanują QR z TV, wpisują nicki | Nicki wskakują na TV w ciągu ~1 s. Ten sam nick drugi raz jest odrzucony. |
 | 2 | Jeden gracz odświeża stronę | Wraca do gry z tym samym nickiem, bez wpisywania. |
-| 3 | Pilot: Start quizu | TV i telefony odliczają 3‑2‑1 i odsłaniają pytanie w tym samym momencie. |
+| 3 | Pilot: Start quizu | W quizie z etapami najpierw plansza etapu (zasady, telefon z animacją). Po „Start etapu” TV i telefony odliczają 3‑2‑1 i odsłaniają pytanie w tym samym momencie. |
 | 4 | Gracze odpowiadają w różnym tempie | Na TV rośnie „Odpowiedziało x/y”. Telefon pokazuje „Odpowiedź zapisana (3,4 s)”. |
 | 5 | Wszyscy odpowiadają | Zegar kończy się od razu, TV pokazuje „Czas minął!”. |
 | 6 | Pilot: Pokaż wynik | TV: poprawna na zielono, słupki, najszybszy. Telefon: „Dobrze! +… pkt” albo „Niestety źle”, miejsce. |
@@ -30,11 +31,18 @@ Ustaw quiz z 3–4 pytaniami: jedno z grafiką, jedno z 6 odpowiedziami. Czas na
 | 9 | Pilot: Pokaż odpowiedzi graczy, potem Pokaż ranking | TV: zielona ramka z dobrymi od najszybszego, czerwona ze złymi, przy każdym odpowiedź i czas, na dole bez odpowiedzi. Potem ranking: przetasowanie, „+zdobyte”, strzałki. Telefon: miejsce i zmiana. |
 | 10 | Ostatnie pytanie → Pokaż podium → Pokaż pełną tabelę → Zakończ grę | Podium wjeżdża 3 → 2 → 1. Tabela: wszyscy gracze z punktami. Na końcu podziękowanie. |
 | 11 | Wyłącz na chwilę Wi‑Fi na TV | W rogu „Brak połączenia, ponawiam…”, a po powrocie sieci TV dogania grę sam. |
-| 12 | Gra uruchomiona z czasem „bez limitu” | TV, telefon i pilot pokazują „Bez limitu”, bez paska czasu. Po ostatniej odpowiedzi: „Wszyscy odpowiedzieli”. „Pokaż wynik”, zanim wszyscy odpowiedzą, pyta o potwierdzenie. Poprawna = 1000 pkt. |
+| 12 | Gra uruchomiona z czasem „bez limitu” | Nigdzie nie ma zegara ani napisu „bez limitu”. Po ostatniej odpowiedzi: „Wszyscy odpowiedzieli”. „Pokaż wynik”, zanim wszyscy odpowiedzą, pyta o potwierdzenie. Dobra odpowiedź od razu ≈ 1000 pkt, po 15 s ≈ 750, po 30 s 500 (pary, kolejność i wielokrotny: po 60 s). |
+| 13 | Ranking po pytaniu | Wyścig po piwo: awatary jadą po torach, szklanka dolewa się po każdym pytaniu (na TV i na telefonie). Przy ponad 12 graczach tabela. |
+| 14 | Etap przed finałem | Plansza „Walka o finał: 3 najlepszych”, telefon „Do 3. miejsca brakuje Ci X pkt”, w wyścigu kreska pod 3. torem. |
+| 15 | Finał (seria) | Plansza finału z finalistami i nagrodą. Start: „Start za 3” w nagłówku, drogi widać. Finaliści klikają koła ✓/✗ we własnym tempie, na TV jadą do szklanki (bez numerów pytań), reszta kibicuje. Od połowy pytań utrudnienia: drżenie, zamiana przycisków, mgła, dryf, zanikanie, uciekające przyciski, kołysanie. |
+| 16 | Ktoś odpowie dobrze na wszystko | Seria kończy się od razu: TV gaśnie z błyskiem, telefony robią się czarne, po chwili „Werble…” z kropkami. Pilot: „Pokaż podium”. |
+| 17 | Podium i nagroda | Podium wjeżdża 3 → 2 → 1 ze zdjęciem nagrody. Telefon zwycięzcy: karta nagrody, „Potwierdź odbiór”, potem pieczątka „Odebrana”. |
 
 Do zanotowania po teście (dzień 7):
-- czy bonus za szybkość jest sprawiedliwy (przełącznik przy uruchamianiu gry),
-- czy czasy pytań i 5 s odliczania pasują,
+- czy bonus za szybkość jest sprawiedliwy (z limitem i bez),
+- czy czasy pytań, 3 s odliczania i 120 s na finał pasują,
+- czy utrudnienia w finale nie są za mocne (albo za słabe),
+- czy telewizor dalej się wygasza (wideo czuwania 720p z dźwiękiem, ustawienia Samsunga wyżej),
 - czy coś na TV jest za małe z końca sali,
 - błędy i dziwne zachowania: kiedy, na jakim telefonie i w jakiej przeglądarce.
 
