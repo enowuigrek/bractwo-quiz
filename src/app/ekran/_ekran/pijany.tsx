@@ -14,10 +14,13 @@ import { Szklanka } from "./wyscig";
  */
 export type GraczPijany = { nick: string; zdjecie: string | null; start: number; lider: boolean };
 
-/** Sekundy od wejścia w fazę: chwila bezruchu, cofanie od szklanki, spadające drogi, potem lot. */
-const COFANIE_S = 1.2;
-const SPADANIE_S = 2.2;
-const LOT_S = 3.4;
+/**
+ * Sekundy od wejścia w fazę: chwila bezruchu, powolne cofanie od szklanki, spadające drogi, potem lot.
+ * Rozłożone na pierwsze pytania dogrywki, żeby chaos narastał stopniowo, a nie od razu.
+ */
+const COFANIE_S = 6;
+const SPADANIE_S = 18;
+const LOT_S = 24;
 /** Z drogi zostaje tyle, ile przejechał gracz, razy to (cofają się w stronę startu). */
 const COFNIECIE = 0.3;
 /** Prędkość lotu w px/s: na początku powoli, pod koniec fazy szybciej. */

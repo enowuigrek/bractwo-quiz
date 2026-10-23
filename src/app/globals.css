@@ -2400,9 +2400,29 @@ html:has(.kolumna) {
 }
 
 /* jeden nad drugim */
-.efekt-pion .pijane-przyciski,
-.efekt-chaos .pijane-przyciski {
+.efekt-pion .pijane-przyciski {
   grid-template-columns: 1fr;
+}
+
+/* „wszystko naraz”: obok siebie, ale na zmianę płynnie rosną i tracą ostrość */
+.efekt-chaos .pijane-przyciski .odp-pf-przycisk {
+  animation: na-zmiane-pijane 2.4s ease-in-out infinite;
+}
+
+.efekt-chaos .pijane-przyciski .falsz {
+  animation-delay: -1.2s;
+}
+
+@keyframes na-zmiane-pijane {
+  0%,
+  100% {
+    transform: scale(0.85);
+    filter: blur(0.5px);
+  }
+  50% {
+    transform: scale(1.22);
+    filter: blur(2.5px);
+  }
 }
 
 /* „Fałsz” maleje aż do zniknięcia, „Prawda” rośnie (i za chwilę klika się sama) */
@@ -2428,8 +2448,7 @@ html:has(.kolumna) {
   }
 }
 
-.efekt-mgla .pijany-pytanie,
-.efekt-chaos .pijane-przyciski {
+.efekt-mgla .pijany-pytanie {
   animation: mgla-pijana 1.8s ease-in-out infinite;
 }
 
@@ -2488,7 +2507,7 @@ html:has(.kolumna) {
   .efekt-drzenie .pijany-pytanie,
   .efekt-chaos .pijany-pytanie,
   .efekt-mgla .pijany-pytanie,
-  .efekt-chaos .pijane-przyciski,
+  .efekt-chaos .pijane-przyciski .odp-pf-przycisk,
   .efekt-ucieczka .pijane-przyciski .odp-pf-przycisk,
   .efekt-obrot .pijany-pytanie {
     animation: none;
