@@ -4,15 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { usePotwierdzenie } from "@/components/okno";
 import { odslonaPodiumS } from "@/lib/gra/podium";
 /* eslint-disable @next/next/no-img-element -- selfie z bucketu Supabase w medalu */
-import type { MojWynik, Nagroda } from "@/lib/gra/typy";
+import type { MojWynik, Nagroda, StanSesji } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { Miejsce } from "./rozgrywka";
+import { UdostepnijWynik } from "./udostepnij";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 
 type Props = {
+  /** Stan gry: tytuł, okazja, lokal i browar do grafiki z wynikiem. */
+  stan: StanSesji;
   faza: "podium" | "tabela" | "koniec";
   /** Początek fazy `podium` według zegara serwera. */
   fazaOd: string | null;
@@ -30,7 +33,7 @@ type Props = {
  * Koniec quizu na telefonie. Na podium miejsce odsłania się razem ze stopniem na TV
  * (wcześniej „werble”), a pierwsza trójka dostaje medal i konfetti.
  */
-export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token, nagrody, zdjecie }: Props) {
+export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod, token, nagrody, zdjecie }: Props) {
   const miejsce = moj?.miejsce ?? null;
   const nagroda = nagrody?.find((n) => n.miejsce === miejsce) ?? null;
   const [odslonieto, ustawOdslonieto] = useState(faza !== "podium");
@@ -50,6 +53,25 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token
     wybuchKonfetti(false);
     if (miejsce === 1) return deszczKonfetti(4000);
   }, [odslonieto, faza, miejsce]);
+
+  // grafika z wynikiem do relacji: dla każdego gracza z miejscem, po odsłonięciu
+  const udostepnienie = moj?.miejsce ? (
+    <UdostepnijWynik
+      wynik={{
+        tytul: stan.quiz?.tytul ?? "Quiz",
+        okazja: stan.okazja,
+        lokal: stan.lokal,
+        browar: stan.browar,
+        data: new Date().toLocaleDateString("pl-PL"),
+        nick,
+        zdjecie,
+        miejsce: moj.miejsce,
+        liczbaGraczy: moj.liczba_graczy,
+        punkty: moj.punkty,
+      }}
+      konta={[stan.lokal?.instagram, stan.browar?.instagram]}
+    />
+  ) : null;
 
   const podziekowanie = (
     <>
@@ -91,6 +113,7 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token
         {nagroda && (
           <KartaNagrody nagroda={nagroda} nick={nick} kod={kod} token={token} odebrana={moj.nagroda_odebrana} />
         )}
+        {udostepnienie}
         {podziekowanie}
       </>
     );
@@ -108,6 +131,7 @@ export function KoniecGracza({ faza, fazaOd, przesuniecie, moj, nick, kod, token
             ? "Na telewizorze pełna tabela wyników."
             : ""}
       </p>
+      {udostepnienie}
       {podziekowanie}
     </>
   );

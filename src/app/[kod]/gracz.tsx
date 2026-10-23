@@ -310,6 +310,7 @@ function WGrze({
   if (stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {
     return (
       <KoniecGracza
+        stan={stan}
         faza={stan.faza}
         fazaOd={stan.faza_od}
         przesuniecie={przesuniecie}

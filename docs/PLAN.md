@@ -290,6 +290,27 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
+### Punktacja, zapowiedź quizu i udostępnianie (23.10)
+
+**Punktacja (ustalone 23.10):**
+- Kilka odpowiedzi zostaje: (trafione − błędne) / liczba poprawnych, minimum 0. Przy większej liczbie złych odpowiedzi (np. 5 odpowiedzi, 2 dobre) kara za strzelanie rośnie.
+- Kolejność liczona po sąsiadach (migracja `20261023061141_kolejnosc_sasiedzi`): część dobrze ułożonych par kolejnych elementów, n − 1 par. B C D A zamiast A B C D daje 2/3 zamiast 0, odwrotnie 0. Na telefonie zielone są elementy z dobrym sąsiadem, a pod spodem jest „Twoja kolejność: …”.
+- Pary bez zmian: część dobrze połączonych.
+
+**Zapowiedź quizu** (migracja `20261023061407_zapowiedz`: `sesje.planowany_start`, `sesje.poczekalnia_otwarta`, akcja `otworz`):
+- Kreator ma pole „Godzina startu” i dwa przyciski: „Uruchom grę” (QR od razu) albo „Zapowiedz na ekranie lokalu” (poczekalnia zamknięta).
+- Ekran lokalu przy zapowiedzi: pierwsza plansza z logami (przy kranoprzejęciu lokal × browar, bez Bractwa, które ma swoją planszę), „Kranoprzejęcie: …”, tytułem quizu, „Start o 20:00” i odliczaniem. Pozostałe plansze mają odliczanie w pigułce w rogu.
+- Pilot pokazuje „Start o … · za …” i „Otwórz poczekalnię (QR na TV)”. Po otwarciu TV przechodzi sam na poczekalnię z QR i godziną startu. Quiz startuje dalej przyciskiem, nie sam o czasie.
+- Dopóki poczekalnia jest zamknięta, `dolacz` odmawia, a telefon pokazuje „Zapisy jeszcze nie ruszyły”.
+
+**Udostępnianie w social mediach:**
+- Strona nie może sama oznaczyć kont ani dodać relacji (Instagram i Facebook na to nie pozwalają), więc robimy gotową grafikę i systemowe „Udostępnij” (telefon: Instagram, Facebook, Messenger…; komputer: pobranie pliku).
+- Telefon gracza po quizie (każdy, kto ma miejsce): „Udostępnij wynik”, grafika relacji 1080×1920 z logami (Bractwo, lokal, × browar), okazją, tytułem, medalem z selfie albo literą, nickiem, miejscem, punktami i kontami do oznaczenia. Pod przyciskiem konta do skopiowania („Kopiuj”).
+- Panel, zakończona gra: „Grafika podium do social mediów”, post 1080×1350 z pierwszą trójką (gracze z punktami) i kontami do oznaczenia.
+- Konta Instagram: lokal w ustawieniach lokalu, browar w kreatorze (`lokale.instagram`, `sesje.browar_instagram`). Konto Bractwa jest stałą w `src/lib/konta.ts` i czeka na nazwę (na stronie Bractwa jest tylko Facebook `BractwoPiwne1995`).
+- Grafiki rysuje przeglądarka (`src/lib/grafika-wyniku.ts`, canvas). Logo Bractwa jest przemalowane na biało.
+- Sprawdzone na localhost z tymczasowym lokalem „Test Claude” i grą MGBT (usunięte): plansze z zapowiedzią, pilot, otwarcie poczekalni, poczekalnia z odliczaniem, grafika gracza i podium. Systemowego okna „Udostępnij” na prawdziwym telefonie nie sprawdzałem.
+
 ### Poprawki 23.10: odznaczanie, kabelki, pilot, 5 s odliczania
 
 - **Kolejność i pary:** ponowne stuknięcie zaznaczonego elementu odznacza go, tak jak w „Kilka odpowiedzi”. W kolejności dalsze numery się przesuwają, a przycisku „Cofnij” już nie ma. W parach stuknięcie połączonego lewego albo prawego rozłącza parę.

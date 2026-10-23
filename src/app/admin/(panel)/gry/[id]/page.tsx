@@ -10,6 +10,7 @@ import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { wynikiGry, zadaniaGry } from "../wyniki";
+import { GrafikaPodium } from "./grafika-podium";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { TabelaWynikow } from "./tabela-wynikow";
 
@@ -17,7 +18,13 @@ export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
 
 type GraZDanymi = Sesja & {
   quizy: { tytul: string } | null;
-  lokale: { nazwa: string; miasto: string | null; adres_ekranu: string } | null;
+  lokale: {
+    nazwa: string;
+    miasto: string | null;
+    adres_ekranu: string;
+    logo_url: string | null;
+    instagram: string | null;
+  } | null;
 };
 
 export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
@@ -26,7 +33,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
-    db.from("sesje").select("*, quizy(tytul), lokale(nazwa, miasto, adres_ekranu)").eq("id", id).maybeSingle<GraZDanymi>(),
+    db.from("sesje").select("*, quizy(tytul), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram)").eq("id", id).maybeSingle<GraZDanymi>(),
     db.from("gracze").select("id", { count: "exact", head: true }).eq("sesja_id", id),
   ]);
   if (!gra) notFound();
@@ -239,6 +246,22 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
           <p className="pomocniczy" style={{ marginTop: 0 }}>
             {zadania.length > 0 ? `Pytań w grze: ${zadania.length}. ` : ""}Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy.
           </p>
+          {wyniki.some((w) => w.punkty > 0) && (
+            <GrafikaPodium
+              dane={{
+                tytul: gra.quizy?.tytul ?? "Quiz",
+                okazja: gra.okazja,
+                lokal: gra.lokale ? { nazwa: gra.lokale.nazwa, logo_url: gra.lokale.logo_url } : null,
+                browar: gra.browar_nazwa ? { nazwa: gra.browar_nazwa, logo_url: gra.browar_logo_url } : null,
+                data: new Date(gra.faza_od ?? gra.utworzono).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw" }),
+                podium: wyniki
+                  .filter((w) => w.miejsce <= 3 && w.punkty > 0)
+                  .slice(0, 3)
+                  .map((w) => ({ nick: w.nick, zdjecie: w.zdjecie, miejsce: w.miejsce, punkty: w.punkty })),
+              }}
+              konta={[gra.lokale?.instagram ?? null, gra.browar_instagram]}
+            />
+          )}
           <TabelaWynikow graId={gra.id} wyniki={wyniki} liczbaPytan={zadania.length} />
         </section>
       )}

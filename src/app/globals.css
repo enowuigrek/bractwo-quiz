@@ -1330,3 +1330,27 @@ html:has(.kolumna) {
   margin: 0;
   font-size: var(--fs-xs);
 }
+
+/* Koniec gry na telefonie: udostępnianie wyniku */
+.udostepnij {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.udostepnij-konta {
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-small);
+  color: var(--szary);
+  overflow-wrap: anywhere;
+}
+
+.udostepnij-konta strong {
+  color: var(--piana);
+}
+
+.udostepnij-konta .przycisk-zdjecie {
+  margin-left: 6px;
+  padding: 4px 12px;
+}

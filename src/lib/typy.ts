@@ -61,6 +61,7 @@ export type Sesja = {
   max_graczy: number;
   faza: Faza;
   zadanie_nr: number;
+  faza_od: string | null;
   host_token: string;
   utworzono: string;
 };

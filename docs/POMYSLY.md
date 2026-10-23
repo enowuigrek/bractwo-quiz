@@ -20,7 +20,7 @@ Rzeczy spoza MVP. Dopisujemy na bieżąco i wybieramy, co robimy po pierwszym ev
 - **Pełne drużyny:** kilka telefonów w jednej drużynie, wynik liczony jako średnia, żeby większa drużyna nie miała przewagi. (W MVP drużyna = jeden telefon.)
 - **Ponowne użycie quizu:** ten sam zestaw pytań w kilku lokalach i porównanie wyników między miastami.
 - **Historia i statystyki:** najtrudniejsze pytania, średni czas odpowiedzi, frekwencja.
-- **Eksport wyników** (CSV / grafika) do posta na Facebooku Bractwa.
+- **Eksport wyników** do CSV. (Grafika podium do social mediów jest od 23.10.)
 
 ## Animacje i ekran TV
 

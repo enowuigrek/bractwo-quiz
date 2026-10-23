@@ -15,6 +15,8 @@ export type WynikGracza = {
   sredniCzasMs: number | null;
   /** Kiedy gracz potwierdził odbiór nagrody (null: nie odebrał albo bez nagrody). */
   nagrodaOdebrana: string | null;
+  /** Selfie (znika po 7 dniach). */
+  zdjecie: string | null;
 };
 
 export type ZadanieGry = { id: string; nr: number; tresc: string; czas_s: number | null } & ZadanieDane;
@@ -50,9 +52,9 @@ export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<Wy
   const [{ data: gracze }, { data: odpowiedzi }] = await Promise.all([
     db
       .from("gracze")
-      .select("id, nick, nagroda_odebrana")
+      .select("id, nick, nagroda_odebrana, zdjecie_url")
       .eq("sesja_id", sesjaId)
-      .returns<{ id: string; nick: string; nagroda_odebrana: string | null }[]>(),
+      .returns<{ id: string; nick: string; nagroda_odebrana: string | null; zdjecie_url: string | null }[]>(),
     db
       .from("odpowiedzi")
       .select("gracz_id, czas_ms, poprawna, punkty")
@@ -71,6 +73,7 @@ export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<Wy
       odpowiedzi: jego.length,
       sredniCzasMs: jego.length ? jego.reduce((s, o) => s + o.czas_ms, 0) / jego.length : null,
       nagrodaOdebrana: g.nagroda_odebrana,
+      zdjecie: g.zdjecie_url,
     };
   });
 

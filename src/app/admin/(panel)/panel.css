@@ -1003,3 +1003,12 @@ a.przycisk {
   flex-wrap: wrap;
   gap: 10px;
 }
+
+/* Zakończona gra: przycisk grafiki z podium i konta do oznaczenia */
+.grafika-podium {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 16px;
+}
