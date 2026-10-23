@@ -50,7 +50,6 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
     .slice(0, W_RANKINGU);
   const reszta = ranking.length - wiersze.length;
   const z = stan.zadanie;
-  const liczba = stan.quiz?.liczba_zadan ?? "?";
 
   return (
     <MotionConfig reducedMotion="user">
@@ -59,7 +58,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
           <h1>Ranking</h1>
           {z && (
             <p className="tv-okazja">
-              po pytaniu {z.lp}/{liczba}
+              po pytaniu {z.lp}
             </p>
           )}
           <LogoNaglowka />

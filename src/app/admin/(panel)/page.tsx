@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
+import { widoczne } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./gry/lista-gier";
 
 export default async function Panel() {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const db = supabaseAdmin();
   const [lokale, quizy, trwajace] = await Promise.all([
     db.from("lokale").select("*", { count: "exact", head: true }),
-    db.from("quizy").select("*", { count: "exact", head: true }),
+    db.from("quizy").select("*", { count: "exact", head: true }).in("tylko_glowny", widoczne(rola)),
     db
       .from("sesje")
       .select(ZAPYTANIE_GIER)
+      .in("tylko_glowny", widoczne(rola))
       .neq("faza", "koniec")
       .order("utworzono", { ascending: false })
       .returns<GraNaLiscie[]>(),

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { wymagajAdmina } from "@/lib/admin";
+import { wymagajGlownego } from "@/lib/admin";
 import type { PijanePytanie } from "@/lib/pijany";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FormularzPijany } from "./formularz";
@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Pijany finał · Bractwo Quiz" };
 
 /** Pytania pijanego finału: wspólne dla wszystkich gier, w których przy uruchamianiu włączono ten tryb. */
 export default async function PijanyFinal() {
-  await wymagajAdmina();
+  await wymagajGlownego();
   const { data, error } = await supabaseAdmin()
     .from("pijane_pytania")
     .select("nr, tresc, efekt")

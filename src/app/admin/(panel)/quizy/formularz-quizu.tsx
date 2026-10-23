@@ -15,7 +15,7 @@ type EtapSzablonu = { szablon: string; pytania: number };
  * Nowy quiz: tytuł, opis i szablon z etapami. Etapy i liczbę pytań w każdym można zmienić przed
  * utworzeniem (i potem na stronie quizu). Po utworzeniu przechodzi do edycji pytań.
  */
-export function FormularzQuizu() {
+export function FormularzQuizu({ glowny }: { glowny: boolean }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(utworzQuiz, {});
   const [szablon, ustawSzablon] = useState(SZABLONY_QUIZU[0].klucz);
   const [etapy, ustawEtapy] = useState<EtapSzablonu[]>(SZABLONY_QUIZU[0].etapy);
@@ -58,6 +58,12 @@ export function FormularzQuizu() {
         <label htmlFor="opis">Opis (tylko dla obsługi)</label>
         <textarea id="opis" name="opis" className="pole" maxLength={LIMITY.opis} rows={2} />
       </div>
+      {/* tylko główny: jego nowe quizy są domyślnie ukryte przed obsługą (zmiana później na stronie quizu) */}
+      {glowny && (
+        <label className="przelacznik">
+          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (obsługa nie zobaczy tego quizu)
+        </label>
+      )}
 
       <fieldset>
         <legend>Szablon</legend>

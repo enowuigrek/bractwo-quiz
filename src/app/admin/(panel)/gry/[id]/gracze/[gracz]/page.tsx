@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
+import { wymagajGry } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { LITERY, liczbaCzesci, opisOdpowiedzi, opisRozwiazania, ulamek } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
@@ -11,8 +12,9 @@ export const metadata: Metadata = { title: "Gracz · Bractwo Quiz" };
 
 /** Historia gracza w grze: pytanie po pytaniu, co odpowiedział, w jakim czasie i za ile punktów. */
 export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[id]/gracze/[gracz]">) {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const { id, gracz: graczId } = await params;
+  await wymagajGry(rola, id);
   const db = supabaseAdmin();
 
   const { data: gra } = await db

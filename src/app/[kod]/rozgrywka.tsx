@@ -63,7 +63,6 @@ export function Rozgrywka({
 
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
-  const liczba = stan.quiz?.liczba_zadan ?? "?";
   const kibic = czyKibic(stan, ja.nick);
   const etap = stan.etap;
   // plansza etapu pokazała już, jak odpowiadać, więc bez podpowiedzi rodzaju pytania
@@ -84,7 +83,7 @@ export function Rozgrywka({
   const naglowek = (
     <p className="etykieta gra-pasek">
       <span>
-        Pytanie {z.lp}/{liczba}
+        Pytanie {z.lp}
         {etap && etap.mnoznik !== 1 && <span className="gra-mnoznik"> · punkty {napisMnoznika(etap.mnoznik)}</span>}
       </span>
       {faza === "pytanie" && (

@@ -77,13 +77,22 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
  * Nagłówek serii: tytuł, podpis i zegar (przed startem odliczanie). Ten sam w pijanym finale (pijany.tsx),
  * który przed graczami udaje, że seria trwa dalej; zegar liczy wtedy czas dogrywki.
  */
-export function NaglowekSerii({ stan, teraz }: { stan: StanSesji; teraz: number }) {
+export function NaglowekSerii({
+  stan,
+  teraz,
+  zegar,
+}: {
+  stan: StanSesji;
+  teraz: number;
+  /** Pijany finał: własne sekundy zamiast czasu do końca, `null` = zegar znika (`zegarPijany`). */
+  zegar?: number | null;
+}) {
   const e = stan.etap;
   const n = Math.max(1, e?.liczba_pytan ?? 1);
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const przedStartem = teraz < od;
-  const zostalo = Math.max(0, Math.ceil((do_ - teraz) / 1000));
+  const zostalo = zegar !== undefined ? (zegar ?? 0) : Math.max(0, Math.ceil((do_ - teraz) / 1000));
 
   return (
     <header className="tv-ranking-gora">
@@ -94,7 +103,13 @@ export function NaglowekSerii({ stan, teraz }: { stan: StanSesji; teraz: number 
           <span>Start za</span> {Math.max(1, Math.ceil((od - teraz) / 1000))}
         </p>
       ) : (
-        <p className={`tv-zegar${zostalo <= 10 ? " malo" : ""}`}>{zostalo > 0 ? zostalo : "Koniec!"}</p>
+        <p
+          className={`tv-zegar${zostalo <= 10 ? " malo" : ""}`}
+          // znikający zegar trzyma miejsce, żeby nagłówek nie skakał
+          style={zegar === null ? { visibility: "hidden" } : undefined}
+        >
+          {zostalo > 0 ? zostalo : "Koniec!"}
+        </p>
       )}
       <LogoNaglowka />
     </header>

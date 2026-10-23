@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { adresAplikacji } from "@/lib/adres";
 import { wymagajAdmina } from "@/lib/admin";
+import { wymagajGry } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
 import { IkonaKosz } from "../../_komponenty/ikony";
@@ -28,8 +29,9 @@ type GraZDanymi = Sesja & {
 };
 
 export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const { id } = await params;
+  await wymagajGry(rola, id);
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([

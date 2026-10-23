@@ -333,7 +333,6 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         <p className="tv-duzy">Patrz na prowadzącego</p>
       </div>
     );
-  const liczba = stan.quiz?.liczba_zadan ?? "?";
   const etap = stan.etap;
   const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
   const opisEtapu = etap ? ` · ${etap.nazwa}${etap.mnoznik !== 1 ? ` ${napisMnoznika(etap.mnoznik)}` : ""}` : "";
@@ -344,7 +343,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       <div className="tv-srodek">
         <Loga lokal={stan.lokal} browar={stan.browar} />
         <p className="tv-okazja">
-          Pytanie {z.lp}/{liczba}
+          Pytanie {z.lp}
           {opisEtapu}
         </p>
         <p className="tv-odliczanie">{Math.max(1, Math.ceil(doStartu / 1000))}</p>
@@ -366,7 +365,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     <div className="tv-pytanie">
       <header className="tv-pytanie-gora">
         <p className="tv-okazja">
-          Pytanie {z.lp}/{liczba}
+          Pytanie {z.lp}
           {opisEtapu}
         </p>
         {wynik ? (

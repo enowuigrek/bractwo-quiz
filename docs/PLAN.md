@@ -43,7 +43,7 @@ Ta sekcja to skrót dla następnej sesji. Szczegóły i historia decyzji są ni�
 | Telefon gracza | pokazuje pełną treść pytania i odpowiedzi |
 | Prowadzący | pilot na telefonie, obraz na TV w przeglądarce |
 | Liczba graczy | maks. 30 na sesję (ustawiane w bazie, łatwo zmienić) |
-| Panel admina | jedno wspólne hasło, bez kont |
+| Panel admina | dwa hasła bez kont (od 23.10): główny (`ADMIN_HASLO_GLOWNE`, widzi wszystko) i obsługa (`ADMIN_HASLO`, bez rzeczy „tylko dla mnie” i bez „Pijanego finału”); konta później |
 | Szable | bez powiązania, wspólny jest tylko design i domena |
 | Repo | `enowuigrek/bractwo-quiz`, publiczne (portfolio) |
 | Konta | Vercel i Supabase na `l.nowak@bractwopiwne.pl`, kod na prywatnym GitHubie |
@@ -540,6 +540,18 @@ Pomysł Łukasza z 23.10.
 - **Finalista** w serii nic nie widzi; na podium (i w tabeli, na końcu) „📣 Kibicowały Ci 2 osoby!” (odmiana: osoba / osoby / osób).
 - Sprawdzone na localhost (`next start`, gra CKQG bez lokalu, 6 graczy z SQL, potem usunięta w panelu razem z okrzykami): telefon kibica (wybór finalisty, okrzyk, licznik), odmowy w bazie (finalista, za szybko, nieznany finalista), dymki i liczniki na TV 1920×1080 (Broadcast dochodzi w ok. 0,5 s), położenie dymków przy starcie i dalej na drodze, „Kibicowały Ci 2 osoby!” na podium finalisty. **Nie sprawdzone:** wielu kibiców z prawdziwych telefonów naraz, płynność dymków na Samsungu (animacja to tylko `transform` i `opacity`).
 
+
+### Główny i obsługa, zegar pijanego finału, mniej liczb (23.10, noc) ✅
+
+- **Dwa poziomy panelu** (prośba Łukasza: dwie osoby znają hasło, a nie mają wiedzieć o pijanym finale ani widzieć jego quizów i gier). Dotychczasowe `ADMIN_HASLO` to teraz **obsługa**, nowe `ADMIN_HASLO_GLOWNE` (Vercel, tylko Łukasz) to **główny**. Rola siedzi w podpisanym ciasteczku (`rola.wygasa.podpis`), a stare ciasteczka bez roli liczą się jako obsługa, więc nikogo nie wylogowało. Bez `ADMIN_HASLO_GLOWNE` panel działa tylko na poziomie obsługi.
+- Migracja `20261023191423_tylko_glowny`: `quizy.tylko_glowny` i `sesje.tylko_glowny` (domyślnie false, więc wszystko, co było, widzą wszyscy). Obsługa nie widzi takich quizów ani gier na listach, a pod ich adresem dostaje 404 (`src/lib/admin-dostep.ts`: `wymagajQuizu`, `wymagajGry`, filtr `widoczne(rola)`; sprawdzają to też wszystkie akcje quizów i gier).
+- Główny: nowy quiz domyślnie „tylko dla mnie” (pole w formularzu), na stronie quizu przełącznik „Ukryj przed obsługą / Pokaż obsłudze”, w kreatorze gry „Widoczność: tylko dla mnie” (domyślnie zaznaczone; gra z ukrytego quizu zawsze ukryta) i „Pijany finał”. Obsługa nie ma w kreatorze pijanego finału, linku do jego pytań ani strony z nimi (`wymagajGlownego`), a serwer ignoruje `pijany_final` od obsługi.
+- Na przyszłe konta: uprawnienia sprawdzamy funkcjami (`widziWszystko`, `mozePijanyFinal` w `src/lib/admin.ts`), nie porównując ról w stronach. Przejście na konta to podmiana źródła roli (tabela kont zamiast haseł) i znaczników `tylko_glowny` na właściciela.
+- **Zegar w pijanym finale wariuje** (`zegarPijany` w `src/lib/pijany.ts`, TV i telefon liczą to samo z czasu serwera): najpierw normalnie w dół, potem w górę, potem co chwilę zmienia kierunek, a w ostatniej ćwiartce co druga sekunda znika, a w pozostałych pokazuje przypadkowe liczby. Pasek na telefonie idzie za zegarem. Nagłówek TV dostał do tego parametr `zegar` (`NaglowekSerii`).
+- Gracze nie widzą już łącznej liczby pytań: „Pytanie 8” zamiast „8/31” (telefon, TV przy pytaniu, odpowiedziach i rankingu), bez „jeszcze 23 pytania” pod szklanką (TV i telefon, zostaje „Nalane!” na koniec). Pilot dalej pokazuje „8/31”.
+- Pilot: przyciski od razu pod nagłówkiem, nad kartą pytania i listą graczy, więc nie uciekają w dół. „Zakończ grę” jest osobno na samym dole.
+- Lampa błyskowa przy selfie: zdjęcie robi systemowy aparat (`<input type="file" capture="user">`), a jego ustawień (także błysku) strona nie dostaje. Jedyna droga to własny podgląd z kamery (`getUserMedia`, przednia kamera nie ma błysku); zapisane w `docs/POMYSLY.md`.
+- Sprawdzone na localhost (`start-test-hasla` ma oba hasła testowe): stare ciasteczko działa jako obsługa, obsługa bez pijanego finału i bez strony jego pytań, quiz testowy główny „tylko dla mnie” niewidoczny dla obsługi (lista i 404), pilot z przyciskami na górze. Quiz i gra testowa usunięte w panelu.
 
 ## Zadania dla ciebie (dzień 0)
 

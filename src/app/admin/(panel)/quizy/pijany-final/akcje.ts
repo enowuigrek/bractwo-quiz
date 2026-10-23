@@ -1,14 +1,14 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { wymagajAdmina } from "@/lib/admin";
+import { wymagajGlownego } from "@/lib/admin";
 import { czyEfektPijany, LIMITY_PIJANE } from "@/lib/pijany";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
 /** Zapisuje całą listę pytań pijanego finału naraz (kolejność z formularza). */
 export async function zapiszPijanePytania(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajAdmina();
+  await wymagajGlownego();
   let surowe: unknown;
   try {
     surowe = JSON.parse(String(dane.get("pytania") ?? "[]"));

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { StanSesji } from "@/lib/gra/typy";
-import type { PijanePytanie } from "@/lib/pijany";
+import { zegarPijany, type PijanePytanie } from "@/lib/pijany";
 import { supabase } from "@/lib/supabase/przegladarka";
 
 /** Po ilu sekundach „Prawda” klika się sama w pytaniu z efektem `samoklik`. */
@@ -67,10 +67,12 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
   const poziom = liczba > 1 ? Math.min(1, nr / (liczba - 1)) : 1;
   const zostalo = Math.max(0, do_ - teraz);
   const skonczone = pytania !== null && (nr >= liczba || zostalo <= 0);
-  // jak w serii: pasek i sekundy, tylko czas dogrywki (pasek wraca do pełna, kolejny smaczek)
+  // jak w serii: pasek i sekundy, tylko zegar wariuje jak na TV (w górę, w kółko, znika) i pasek razem z nim
+  const calosc = Math.max(1, (do_ - od) / 1000);
+  const zegar = zegarPijany((teraz - od) / 1000, calosc);
   const pasek = (
     <div className="gra-czas" aria-hidden>
-      <div style={{ transform: `scaleX(${do_ > od ? Math.min(1, zostalo / (do_ - od)) : 0})` }} />
+      <div style={{ transform: `scaleX(${Math.min(1, (zegar ?? 0) / calosc)})` }} />
     </div>
   );
 
@@ -100,7 +102,9 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
                 Seria · pytanie {wSerii + nr + 1}/{wSerii || liczba}
                 {p.efekt !== "brak" && <span className="seria-utrudnienie"> · utrudnienie!</span>}
               </span>
-              <span className="gra-kod">{Math.ceil(zostalo / 1000)} s</span>
+              <span className="gra-kod" style={zegar === null ? { visibility: "hidden" } : undefined}>
+                {zegar} s
+              </span>
             </p>
             {pasek}
             <h2 className="gra-pytanie seria-pytanie pijany-pytanie">{p.tresc}</h2>

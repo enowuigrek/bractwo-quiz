@@ -24,3 +24,27 @@ export function czyEfektPijany(x: unknown): x is EfektPijany {
 export type PijanePytanie = { nr: number; tresc: string; efekt: EfektPijany };
 
 export const LIMITY_PIJANE = { pytan: 20, tresc: 200 } as const;
+
+/**
+ * Sekundy na zegarze w pijanym finale (TV i telefon pokazują to samo, bo liczą z czasu serwera). Zegar
+ * coraz bardziej wariuje: najpierw liczy normalnie w dół, potem leci w górę, potem co chwilę zmienia
+ * kierunek, a pod koniec miga przypadkowymi liczbami i znika. `null`: w tej sekundzie zegara nie ma.
+ * `minelo` i `calosc` w sekundach (cała dogrywka: `faza_do` − `faza_od`).
+ */
+export function zegarPijany(minelo: number, calosc: number): number | null {
+  const s = Math.max(0, Math.floor(minelo));
+  const [gora, zakrety, miganie] = [0.2, 0.45, 0.75].map((u) => Math.round(u * calosc));
+  if (s < gora) return calosc - s;
+  // w górę od miejsca, w którym przestał liczyć w dół
+  const odGory = calosc - gora;
+  if (s < zakrety) return odGory + (s - gora);
+  // zmiany kierunku: 4 s w dół, 2 s w górę, i tak w kółko (powoli schodzi)
+  const odZakretow = odGory + (zakrety - gora);
+  if (s < miganie) {
+    const k = s - zakrety;
+    const r = k % 6;
+    return Math.max(1, odZakretow - 2 * Math.floor(k / 6) - (r < 4 ? r : 6 - r));
+  }
+  // co druga sekunda pusto, w pozostałych liczby z kosmosu
+  return s % 2 ? null : (s * 37) % 100;
+}

@@ -49,7 +49,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
       <h1>{etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
       {z && (
         <p className="tv-okazja">
-          {etap ? `${etap.nazwa} · ` : ""}po pytaniu {lp}/{n}
+          {etap ? `${etap.nazwa} · ` : ""}po pytaniu {lp}
         </p>
       )}
       <LogoNaglowka />
@@ -189,14 +189,7 @@ export function Szklanka({
           Gracie o: <strong>{nagroda}</strong>
         </p>
       )}
-      <p className="wyscig-szklanka-opis">{doKonca ? `jeszcze ${doKonca} ${pytan(doKonca)}` : "Nalane!"}</p>
+      <p className="wyscig-szklanka-opis">{doKonca ? "" : "Nalane!"}</p>
     </div>
   );
-}
-
-function pytan(n: number): string {
-  if (n === 1) return "pytanie";
-  const r10 = n % 10;
-  const r100 = n % 100;
-  return r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "pytania" : "pytań";
 }

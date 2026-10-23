@@ -2,7 +2,8 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { wymagajAdmina } from "@/lib/admin";
+import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
@@ -27,7 +28,7 @@ function tekst(dane: FormData, pole: string): string {
 // ---------------------------------------------------------------------------
 
 export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const tytul = tekst(dane, "tytul");
   if (!tytul) return { blad: "Podaj tytuł quizu." };
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
@@ -64,7 +65,8 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
   const db = supabaseAdmin();
   const { data, error } = await db
     .from("quizy")
-    .insert({ tytul, opis: tekst(dane, "opis") || null })
+    // główny decyduje, czy quiz widzi obsługa; quiz założony przez obsługę widzą wszyscy
+    .insert({ tytul, opis: tekst(dane, "opis") || null, tylko_glowny: widziWszystko(rola) && !!dane.get("tylko_glowny") })
     .select("id")
     .single();
   if (error) return { blad: `Nie udało się utworzyć quizu: ${error.message}` };
@@ -76,7 +78,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
 }
 
 export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), id);
   const tytul = tekst(dane, "tytul");
   const opis = tekst(dane, "opis");
   if (!tytul) return { blad: "Podaj tytuł quizu." };
@@ -94,8 +96,17 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   return { ok: "Zapisano." };
 }
 
+/** Przełącznik „Tylko dla mnie” na stronie quizu: obsługa przestaje albo zaczyna widzieć quiz. */
+export async function ustawWidocznoscQuizu(id: string, tylkoGlowny: boolean): Promise<void> {
+  const rola = await wymagajAdmina();
+  if (!widziWszystko(rola)) return;
+  const { error } = await supabaseAdmin().from("quizy").update({ tylko_glowny: tylkoGlowny }).eq("id", id);
+  if (error) throw new Error(`Nie udało się zmienić widoczności: ${error.message}`);
+  refresh();
+}
+
 export async function usunQuiz(id: string): Promise<void> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), id);
   const db = supabaseAdmin();
 
   const { count } = await db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id);
@@ -256,7 +267,7 @@ export async function zapiszZadanie(
   _: StanFormularza,
   dane: FormData,
 ): Promise<StanFormularza> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const db = supabaseAdmin();
 
   const odczyt = odczytajZadanie(dane);
@@ -322,7 +333,7 @@ export async function zapiszZadanie(
 }
 
 export async function usunZadanie(quizId: string, zadanieId: string): Promise<void> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const { data } = await supabaseAdmin()
     .from("zadania")
     .delete()
@@ -345,7 +356,7 @@ async function uporzadkuj(quizId: string): Promise<void> {
  * etapu (na jego koniec albo początek) zamiast zamieniać się z pytaniem z innego etapu.
  */
 export async function przesunZadanie(quizId: string, zadanieId: string, kierunek: "gora" | "dol"): Promise<void> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const db = supabaseAdmin();
   const { data: zadania } = await db.from("zadania").select("id, etap_id").eq("quiz_id", quizId).order("nr");
   const lista = zadania ?? [];
@@ -410,7 +421,7 @@ function odczytajEtap(dane: FormData): { blad: string } | PolaEtapu {
 
 /** −/+ przy etapie: zmienia planowaną liczbę pytań (bez planu: zaczyna od liczby obecnych pytań). */
 export async function zmienPlanEtapu(quizId: string, etapId: string, o: 1 | -1): Promise<void> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const db = supabaseAdmin();
   const { data: etap } = await db.from("etapy").select("plan_pytan").eq("id", etapId).eq("quiz_id", quizId).single();
   if (!etap) return;
@@ -424,7 +435,7 @@ export async function zmienPlanEtapu(quizId: string, etapId: string, o: 1 | -1):
 
 /** Nowy etap na końcu quizu. Pierwszy etap dostaje wszystkie dotychczasowe pytania. */
 export async function dodajEtap(quizId: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const db = supabaseAdmin();
   const etap = odczytajEtap(dane);
   if ("blad" in etap) return etap;
@@ -462,7 +473,7 @@ export async function zapiszEtap(
   _: StanFormularza,
   dane: FormData,
 ): Promise<StanFormularza> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const etap = odczytajEtap(dane);
   if ("blad" in etap) return etap;
   const { error } = await supabaseAdmin().from("etapy").update(etap).eq("id", etapId).eq("quiz_id", quizId);
@@ -473,7 +484,7 @@ export async function zapiszEtap(
 
 /** Usuwa etap; jego pytania przechodzą do poprzedniego etapu (albo następnego, gdy to pierwszy). */
 export async function usunEtap(quizId: string, etapId: string): Promise<void> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const db = supabaseAdmin();
   const { data: etapy } = await db.from("etapy").select("id").eq("quiz_id", quizId).order("nr");
   const lista = etapy ?? [];
@@ -493,7 +504,7 @@ export async function usunEtap(quizId: string, etapId: string): Promise<void> {
 
 /** Zamienia etap z sąsiednim (razem z pytaniami). */
 export async function przesunEtap(quizId: string, etapId: string, kierunek: "gora" | "dol"): Promise<void> {
-  await wymagajAdmina();
+  await wymagajQuizu(await wymagajAdmina(), quizId);
   const db = supabaseAdmin();
   const { data: etapy } = await db.from("etapy").select("id, nr").eq("quiz_id", quizId).order("nr");
   const lista = etapy ?? [];

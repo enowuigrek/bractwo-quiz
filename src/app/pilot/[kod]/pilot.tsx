@@ -185,181 +185,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
       </p>
 
-      {faza === "poczekalnia" && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0 }}>
-            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
-          </p>
-          <GraczePilota kod={kod} token={token} gracze={gracze} pytanie={false} koniec={false} odswiez={pobierz} />
-        </section>
-      )}
-
-      {faza === "etap" && etap && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0 }}>
-            Etap {etap.nr} z {etap.liczba} · {etap.liczba_pytan} pyt.
-          </p>
-          <p
-            style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 6px", color: "var(--zloto)" }}
-          >
-            {etap.nazwa}
-          </p>
-          {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
-          <p className="pomocniczy" style={{ margin: 0 }}>
-            {[
-              `Punkty ${napisMnoznika(etap.mnoznik)}`,
-              etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
-              etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", "),
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-          {stan.finalisci && (
-            <p style={{ margin: "10px 0 0" }}>
-              <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
-            </p>
-          )}
-          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-            TV pokazuje planszę z zasadami i animacją. Wytłumacz etap i wystartuj, kiedy wszyscy będą gotowi.
-          </p>
-        </section>
-      )}
-
-      {/* seria: postęp każdego grającego na żywo (TV pokazuje go na drogach do szklanki) */}
-      {faza === "seria" && etap && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
-            <span>
-              {etap.nazwa} · seria {etap.liczba_pytan} pyt.
-            </span>
-            <span className="gra-kod">
-              {stan.faza_od && teraz < Date.parse(stan.faza_od)
-                ? `start za ${Math.max(0, Math.ceil((Date.parse(stan.faza_od) - teraz) / 1000))} s`
-                : stan.faza_do
-                  ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s`
-                  : ""}
-            </span>
-          </p>
-          <ol className="pilot-odpowiedzi">
-            {(stan.seria ?? []).map((g) => (
-              <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
-                {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
-              </li>
-            ))}
-          </ol>
-          {stan.pijany_final && (
-            <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-              Po serii zamiast werbli przyjdzie pijany finał (nic nie liczy), a po nim werble. Zwycięzcę zobaczysz tutaj
-              od razu.
-            </p>
-          )}
-        </section>
-      )}
-
-      {/* pijany finał: wynik jest już ustalony i widzi go tylko prowadzący */}
-      {faza === "pijany" && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
-            <span>Pijany finał · nic się nie liczy</span>
-            <span className="gra-kod">
-              {stan.faza_do ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}
-            </span>
-          </p>
-          <PodiumPilota gracze={gracze} />
-          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-            Widzisz to tylko Ty. Gracze odpowiadają na pytania, które nic nie liczą, a TV i telefony wariują coraz
-            bardziej. Po czasie same przyjdą werble, a potem odsłaniasz podium.
-          </p>
-        </section>
-      )}
-
-      {z &&
-        faza !== "poczekalnia" &&
-        faza !== "etap" &&
-        faza !== "seria" &&
-        faza !== "pijany" &&
-        faza !== "werble" &&
-        faza !== "koniec" &&
-        faza !== "podium" &&
-        faza !== "tabela" && (
-          <section className="karta" style={{ marginTop: 18 }}>
-            <p
-              className="etykieta"
-              style={{
-                marginTop: 0,
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <span>
-                Pytanie {z.lp}/{liczba}
-              </span>
-              {faza === "przygotuj" && (
-                <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>
-              )}
-              {faza === "pytanie" && (
-                <span className="gra-kod">
-                  {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
-                  {bezLimitu
-                    ? ""
-                    : doKonca > 0
-                      ? `${Math.ceil(doKonca / 1000)} s`
-                      : wszyscy
-                        ? "wszyscy odpowiedzieli"
-                        : "czas minął"}
-                </span>
-              )}
-            </p>
-            {etap && (
-              <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
-                {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
-                {stan.finalisci ? " · finał trójki" : ""}
-              </p>
-            )}
-            <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
-            <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
-            {stan.wszystkie_podpowiedzi.length > 0 && (
-              <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
-                {stan.wszystkie_podpowiedzi.map((p, i) => (
-                  <li key={i} className={i < z.podpowiedzi.length ? "poprawna" : undefined}>
-                    <span className="pilot-litera">P{i + 1}</span>
-                    {p}
-                  </li>
-                ))}
-              </ol>
-            )}
-            <p style={{ margin: "14px 0 0" }}>
-              Odpowiedziało{" "}
-              <strong className="gra-kod">
-                {stan.liczba_odpowiedzi}/{grajacy}
-              </strong>
-              {z.liczba_poprawnych !== undefined && (
-                <>
-                  {" · "}
-                  {jedenWybor(z.typ) ? "dobrze" : z.typ === "szacowanie" ? "w punkt" : "w pełni dobrze"}{" "}
-                  <strong className="ok">{z.liczba_poprawnych}</strong>
-                </>
-              )}
-            </p>
-          </section>
-        )}
-
-      {faza !== "poczekalnia" && (
-        <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
-          <summary className="etykieta">
-            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
-          </summary>
-          <GraczePilota
-            kod={kod}
-            token={token}
-            gracze={gracze}
-            pytanie={faza === "pytanie"}
-            koniec={faza === "koniec"}
-            odswiez={pobierz}
-          />
-        </details>
-      )}
-
+      {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy */}
       {bladAkcji && (
         <p className="blad" role="alert">
           {bladAkcji}
@@ -393,7 +219,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </p>
       )}
 
-      <section style={{ marginTop: "var(--section-gap)", display: "grid", gap: 12 }}>
+      <section style={{ marginTop: 18, display: "grid", gap: 12 }}>
         {faza === "poczekalnia" && !stan.poczekalnia_otwarta && (
           <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("otworz")}>
             Otwórz poczekalnię (QR na TV)
@@ -609,23 +435,199 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             )}
           </>
         )}
-
-        {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
-          <button
-            className="przycisk niebezpieczny"
-            style={{ marginTop: 24 }}
-            disabled={wysylam}
-            onClick={() =>
-              akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
-                tak: "Zakończ grę",
-                niebezpieczne: true,
-              })
-            }
-          >
-            Zakończ grę
-          </button>
-        )}
       </section>
+
+      {faza === "poczekalnia" && (
+        <section className="karta" style={{ marginTop: 18 }}>
+          <p className="etykieta" style={{ marginTop: 0 }}>
+            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
+          </p>
+          <GraczePilota kod={kod} token={token} gracze={gracze} pytanie={false} koniec={false} odswiez={pobierz} />
+        </section>
+      )}
+
+      {faza === "etap" && etap && (
+        <section className="karta" style={{ marginTop: 18 }}>
+          <p className="etykieta" style={{ marginTop: 0 }}>
+            Etap {etap.nr} z {etap.liczba} · {etap.liczba_pytan} pyt.
+          </p>
+          <p
+            style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 6px", color: "var(--zloto)" }}
+          >
+            {etap.nazwa}
+          </p>
+          {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
+          <p className="pomocniczy" style={{ margin: 0 }}>
+            {[
+              `Punkty ${napisMnoznika(etap.mnoznik)}`,
+              etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
+              etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", "),
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+          {stan.finalisci && (
+            <p style={{ margin: "10px 0 0" }}>
+              <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
+            </p>
+          )}
+          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+            TV pokazuje planszę z zasadami i animacją. Wytłumacz etap i wystartuj, kiedy wszyscy będą gotowi.
+          </p>
+        </section>
+      )}
+
+      {/* seria: postęp każdego grającego na żywo (TV pokazuje go na drogach do szklanki) */}
+      {faza === "seria" && etap && (
+        <section className="karta" style={{ marginTop: 18 }}>
+          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+            <span>
+              {etap.nazwa} · seria {etap.liczba_pytan} pyt.
+            </span>
+            <span className="gra-kod">
+              {stan.faza_od && teraz < Date.parse(stan.faza_od)
+                ? `start za ${Math.max(0, Math.ceil((Date.parse(stan.faza_od) - teraz) / 1000))} s`
+                : stan.faza_do
+                  ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s`
+                  : ""}
+            </span>
+          </p>
+          <ol className="pilot-odpowiedzi">
+            {(stan.seria ?? []).map((g) => (
+              <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
+                {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
+              </li>
+            ))}
+          </ol>
+          {stan.pijany_final && (
+            <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+              Po serii zamiast werbli przyjdzie pijany finał (nic nie liczy), a po nim werble. Zwycięzcę zobaczysz tutaj
+              od razu.
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* pijany finał: wynik jest już ustalony i widzi go tylko prowadzący */}
+      {faza === "pijany" && (
+        <section className="karta" style={{ marginTop: 18 }}>
+          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+            <span>Pijany finał · nic się nie liczy</span>
+            <span className="gra-kod">
+              {stan.faza_do ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}
+            </span>
+          </p>
+          <PodiumPilota gracze={gracze} />
+          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+            Widzisz to tylko Ty. Gracze odpowiadają na pytania, które nic nie liczą, a TV i telefony wariują coraz
+            bardziej. Po czasie same przyjdą werble, a potem odsłaniasz podium.
+          </p>
+        </section>
+      )}
+
+      {z &&
+        faza !== "poczekalnia" &&
+        faza !== "etap" &&
+        faza !== "seria" &&
+        faza !== "pijany" &&
+        faza !== "werble" &&
+        faza !== "koniec" &&
+        faza !== "podium" &&
+        faza !== "tabela" && (
+          <section className="karta" style={{ marginTop: 18 }}>
+            <p
+              className="etykieta"
+              style={{
+                marginTop: 0,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>
+                Pytanie {z.lp}/{liczba}
+              </span>
+              {faza === "przygotuj" && (
+                <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>
+              )}
+              {faza === "pytanie" && (
+                <span className="gra-kod">
+                  {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
+                  {bezLimitu
+                    ? ""
+                    : doKonca > 0
+                      ? `${Math.ceil(doKonca / 1000)} s`
+                      : wszyscy
+                        ? "wszyscy odpowiedzieli"
+                        : "czas minął"}
+                </span>
+              )}
+            </p>
+            {etap && (
+              <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+                {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
+                {stan.finalisci ? " · finał trójki" : ""}
+              </p>
+            )}
+            <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
+            <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
+            {stan.wszystkie_podpowiedzi.length > 0 && (
+              <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
+                {stan.wszystkie_podpowiedzi.map((p, i) => (
+                  <li key={i} className={i < z.podpowiedzi.length ? "poprawna" : undefined}>
+                    <span className="pilot-litera">P{i + 1}</span>
+                    {p}
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p style={{ margin: "14px 0 0" }}>
+              Odpowiedziało{" "}
+              <strong className="gra-kod">
+                {stan.liczba_odpowiedzi}/{grajacy}
+              </strong>
+              {z.liczba_poprawnych !== undefined && (
+                <>
+                  {" · "}
+                  {jedenWybor(z.typ) ? "dobrze" : z.typ === "szacowanie" ? "w punkt" : "w pełni dobrze"}{" "}
+                  <strong className="ok">{z.liczba_poprawnych}</strong>
+                </>
+              )}
+            </p>
+          </section>
+        )}
+
+      {faza !== "poczekalnia" && (
+        <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
+          <summary className="etykieta">
+            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
+          </summary>
+          <GraczePilota
+            kod={kod}
+            token={token}
+            gracze={gracze}
+            pytanie={faza === "pytanie"}
+            koniec={faza === "koniec"}
+            odswiez={pobierz}
+          />
+        </details>
+      )}
+
+      {/* awaryjne zakończenie na samym dole, z dala od zwykłych przycisków */}
+      {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
+        <button
+          className="przycisk niebezpieczny"
+          style={{ marginTop: 32, width: "100%" }}
+          disabled={wysylam}
+          onClick={() =>
+            akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
+              tak: "Zakończ grę",
+              niebezpieczne: true,
+            })
+          }
+        >
+          Zakończ grę
+        </button>
+      )}
       <p style={{ marginTop: 32, textAlign: "center" }}>
         {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło */}
         <Link href="/admin/gry" className="pomocniczy">

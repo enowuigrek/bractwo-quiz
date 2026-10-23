@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { wymagajAdmina } from "@/lib/admin";
+import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { wymagajQuizu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
 import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { przesunEtap, przesunZadanie, usunEtap, usunZadanie, zmienPlanEtapu } from "../akcje";
+import { przesunEtap, przesunZadanie, ustawWidocznoscQuizu, usunEtap, usunZadanie, zmienPlanEtapu } from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
@@ -15,12 +16,13 @@ import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
 
 export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[id]">) {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const { id } = await params;
+  await wymagajQuizu(rola, id);
   const db = supabaseAdmin();
 
   const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }] = await Promise.all([
-    db.from("quizy").select("id, tytul, opis, utworzono").eq("id", id).maybeSingle<Quiz>(),
+    db.from("quizy").select("id, tytul, opis, utworzono, tylko_glowny").eq("id", id).maybeSingle<Quiz>(),
     db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
     db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
     db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
@@ -88,6 +90,15 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         <Link href="/admin/quizy">← Quizy</Link>
       </p>
       <NaglowekQuizu quiz={quiz} />
+      {/* tylko główny decyduje, czy obsługa (wspólne hasło) widzi ten quiz */}
+      {widziWszystko(rola) && (
+        <form action={ustawWidocznoscQuizu.bind(null, quiz.id, !quiz.tylko_glowny)} className="pomocniczy">
+          {quiz.tylko_glowny ? "🔒 Tylko dla mnie: obsługa nie widzi tego quizu." : "Obsługa widzi ten quiz."}{" "}
+          <button type="submit" className="przycisk-maly">
+            {quiz.tylko_glowny ? "Pokaż obsłudze" : "Ukryj przed obsługą"}
+          </button>
+        </form>
+      )}
       {!!aktywneGry && (
         <p className="blad">Ten quiz jest teraz w trwającej grze. Zmiany w pytaniach gracze zobaczą od razu.</p>
       )}

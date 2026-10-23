@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { wymagajAdmina } from "@/lib/admin";
+import { mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { widoczne } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { IkonaEdytuj, IkonaKosz } from "../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
@@ -9,7 +10,13 @@ import { liczbaPytan } from "./limity";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
 
-type QuizNaLiscie = { id: string; tytul: string; opis: string | null; zadania: { count: number }[] };
+type QuizNaLiscie = {
+  id: string;
+  tytul: string;
+  opis: string | null;
+  tylko_glowny: boolean;
+  zadania: { count: number }[];
+};
 
 const BLEDY: Record<string, string> = {
   gry: "Tego quizu nie da się usunąć, bo były na nim rozegrane gry. Najpierw usuń te gry w zakładce „Gry”.",
@@ -17,11 +24,12 @@ const BLEDY: Record<string, string> = {
 };
 
 export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">) {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const { blad } = await searchParams;
   const { data, error } = await supabaseAdmin()
     .from("quizy")
-    .select("id, tytul, opis, zadania(count)")
+    .select("id, tytul, opis, tylko_glowny, zadania(count)")
+    .in("tylko_glowny", widoczne(rola))
     .order("utworzono", { ascending: false })
     .returns<QuizNaLiscie[]>();
 
@@ -43,6 +51,8 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
                   <Link href={`/admin/quizy/${q.id}`}>{q.tytul}</Link>
                 </div>
                 <div className="lista-opis">
+                  {/* obsługa takich nie widzi, więc znacznik ma sens tylko u głównego */}
+                  {widziWszystko(rola) && q.tylko_glowny && "🔒 tylko dla mnie · "}
                   {liczbaPytan(q.zadania[0]?.count ?? 0)}
                   {q.opis && ` · ${q.opis}`}
                 </div>
@@ -76,10 +86,12 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         <Link href="/admin/quizy/nowy" className="przycisk zloty">
           Nowy quiz
         </Link>
-        {/* pytania dogrywki „Pijany finał”, wspólne dla wszystkich gier */}
-        <Link href="/admin/quizy/pijany-final" className="przycisk">
-          Pijany finał: pytania
-        </Link>
+        {/* pytania dogrywki „Pijany finał”, wspólne dla wszystkich gier; obsługa nie wie o tym trybie */}
+        {mozePijanyFinal(rola) && (
+          <Link href="/admin/quizy/pijany-final" className="przycisk">
+            Pijany finał: pytania
+          </Link>
+        )}
       </p>
     </main>
   );

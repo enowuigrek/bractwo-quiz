@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { wymagajAdmina } from "@/lib/admin";
+import { widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { FormularzQuizu } from "../formularz-quizu";
 
 export const metadata: Metadata = { title: "Nowy quiz · Bractwo Quiz" };
 
 export default async function NowyQuiz() {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   return (
     <main>
       <p className="okruchy">
@@ -14,7 +14,7 @@ export default async function NowyQuiz() {
       </p>
       <h1>Nowy quiz</h1>
       <section className="karta">
-        <FormularzQuizu />
+        <FormularzQuizu glowny={widziWszystko(rola)} />
       </section>
     </main>
   );

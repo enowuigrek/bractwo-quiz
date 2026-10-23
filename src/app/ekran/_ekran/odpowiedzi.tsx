@@ -104,7 +104,6 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
   // brak odpowiedzi też w czerwonej ramce, na końcu (baza zwraca ich po odpowiedziach)
   const zle = odpowiedzi.filter((o) => o.poprawna === null || (o.poprawna === false && !((o.ocena ?? 0) > 0)));
   const gesto = odpowiedzi.length > 16;
-  const liczba = stan.quiz?.liczba_zadan ?? "?";
 
   // szacowanie: oś z graczami wokół poprawnej liczby zamiast ramek dobrze / częściowo / źle
   if (z?.typ === "szacowanie") {
@@ -114,7 +113,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           <header className="tv-ranking-gora tv-odpowiedzi-gora">
             <h1>{z.tresc}</h1>
             <p className="tv-okazja">
-              Pytanie {z.lp}/{liczba}
+              Pytanie {z.lp}
             </p>
             <LogoNaglowka />
           </header>
@@ -131,7 +130,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           <h1>{z?.tresc ?? "Odpowiedzi"}</h1>
           {z && (
             <p className="tv-okazja">
-              Pytanie {z.lp}/{liczba}
+              Pytanie {z.lp}
             </p>
           )}
           <LogoNaglowka />

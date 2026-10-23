@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
+import { wymagajQuizu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { EdytorZadania } from "../edytor";
@@ -13,8 +14,9 @@ export default async function StronaZadania({
   params,
   searchParams,
 }: PageProps<"/admin/quizy/[id]/zadania/[zadanie]">) {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const { id, zadanie: zadanieId } = await params;
+  await wymagajQuizu(rola, id);
   // `?etap=<id>`: nowe pytanie w tym etapie (z listy pytań albo po „Dodaj i następne”)
   const { etap: etapZAdresu } = await searchParams;
   const db = supabaseAdmin();

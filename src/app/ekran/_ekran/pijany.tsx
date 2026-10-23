@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji } from "@/lib/gra/typy";
+import { zegarPijany } from "@/lib/pijany";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
@@ -139,7 +140,8 @@ export function PijanyTv({
 
   return (
     <div className="tv-wyscig tv-seria tv-pijany" style={{ "--poziom": poziom } as React.CSSProperties}>
-      <NaglowekSerii stan={stan} teraz={teraz} />
+      {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
+      <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000)} />
 
       <div className="drogi-finalu">
         <PlanszaDrog

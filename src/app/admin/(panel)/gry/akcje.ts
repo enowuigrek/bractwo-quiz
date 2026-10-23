@@ -2,7 +2,8 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { wymagajAdmina } from "@/lib/admin";
+import { mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { wymagajGry, wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { kontoInstagram } from "@/lib/instagram";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
@@ -12,7 +13,7 @@ import { LIMITY } from "../quizy/limity";
 const MAX_OKAZJA = 80;
 
 export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const db = supabaseAdmin();
 
   const lokal_id = String(dane.get("lokal_id") ?? "");
@@ -31,6 +32,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   if (!lokal_id) return { blad: "Wybierz lokal." };
   if (!quiz_id) return { blad: "Wybierz quiz." };
+  await wymagajQuizu(rola, quiz_id);
   if (czas_s !== null && (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas)) {
     return { blad: "Wybierz czas na odpowiedź." };
   }
@@ -66,9 +68,10 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     });
   }
 
-  const [{ data: lokal }, { count: pytania }] = await Promise.all([
+  const [{ data: lokal }, { count: pytania }, { data: quiz }] = await Promise.all([
     db.from("lokale").select("id").eq("id", lokal_id).maybeSingle(),
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
+    db.from("quizy").select("tylko_glowny").eq("id", quiz_id).maybeSingle<{ tylko_glowny: boolean }>(),
   ]);
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
@@ -80,7 +83,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   if (zapowiedz && !planowany_start) return { blad: "Do zapowiedzi ustaw godzinę startu." };
 
   // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań
-  const pijany_final = dane.get("pijany_final") === "on";
+  const pijany_final = mozePijanyFinal(rola) && dane.get("pijany_final") === "on";
+  // gra głównego jest domyślnie tylko jego (przełącznik w kreatorze); gra z jego ukrytego quizu zawsze
+  const tylko_glowny = widziWszystko(rola) && (dane.get("tylko_glowny") === "on" || !!quiz?.tylko_glowny);
   const za_barem = pijany_final
     ? String(dane.get("za_barem") ?? "")
         .trim()
@@ -133,6 +138,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       poczekalnia_otwarta: !zapowiedz,
       pijany_final,
       za_barem,
+      tylko_glowny,
     })
     .select("id")
     .single();
@@ -144,7 +150,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 }
 
 export async function zakonczGre(id: string): Promise<void> {
-  await wymagajAdmina();
+  await wymagajGry(await wymagajAdmina(), id);
   const { error } = await supabaseAdmin()
     .from("sesje")
     .update({ faza: "koniec", faza_od: new Date().toISOString(), faza_do: null })
@@ -159,7 +165,7 @@ export async function zakonczGre(id: string): Promise<void> {
  * Telefon gracza pokaże „Odebrana” przy najbliższym odświeżeniu stanu (co kilka sekund).
  */
 export async function ustawOdbiorNagrody(sesjaId: string, graczId: string, odebrana: boolean): Promise<void> {
-  await wymagajAdmina();
+  await wymagajGry(await wymagajAdmina(), sesjaId);
   const { error } = await supabaseAdmin()
     .from("gracze")
     .update({ nagroda_odebrana: odebrana ? new Date().toISOString() : null })
@@ -174,7 +180,7 @@ export async function ustawOdbiorNagrody(sesjaId: string, graczId: string, odebr
  * `przekieruj`: ze strony gry wracamy do listy, z listy tylko ją odświeżamy.
  */
 export async function usunGre(id: string, przekieruj: boolean): Promise<void> {
-  await wymagajAdmina();
+  await wymagajGry(await wymagajAdmina(), id);
   // selfie graczy są w magazynie: kasujemy je razem z grą (wiersze graczy znikają kaskadowo)
   const { data: zdjecia } = await supabaseAdmin()
     .from("gracze")

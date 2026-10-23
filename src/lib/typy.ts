@@ -16,6 +16,8 @@ export type Quiz = {
   tytul: string;
   opis: string | null;
   utworzono: string;
+  /** Widzi go tylko główny (src/lib/admin.ts), obsługa nie. */
+  tylko_glowny: boolean;
 };
 
 import type { TypZadania, ZadanieDane } from "./zadania";

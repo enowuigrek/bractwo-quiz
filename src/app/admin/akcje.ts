@@ -7,12 +7,13 @@ export type StanLogowania = { blad?: string };
 
 export async function zalogujAdmina(_: StanLogowania, dane: FormData): Promise<StanLogowania> {
   const haslo = String(dane.get("haslo") ?? "");
-  if (!sprawdzHaslo(haslo)) {
+  const rola = sprawdzHaslo(haslo);
+  if (!rola) {
     // spowalnia zgadywanie
     await new Promise((r) => setTimeout(r, 800));
     return { blad: "Złe hasło." };
   }
-  await zaloguj();
+  await zaloguj(rola);
   redirect("/admin");
 }
 

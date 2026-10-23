@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
+import { widoczne } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
 
 export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
 
 export default async function Gry() {
-  await wymagajAdmina();
+  const rola = await wymagajAdmina();
   const { data, error } = await supabaseAdmin()
     .from("sesje")
     .select(ZAPYTANIE_GIER)
+    .in("tylko_glowny", widoczne(rola))
     .order("utworzono", { ascending: false })
     .limit(100)
     .returns<GraNaLiscie[]>();

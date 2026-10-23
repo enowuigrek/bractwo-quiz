@@ -12,7 +12,8 @@ import { ZdjecieNagrody } from "./zdjecie-nagrody";
 
 export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
 
-type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[] };
+/** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) widzi „Pijany finał” i widoczność gry. */
+type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean };
 
 /** Uruchamianie gry krokami: miasto → lokal → quiz, potem szczegóły. */
 /** Data (RRRR-MM-DD, pusta: dziś) i godzina (GG:MM) w czasie lokalnym jako ISO. */
@@ -22,7 +23,7 @@ function isoStartu(data: string, godzina: string): string {
   return Number.isNaN(czas.getTime()) ? "" : czas.toISOString();
 }
 
-export function Kreator({ lokale, quizy }: Props) {
+export function Kreator({ lokale, quizy, glowny }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
   const miasta = [...new Set(lokale.map((p) => p.miasto).filter((m): m is string => !!m))].sort((a, b) =>
@@ -195,31 +196,44 @@ export function Kreator({ lokale, quizy }: Props) {
             )}
           </fieldset>
 
-          <fieldset>
-            <legend>Pijany finał</legend>
-            <label className="przelacznik">
-              <input
-                type="checkbox"
-                name="pijany_final"
-                checked={pijany}
-                onChange={(e) => setPijany(e.target.checked)}
-              />{" "}
-              po finale dogrywka „Pijany finał”
-            </label>
-            <p className="podpowiedz">
-              Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze dostają jeszcze kilka pytań, które nic
-              nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał trwa
-              dalej (pytanie 15/14…). Potem werble i podium. Działa w quizie z finałem serią. Pytania zmieniasz
-              w Quizy → Pijany finał.
-            </p>
-            {pijany && (
-              <div style={{ marginTop: 10 }}>
-                <label htmlFor="za_barem">Kto dziś stoi za barem (opcjonalnie)</label>
-                <input id="za_barem" name="za_barem" className="pole" placeholder="np. Kasia" maxLength={40} />
-                <p className="podpowiedz">Do pytania z {"{za_barem}"}. Bez imienia to pytanie odpada.</p>
-              </div>
-            )}
-          </fieldset>
+          {/* tylko główny: obsługa nie wie o pijanym finale, a gry głównego są domyślnie ukryte przed nią */}
+          {glowny && (
+            <>
+              <fieldset>
+                <legend>Widoczność</legend>
+                <label className="przelacznik">
+                  <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (obsługa nie zobaczy tej
+                  gry w panelu)
+                </label>
+              </fieldset>
+
+              <fieldset>
+                <legend>Pijany finał</legend>
+                <label className="przelacznik">
+                  <input
+                    type="checkbox"
+                    name="pijany_final"
+                    checked={pijany}
+                    onChange={(e) => setPijany(e.target.checked)}
+                  />{" "}
+                  po finale dogrywka „Pijany finał”
+                </label>
+                <p className="podpowiedz">
+                  Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze dostają jeszcze kilka pytań, które
+                  nic nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał
+                  trwa dalej (pytanie 15/14…). Potem werble i podium. Działa w quizie z finałem serią. Pytania zmieniasz
+                  w Quizy → Pijany finał.
+                </p>
+                {pijany && (
+                  <div style={{ marginTop: 10 }}>
+                    <label htmlFor="za_barem">Kto dziś stoi za barem (opcjonalnie)</label>
+                    <input id="za_barem" name="za_barem" className="pole" placeholder="np. Kasia" maxLength={40} />
+                    <p className="podpowiedz">Do pytania z {"{za_barem}"}. Bez imienia to pytanie odpada.</p>
+                  </div>
+                )}
+              </fieldset>
+            </>
+          )}
 
           <fieldset>
             <legend>Start quizu (opcjonalnie)</legend>
