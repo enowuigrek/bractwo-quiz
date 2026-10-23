@@ -11,6 +11,7 @@ import {
   useNasluch,
 } from "@/lib/gra/nasluch";
 import { Awatar } from "@/components/awatar";
+import { useBezWygaszacza, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
@@ -34,18 +35,23 @@ function useSkala() {
   return useSyncExternalStore(subskrybujRozmiar, skalaOkna, () => 1);
 }
 
-/** Scena 1920×1080 przeskalowana do ekranu. Wspólna dla gry i plansz ekranu lokalu. */
-/** `bezLogoWRogu`: plansze lokalu mają duże logo Bractwa, więc w rogu go nie dublujemy. */
+/**
+ * Scena 1920×1080 przeskalowana do ekranu. Wspólna dla gry i plansz ekranu lokalu.
+ * Trzyma telewizor bez wygaszacza i co 2 minuty przesuwa się o kilka pikseli (OLED).
+ * `bezLogoWRogu`: plansze lokalu mają duże logo Bractwa, więc w rogu go nie dublujemy.
+ */
 export function Scena({ children, bezLogoWRogu = false }: { children: React.ReactNode; bezLogoWRogu?: boolean }) {
   const skala = useSkala();
+  useBezWygaszacza();
+  const [dx, dy] = usePrzesuniecieOled();
   return (
     <div className="tv">
       <div
         className="scena"
         style={{
           transform: `scale(${skala})`,
-          left: `calc(50% - ${(SZER * skala) / 2}px)`,
-          top: `calc(50% - ${(WYS * skala) / 2}px)`,
+          left: `calc(50% - ${(SZER * skala) / 2 - dx * skala}px)`,
+          top: `calc(50% - ${(WYS * skala) / 2 - dy * skala}px)`,
         }}
       >
         {children}

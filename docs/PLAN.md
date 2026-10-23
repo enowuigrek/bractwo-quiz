@@ -290,6 +290,12 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
+### Telewizor OLED bez wygaszacza (23.10)
+
+- Każda scena TV (`Scena` w `tv.tsx`, hooki w `src/lib/ekran-tv.ts`) prosi przeglądarkę o Screen Wake Lock (ponawia po powrocie karty z tła) i odtwarza niewidoczne, wyciszone wideo 2×2 px z płótna, które co sekundę zmienia odcień. Telewizory zwykle nie włączają wygaszacza, gdy coś się odtwarza.
+- Przeciw wypaleniu OLED cała scena przesuwa się co 2 minuty o kilka pikseli (7 położeń, do 3 px), więc logo w rogu i kropki plansz nie stoją ciągle w jednym miejscu.
+- Sprawdzone w przeglądarce Chromium: wideo gra, Wake Lock dostępny. Na prawdziwym telewizorze LG do sprawdzenia, czy wygaszacz już się nie włącza (jeśli tak: wyłączyć go w ustawieniach TV, opis w TEST.md).
+
 ### Quiz o serialach, lokal „Dom” i porządki (23.10)
 
 - **Quiz „Seriale · quiz testowy (Claude)”**: 15 pytań, wszystkie rodzaje na przemian (7 × jedna odpowiedź, 3 × kilka, 3 × kolejność, 2 × pary). Rozwiązania sprawdzone funkcją `wewn.ocena`.

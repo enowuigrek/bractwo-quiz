@@ -8,7 +8,7 @@
 
 ## Na miejscu (30 min przed)
 
-1. Telewizor: przeglądarka na pełnym ekranie (F11), ekran lokalu z zakładek (`/ekran/<adres-lokalu>`, adres w panelu: ⚙ → lokal). Bez gry lecą plansze, a po uruchomieniu gry ekran sam przechodzi do poczekalni. Wyłącz wygaszacz i usypianie ekranu.
+1. Telewizor: przeglądarka na pełnym ekranie (F11), ekran lokalu z zakładek (`/ekran/<adres-lokalu>`, adres w panelu: ⚙ → lokal). Bez gry lecą plansze, a po uruchomieniu gry ekran sam przechodzi do poczekalni. Ekran sam prosi telewizor o niewygaszanie (Wake Lock i niewidoczne wideo). Jeśli mimo to włącza się wygaszacz, wyłącz go w ustawieniach TV (LG OLED: Ustawienia → Ogólne → OLED Care / Ochrona ekranu) i dotknij raz pilota TV po otwarciu strony.
 2. Telefon prowadzącego: zeskanuj QR pilota z ekranu gry w panelu. Pilot zapamięta się po odświeżeniu.
 3. Sprawdź Wi‑Fi lokalu albo zasięg LTE w sali. Każdy telefon potrzebuje internetu.
 4. Ty dołączasz jako pierwszy gracz i sprawdzasz, że nick pojawia się na TV.
