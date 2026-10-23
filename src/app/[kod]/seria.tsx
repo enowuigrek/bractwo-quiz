@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import type { PytanieSerii, StanSesji, ZapisOdpowiedzi, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { LITERY, PODPOWIEDZI_TYPOW, type DaneOdpowiedzi } from "@/lib/zadania";
+import { LITERY, type DaneOdpowiedzi } from "@/lib/zadania";
 import {
   OdpowiedzKolejnosc,
   OdpowiedzLiczba,
@@ -60,8 +60,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
           <span>{e?.nazwa ?? "Seria"}</span>
         </p>
         <p className="gra-kibic">
-          Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Patrz na telewizor, kto pierwszy dojdzie
-          do piwa, i kibicuj!
+          Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj, kto pierwszy dobiegnie do
+          piwa!
         </p>
       </>
     );
@@ -73,8 +73,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
         <span className="odliczanie-liczba">{Math.max(1, Math.ceil((od - teraz) / 1000))}</span>
         <span>Seria startuje!</span>
         <span className="odliczanie-typ">
-          {e?.liczba_pytan ?? ""} pytań, {e?.czas_s ?? 60} s na wszystkie. Odpowiadaj szybko: każda dobra odpowiedź to
-          krok do piwa.
+          {e?.liczba_pytan ?? ""} pytań, {e?.czas_s ?? 60} s na wszystkie. Każda dobra odpowiedź to krok do piwa, a kto
+          pierwszy do niego dobiegnie, kończy serię.
         </span>
       </div>
     );
@@ -99,7 +99,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
         <div className="werdykt czesciowo">
           <span className="werdykt-tytul">{teraz_ ? "Koniec czasu!" : "Gotowe!"}</span>
           <span className="pomocniczy">
-            Odpowiedziano na {odpowiedziane.length} z {pytania.length}. Wynik po całej serii, patrz na telewizor.
+            Odpowiedzi: {odpowiedziane.length} z {pytania.length}. Czekamy na resztę.
           </span>
         </div>
       </>
@@ -142,9 +142,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
       {pasek}
       <h2 className="gra-pytanie">{z.tresc}</h2>
       {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
-      {z.typ !== "wybor" && <p className="gra-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
       {z.typ === "prawda_falsz" ? (
-        <OdpowiedzPrawdaFalsz key={z.id} {...wspolne} />
+        <OdpowiedzPrawdaFalsz key={z.id} {...wspolne} okragle />
       ) : z.typ === "szacowanie" ? (
         <OdpowiedzLiczba key={z.id} {...wspolne} />
       ) : z.typ === "wielokrotny" ? (

@@ -7,6 +7,7 @@ import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
 import { OdpowiedziSzacowania } from "./szacowanie";
 import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/lib/zadania";
+import { LogoNaglowka } from "./logo";
 
 /**
  * Ile kolumn w ramce, żeby 30 graczy zmieściło się na scenie 1920×1080.
@@ -115,6 +116,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             <p className="tv-okazja">
               Pytanie {z.lp}/{liczba}
             </p>
+            <LogoNaglowka />
           </header>
           <OdpowiedziSzacowania z={z} odpowiedzi={odpowiedzi} />
         </div>
@@ -132,6 +134,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
               Pytanie {z.lp}/{liczba}
             </p>
           )}
+          <LogoNaglowka />
         </header>
 
         <section className="tv-odpowiedzi-ramka dobrze">
@@ -191,6 +194,7 @@ export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         <header className="tv-ranking-gora">
           <h1>Tabela wyników</h1>
           <p className="tv-okazja">{stan.quiz?.tytul}</p>
+          <LogoNaglowka />
         </header>
         {wiersze.length === 0 ? (
           <p className="tv-zacheta">Nikt nie grał.</p>

@@ -8,6 +8,16 @@
   cursor: none;
 }
 
+/* werble: czarny ekran, wideo czuwania pod spodem gra dalej */
+.tv.zgaszona {
+  background: #000;
+}
+
+.tv.zgaszona .tv-blask,
+.tv.zgaszona .tv-smuga {
+  display: none;
+}
+
 .scena {
   position: absolute;
   width: 1920px;
@@ -28,6 +38,38 @@
   width: auto;
   opacity: 0.85;
   pointer-events: none;
+}
+
+/* logo Bractwa po prawej w nagłówku ekranów gry (logo.tsx) */
+.tv-logo-naglowek {
+  flex: none;
+  align-self: center;
+  height: 76px;
+  width: auto;
+  margin-left: auto;
+  opacity: 0.9;
+}
+
+/* nagłówek z zegarem po prawej (pytanie, seria): zegar dosuwa się do logo */
+.tv-zegar ~ .tv-logo-naglowek {
+  margin-left: 0;
+}
+
+.tv-pytanie-gora {
+  gap: 40px;
+}
+
+.tv-pytanie-gora > .tv-zegar {
+  margin-left: auto;
+}
+
+/* nagłówek z logami lokalu po lewej: tytuł albo droga etapów zostaje po prawej, tuż przed logo Bractwa */
+.tv-naglowek > .tv-logo-naglowek {
+  margin-left: 0;
+}
+
+.tv-naglowek > :nth-last-child(2):not(:first-child) {
+  margin-left: auto;
 }
 
 .tv h1 {
@@ -1218,6 +1260,15 @@
   margin-top: 8px;
 }
 
+/* tytuł quizu pod podium (okazja · tytuł · lokal) */
+.tv-koniec-tytul {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 36px;
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+}
+
 .tv-koniec .tv-stopien-nr {
   font-size: 90px;
 }
@@ -1739,43 +1790,11 @@
   align-content: center;
 }
 
-/* poświata na całości: na samym nalewanym obrazku przycięcie ucięłoby ją do prostokąta */
+/* poświata na całości: na samym nalewanym piwie przycięcie ucięłoby ją do prostokąta */
 .wyscig-szklo {
   position: relative;
   width: 100%;
-  display: grid;
-  /* bąbelki liczą drogę w górę od szerokości szklanki (wysokość to ok. 1,87 szerokości) */
-  container-type: inline-size;
   filter: drop-shadow(0 0 36px rgba(227, 172, 63, 0.4));
-}
-
-.wyscig-szklo img {
-  grid-area: 1 / 1;
-  width: 100%;
-  max-width: none;
-  height: auto;
-}
-
-/* pusta szklanka: blady, szklany zarys tej samej grafiki */
-.wyscig-szklanka-pusta {
-  filter: grayscale(1) brightness(1.3) contrast(0.7);
-  opacity: 0.16;
-}
-
-/* piana na powierzchni nalewanego piwa */
-.wyscig-piana {
-  position: absolute;
-  min-height: 10px;
-  translate: 0 -70%;
-  border-radius: 40% / 30%;
-  background:
-    radial-gradient(circle at 20% 35%, rgba(255, 255, 255, 0.9) 0 3%, transparent 4%),
-    radial-gradient(circle at 63% 28%, rgba(255, 255, 255, 0.8) 0 2.5%, transparent 3.5%),
-    radial-gradient(circle at 82% 55%, rgba(255, 255, 255, 0.7) 0 2%, transparent 3%),
-    linear-gradient(180deg, #fffaf0 0%, #f4ecd8 55%, rgba(236, 220, 180, 0.85) 85%, rgba(227, 172, 63, 0) 100%);
-  box-shadow: 0 -2px 8px rgba(255, 250, 240, 0.35);
-  filter: blur(0.6px);
-  pointer-events: none;
 }
 
 .wyscig-szklanka-opis {
@@ -2346,6 +2365,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Prawda / fałsz na TV: dwa wysokie kafle */
+.tv-odp-pf .tv-odp {
+  min-height: 300px;
+  justify-content: center;
+  font-size: 72px;
+}
+
+.tv-odp-pf .tv-odp-litera {
+  width: 110px;
+  height: 110px;
+  font-size: 60px;
+}
+
 /* Zdjęcie nagrody (bez tła): przy szklance w wyścigu, w finale, na podium i na planszy finału */
 .wyscig-szklanka {
   position: relative;
@@ -2369,8 +2401,14 @@
 .tv-stopien-zdjecie {
   width: 150px;
   height: 150px;
+  margin: 6px 0 0;
   object-fit: contain;
   filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.8));
+}
+
+/* nazwa nagrody pod jej zdjęciem, z odstępem (ujemny margines nachodził na zdjęcie) */
+.tv-stopien-zdjecie + .tv-stopien-nagroda {
+  margin-top: 12px;
 }
 
 .tv-etap-nagroda {
@@ -2619,24 +2657,39 @@
   padding-top: 6px;
 }
 
-/* Seria na TV: zegar w nagłówku, odliczanie przed startem na planszy */
+/* Seria na TV: odliczanie do startu i potem zegar w nagłówku, plansza zostaje odsłonięta */
 .tv-seria .tv-ranking-gora {
   align-items: center;
+}
+
+/* tytuł i podpis w jednej linii obok zegara i logo */
+.tv-seria .tv-ranking-gora h1 {
+  font-size: 72px;
+  white-space: nowrap;
+}
+
+.tv-seria .tv-ranking-gora .tv-okazja {
+  white-space: nowrap;
 }
 
 .tv-seria .tv-zegar {
   margin-left: auto;
 }
 
-.tv-seria-start {
-  position: absolute;
-  inset: 0;
+.tv-seria-odliczanie {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 28px;
-  background: rgba(0, 0, 0, 0.55);
+  align-items: baseline;
+  gap: 20px;
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.tv-seria-odliczanie span {
+  font-size: 40px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--szary);
+  text-shadow: none;
 }
 
 .tv-seria {

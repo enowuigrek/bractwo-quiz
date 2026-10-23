@@ -20,11 +20,13 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const okazja = String(dane.get("okazja") ?? "")
     .trim()
     .replace(/\s+/g, " ");
+  // kreator nie pokazuje już drużyn (każdy gra sam); tryb zostaje w bazie dla starszych gier
   const tryb = dane.get("tryb") === "druzyny" ? "druzyny" : "solo";
-  // czas na odpowiedź dla wszystkich pytań; bez limitu nie ma od czego liczyć bonusu
+  // czas na odpowiedź dla wszystkich pytań; bonus za szybkość jest zawsze (bez limitu liczy się kolejność),
+  // a limit tylko odlicza czas, po którym nie da się już odpowiedzieć
   const czasPole = String(dane.get("czas_s") ?? "");
   const czas_s = czasPole === "bez" ? null : Number(czasPole);
-  const bonus_czas = czas_s !== null && dane.get("bonus_czas") === "on";
+  const bonus_czas = true;
   const max_graczy = Number(dane.get("max_graczy") || 30);
 
   if (!lokal_id) return { blad: "Wybierz lokal." };

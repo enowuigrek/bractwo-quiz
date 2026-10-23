@@ -35,10 +35,12 @@ export function useBezWygaszacza() {
 }
 
 /**
- * Zapętlone, prawie czarne wideo (`/wideo/czuwanie.mp4`, H.264, 6 s, 3 KB) na całym ekranie pod tłem.
- * Telewizory (np. przeglądarka LG webOS) nie włączają wygaszacza, dopóki odtwarza się prawdziwy plik
- * wideo; strumień z płótna im nie wystarczał. Wideo jest wyciszone, więc może startować samo,
- * a gdyby się zatrzymało (np. po powrocie karty z tła), co 20 s wznawiamy je jeszcze raz.
+ * Zapętlone, prawie czarne wideo (`/wideo/czuwanie.mp4`) na całym ekranie pod tłem. Telewizory nie
+ * włączają wygaszacza, dopóki odtwarza się prawdziwy plik wideo; strumień z płótna im nie wystarczał.
+ * Pierwsza wersja (128×72 px, bez dźwięku) nie powstrzymała Samsunga (Tizen), więc teraz to zwykłe MP4
+ * jak z kamery: H.264 1280×720, cicha ścieżka AAC, 8 s, ok. 70 KB, z ledwo widoczną pływającą plamą.
+ * Wideo jest wyciszone, więc może startować samo, a gdyby się zatrzymało (np. po powrocie karty z tła),
+ * co 20 s wznawiamy je jeszcze raz.
  */
 export function useWideoCzuwania(): RefObject<HTMLVideoElement | null> {
   const ref = useRef<HTMLVideoElement>(null);

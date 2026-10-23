@@ -8,7 +8,7 @@
 
 ## Na miejscu (30 min przed)
 
-1. Telewizor: przeglądarka na pełnym ekranie (F11), ekran lokalu z zakładek (`/ekran/<adres-lokalu>`, adres w panelu: ⚙ → lokal). Bez gry lecą plansze, a po uruchomieniu gry ekran sam przechodzi do poczekalni. Ekran sam prosi telewizor o niewygaszanie (Wake Lock i zapętlone, prawie czarne wideo na całym ekranie). Jeśli mimo to włącza się wygaszacz, wyłącz go w ustawieniach TV (LG OLED: Ustawienia → Ogólne → OLED Care / Ochrona ekranu) i dotknij raz pilota TV po otwarciu strony.
+1. Telewizor: przeglądarka na pełnym ekranie (F11), ekran lokalu z zakładek (`/ekran/<adres-lokalu>`, adres w panelu: ⚙ → lokal). Bez gry lecą plansze, a po uruchomieniu gry ekran sam przechodzi do poczekalni. Ekran sam prosi telewizor o niewygaszanie (Wake Lock i zapętlone, prawie czarne wideo na całym ekranie). Jeśli mimo to obraz gaśnie albo ciemnieje, to ustawienia telewizora. W lokalu stoi Samsung OLED (Tizen, przeglądarka Samsung Internet): Ustawienia → Wszystkie ustawienia → Ogólne i prywatność → Menedżer systemu → Czas autoochrony (wyłącz albo ustaw najdłuższy) oraz Ogólne i prywatność → Ochrona panelu OLED / Panel Care → Dostosuj jasność logo (wyłącz). Po otwarciu strony dotknij raz pilota TV. Nazwy pozycji różnią się trochę między rocznikami.
 2. Telefon prowadzącego: zeskanuj QR pilota z ekranu gry w panelu. Pilot zapamięta się po odświeżeniu.
 3. Sprawdź Wi‑Fi lokalu albo zasięg LTE w sali. Każdy telefon potrzebuje internetu.
 4. Ty dołączasz jako pierwszy gracz i sprawdzasz, że nick pojawia się na TV.

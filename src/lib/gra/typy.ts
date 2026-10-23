@@ -10,6 +10,8 @@ export type FazaWidoczna =
   | "poczekalnia"
   | "etap"
   | "seria"
+  /** Po finale serią: ekrany gasną i czekają, aż prowadzący pokaże podium. */
+  | "werble"
   | "przygotuj"
   | "pytanie"
   | "wynik"

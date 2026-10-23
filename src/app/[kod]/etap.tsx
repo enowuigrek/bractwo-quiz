@@ -7,7 +7,7 @@ import { czyKibic } from "./rozgrywka";
 /** Telefon w fazie `etap`: nazwa i zasady etapu, mnożnik, a w finale trójki: grasz czy kibicujesz. */
 export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
   const e = stan.etap;
-  if (!e) return <p className="pomocniczy">Patrz na telewizor.</p>;
+  if (!e) return <p className="pomocniczy">Za chwilę start.</p>;
   const kibic = czyKibic(stan, nick);
   return (
     <>
@@ -22,8 +22,14 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
       {e.opis && <p className="etap-opis">{e.opis}</p>}
       <ul className="etap-cechy">
         {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
-        {e.czas_s && <li>{e.seria ? `${e.czas_s} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>}
-        {e.seria && <li className="zloty">Seria we własnym tempie</li>}
+        <li>
+          {e.czas_s
+            ? e.seria
+              ? `${e.czas_s} s na całą serię`
+              : `${e.czas_s} s na odpowiedź`
+            : "Kto pierwszy, ten lepszy"}
+        </li>
+        {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
         {e.typy.map((t) => (
           <li key={t}>{NAZWY_TYPOW[t]}</li>
         ))}
@@ -49,11 +55,10 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
             ))}
           </ul>
           {kibic && (
-            <p className="pomocniczy">Tym razem kibicujesz. Pytania zobaczysz na telefonie i na telewizorze.</p>
+            <p className="pomocniczy">Tym razem kibicujesz. Pytania i tak zobaczysz tutaj.</p>
           )}
         </section>
       )}
-      <p className="pomocniczy">Prowadzący zaraz wystartuje etap. Patrz na telewizor.</p>
     </>
   );
 }

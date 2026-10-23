@@ -4,11 +4,13 @@ import { MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
+import { LogoNaglowka } from "./logo";
 
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
- * do pełnej szklanki. Każda dobra odpowiedź to krok (dobre / liczba pytań). Przed startem odliczanie,
- * u góry czas do końca serii. Dane: `StanSesji.seria`, odświeżane po każdej odpowiedzi.
+ * do pełnej szklanki. Każda dobra odpowiedź to krok (dobre / liczba pytań). Przed startem odliczanie
+ * w nagłówku (drogi i gracze zostają widoczne), po nim w tym samym miejscu czas do końca serii.
+ * Dane: `StanSesji.seria`, odświeżane po każdej odpowiedzi.
  */
 export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const e = stan.etap;
@@ -25,10 +27,17 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       <div className="tv-wyscig tv-seria">
         <header className="tv-ranking-gora">
           <h1>{e?.finalowy ? "Finał: seria pytań" : (e?.nazwa ?? "Seria pytań")}</h1>
-          <p className="tv-okazja">{przedStartem ? "Start za chwilę" : `Pytań: ${n} · każda dobra to krok do piwa`}</p>
-          <p className={`tv-zegar${!przedStartem && zostalo <= 10 ? " malo" : ""}`}>
-            {przedStartem ? "" : zostalo > 0 ? zostalo : "Koniec!"}
+          <p className="tv-okazja">
+            {przedStartem ? "Przygotujcie telefony!" : `Pytań: ${n} · kto pierwszy do piwa`}
           </p>
+          {przedStartem ? (
+            <p className="tv-zegar tv-seria-odliczanie" aria-live="polite">
+              <span>Start za</span> {Math.max(1, Math.ceil((od - teraz) / 1000))}
+            </p>
+          ) : (
+            <p className={`tv-zegar${zostalo <= 10 ? " malo" : ""}`}>{zostalo > 0 ? zostalo : "Koniec!"}</p>
+          )}
+          <LogoNaglowka />
         </header>
 
         <DrogiFinalu
@@ -41,23 +50,10 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             przed: 0,
             teraz: Math.min(1, g.dobre / n),
             lider: g.dobre > 0 && g.dobre === najlepszy,
-            podpis: (
-              <>
-                <span>{g.nick}</span>
-                <span className="drogi-finalu-punkty">
-                  {g.odpowiedzi >= n ? "skończył" : `pytanie ${Math.min(n, g.odpowiedzi + 1)}/${n}`}
-                </span>
-              </>
-            ),
+            // bez numeru pytania: widać tylko, kto jedzie szybciej, ciekawiej do samego końca
+            podpis: <span>{g.nick}</span>,
           }))}
         />
-
-        {przedStartem && (
-          <div className="tv-seria-start" aria-live="polite">
-            <p className="tv-odliczanie">{Math.max(1, Math.ceil((od - teraz) / 1000))}</p>
-            <p className="tv-duzy">Przygotujcie telefony!</p>
-          </div>
-        )}
       </div>
     </MotionConfig>
   );

@@ -66,9 +66,11 @@ export function Rozgrywka({
   const liczba = stan.quiz?.liczba_zadan ?? "?";
   const kibic = czyKibic(stan, ja.nick);
   const etap = stan.etap;
+  // plansza etapu pokazała już, jak odpowiadać, więc bez podpowiedzi rodzaju pytania
+  const zEtapami = (stan.quiz?.liczba_etapow ?? 0) > 0;
 
   if (!z) {
-    return <p className="pomocniczy">Patrz na telewizor.</p>;
+    return <p className="pomocniczy">Za chwilę następne pytanie.</p>;
   }
 
   // Odpowiedź z tego telefonu albo, po odświeżeniu strony, zapisana w bazie.
@@ -87,12 +89,13 @@ export function Rozgrywka({
       </span>
       {faza === "pytanie" && (
         <span className="gra-kod">
+          {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
           {czasMinal
             ? z.czas_s
               ? "koniec czasu"
               : "wszyscy odpowiedzieli"
             : bezLimitu
-              ? "bez limitu"
+              ? ""
               : `${Math.ceil(doKonca / 1000)} s`}
         </span>
       )}
@@ -107,8 +110,13 @@ export function Rozgrywka({
         <div className="odliczanie" aria-live="polite">
           <span className="odliczanie-liczba">{Math.max(1, Math.ceil(doStartu / 1000))}</span>
           <span>Przygotuj się!</span>
-          {/* rodzaj pytania już w odliczaniu, żeby nikt nie był zaskoczony parami czy kolejnością */}
-          <span className="odliczanie-typ">{kibic ? "Finał: tym razem kibicujesz" : PODPOWIEDZI_TYPOW[z.typ]}</span>
+          {/* rodzaj pytania już w odliczaniu, żeby nikt nie był zaskoczony parami czy kolejnością;
+              w quizie z etapami tłumaczy to plansza etapu */}
+          {kibic ? (
+            <span className="odliczanie-typ">Finał: tym razem kibicujesz</span>
+          ) : (
+            !zEtapami && <span className="odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</span>
+          )}
         </div>
       </>
     );
@@ -160,7 +168,7 @@ export function Rozgrywka({
           {pasek}
           <Pytanie stan={stan} teraz={teraz} />
           <p className="gra-kibic">
-            Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj i patrz na telewizor.
+            Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj!
           </p>
         </>
       );
@@ -170,7 +178,7 @@ export function Rozgrywka({
         {naglowek}
         {pasek}
         <Pytanie stan={stan} teraz={teraz} />
-        {z.typ !== "wybor" && <p className="gra-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
+        {z.typ !== "wybor" && !zEtapami && <p className="gra-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
         {z.typ === "prawda_falsz" ? (
           <OdpowiedzPrawdaFalsz
             key={z.id}
@@ -273,7 +281,7 @@ export function Rozgrywka({
       {kibic ? (
         <div className="werdykt czesciowo">
           <span className="werdykt-tytul">Finał trójki</span>
-          <span className="pomocniczy">Tym razem kibicujesz. Wynik na telewizorze.</span>
+          <span className="pomocniczy">Tym razem kibicujesz.</span>
         </div>
       ) : !gotowe ? (
         <p className="pomocniczy">Liczę punkty…</p>

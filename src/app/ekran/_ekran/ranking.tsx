@@ -7,6 +7,7 @@ import { Awatar } from "@/components/awatar";
 import { RESZTA_PODIUM_S, WJAZD_PODIUM_S } from "@/lib/gra/podium";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
+import { LogoNaglowka } from "./logo";
 
 /** Ile wierszy mieści ranking na scenie 1920×1080. */
 const W_RANKINGU = 10;
@@ -61,6 +62,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
               po pytaniu {z.lp}/{liczba}
             </p>
           )}
+          <LogoNaglowka />
         </header>
 
         {ranking.length === 0 ? (
@@ -168,6 +170,8 @@ export function PodiumTv({
       <div className="tv-podium">
         {STOPNIE.filter((i) => top[i]).map((i) => {
           const w = top[i];
+          // nagroda według miejsca (przy remisie obaj gracze mają tę samą)
+          const nagroda = nagrody?.find((n) => n.miejsce === w.miejsce);
           return (
             <motion.div
               key={w.nick}
@@ -180,17 +184,9 @@ export function PodiumTv({
               {i === 0 && <span className="tv-stopien-korona">Zwycięzca</span>}
               <span className="tv-stopien-nick">{w.nick}</span>
               <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
-              {/* nagroda według miejsca (przy remisie obaj gracze mają tę samą) */}
-              {nagrody?.find((n) => n.miejsce === w.miejsce)?.zdjecie && (
-                <img
-                  src={nagrody.find((n) => n.miejsce === w.miejsce)?.zdjecie ?? ""}
-                  alt=""
-                  className="tv-stopien-zdjecie"
-                />
-              )}
-              {nagrody?.find((n) => n.miejsce === w.miejsce) && (
-                <span className="tv-stopien-nagroda">{nagrody.find((n) => n.miejsce === w.miejsce)?.nagroda}</span>
-              )}
+              {/* zdjęcie nagrody między punktami a jej nazwą */}
+              {nagroda?.zdjecie && <img src={nagroda.zdjecie} alt="" className="tv-stopien-zdjecie" />}
+              {nagroda && <span className="tv-stopien-nagroda">{nagroda.nagroda}</span>}
               <div className="tv-stopien-blok">
                 <span className="tv-stopien-nr">{w.miejsce}</span>
               </div>

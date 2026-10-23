@@ -175,7 +175,8 @@ function scena(typ: TypZadania, t: number): Scena {
       };
     }
     case "kolejnosc": {
-      const odp = ["Fermentacja", "Śrutowanie", "Leżakowanie", "Zacieranie"];
+      // bez etapów warzenia: to pytanie jest w quizie o piwie, a plansza nie może zdradzać odpowiedzi
+      const odp = ["Kufel 0,5 l", "Kieliszek", "Beczka", "Puszka 0,33 l"];
       // właściwa kolejność kafelków i chwile stuknięć
       const kolej = [1, 3, 0, 2];
       const chwile = [0.16, 0.3, 0.44, 0.58];
@@ -184,7 +185,7 @@ function scena(typ: TypZadania, t: number): Scena {
         return poStuku(chwile[k]) ? String(k + 1) : "·";
       };
       return {
-        tresc: "Ułóż etapy warzenia po kolei.",
+        tresc: "Ułóż od najmniejszego do największego.",
         elementy: odp.map((o, i) => (
           <Kafel
             key={o}
@@ -207,8 +208,9 @@ function scena(typ: TypZadania, t: number): Scena {
     }
     case "pary": {
       // Łączenie par w dwóch kolumnach na pionowym ekranie telefonu.
-      const lewe = ["Pilzner", "Weizen", "Grodziskie"];
-      const prawe = ["Polska", "Czechy", "Niemcy"];
+      // bez stylów i krajów: pary styl–kraj są w quizie o piwie, a plansza nie może zdradzać odpowiedzi
+      const lewe = ["Kufel", "Kieliszek", "Filiżanka"];
+      const prawe = ["Kawa", "Piwo", "Wino"];
       // lewy i → prawy pary[i]; stuknięcia: lewy, potem prawy
       const pary = [1, 2, 0];
       const chwile = [0.18, 0.4, 0.62];
@@ -218,7 +220,7 @@ function scena(typ: TypZadania, t: number): Scena {
       const polaczona = (i: number) => poStuku(chwile[i] + 0.12);
       const kolor = (i: number) => (polaczona(i) ? (["para0", "para1", "para2"] as const)[i] : undefined);
       return {
-        tresc: "Połącz styl z krajem.",
+        tresc: "Połącz naczynie z napojem.",
         elementy: (
           <>
             <svg className="demo-linie" width={PIONOWO.szer} height={PIONOWO.wys} aria-hidden>

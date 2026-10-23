@@ -8,8 +8,11 @@ type Props = {
   nick: string;
   /** Obecne zdjęcie (adres albo podgląd). */
   zdjecie: string | null;
-  /** Dostaje gotowe zdjęcie 256×256 i jego podgląd. Może rzucić błąd, który pokażemy pod przyciskiem. */
-  onWybrano: (zdjecie: Blob, podglad: string) => Promise<void> | void;
+  /**
+   * Dostaje gotowe zdjęcie 256×256, jego podgląd i oryginał z aparatu (np. do przeróbki w stylu Bractwa).
+   * Może rzucić błąd, który pokażemy pod przyciskiem.
+   */
+  onWybrano: (zdjecie: Blob, podglad: string, oryginal: File) => Promise<void> | void;
   onUsun?: () => Promise<void> | void;
   rozmiar?: number;
 };
@@ -29,7 +32,7 @@ export function ZdjecieGracza({ nick, zdjecie, onWybrano, onUsun, rozmiar = 88 }
     ustawBlad(null);
     try {
       const gotowe = await przygotujZdjecie(plik);
-      await onWybrano(gotowe, URL.createObjectURL(gotowe));
+      await onWybrano(gotowe, URL.createObjectURL(gotowe), plik);
     } catch (e) {
       ustawBlad((e as Error).message);
     } finally {

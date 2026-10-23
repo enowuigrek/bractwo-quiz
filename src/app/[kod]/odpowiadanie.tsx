@@ -15,10 +15,20 @@ type Props = {
 };
 
 /** Prawda / fałsz: dwa duże przyciski, jedno stuknięcie wysyła odpowiedź. */
-export function OdpowiedzPrawdaFalsz({ z, wyslana, zablokowane, onWyslij }: Props) {
+/**
+ * Prawda / fałsz. `okragle`: w serii dwa duże okrągłe przyciski (zielony ✓, czerwony ✗) nisko na ekranie,
+ * pod kciuki, bo pytania lecą jedno po drugim i liczy się tempo.
+ */
+export function OdpowiedzPrawdaFalsz({
+  z,
+  wyslana,
+  zablokowane,
+  onWyslij,
+  okragle = false,
+}: Props & { okragle?: boolean }) {
   const wybrana = wyslana?.odpowiedz ?? null;
   return (
-    <div className="odp-pf">
+    <div className={`odp-pf${okragle ? " okragle" : ""}`}>
       {(z.dane.odpowiedzi ?? []).map((o, i) => (
         <button
           key={i}
@@ -185,8 +195,8 @@ export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij }: Props)
   );
 }
 
-/** Kolory par: takie same jak `.para-0` … `.para-5` w globals.css. */
-const KOLORY_PAR = ["#e3ac3f", "#8fb63a", "#6fa8dc", "#e2735a", "#c39bd3", "#f4ecd8"];
+/** Kolory par: takie same jak `.para-0` … `.para-5` w globals.css. Bez czerwieni: kojarzy się z błędem. */
+const KOLORY_PAR = ["#e3ac3f", "#8fb63a", "#6fa8dc", "#4fb8a8", "#c39bd3", "#f4ecd8"];
 
 type Linia = { x1: number; y1: number; x2: number; y2: number; kolor: string };
 

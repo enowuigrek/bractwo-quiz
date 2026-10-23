@@ -4,16 +4,18 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { LogoQuiz } from "@/components/logo-quiz";
+import { Werble } from "@/components/werble";
 import { komunikatBledu, pamiec, pobierzStan, useCzasSerwera, useKoniecPytania, useNasluch } from "@/lib/gra/nasluch";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
 import { godzinaStartu } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
+import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { MojWyscig } from "./moj-wyscig";
 import { SeriaGracza } from "./seria";
-import { PrzerobkaAwatara } from "./przerobka-awatara";
+import { StylAwatara, type Zdjecie } from "./styl-awatara";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { ZdjecieGracza } from "./zdjecie-gracza";
@@ -223,7 +225,9 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
   const [nick, ustawNick] = useState("");
   const [blad, ustawBlad] = useState<string | null>(null);
   const [wysylam, ustawWysylam] = useState<false | "gracz" | "zdjecie">(false);
-  const [zdjecie, ustawZdjecie] = useState<{ blob: Blob; podglad: string } | null>(null);
+  // wybrane zdjęcie (zwykłe albo w stylu Bractwa) i to z aparatu, do przeróbki
+  const [zdjecie, ustawZdjecie] = useState<Zdjecie | null>(null);
+  const [zwykle, ustawZwykle] = useState<(Zdjecie & { oryginal: File }) | null>(null);
   const druzyny = stan.tryb === "druzyny";
   const pelna = stan.liczba_graczy >= stan.max_graczy;
 
@@ -282,9 +286,27 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
       <ZdjecieGracza
         nick={nick}
         zdjecie={zdjecie?.podglad ?? null}
-        onWybrano={(blob, podglad) => ustawZdjecie({ blob, podglad })}
-        onUsun={() => ustawZdjecie(null)}
+        onWybrano={(blob, podglad, oryginal) => {
+          const nowe = { blob, podglad, oryginal };
+          ustawZwykle(nowe);
+          ustawZdjecie(nowe);
+        }}
+        onUsun={() => {
+          ustawZwykle(null);
+          ustawZdjecie(null);
+        }}
       />
+      {/* kod klucza: nowe selfie to nowy wybór i nowa przeróbka */}
+      {zwykle && zdjecie && (
+        <StylAwatara
+          key={zwykle.podglad}
+          kod={kod}
+          oryginal={zwykle.oryginal}
+          zwykle={zwykle}
+          wybrane={zdjecie}
+          onWybierz={ustawZdjecie}
+        />
+      )}
       {blad && (
         <p className="blad" role="alert">
           {blad}
@@ -367,12 +389,7 @@ function WGrze({
             await odswiez();
           }}
         />
-        <PrzerobkaAwatara
-          token={ja.token}
-          zdjecie={gracze.find((g) => g.nick === ja.nick)?.zdjecie ?? null}
-          odswiez={odswiez}
-        />
-        <p>Patrz na telewizor. Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
+        <p>Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
         <section style={{ marginTop: "var(--section-gap)" }}>
           <p className="etykieta">
             {stan.tryb === "druzyny" ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
@@ -394,6 +411,10 @@ function WGrze({
 
   if (stan.faza === "seria") {
     return <SeriaGracza stan={stan} ja={ja} teraz={teraz} />;
+  }
+
+  if (stan.faza === "werble") {
+    return <Werble />;
   }
 
   if (stan.faza === "etap") {
@@ -426,8 +447,8 @@ function WGrze({
             )}
           </p>
         )}
-        {/* TV pokazuje wyścig: na telefonie własny tor i szklanka */}
-        {mojWiersz && stan.widok_rankingu === "wyscig" && (
+        {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV */}
+        {mojWiersz && rankingJakoWyscig(stan.quiz?.liczba_etapow ?? 0, stan.liczba_graczy) && (
           <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />
         )}
       </>

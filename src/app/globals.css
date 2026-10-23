@@ -649,15 +649,187 @@ html:has(.kolumna) {
   display: none;
 }
 
-/* Koniec quizu na telefonie: werble przed odsłoną, potem medal dla pierwszej trójki */
-.werble h1 {
-  animation: werble 0.5s ease-in-out infinite alternate;
+/* Koniec quizu na telefonie: kropki „czekamy” przed odsłoną miejsca, potem medal dla pierwszej trójki */
+.odslona {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
 }
 
-@keyframes werble {
+.odslona .werble-kropki {
+  margin-bottom: 12px;
+}
+
+.odslona h1 {
+  animation: pulsowanie-werbli 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulsowanie-werbli {
   to {
     transform: scale(1.06);
     color: var(--zloto);
+  }
+}
+
+/* Werble po finale (components/werble.tsx): ekran gaśnie jak wyłączany telewizor, potem wolno wchodzi napis.
+   Na telefonie zasłania całą stronę, na TV całą scenę (.duzy). */
+.werble {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: #000;
+  text-align: center;
+  overflow: hidden;
+}
+
+.werble.duzy {
+  position: absolute;
+}
+
+/* błysk: biały obraz zapada się w poziomą kreskę, potem w punkt i gaśnie */
+.werble-blysk {
+  position: absolute;
+  inset: 0;
+  background: #fffaf0;
+  box-shadow: 0 0 60px 24px rgba(255, 250, 240, 0.85);
+  opacity: 0;
+  animation: gasniecie-ekranu 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes gasniecie-ekranu {
+  0% {
+    opacity: 0.95;
+    transform: scale(1, 1);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1, 0.004);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.003, 0.004);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0, 0);
+  }
+}
+
+.werble-tresc {
+  position: relative;
+  /* poświata (::before, z-index -1) zostaje za napisem, ale nad czarnym tłem */
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: wejscie-werbli 3s ease-in 1.8s forwards;
+}
+
+@keyframes wejscie-werbli {
+  to {
+    opacity: 1;
+  }
+}
+
+/* trzy kropki skaczą na zmianę, za napisem wolno pulsuje złota poświata */
+.werble-kropki {
+  display: flex;
+  gap: 14px;
+}
+
+.werble-kropki span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--zloto);
+  box-shadow: var(--glow-sm);
+  animation: skok-kropki 0.5s ease-in-out infinite alternate;
+}
+
+.werble-kropki span:nth-child(2) {
+  animation-delay: 0.17s;
+}
+
+.werble-kropki span:nth-child(3) {
+  animation-delay: 0.34s;
+}
+
+@keyframes skok-kropki {
+  from {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  to {
+    transform: translateY(-14px);
+    opacity: 1;
+  }
+}
+
+.werble-tresc::before {
+  content: "";
+  position: absolute;
+  inset: -40% -30%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(227, 172, 63, 0.18), transparent);
+  animation: poswiata-werbli 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes poswiata-werbli {
+  from {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.werble-tytul {
+  margin: 8px 0 0;
+  font-size: var(--fs-h1);
+  font-weight: var(--w-black);
+  color: var(--zloto);
+  text-shadow: var(--glow-md);
+}
+
+.werble-podpis {
+  margin: 0;
+  color: var(--szary);
+}
+
+.werble.duzy .werble-kropki {
+  gap: 30px;
+}
+
+.werble.duzy .werble-kropki span {
+  width: 38px;
+  height: 38px;
+}
+
+.werble.duzy .werble-tytul {
+  font-size: 128px;
+}
+
+.werble.duzy .werble-podpis {
+  font-size: 40px;
+}
+
+/* przy ograniczonym ruchu bez migania: kropki stoją, błysk znika od razu */
+@media (prefers-reduced-motion: reduce) {
+  .werble-kropki span,
+  .werble-tresc::before,
+  .odslona h1 {
+    animation: none;
+  }
+
+  .werble-blysk {
+    display: none;
   }
 }
 
@@ -950,18 +1122,50 @@ html:has(.kolumna) {
   text-decoration: line-through;
 }
 
+/* pieczątka „Odebrana” jak odbita tuszem: podwójna ramka, lekki obrót i przetarcia z maski szumu */
 .karta-nagrody-pieczatka {
-  display: inline-block;
-  margin-top: 12px !important;
-  padding: 6px 14px;
-  border: 3px solid var(--czerwien);
-  border-radius: var(--r-pole);
+  --tusz: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3.4 0 0 0 -0.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+  display: inline-grid;
+  justify-items: center;
+  gap: 2px;
+  margin-top: 16px !important;
+  padding: 10px 22px 8px;
+  border: 4px solid currentColor;
+  border-radius: 10px;
+  /* druga, cieńsza ramka w środku (outline maska by ucięła) */
+  box-shadow:
+    inset 0 0 0 3px var(--kamien),
+    inset 0 0 0 5px currentColor;
   color: var(--czerwien);
-  font-size: 22px;
-  font-weight: var(--w-black);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  transform: rotate(-4deg);
+  opacity: 0.9;
+  transform: rotate(-7deg);
+  -webkit-mask-image: var(--tusz);
+  mask-image: var(--tusz);
+  -webkit-mask-size: 220px 120px;
+  mask-size: 220px 120px;
+  animation: odbicie-pieczatki 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+.karta-nagrody-pieczatka strong {
+  font-size: 30px;
+  font-weight: var(--w-black);
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+.karta-nagrody-pieczatka span {
+  font-size: 14px;
+  font-weight: var(--w-black);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes odbicie-pieczatki {
+  from {
+    opacity: 0;
+    transform: rotate(-7deg) scale(1.8);
+  }
 }
 
 /* Nowe typy pytań na telefonie: kilka odpowiedzi, kolejność, pary */
@@ -1034,8 +1238,8 @@ html:has(.kolumna) {
 .odp-para.para-1 .odp-litera { background: #8fb63a; border-color: #8fb63a; }
 .odp-para.para-2 { border-color: #6fa8dc; }
 .odp-para.para-2 .odp-litera { background: #6fa8dc; border-color: #6fa8dc; }
-.odp-para.para-3 { border-color: #e2735a; }
-.odp-para.para-3 .odp-litera { background: #e2735a; border-color: #e2735a; }
+.odp-para.para-3 { border-color: #4fb8a8; }
+.odp-para.para-3 .odp-litera { background: #4fb8a8; border-color: #4fb8a8; }
 .odp-para.para-4 { border-color: #c39bd3; }
 .odp-para.para-4 .odp-litera { background: #c39bd3; border-color: #c39bd3; }
 .odp-para.para-5 { border-color: #f4ecd8; }
@@ -1683,34 +1887,7 @@ html:has(.kolumna) {
 .moj-wyscig-szklanka {
   position: relative;
   width: 112px;
-  display: grid;
   filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.35));
-}
-
-.moj-wyscig-szklanka img {
-  grid-area: 1 / 1;
-  width: 100%;
-  height: auto;
-}
-
-.moj-wyscig-pusta {
-  filter: grayscale(1) brightness(1.3) contrast(0.7);
-  opacity: 0.2;
-}
-
-.moj-wyscig-pelna {
-  transition: clip-path 2.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.moj-wyscig-piana {
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  height: 7%;
-  translate: 0 -70%;
-  border-radius: 40% / 30%;
-  background: linear-gradient(180deg, #fffaf0 0%, #f4ecd8 60%, rgba(227, 172, 63, 0) 100%);
-  transition: top 2.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .moj-wyscig-opis {
@@ -1724,18 +1901,195 @@ html:has(.kolumna) {
   color: var(--zloto);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .moj-wyscig-pelna,
-  .moj-wyscig-piana {
-    transition: none;
+/* Szklanka nalewana piwem (components/szklanka-piwa.tsx), wspólna dla TV i telefonu. Bez clip-path:
+   warstwy to bloki przycięte overflow, z grafiką szklanki przyklejoną do dołu (szerokość 100%). */
+.szklanka-piwa {
+  --ruch-nalewania: var(--nalewanie, 3s) cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 382 / 713;
+  /* bąbelki liczą drogę w górę od szerokości szklanki */
+  container-type: inline-size;
+}
+
+.szklanka-warstwa {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("/grafiki/szklanka.webp") center bottom / 100% auto no-repeat;
+  transition: height var(--ruch-nalewania);
+}
+
+/* pusta szklanka: blady, szklany zarys tej samej grafiki; górę ścianek wygasza maska, a tylną połowę
+   brzegu (elipsa .szklanka-brzeg) dopełnia ta sama mgiełka, żeby szkło sięgało do samej góry elipsy */
+.szklanka-pusta {
+  filter: grayscale(1) brightness(1.3) contrast(0.7);
+  opacity: 0.16;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.5%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 2.5%);
+  transition: none;
+}
+
+/* brzeg szkła lekko z góry: cienka jasna elipsa, z przodu odrobinę mocniejsza */
+.szklanka-brzeg {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 250, 235, 0.22);
+  border-bottom-color: rgba(255, 250, 235, 0.38);
+  /* mgiełka szkła w tylnej połowie elipsy, w środku przechodzi w ściankę z grafiki */
+  background: linear-gradient(
+    to bottom,
+    rgba(225, 220, 205, 0.1) 0%,
+    rgba(225, 220, 205, 0.08) 50%,
+    rgba(225, 220, 205, 0) 64%
+  );
+  box-shadow:
+    0 0 6px rgba(255, 240, 200, 0.12),
+    inset 0 0 6px rgba(255, 240, 200, 0.08);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* piana na powierzchni piwa: elipsa od ścianki do ścianki, pod nią warstwa piany nad piwem */
+.szklanka-piana {
+  position: absolute;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f3e6c8 0%, #ecdab3 50%, #ddc088 84%, rgba(214, 160, 60, 0.95) 100%);
+  box-shadow:
+    inset 0 -4px 8px rgba(150, 98, 24, 0.35),
+    inset 6px 0 8px rgba(150, 98, 24, 0.18),
+    inset -6px 0 8px rgba(150, 98, 24, 0.18);
+  pointer-events: none;
+  transition:
+    top var(--ruch-nalewania),
+    left var(--ruch-nalewania),
+    right var(--ruch-nalewania),
+    height var(--ruch-nalewania),
+    border-radius var(--ruch-nalewania),
+    opacity 0.6s ease;
+}
+
+/* wierzch piany: jaśniejsza elipsa z drobnymi pęcherzykami, przy brzegu lekki cień od szkła */
+.szklanka-piana-wierzch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 22% 45%, rgba(255, 255, 255, 0.95) 0 2.5%, transparent 3.5%),
+    radial-gradient(circle at 41% 62%, rgba(255, 255, 255, 0.8) 0 2%, transparent 3%),
+    radial-gradient(circle at 63% 38%, rgba(255, 255, 255, 0.9) 0 2.5%, transparent 3.5%),
+    radial-gradient(circle at 80% 58%, rgba(255, 255, 255, 0.75) 0 2%, transparent 3%),
+    radial-gradient(ellipse at 50% 55%, #fffdf6 0%, #fbf2de 55%, #ecdcb8 100%);
+  box-shadow:
+    inset 0 3px 5px rgba(255, 255, 255, 0.85),
+    inset 0 -3px 6px rgba(170, 125, 50, 0.4);
+  transition: height var(--ruch-nalewania);
+}
+
+/* bąbelki wznoszą się od dna do powierzchni, lekko kołysząc się na boki */
+.szklanka-babelki {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: top var(--ruch-nalewania);
+}
+
+.szklanka-babelki span {
+  position: absolute;
+  bottom: 2%;
+  width: var(--r);
+  height: var(--r);
+  margin-left: calc(var(--r) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(255, 244, 210, 0.45) 55%, transparent 72%);
+  box-shadow: 0 0 3px rgba(255, 250, 230, 0.5);
+  opacity: 0;
+  animation: babel-w-piwie var(--t) linear var(--d) infinite;
+}
+
+@keyframes babel-w-piwie {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(var(--w), -82cqw) scale(0.85);
+  }
+  92% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(0, -165cqw) scale(1);
+    opacity: 0;
   }
 }
 
-/* Przeróbka selfie w stylu Bractwa (poczekalnia na telefonie) */
-.przerobka-awatara {
+@media (prefers-reduced-motion: reduce) {
+  .szklanka-warstwa,
+  .szklanka-piana,
+  .szklanka-piana-wierzch,
+  .szklanka-babelki {
+    transition: none;
+  }
+
+  .szklanka-babelki span {
+    animation: none;
+  }
+}
+
+/* Wybór zdjęcia przed dołączeniem: zwykłe albo w stylu Bractwa */
+.styl-awatara {
   display: grid;
   gap: 6px;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
+}
+
+.styl-awatara-opcje {
+  display: flex;
+  gap: 12px;
+}
+
+.styl-awatara-opcja {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  cursor: pointer;
+}
+
+.styl-awatara-opcja img,
+.styl-awatara-puste {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.styl-awatara-puste {
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  background: var(--kamien2);
+}
+
+.styl-awatara-opcja.wybrana {
+  border-color: var(--zloto);
+  color: var(--zloto);
 }
 
 .etap-uwaga {
@@ -1749,4 +2103,43 @@ html:has(.kolumna) {
 
 .etap-uwaga strong {
   color: var(--zloto);
+}
+
+/* Seria prawda / fałsz: dwa okrągłe przyciski nisko na ekranie, pod kciuki */
+.odp-pf.okragle {
+  margin-top: 28px;
+  gap: 18px;
+  justify-items: center;
+}
+
+.odp-pf.okragle .odp-pf-przycisk {
+  width: min(42vw, 170px);
+  min-height: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border-width: 4px;
+  font-size: var(--fs-body);
+  gap: 2px;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.odp-pf.okragle .odp-pf-przycisk span {
+  font-size: 64px;
+  color: #fff !important;
+}
+
+.odp-pf.okragle .prawda {
+  background: radial-gradient(circle at 35% 30%, #a9d35a, #5e8a22 70%);
+  border-color: #c9ef7f;
+  color: #fff;
+}
+
+.odp-pf.okragle .falsz {
+  background: radial-gradient(circle at 35% 30%, #f08f78, #b23b26 70%);
+  border-color: #ffb3a1;
+  color: #fff;
+}
+
+.odp-pf.okragle .odp-pf-przycisk:not(:disabled):active {
+  transform: scale(0.92);
 }

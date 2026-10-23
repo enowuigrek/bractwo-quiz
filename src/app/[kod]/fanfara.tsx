@@ -8,6 +8,7 @@ import type { MojWynik, Nagroda, StanSesji } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { Kropki } from "@/components/werble";
 import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
 
@@ -31,7 +32,7 @@ type Props = {
 
 /**
  * Koniec quizu na telefonie. Na podium miejsce odsłania się razem ze stopniem na TV
- * (wcześniej „werble”), a pierwsza trójka dostaje medal i konfetti.
+ * (wcześniej bęben i werble), a pierwsza trójka dostaje medal i konfetti.
  */
 export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod, token, nagrody, zdjecie }: Props) {
   const miejsce = moj?.miejsce ?? null;
@@ -89,10 +90,11 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
 
   if (!odslonieto) {
     return (
-      <div className="werble">
+      <div className="odslona">
+        <Kropki />
         <p className="nadtytul">{nick}</p>
         <h1>Werble…</h1>
-        <p>Patrz na telewizor, zaraz poznasz swoje miejsce!</p>
+        <p>Zaraz poznasz swoje miejsce!</p>
       </div>
     );
   }
@@ -189,8 +191,15 @@ function KartaNagrody(props: { nagroda: Nagroda; nick: string; kod: string; toke
     return (
       <section className="karta-nagrody odebrana" aria-label="Nagroda odebrana">
         <p className="karta-nagrody-etykieta">Twoja nagroda</p>
-        <p className="karta-nagrody-nazwa">{nagroda.nagroda}</p>
-        <p className="karta-nagrody-pieczatka">Odebrana o {godzina(widocznaOdebrana)}</p>
+        <p className="karta-nagrody-nazwa">
+          {nagroda.zdjecie && <img src={nagroda.zdjecie} alt="" className="karta-nagrody-zdjecie" />}
+          {nagroda.nagroda}
+        </p>
+        {/* pieczątka jak tuszem: podwójna ramka, przetarcia z maski szumu (globals.css) */}
+        <p className="karta-nagrody-pieczatka">
+          <strong>Odebrana</strong>
+          <span>{godzina(widocznaOdebrana)}</span>
+        </p>
         <p className="karta-nagrody-dowod">
           <span>{nick}</span>
           <span>gra {kod}</span>

@@ -50,3 +50,4 @@ Etapy z planszą, mnożnikiem i finałem trójki są od 23.10 (PLAN.md). Na pó�
 - **Podgląd pytania tak, jak zobaczy je TV** prosto z edytora.
 - **Własne plansze na ekranie lokalu**, dodawane i zmieniane w panelu: grafiki, zapowiedzi wydarzeń (np. Dzień Porteru), ciekawostki piwne.
 - **„Dłuższy czas” dla wybranych pytań** (np. ×2 przy grafice albo długiej treści), jeśli jeden czas na całą grę okaże się za mało elastyczny.
+- **Dźwięk na TV:** werble po finale i fanfara przy podium (teraz jest cisza, a werble to tylko obraz).

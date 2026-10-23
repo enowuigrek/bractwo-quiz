@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
 import { napisMnoznika } from "@/lib/etapy";
 import { rozmycie, useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
+import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { OsLiczbowa } from "./szacowanie";
@@ -26,8 +27,9 @@ import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz"
 import { Plansze } from "./plansze";
 import { TloTv } from "./tlo";
 import { WyscigTv } from "./wyscig";
-import { MAX_W_WYSCIGU } from "@/lib/gra/wyscig";
+import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { PodiumTv, RankingTv } from "./ranking";
+import { LogoNaglowka } from "./logo";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
 const SZER = 1920;
@@ -46,14 +48,21 @@ function useSkala() {
 /**
  * Scena 1920×1080 przeskalowana do ekranu. Wspólna dla gry i plansz ekranu lokalu.
  * Trzyma telewizor bez wygaszacza i co 2 minuty przesuwa się o kilka pikseli (OLED).
- * `bezLogoWRogu`: plansze lokalu mają duże logo Bractwa, więc w rogu go nie dublujemy.
+ * Logo Bractwa jest w nagłówkach ekranów (logo.tsx), nie w rogu sceny, gdzie zasłaniało podpisy.
  */
-export function Scena({ children, bezLogoWRogu = false }: { children: React.ReactNode; bezLogoWRogu?: boolean }) {
+export function Scena({
+  children,
+  zgaszona = false,
+}: {
+  children: React.ReactNode;
+  /** Werble: czarny ekran bez smug tła (wideo czuwania gra dalej). */
+  zgaszona?: boolean;
+}) {
   const skala = useSkala();
   useBezWygaszacza();
   const [dx, dy] = usePrzesuniecieOled();
   return (
-    <div className="tv">
+    <div className={`tv${zgaszona ? " zgaszona" : ""}`}>
       <TloTv />
       <div
         className="scena"
@@ -64,7 +73,6 @@ export function Scena({ children, bezLogoWRogu = false }: { children: React.Reac
         }}
       >
         {children}
-        {!bezLogoWRogu && <img src="/loga/bractwo.svg" alt="" className="logo-bractwo tv-bractwo-rog" />}
       </div>
     </div>
   );
@@ -123,12 +131,14 @@ export function Tv({ kod, qr, host }: Props) {
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
 
   return (
-    // na planszy etapu logo w rogu zasłaniało podpis pod telefonem z animacją
-    <Scena bezLogoWRogu={zapowiedz || stan?.faza === "etap"}>
+    <Scena zgaszona={stan?.faza === "werble"}>
       {!stan ? (
         <div className="tv-srodek">
           <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
         </div>
+      ) : stan.faza === "werble" ? (
+        // po finale ekran gaśnie (bez łagodnego wejścia fazy), podium pokazuje prowadzący
+        <Werble duzy />
       ) : (
         // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
         <div key={kluczEkranu(stan)} className="tv-ekran">
@@ -155,8 +165,8 @@ export function Tv({ kod, qr, host }: Props) {
           ) : stan.faza === "odpowiedzi" ? (
             <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
           ) : stan.faza === "ranking" ? (
-            // wyścig, gdy wybrał go prowadzący i gracze mieszczą się na torach; inaczej tabela
-            stan.widok_rankingu === "wyscig" && ranking.length > 0 && ranking.length <= MAX_W_WYSCIGU ? (
+            // quiz z etapami: wyścig po piwo (gdy gracze mieszczą się na torach); bez etapów tabela
+            rankingJakoWyscig(stan.quiz?.liczba_etapow ?? 0, ranking.length) ? (
               <WyscigTv stan={stan} ranking={ranking} />
             ) : (
               <RankingTv stan={stan} ranking={ranking} />
@@ -227,6 +237,7 @@ function Poczekalnia({
           {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
           {stan.browar && <p className="tv-lokal">Kranoprzejęcie: {stan.browar.nazwa}</p>}
         </div>
+        <LogoNaglowka />
       </header>
 
       <div className="poczekalnia-tresc">
@@ -308,6 +319,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const etap = stan.etap;
   const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
   const opisEtapu = etap ? ` · ${etap.nazwa}${etap.mnoznik !== 1 ? ` ${napisMnoznika(etap.mnoznik)}` : ""}` : "";
+  const zEtapami = (stan.quiz?.liczba_etapow ?? 0) > 0;
 
   if (faza === "przygotuj") {
     return (
@@ -319,7 +331,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         </p>
         <p className="tv-odliczanie">{Math.max(1, Math.ceil(doStartu / 1000))}</p>
         <p className="tv-duzy">Przygotuj się!</p>
-        <p className="tv-odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</p>
+        {/* w quizie z etapami rodzaj pytania tłumaczy plansza etapu */}
+        {!zEtapami && <p className="tv-odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
       </div>
     );
   }
@@ -343,10 +356,12 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         ) : czasMinal ? (
           <p className="tv-zegar tv-zegar-koniec">{z.czas_s ? "Czas minął!" : "Wszyscy odpowiedzieli!"}</p>
         ) : bezLimitu ? (
-          <p className="tv-zegar tv-zegar-koniec">Bez limitu</p>
+          // bez limitu czasu zegara nie ma: napis „bez limitu” tylko mylił
+          <p className="tv-zegar" />
         ) : (
           <p className={`tv-zegar${doKonca <= 5000 ? " malo" : ""}`}>{Math.ceil(doKonca / 1000)}</p>
         )}
+        <LogoNaglowka />
       </header>
       {z.czas_s ? (
         <div className="tv-czas" aria-hidden>
@@ -355,7 +370,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       ) : null}
 
       <h1 className="tv-tresc">{z.tresc}</h1>
-      {z.typ !== "wybor" && !wynik && <p className="tv-typ-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
+      {z.typ !== "wybor" && !wynik && !zEtapami && <p className="tv-typ-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
       {z.podpowiedzi.length > 0 && (
         <ol className="tv-podpowiedzi">
           {z.podpowiedzi.map((p, i) => (
@@ -499,13 +514,10 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
   const bylaGra = stan.zadanie !== null && ranking.length > 0;
   return (
     <div className="tv-koniec">
+      {/* nad podium tylko loga: tytuł quizu jest na dole, żeby nie wisiał nad zwycięzcą */}
       <header className="tv-naglowek">
         <Loga lokal={stan.lokal} browar={stan.browar} />
-        <div className="tv-tytul">
-          {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
-          <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
-          {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
-        </div>
+        <LogoNaglowka />
       </header>
       {bylaGra ? (
         <PodiumTv
@@ -520,6 +532,9 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
           <p className="tv-duzy">Koniec gry</p>
         </div>
       )}
+      <p className="tv-koniec-tytul">
+        {[stan.okazja, stan.quiz?.tytul ?? "Quiz", stan.lokal?.nazwa].filter(Boolean).join(" · ")}
+      </p>
       {koniec && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
     </div>
   );

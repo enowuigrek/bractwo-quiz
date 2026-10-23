@@ -1,14 +1,14 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- grafiki z /public/grafiki skalowane CSS-em na scenie 1920×1080 */
 
 import { Fragment } from "react";
 import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { naTrasie } from "@/lib/gra/wyscig";
-import { DNO, POD_PIANA, poziom } from "@/lib/gra/szklanka";
+import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { Licznik } from "./ranking";
+import { LogoNaglowka } from "./logo";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
 const START_S = 0.8;
@@ -52,6 +52,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
           {etap ? `${etap.nazwa} · ` : ""}po pytaniu {lp}/{n}
         </p>
       )}
+      <LogoNaglowka />
     </header>
   );
 
@@ -165,25 +166,7 @@ function FinalWyscigu({ wiersze, lp, n }: { wiersze: WierszRankingu[]; lp: numbe
   );
 }
 
-/**
- * Szklanka na mecie: pusta to blady zarys grafiki, a pełna nalewa się od dołu (przycięcie od góry),
- * z pasem piany na powierzchni piwa. Poziomy w grafice: src/lib/gra/szklanka.ts.
- */
-/** Szklanka zwęża się ku dołowi: odstęp piany od boków obrazka na danym poziomie. */
-const bok = (y: number) => 6 + Math.max(0, y - 35) * 0.18;
-
-/**
- * Bąbelki w piwie: stałe położenia i tempo (bez losowania, żeby nie skakały przy odświeżeniu),
- * `x` w procentach szerokości szklanki, `r` średnica w px, `t` czas wznoszenia, `d` opóźnienie startu.
- */
-const BABELKI = Array.from({ length: 26 }, (_, i) => ({
-  x: 24 + ((i * 37) % 52),
-  r: 3 + ((i * 5) % 4),
-  t: 2.6 + ((i * 7) % 10) * 0.28,
-  d: -((i * 1.3) % 4.2),
-  w: ((i % 3) - 1) * 6,
-}));
-
+/** Szklanka na mecie: nalewa się z każdym pytaniem (components/szklanka-piwa.tsx), pod nią nagroda i ile zostało. */
 export function Szklanka({
   przed,
   teraz,
@@ -196,58 +179,10 @@ export function Szklanka({
   /** Nazwa nagrody za 1. miejsce: o nią toczy się wyścig. */
   nagroda?: string | null;
 }) {
-  const nalewanie = { delay: START_S, duration: RUCH_S + 0.6, ease: [0.22, 1, 0.36, 1] as const };
-  // pas piany tylko w trakcie: pusta szklanka nie ma piany, a pełna ma swoją z grafiki
-  const piana = (cz: number) => ({
-    top: `${poziom(cz)}%`,
-    left: `${bok(poziom(cz))}%`,
-    right: `${bok(poziom(cz))}%`,
-    // piana rośnie razem z piwem: cienka warstwa na dnie, gruba czapa pod koniec
-    height: `${1.5 + 5 * cz}%`,
-    opacity: cz > 0 && cz < 1 ? 1 : 0,
-  });
-  const babelkiOd = (cz: number) => (cz >= 1 ? POD_PIANA : Math.min(DNO, poziom(cz) + 2));
   return (
     <div className="wyscig-szklanka" aria-hidden>
       <div className="wyscig-szklo">
-        {/* pusta szklanka bez piany z grafiki: piana tworzy się dopiero na nalewanym piwie */}
-        <img
-          src="/grafiki/szklanka.webp"
-          alt=""
-          className="wyscig-szklanka-pusta"
-          style={{ clipPath: `inset(${POD_PIANA - 3}% 0 0 0)` }}
-        />
-        <motion.img
-          src="/grafiki/szklanka.webp"
-          alt=""
-          className="wyscig-szklanka-pelna"
-          initial={{ clipPath: `inset(${poziom(przed)}% 0 0 0)` }}
-          animate={{ clipPath: `inset(${poziom(teraz)}% 0 0 0)` }}
-          transition={nalewanie}
-        />
-        {/* bąbelki unoszą się od dna, widać je tylko w nalanym piwie (pod pianą) */}
-        <motion.div
-          className="wyscig-babelki"
-          initial={{ clipPath: `inset(${babelkiOd(przed)}% 0 ${100 - DNO}% 0)` }}
-          animate={{ clipPath: `inset(${babelkiOd(teraz)}% 0 ${100 - DNO}% 0)` }}
-          transition={nalewanie}
-        >
-          {BABELKI.map((b, i) => (
-            <span
-              key={i}
-              style={
-                {
-                  left: `${b.x}%`,
-                  "--r": `${b.r}px`,
-                  "--t": `${b.t}s`,
-                  "--d": `${b.d}s`,
-                  "--w": `${b.w}px`,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </motion.div>
-        <motion.div className="wyscig-piana" initial={piana(przed)} animate={piana(teraz)} transition={nalewanie} />
+        <SzklankaPiwa przed={przed} teraz={teraz} opoznienie={START_S} trwanie={RUCH_S + 0.6} babelki />
       </div>
       {nagroda && (
         <p className="wyscig-szklanka-nagroda">

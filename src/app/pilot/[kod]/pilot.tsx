@@ -15,7 +15,6 @@ import {
 } from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { MAX_W_WYSCIGU } from "@/lib/gra/wyscig";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
@@ -27,6 +26,7 @@ const NAZWY: Record<FazaWidoczna, string> = {
   poczekalnia: "Poczekalnia",
   etap: "Plansza etapu",
   seria: "Seria trwa",
+  werble: "Werble przed podium",
   przygotuj: "Odliczanie",
   pytanie: "Pytanie trwa",
   wynik: "Wynik",
@@ -131,19 +131,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     );
   }
 
-  async function ustawWidok(widok: PilotStan["widok_rankingu"]) {
-    if (wysylam || !token || stan?.widok_rankingu === widok) return;
-    ustawWysylam(true);
-    ustawBladAkcji(null);
-    const { data, error } = await supabase().rpc("pilot_widok", { p_kod: kod, p_host_token: token, p_widok: widok });
-    ustawWysylam(false);
-    if (error) {
-      ustawBladAkcji(komunikatBledu(error));
-      return;
-    }
-    ustawStan(data as PilotStan);
-  }
-
   async function akcja(a: AkcjaPilota, pytanie?: string, opcje?: OpcjePotwierdzenia) {
     if (wysylam || !token) return;
     if (pytanie && !(await potwierdz(pytanie, opcje))) return;
@@ -217,8 +204,13 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </p>
           {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
           <p className="pomocniczy" style={{ margin: 0 }}>
-            Punkty {napisMnoznika(etap.mnoznik)} · {etap.czas_s ? `${etap.czas_s} s na odpowiedź` : "bez limitu czasu"}{" "}
-            · {etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", ")}
+            {[
+              `Punkty ${napisMnoznika(etap.mnoznik)}`,
+              etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
+              etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", "),
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
           {stan.finalisci && (
             <p style={{ margin: "10px 0 0" }}>
@@ -260,6 +252,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         faza !== "poczekalnia" &&
         faza !== "etap" &&
         faza !== "seria" &&
+        faza !== "werble" &&
         faza !== "koniec" &&
         faza !== "podium" &&
         faza !== "tabela" && (
@@ -280,8 +273,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
               )}
               {faza === "pytanie" && (
                 <span className="gra-kod">
+                  {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
                   {bezLimitu
-                    ? "bez limitu"
+                    ? ""
                     : doKonca > 0
                       ? `${Math.ceil(doKonca / 1000)} s`
                       : wszyscy
@@ -371,34 +365,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </span>
           )}
         </p>
-      )}
-
-      {/* ranking po pytaniu: tabela albo wyścig; wyścig tylko, gdy gracze mieszczą się na torach */}
-      {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
-        <div className="pilot-widok" role="group" aria-label="Ranking po pytaniu na TV">
-          <span className="pomocniczy">Ranking na TV:</span>
-          <button
-            type="button"
-            className={`pilot-widok-opcja${stan.widok_rankingu === "tabela" ? " wybrana" : ""}`}
-            aria-pressed={stan.widok_rankingu === "tabela"}
-            disabled={wysylam}
-            onClick={() => void ustawWidok("tabela")}
-          >
-            Tabela
-          </button>
-          <button
-            type="button"
-            className={`pilot-widok-opcja${stan.widok_rankingu === "wyscig" ? " wybrana" : ""}`}
-            aria-pressed={stan.widok_rankingu === "wyscig"}
-            disabled={wysylam || stan.liczba_graczy > MAX_W_WYSCIGU}
-            onClick={() => void ustawWidok("wyscig")}
-          >
-            Wyścig
-          </button>
-          {stan.liczba_graczy > MAX_W_WYSCIGU && (
-            <span className="pomocniczy">Wyścig mieści {MAX_W_WYSCIGU} graczy, więc zostaje tabela.</span>
-          )}
-        </div>
       )}
 
       <section style={{ marginTop: "var(--section-gap)", display: "grid", gap: 12 }}>
@@ -543,6 +509,18 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
             Pokaż pełną tabelę
           </button>
+        )}
+
+        {/* po finale serią TV i telefony czekają w ciemności, aż prowadzący odsłoni podium */}
+        {faza === "werble" && (
+          <>
+            <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
+              Finał skończony. TV i telefony zgasły i grają werble. Zbuduj napięcie i odsłoń wynik.
+            </p>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
+              Pokaż podium
+            </button>
+          </>
         )}
 
         {faza === "podium" && (

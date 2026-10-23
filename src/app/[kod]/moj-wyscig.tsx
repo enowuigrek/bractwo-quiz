@@ -1,9 +1,6 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- grafika szklanki z /public/grafiki */
 
-import { useEffect, useState } from "react";
-
-import { POD_PIANA, poziom } from "@/lib/gra/szklanka";
+import { SzklankaPiwa } from "@/components/szklanka-piwa";
 
 function pytan(n: number): string {
   if (n === 1) return "pytanie";
@@ -17,30 +14,11 @@ function pytan(n: number): string {
  * się po pytaniu tak jak na TV. Najpierw stan sprzed pytania, po chwili piwo rośnie z pianą na wierzchu.
  */
 export function MojWyscig({ lp, n }: { lp: number; n: number }) {
-  const [nalewa, ustawNalewa] = useState(false);
-  useEffect(() => {
-    const zegar = setTimeout(() => ustawNalewa(true), 500);
-    return () => clearTimeout(zegar);
-  }, []);
-  const cz = n ? Math.min(1, (nalewa ? lp : lp - 1) / n) : 0;
   const zostalo = Math.max(0, n - lp);
-
   return (
     <section className="moj-wyscig" aria-label="Wyścig po piwo">
-      <div className="moj-wyscig-szklanka" aria-hidden>
-        <img
-          src="/grafiki/szklanka.webp"
-          alt=""
-          className="moj-wyscig-pusta"
-          style={{ clipPath: `inset(${POD_PIANA - 3}% 0 0 0)` }}
-        />
-        <img
-          src="/grafiki/szklanka.webp"
-          alt=""
-          className="moj-wyscig-pelna"
-          style={{ clipPath: `inset(${poziom(cz)}% 0 0 0)` }}
-        />
-        {cz > 0 && cz < 1 && <span className="moj-wyscig-piana" style={{ top: `${poziom(cz)}%` }} />}
+      <div className="moj-wyscig-szklanka">
+        <SzklankaPiwa przed={n ? Math.min(1, (lp - 1) / n) : 0} teraz={n ? Math.min(1, lp / n) : 0} opoznienie={0.5} />
       </div>
       <p className="moj-wyscig-opis">
         {zostalo ? (

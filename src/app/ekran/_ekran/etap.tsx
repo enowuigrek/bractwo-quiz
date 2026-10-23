@@ -6,6 +6,7 @@ import { Awatar } from "@/components/awatar";
 import { napisMnoznika } from "@/lib/etapy";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
+import { LogoNaglowka } from "./logo";
 
 /**
  * Plansza etapu na TV (faza `etap`): który to etap, nazwa i zasady, mnożnik i czas, a obok telefon,
@@ -34,6 +35,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               </li>
             ))}
           </ol>
+          <LogoNaglowka />
         </header>
 
         <div className="tv-etap-tresc">
@@ -55,23 +57,17 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                   ? `${e.czas_s ?? 60} s na całą serię`
                   : e.czas_s
                     ? `${e.czas_s} s na odpowiedź`
-                    : "Bez limitu czasu"}
+                    : "Kto pierwszy, ten lepszy"}
               </li>
-              {e.seria && <li className="zloty">Seria: każdy we własnym tempie</li>}
+              {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
               <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>
             </motion.ul>
-            {/* zapowiedź finału: w etapie przed nim gracze walczą o miejsce w trójce */}
-            {e.final_po_etapie ? (
+            {/* o odpadaniu mówimy tylko w etapie tuż przed finałem: tu gracze walczą o miejsce w trójce */}
+            {e.final_po_etapie && (
               <motion.p className="tv-etap-walka" {...wejscie(4)}>
                 🏆 Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału
                 {stan.liczba_graczy > 3 ? `, ${stan.liczba_graczy - 3} odpada i kibicuje` : ""}.
               </motion.p>
-            ) : (
-              e.final_dalej && (
-                <motion.p className="tv-etap-zapowiedz" {...wejscie(4)}>
-                  Na końcu quizu finał: grają w nim tylko 3 najlepsi.
-                </motion.p>
-              )
             )}
             {stan.finalisci && (
               <motion.div className="tv-etap-final" {...wejscie(4)}>

@@ -9,9 +9,9 @@ export const LIMITY = {
   maxPodpowiedzi: 4,
   minCzas: 5,
   maxCzas: 300,
-  /** Do wyboru przy uruchamianiu gry; `null` = bez limitu. */
-  czasyGry: [10, 20, 30, 45, null] as (number | null)[],
-  domyslnyCzas: 20,
+  /** Do wyboru przy uruchamianiu gry; `null` = bez limitu (domyślnie: etapy i tak mają własny czas). */
+  czasyGry: [null, 10, 20, 30, 45] as (number | null)[],
+  domyslnyCzas: null as number | null,
   nagroda: 80,
   instrukcja: 160,
 } as const;

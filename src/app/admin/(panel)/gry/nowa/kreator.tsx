@@ -32,7 +32,7 @@ export function Kreator({ lokale, quizy }: Props) {
   const lokaleWMiescie = lokale.filter((p) => p.miasto === miasto);
   const [lokal, setLokal] = useState(lokaleWMiescie.length === 1 ? lokaleWMiescie[0].id : "");
   const [quiz, setQuiz] = useState("");
-  const [czas, setCzas] = useState<string>(String(LIMITY.domyslnyCzas));
+  const [czas, setCzas] = useState<string>(LIMITY.domyslnyCzas === null ? "bez" : String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
   const [ileNagrod, setIleNagrod] = useState(0);
   // start: osobno data i godzina (czas lokalny przeglądarki); bez daty to dziś. Do serwera idzie ISO.
@@ -115,16 +115,6 @@ export function Kreator({ lokale, quizy }: Props) {
           </div>
 
           <fieldset>
-            <legend>Tryb</legend>
-            <label className="przelacznik">
-              <input type="radio" name="tryb" value="solo" defaultChecked /> każdy gra sam
-            </label>
-            <label className="przelacznik">
-              <input type="radio" name="tryb" value="druzyny" /> drużyny (jeden telefon na drużynę)
-            </label>
-          </fieldset>
-
-          <fieldset>
             <legend>Czas na odpowiedź (każde pytanie)</legend>
             <div className="wybor-czasu">
               {LIMITY.czasyGry.map((c) => {
@@ -143,23 +133,13 @@ export function Kreator({ lokale, quizy }: Props) {
                 );
               })}
             </div>
-            {bezLimitu && (
-              <p className="podpowiedz">
-                Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik.
-              </p>
-            )}
-          </fieldset>
-
-          <div>
-            <label className="przelacznik">
-              <input type="checkbox" name="bonus_czas" defaultChecked disabled={bezLimitu} /> bonus za szybkość
-            </label>
+            {/* bonus za szybkość jest zawsze; limit tylko odlicza czas, po którym nie da się już odpowiedzieć */}
             <p className="podpowiedz">
               {bezLimitu
-                ? "Bez limitu czasu nie ma bonusu: poprawna odpowiedź zawsze daje 1000 pkt."
-                : "Z bonusem poprawna odpowiedź daje 500–1000 pkt zależnie od czasu, bez niego zawsze 1000."}
+                ? "Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik. Kto pierwszy, ten lepszy: pierwsza dobra odpowiedź daje 1000 pkt, kolejne mniej, ostatnia 500."
+                : "Czas się odlicza i kto nie zdąży, nie odpowie. Dobra odpowiedź daje 500–1000 pkt: im szybciej, tym więcej."}
             </p>
-          </div>
+          </fieldset>
 
           <fieldset>
             <legend>Nagrody</legend>

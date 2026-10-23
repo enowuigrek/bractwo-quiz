@@ -9,7 +9,7 @@ export const LIMITY_ETAPU = { nazwa: 60, opis: 240 } as const;
 export const MNOZNIKI = [1, 1.5, 2, 3] as const;
 
 /** Czasy etapu do wyboru; null = jak w ustawieniach gry. */
-export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45, 60, 90];
+export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45, 60, 90, 120];
 
 /** „×1,5” */
 export function napisMnoznika(m: number): string {
