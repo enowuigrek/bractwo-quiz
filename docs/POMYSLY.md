@@ -27,7 +27,7 @@ Etapy z planszą, mnożnikiem i finałem trójki są od 23.10 (PLAN.md). Na pó�
 
 ## Animacje i ekran TV
 
-- **Selfie finalistów i podium przerobione przez AI** (jak zdjęcia nagród, od 23.10): tylko 3 zdjęcia na grę, za zgodą gracza, pokazywane w finale i na podium.
+- **Przeróbka selfie bez czekania:** teraz gracz czeka ok. 20 s w poczekalni; można by przerabiać w tle po dołączeniu albo dać kilka stylów do wyboru.
 
 - **Więcej wyglądów wyścigu** (teraz jest „Wyścig po piwo” ze szklanką na mecie): np. beczki toczące się po ladzie, kufle przesuwane po barze. Wybór w ustawieniach rozgrywki, a przy dużej liczbie graczy tylko tabela.
 

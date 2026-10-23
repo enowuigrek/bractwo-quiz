@@ -20,7 +20,7 @@ Zasady:
 - Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime.
 - Next nie uruchomi drugiego `next dev` w tym samym katalogu. Gdy jakiś już działa, podgląd otwieraj konfiguracją `dev-dzialajacy` z `.claude/launch.json`.
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.
-- OpenAI (`OPENAI_API_KEY`) przerabia zdjęcia nagród w `/api/nagroda`: tylko dla zalogowanego panelu i z dziennym limitem, bo każde wywołanie kosztuje. Nie wołaj API OpenAI z telefonów graczy ani bez limitu.
+- OpenAI (`OPENAI_API_KEY`) przerabia zdjęcia nagród (`/api/nagroda`: tylko zalogowany panel, limit 40 dziennie) i selfie graczy (`/api/awatar`: na prośbę gracza, raz na zdjęcie, limit 40 na grę, niska jakość). Każde wywołanie kosztuje, więc nowe użycia API OpenAI zawsze z limitem i nigdy bez wyraźnej prośby użytkownika w aplikacji.
 - `/api/keepalive` (Vercel Cron raz dziennie) trzyma bazę obudzoną i łączy się z Realtime, żeby istniały partycje `realtime.messages`. Nie usuwaj części z Realtime. Lista przed eventem i scenariusz testu są w `docs/TEST.md`.
 - Domena `bractwopiwne.pl` jest w Hostido, a poczta w Google Workspace. Rekordów MX nie ruszamy.
 - Aplikacja działa pod `https://quiz.bractwopiwne.pl`: rekord A `quiz` → `76.76.21.21` w strefie DNS na hostingu Hostido (DirectAdmin konta host367070 → Zarządzanie DNS, nie w panelu domeny), certyfikat wystawia i odnawia Vercel. Nigdzie nie wpisuj domeny na sztywno: linki i kody QR buduj z adresu bieżącego żądania (albo `NEXT_PUBLIC_SITE_URL`), żeby zmiana domeny nie wymagała zmian w kodzie.

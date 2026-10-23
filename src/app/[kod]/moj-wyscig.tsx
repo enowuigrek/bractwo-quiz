@@ -2,9 +2,6 @@
 /* eslint-disable @next/next/no-img-element -- grafika szklanki z /public/grafiki */
 
 import { useEffect, useState } from "react";
-import { Awatar } from "@/components/awatar";
-import { naTrasie } from "@/lib/gra/wyscig";
-import type { WierszRankingu } from "@/lib/gra/typy";
 
 /** Poziom piwa w grafice szklanki (procent wysokości od góry): jak `GORA` i `DNO` w ekran/_ekran/wyscig.tsx. */
 const GORA = 1;
@@ -12,42 +9,28 @@ const DNO = 92;
 const POD_PIANA = 24;
 const poziom = (cz: number) => DNO - (DNO - GORA) * cz;
 
+function pytan(n: number): string {
+  if (n === 1) return "pytanie";
+  const r10 = n % 10;
+  const r100 = n % 100;
+  return r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "pytania" : "pytań";
+}
+
 /**
- * Wyścig po piwo na telefonie (w rankingu, gdy TV pokazuje wyścig): własny tor z awatarem i mała szklanka.
- * Najpierw stan sprzed pytania, po chwili awatar jedzie i piwo dolewa się, tak samo jak na TV.
+ * Wyścig po piwo na telefonie (ranking, gdy TV pokazuje wyścig): duża szklanka na środku, która dolewa
+ * się po pytaniu tak jak na TV. Najpierw stan sprzed pytania, po chwili piwo rośnie z pianą na wierzchu.
  */
-export function MojWyscig({
-  ja,
-  ranking,
-  lp,
-  n,
-}: {
-  ja: WierszRankingu;
-  ranking: WierszRankingu[];
-  lp: number;
-  n: number;
-}) {
-  const [ruszyl, ustawRuszyl] = useState(false);
+export function MojWyscig({ lp, n }: { lp: number; n: number }) {
+  const [nalewa, ustawNalewa] = useState(false);
   useEffect(() => {
-    const zegar = setTimeout(() => ustawRuszyl(true), 500);
+    const zegar = setTimeout(() => ustawNalewa(true), 500);
     return () => clearTimeout(zegar);
   }, []);
-
-  const lider = Math.max(0, ...ranking.map((w) => w.punkty));
-  const liderPrzed = Math.max(0, ...ranking.map((w) => w.punkty - w.zdobyte));
-  const gdzie = ruszyl ? naTrasie(ja.punkty, lider, lp, n) : naTrasie(ja.punkty - ja.zdobyte, liderPrzed, lp - 1, n);
-  const nalane = n ? (ruszyl ? lp : lp - 1) / n : 0;
+  const cz = n ? Math.min(1, (nalewa ? lp : lp - 1) / n) : 0;
+  const zostalo = Math.max(0, n - lp);
 
   return (
-    <section className="moj-wyscig" aria-label="Twój wyścig po piwo">
-      <div className="moj-wyscig-tor">
-        <div className="moj-wyscig-trasa">
-          <span className="moj-wyscig-slad" style={{ width: `${gdzie * 100}%` }} />
-          <span className="moj-wyscig-jezdziec" style={{ left: `${gdzie * 100}%` }}>
-            <Awatar nick={ja.nick} zdjecie={ja.zdjecie} rozmiar={44} />
-          </span>
-        </div>
-      </div>
+    <section className="moj-wyscig" aria-label="Wyścig po piwo">
       <div className="moj-wyscig-szklanka" aria-hidden>
         <img
           src="/grafiki/szklanka.webp"
@@ -59,11 +42,18 @@ export function MojWyscig({
           src="/grafiki/szklanka.webp"
           alt=""
           className="moj-wyscig-pelna"
-          style={{ clipPath: `inset(${poziom(nalane)}% 0 0 0)` }}
+          style={{ clipPath: `inset(${poziom(cz)}% 0 0 0)` }}
         />
+        {cz > 0 && cz < 1 && <span className="moj-wyscig-piana" style={{ top: `${poziom(cz)}%` }} />}
       </div>
       <p className="moj-wyscig-opis">
-        {lp >= n ? "Szklanka pełna, koniec wyścigu!" : `Piwo nalane w ${Math.round((lp / Math.max(1, n)) * 100)}%`}
+        {zostalo ? (
+          <>
+            Wyścig po piwo: jeszcze <strong>{zostalo}</strong> {pytan(zostalo)}
+          </>
+        ) : (
+          "Nalane! Koniec wyścigu."
+        )}
       </p>
     </section>
   );

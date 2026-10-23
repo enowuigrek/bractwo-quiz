@@ -1462,7 +1462,7 @@
   color: var(--zloto);
 }
 
-/* Ruchome tło (tlo.tsx): ciepłe plamy światła i złote bąbelki. Pod sceną, na całym ekranie TV. */
+/* Ruchome tło (tlo.tsx): ciepłe plamy światła i smugi światła z góry. Pod sceną, na całym ekranie TV. */
 .tv-tlo {
   position: absolute;
   inset: 0;
@@ -1517,49 +1517,68 @@
   }
 }
 
-.tv-babel {
+/* Smugi światła z góry: szerokie, rozmyte, kołyszą się wokół górnego końca w różnym tempie */
+.tv-smuga {
   position: absolute;
-  bottom: -40px;
-  border-radius: 50%;
-  /* bąbelek bez obręczy: jasny odblask u góry, miękko gasnący ku brzegom */
-  border: 1px solid rgba(227, 172, 63, 0.12);
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(251, 231, 161, 0.45) 0%,
-    rgba(227, 172, 63, 0.14) 35%,
-    rgba(227, 172, 63, 0.04) 70%,
+  top: -30vh;
+  width: 22vw;
+  height: 170vh;
+  transform-origin: 50% 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(227, 172, 63, 0.05) 25%,
+    rgba(255, 226, 160, 0.11) 50%,
+    rgba(227, 172, 63, 0.05) 75%,
     transparent 100%
   );
-  opacity: 0;
+  /* gaśnie ku dołowi, jakby światło rozpraszało się w sali */
+  mask-image: linear-gradient(180deg, #000 0%, #000 35%, transparent 90%);
+  filter: blur(18px);
   will-change: transform, opacity;
-  animation-name: babel;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation: smuga 48s ease-in-out infinite alternate;
 }
 
-@keyframes babel {
+.tv-smuga-1 {
+  left: 8vw;
+  rotate: -22deg;
+}
+
+.tv-smuga-2 {
+  left: 46vw;
+  width: 15vw;
+  rotate: 8deg;
+  animation-duration: 63s;
+  animation-delay: -20s;
+}
+
+.tv-smuga-3 {
+  left: 74vw;
+  width: 26vw;
+  rotate: 24deg;
+  animation-duration: 71s;
+  animation-delay: -45s;
+}
+
+@keyframes smuga {
   0% {
-    transform: translate(0, 0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
+    transform: rotate(-9deg);
+    opacity: 0.55;
   }
   50% {
-    transform: translate(var(--dryf), -55vh);
-  }
-  85% {
-    opacity: 0.6;
+    opacity: 1;
   }
   100% {
-    transform: translate(0, -115vh);
-    opacity: 0;
+    transform: rotate(9deg);
+    opacity: 0.6;
   }
 }
 
+/* ograniczony ruch: tło stoi, ale wideo czuwania (pod spodem) dalej gra */
 @media (prefers-reduced-motion: reduce) {
-  .tv-tlo {
-    display: none;
+  .tv-blask,
+  .tv-smuga {
+    animation: none;
   }
 }
 
@@ -2348,10 +2367,10 @@
   background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(255, 244, 210, 0.45) 55%, transparent 72%);
   box-shadow: 0 0 3px rgba(255, 250, 230, 0.5);
   opacity: 0;
-  animation: babel var(--t) linear var(--d) infinite;
+  animation: babel-w-piwie var(--t) linear var(--d) infinite;
 }
 
-@keyframes babel {
+@keyframes babel-w-piwie {
   0% {
     transform: translate(0, 0) scale(0.6);
     opacity: 0;

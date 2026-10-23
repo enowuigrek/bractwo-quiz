@@ -12,6 +12,7 @@ import { godzinaStartu } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { EtapGracza } from "./etap";
 import { MojWyscig } from "./moj-wyscig";
+import { PrzerobkaAwatara } from "./przerobka-awatara";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { ZdjecieGracza } from "./zdjecie-gracza";
@@ -38,8 +39,6 @@ export function Gracz({ kod }: { kod: string }) {
   const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
   const [moj, ustawMoj] = useState<MojWynik | null>(null);
   const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
-  // cały ranking: do własnego toru w wyścigu na telefonie (pozycja względem lidera)
-  const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [usuniety, ustawUsuniety] = useState(false);
   // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
@@ -81,7 +80,6 @@ export function Gracz({ kod }: { kod: string }) {
             const r = await supabase().rpc("ranking", { p_kod: kod });
             if (r.data) {
               const wiersze = r.data as WierszRankingu[];
-              ustawRanking(wiersze);
               ustawMojWiersz(wiersze.find((w) => w.nick === nowy.nick) ?? null);
             }
           }
@@ -200,7 +198,6 @@ export function Gracz({ kod }: { kod: string }) {
         gracze={gracze}
         moj={moj}
         mojWiersz={mojWiersz}
-        ranking={ranking}
         przesuniecie={przesuniecie}
         odswiez={pobierz}
       />
@@ -312,7 +309,6 @@ function WGrze({
   gracze,
   moj,
   mojWiersz,
-  ranking,
   przesuniecie,
   odswiez,
 }: {
@@ -321,7 +317,6 @@ function WGrze({
   gracze: GraczNaLiscie[];
   moj: MojWynik | null;
   mojWiersz: WierszRankingu | null;
-  ranking: WierszRankingu[];
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
@@ -365,6 +360,11 @@ function WGrze({
             await odswiez();
           }}
         />
+        <PrzerobkaAwatara
+          token={ja.token}
+          zdjecie={gracze.find((g) => g.nick === ja.nick)?.zdjecie ?? null}
+          odswiez={odswiez}
+        />
         <p>Patrz na telewizor. Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
         <section style={{ marginTop: "var(--section-gap)" }}>
           <p className="etykieta">
@@ -392,19 +392,17 @@ function WGrze({
   if (stan.faza === "ranking") {
     return (
       <>
-        <p className="nadtytul">{ja.nick}</p>
+        {/* awatar obok nicku: gracz od razu widzi, że to jego wynik */}
+        <p className="nadtytul gra-ja">
+          <Awatar nick={ja.nick} zdjecie={moj?.zdjecie ?? null} rozmiar={40} />
+          {ja.nick}
+        </p>
         <h1>Ranking</h1>
         {moj && <Miejsce moj={moj} />}
         {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
         {/* TV pokazuje wyścig: na telefonie własny tor i szklanka */}
         {mojWiersz && stan.widok_rankingu === "wyscig" && (
-          <MojWyscig
-            key={stan.zadanie?.nr ?? 0}
-            ja={mojWiersz}
-            ranking={ranking}
-            lp={stan.zadanie?.lp ?? 0}
-            n={stan.quiz?.liczba_zadan ?? 0}
-          />
+          <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />
         )}
       </>
     );

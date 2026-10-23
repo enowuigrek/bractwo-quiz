@@ -1667,71 +1667,24 @@ html:has(.kolumna) {
   margin: 0 auto 4px;
 }
 
-/* Własny wyścig po piwo w rankingu na telefonie: tor z awatarem i mała szklanka obok */
+/* Wyścig po piwo w rankingu na telefonie: awatar przy nicku, duża szklanka na środku */
+.gra-ja {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .moj-wyscig {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 64px;
-  grid-template-areas: "tor szklanka" "opis szklanka";
-  align-items: center;
-  column-gap: 12px;
-  padding: 14px;
-  border-radius: var(--r-card);
-  background: var(--kamien);
-  border: 1px solid var(--kamien2);
-}
-
-.moj-wyscig-tor {
-  grid-area: tor;
-  height: 52px;
-  border-radius: 10px;
-  background:
-    linear-gradient(180deg, rgba(255, 220, 160, 0.12), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.45)),
-    url("/grafiki/lada.webp") center / cover,
-    #2b1a0b;
-  position: relative;
-}
-
-.moj-wyscig-tor::after {
-  content: "";
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  right: 0;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--zloto);
-}
-
-.moj-wyscig-trasa {
-  position: absolute;
-  inset: 0 26px;
-}
-
-.moj-wyscig-slad {
-  position: absolute;
-  top: 30%;
-  bottom: 30%;
-  left: 0;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(227, 172, 63, 0), rgba(227, 172, 63, 0.6));
-  transition: width 2.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.moj-wyscig-jezdziec {
-  position: absolute;
-  top: 50%;
-  translate: -50% -50%;
-  transition: left 2.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.moj-wyscig-jezdziec .awatar {
-  border: 3px solid var(--zloto);
-  box-shadow: var(--glow-md);
+  justify-items: center;
+  gap: 10px;
 }
 
 .moj-wyscig-szklanka {
-  grid-area: szklanka;
+  position: relative;
+  width: 132px;
   display: grid;
+  filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.35));
 }
 
 .moj-wyscig-szklanka img {
@@ -1749,18 +1702,38 @@ html:has(.kolumna) {
   transition: clip-path 2.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.moj-wyscig-piana {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  height: 7%;
+  translate: 0 -70%;
+  border-radius: 40% / 30%;
+  background: linear-gradient(180deg, #fffaf0 0%, #f4ecd8 60%, rgba(227, 172, 63, 0) 100%);
+  transition: top 2.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .moj-wyscig-opis {
-  grid-area: opis;
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--szary);
-  font-size: var(--fs-small);
   font-weight: var(--w-semibold);
+  text-align: center;
+}
+
+.moj-wyscig-opis strong {
+  color: var(--zloto);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .moj-wyscig-slad,
-  .moj-wyscig-jezdziec,
-  .moj-wyscig-pelna {
+  .moj-wyscig-pelna,
+  .moj-wyscig-piana {
     transition: none;
   }
+}
+
+/* Przeróbka selfie w stylu Bractwa (poczekalnia na telefonie) */
+.przerobka-awatara {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
 }

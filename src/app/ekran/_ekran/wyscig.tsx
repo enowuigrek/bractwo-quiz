@@ -225,9 +225,9 @@ const POD_PIANA = 24;
  * Bąbelki w piwie: stałe położenia i tempo (bez losowania, żeby nie skakały przy odświeżeniu),
  * `x` w procentach szerokości szklanki, `r` średnica w px, `t` czas wznoszenia, `d` opóźnienie startu.
  */
-const BABELKI = Array.from({ length: 18 }, (_, i) => ({
+const BABELKI = Array.from({ length: 26 }, (_, i) => ({
   x: 24 + ((i * 37) % 52),
-  r: 6 + ((i * 5) % 9),
+  r: 3 + ((i * 5) % 4),
   t: 2.6 + ((i * 7) % 10) * 0.28,
   d: -((i * 1.3) % 4.2),
   w: ((i % 3) - 1) * 6,
