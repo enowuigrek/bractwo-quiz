@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 // Telewizor w lokalu ma świecić cały wieczór: bez wygaszacza i bez wypalania OLED.
 
 /**
- * Prosi przeglądarkę, żeby nie wygaszała ekranu (Screen Wake Lock), a na wypadek, gdy jej to nie
- * wystarcza albo jej nie zna, odtwarza niewidoczne, wyciszone wideo 2×2 px z płótna. Telewizory
- * (np. przeglądarka LG webOS) zwykle nie włączają wygaszacza, dopóki coś się odtwarza.
+ * Prosi przeglądarkę, żeby nie wygaszała ekranu (Screen Wake Lock). Telewizorom to zwykle nie
+ * wystarcza: wygaszacz wyłącza dopiero prawdziwe odtwarzanie wideo, patrz `useWideoCzuwania`.
  */
 export function useBezWygaszacza() {
   useEffect(() => {
@@ -27,42 +26,39 @@ export function useBezWygaszacza() {
     document.addEventListener("visibilitychange", poPowrocie);
     void zablokuj();
 
-    // wideo z płótna, które co sekundę zmienia kolor o jeden odcień (inaczej strumień stoi)
-    const plotno = document.createElement("canvas");
-    plotno.width = 2;
-    plotno.height = 2;
-    const ctx = plotno.getContext("2d");
-    let klatka = 0;
-    const rysuj = () => {
-      if (!ctx) return;
-      ctx.fillStyle = klatka++ % 2 ? "#000000" : "#010101";
-      ctx.fillRect(0, 0, 2, 2);
-    };
-    rysuj();
-    const zegar = setInterval(rysuj, 1000);
-
-    const wideo = document.createElement("video");
-    wideo.muted = true;
-    wideo.loop = true;
-    wideo.playsInline = true;
-    wideo.setAttribute("aria-hidden", "true");
-    wideo.style.cssText = "position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:0.01;pointer-events:none";
-    if ("captureStream" in plotno) {
-      wideo.srcObject = plotno.captureStream(1);
-      document.body.appendChild(wideo);
-      void wideo.play().catch(() => undefined);
-    }
-
     return () => {
       zamkniete = true;
       document.removeEventListener("visibilitychange", poPowrocie);
       void blokada?.release().catch(() => undefined);
-      clearInterval(zegar);
-      wideo.pause();
-      wideo.srcObject = null;
-      wideo.remove();
     };
   }, []);
+}
+
+/**
+ * Zapętlone, prawie czarne wideo (`/wideo/czuwanie.mp4`, H.264, 6 s, 3 KB) na całym ekranie pod tłem.
+ * Telewizory (np. przeglądarka LG webOS) nie włączają wygaszacza, dopóki odtwarza się prawdziwy plik
+ * wideo; strumień z płótna im nie wystarczał. Wideo jest wyciszone, więc może startować samo,
+ * a gdyby się zatrzymało (np. po powrocie karty z tła), co 20 s wznawiamy je jeszcze raz.
+ */
+export function useWideoCzuwania(): RefObject<HTMLVideoElement | null> {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const wideo = ref.current;
+    if (!wideo) return;
+    // atrybut `muted` musi być ustawiony przed play(), inaczej przeglądarka zablokuje autostart
+    wideo.muted = true;
+    const graj = () => {
+      if (wideo.paused) void wideo.play().catch(() => undefined);
+    };
+    graj();
+    const zegar = setInterval(graj, 20_000);
+    document.addEventListener("visibilitychange", graj);
+    return () => {
+      clearInterval(zegar);
+      document.removeEventListener("visibilitychange", graj);
+    };
+  }, []);
+  return ref;
 }
 
 /** Kolejne położenia sceny w pikselach sceny (ok. 3 px w każdą stronę), zmieniane co 2 minuty. */

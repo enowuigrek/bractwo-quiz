@@ -294,7 +294,8 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 
 - **Ruchome tło** wszystkich ekranów `/ekran` (`tlo.tsx`): ciepłe plamy światła jak od świec, które wolno dryfują, i złote bąbelki unoszące się jak w kuflu. Słabe, żeby nie przeszkadzało w czytaniu, na samych transformacjach CSS. Ruch na całym ekranie dodatkowo pomaga OLED-om.
 
-- Każda scena TV (`Scena` w `tv.tsx`, hooki w `src/lib/ekran-tv.ts`) prosi przeglądarkę o Screen Wake Lock (ponawia po powrocie karty z tła) i odtwarza niewidoczne, wyciszone wideo 2×2 px z płótna, które co sekundę zmienia odcień. Telewizory zwykle nie włączają wygaszacza, gdy coś się odtwarza.
+- Każda scena TV (`Scena` w `tv.tsx`, hooki w `src/lib/ekran-tv.ts`) prosi przeglądarkę o Screen Wake Lock (ponawia po powrocie karty z tła).
+- Pierwsza wersja z niewidocznym wideo 2×2 px z płótna (`captureStream`) nie wystarczyła: telewizor i tak włączył wygaszacz. Teraz pod tłem gra na całym ekranie prawdziwy plik `public/wideo/czuwanie.mp4` (H.264, 128×72, 6 s, 3 KB, prawie czarny, nagrany w przeglądarce MediaRecorderem, bo nie ma ffmpeg), wyciszony i zapętlony, wznawiany co 20 s, gdyby stanął. Do sprawdzenia na telewizorze.
 - Przeciw wypaleniu OLED cała scena przesuwa się co 2 minuty o kilka pikseli (7 położeń, do 3 px), więc logo w rogu i kropki plansz nie stoją ciągle w jednym miejscu.
 - Sprawdzone w przeglądarce Chromium: wideo gra, Wake Lock dostępny. Na prawdziwym telewizorze LG do sprawdzenia, czy wygaszacz już się nie włącza (jeśli tak: wyłączyć go w ustawieniach TV, opis w TEST.md).
 

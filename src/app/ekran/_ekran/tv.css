@@ -1562,3 +1562,12 @@
     display: none;
   }
 }
+
+/* Prawie czarne wideo na całym ekranie (tlo.tsx): odtwarzanie trzyma telewizor bez wygaszacza */
+.tv-czuwanie {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
