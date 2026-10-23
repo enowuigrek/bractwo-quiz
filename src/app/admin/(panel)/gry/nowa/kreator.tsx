@@ -136,7 +136,7 @@ export function Kreator({ lokale, quizy }: Props) {
             {/* bonus za szybkość jest zawsze; limit tylko odlicza czas, po którym nie da się już odpowiedzieć */}
             <p className="podpowiedz">
               {bezLimitu
-                ? "Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik. Kto pierwszy, ten lepszy: pierwsza dobra odpowiedź daje 1000 pkt, kolejne mniej, ostatnia 500."
+                ? "Pytanie trwa, aż odpowiedzą wszyscy albo prowadzący pokaże wynik. Kto szybciej, ten więcej: dobra odpowiedź daje 1000 pkt na starcie i coraz mniej, do 500 po 30 s (wielokrotny, pary i kolejność: po 60 s)."
                 : "Czas się odlicza i kto nie zdąży, nie odpowie. Dobra odpowiedź daje 500–1000 pkt: im szybciej, tym więcej."}
             </p>
           </fieldset>

@@ -15,7 +15,6 @@ import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { MojWyscig } from "./moj-wyscig";
 import { SeriaGracza } from "./seria";
-import { StylAwatara, type Zdjecie } from "./styl-awatara";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { ZdjecieGracza } from "./zdjecie-gracza";
@@ -225,9 +224,7 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
   const [nick, ustawNick] = useState("");
   const [blad, ustawBlad] = useState<string | null>(null);
   const [wysylam, ustawWysylam] = useState<false | "gracz" | "zdjecie">(false);
-  // wybrane zdjęcie (zwykłe albo w stylu Bractwa) i to z aparatu, do przeróbki
-  const [zdjecie, ustawZdjecie] = useState<Zdjecie | null>(null);
-  const [zwykle, ustawZwykle] = useState<(Zdjecie & { oryginal: File }) | null>(null);
+  const [zdjecie, ustawZdjecie] = useState<{ blob: Blob; podglad: string } | null>(null);
   const druzyny = stan.tryb === "druzyny";
   const pelna = stan.liczba_graczy >= stan.max_graczy;
 
@@ -286,27 +283,9 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
       <ZdjecieGracza
         nick={nick}
         zdjecie={zdjecie?.podglad ?? null}
-        onWybrano={(blob, podglad, oryginal) => {
-          const nowe = { blob, podglad, oryginal };
-          ustawZwykle(nowe);
-          ustawZdjecie(nowe);
-        }}
-        onUsun={() => {
-          ustawZwykle(null);
-          ustawZdjecie(null);
-        }}
+        onWybrano={(blob, podglad) => ustawZdjecie({ blob, podglad })}
+        onUsun={() => ustawZdjecie(null)}
       />
-      {/* kod klucza: nowe selfie to nowy wybór i nowa przeróbka */}
-      {zwykle && zdjecie && (
-        <StylAwatara
-          key={zwykle.podglad}
-          kod={kod}
-          oryginal={zwykle.oryginal}
-          zwykle={zwykle}
-          wybrane={zdjecie}
-          onWybierz={ustawZdjecie}
-        />
-      )}
       {blad && (
         <p className="blad" role="alert">
           {blad}
@@ -448,7 +427,7 @@ function WGrze({
           </p>
         )}
         {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV */}
-        {mojWiersz && rankingJakoWyscig(stan.quiz?.liczba_etapow ?? 0, stan.liczba_graczy) && (
+        {mojWiersz && rankingJakoWyscig(stan.liczba_graczy) && (
           <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />
         )}
       </>

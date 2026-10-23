@@ -2045,53 +2045,6 @@ html:has(.kolumna) {
   }
 }
 
-/* Wybór zdjęcia przed dołączeniem: zwykłe albo w stylu Bractwa */
-.styl-awatara {
-  display: grid;
-  gap: 6px;
-  margin: 12px 0 0;
-}
-
-.styl-awatara-opcje {
-  display: flex;
-  gap: 12px;
-}
-
-.styl-awatara-opcja {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  font: inherit;
-  font-size: var(--fs-small);
-  font-weight: var(--w-semibold);
-  color: var(--szary);
-  background: var(--kamien);
-  border: 2px solid var(--kamien2);
-  border-radius: var(--r-pole);
-  cursor: pointer;
-}
-
-.styl-awatara-opcja img,
-.styl-awatara-puste {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.styl-awatara-puste {
-  display: grid;
-  place-items: center;
-  font-size: 32px;
-  background: var(--kamien2);
-}
-
-.styl-awatara-opcja.wybrana {
-  border-color: var(--zloto);
-  color: var(--zloto);
-}
-
 .etap-uwaga {
   margin: 0 0 12px;
   padding: 10px 14px;

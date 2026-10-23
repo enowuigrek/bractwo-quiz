@@ -11,7 +11,7 @@ import {
   useNasluch,
 } from "@/lib/gra/nasluch";
 import { Awatar } from "@/components/awatar";
-import { useBezWygaszacza, usePrzesuniecieOled } from "@/lib/ekran-tv";
+import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
@@ -127,6 +127,9 @@ export function Tv({ kod, qr, host }: Props) {
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
 
+  // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację)
+  useNowaWersja(!stan || !["przygotuj", "pytanie", "seria", "werble", "podium"].includes(stan.faza));
+
   // zapowiedziana gra: zamiast poczekalni z QR plansze z godziną i odliczaniem (jak na ekranie lokalu)
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
 
@@ -165,8 +168,8 @@ export function Tv({ kod, qr, host }: Props) {
           ) : stan.faza === "odpowiedzi" ? (
             <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
           ) : stan.faza === "ranking" ? (
-            // quiz z etapami: wyścig po piwo (gdy gracze mieszczą się na torach); bez etapów tabela
-            rankingJakoWyscig(stan.quiz?.liczba_etapow ?? 0, ranking.length) ? (
+            // wyścig po piwo, gdy gracze mieszczą się na torach; inaczej tabela
+            rankingJakoWyscig(ranking.length) ? (
               <WyscigTv stan={stan} ranking={ranking} />
             ) : (
               <RankingTv stan={stan} ranking={ranking} />
@@ -303,7 +306,7 @@ function Poczekalnia({
   );
 }
 
-/** Przygotuj (odliczanie 5 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
+/** Przygotuj (odliczanie 3 s), pytanie z czasem i wynik z rozkładem odpowiedzi. */
 function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);

@@ -7,18 +7,18 @@ const BOK = 256;
  * Zdjęcie z aparatu albo galerii → kwadrat 256×256 JPEG (ok. 20 KB), wycięty ze środka.
  * `createImageBitmap` z `imageOrientation` obraca zdjęcia z telefonów według EXIF.
  */
-export async function przygotujZdjecie(plik: File, rozmiar = BOK): Promise<Blob> {
+export async function przygotujZdjecie(plik: File): Promise<Blob> {
   const obraz = await createImageBitmap(plik, { imageOrientation: "from-image" }).catch(() => wczytajObraz(plik));
   const szer = "naturalWidth" in obraz ? obraz.naturalWidth : obraz.width;
   const wys = "naturalHeight" in obraz ? obraz.naturalHeight : obraz.height;
   const bok = Math.min(szer, wys);
 
   const plotno = document.createElement("canvas");
-  plotno.width = rozmiar;
-  plotno.height = rozmiar;
+  plotno.width = BOK;
+  plotno.height = BOK;
   const ctx = plotno.getContext("2d");
   if (!ctx) throw new Error("Nie da się przygotować zdjęcia.");
-  ctx.drawImage(obraz, (szer - bok) / 2, (wys - bok) / 2, bok, bok, 0, 0, rozmiar, rozmiar);
+  ctx.drawImage(obraz, (szer - bok) / 2, (wys - bok) / 2, bok, bok, 0, 0, BOK, BOK);
 
   return new Promise((gotowe, zle) =>
     plotno.toBlob((blob) => (blob ? gotowe(blob) : zle(new Error("Nie da się przygotować zdjęcia."))), "image/jpeg", 0.82),

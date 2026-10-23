@@ -2613,11 +2613,6 @@
   font-weight: var(--w-semibold);
 }
 
-.demo-pionowy {
-  color: var(--zloto) !important;
-  font-weight: var(--w-black);
-}
-
 /* Zapowiedź finału: na planszy etapu przed finałem i kreska pod 3. torem w wyścigu */
 .tv-etap-walka {
   margin: 32px 0 0;

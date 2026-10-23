@@ -51,3 +51,4 @@ Etapy z planszą, mnożnikiem i finałem trójki są od 23.10 (PLAN.md). Na pó�
 - **Własne plansze na ekranie lokalu**, dodawane i zmieniane w panelu: grafiki, zapowiedzi wydarzeń (np. Dzień Porteru), ciekawostki piwne.
 - **„Dłuższy czas” dla wybranych pytań** (np. ×2 przy grafice albo długiej treści), jeśli jeden czas na całą grę okaże się za mało elastyczny.
 - **Dźwięk na TV:** werble po finale i fanfara przy podium (teraz jest cisza, a werble to tylko obraz).
+- **Selfie w stylu Bractwa (AI):** było 23.10 (przed dołączeniem gracz wybierał zwykłe albo przeróbkę z OpenAI, limit 40 na grę), ale na produkcji przeróbka się nie wyświetlała i funkcja wypadła. Przy powrocie najpierw sprawdzić w logach Vercela błąd OpenAI (`OpenAI (awatar):`); tabela `przerobki_ai` czeka w bazie.

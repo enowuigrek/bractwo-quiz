@@ -35,7 +35,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
         ))}
       </ul>
       {e.typy.includes("pary") && (
-        <p className="etap-uwaga">📱 Telefon trzymaj pionowo. Wybierz element z lewej kolumny, a potem pasujący z prawej.</p>
+        <p className="etap-uwaga">Łączenie: wybierz element z lewej kolumny, a potem pasujący z prawej.</p>
       )}
       {e.final_po_etapie && (
         <p className="etap-uwaga">

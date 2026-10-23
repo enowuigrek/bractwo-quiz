@@ -87,3 +87,32 @@ export function usePrzesuniecieOled(): [number, number] {
   }, []);
   return POLOZENIA[nr];
 }
+
+/** Wersja tego kodu (commit z builda na Vercelu); lokalnie pusta i wtedy niczego nie sprawdzamy. */
+const WERSJA = process.env.NEXT_PUBLIC_WERSJA ?? "";
+const SPRAWDZ_WERSJE_MS = 60_000;
+
+/**
+ * Ekran TV wisi otwarty cały wieczór, więc po wdrożeniu dalej działa na starym kodzie (np. 23.10 pokazywał
+ * tabelę zamiast wyścigu, bo nowy pilot nie miał już przełącznika). Co minutę porównuje swoją wersję
+ * z `/api/wersja` i przy nowej przeładowuje się sam, ale dopiero gdy `moznaOdswiezyc` (nie w trakcie
+ * pytania, serii ani odsłony podium).
+ */
+export function useNowaWersja(moznaOdswiezyc: boolean) {
+  const [nowa, ustawNowa] = useState(false);
+  useEffect(() => {
+    if (!WERSJA) return;
+    const sprawdz = () =>
+      fetch("/api/wersja", { cache: "no-store" })
+        .then((odp) => odp.json())
+        .then((d: { wersja?: string }) => {
+          if (d.wersja && d.wersja !== WERSJA) ustawNowa(true);
+        })
+        .catch(() => undefined);
+    const zegar = setInterval(sprawdz, SPRAWDZ_WERSJE_MS);
+    return () => clearInterval(zegar);
+  }, []);
+  useEffect(() => {
+    if (nowa && moznaOdswiezyc) window.location.reload();
+  }, [nowa, moznaOdswiezyc]);
+}

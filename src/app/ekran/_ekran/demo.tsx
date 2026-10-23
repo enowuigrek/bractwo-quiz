@@ -304,7 +304,6 @@ export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
       <figcaption>
         <strong>{NAZWY_TYPOW[typ]}</strong>
         <span>{PODPOWIEDZI_TYPOW[typ]}</span>
-        {typ === "pary" && <span className="demo-pionowy">📱 Trzymaj telefon pionowo</span>}
       </figcaption>
     </figure>
   );

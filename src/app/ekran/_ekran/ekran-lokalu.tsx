@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { przesuniecieZegara, useNasluchTematu } from "@/lib/gra/nasluch";
+import { useNowaWersja } from "@/lib/ekran-tv";
 import type { Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
@@ -40,6 +41,8 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   }, [adres]);
 
   useNasluchTematu(`lokal:${adres}`, pobierz, ["gra"]);
+  // plansze bez gry można przeładować od razu; w trakcie gry pilnuje tego ekran gry (Tv)
+  useNowaWersja(!kod);
 
   useEffect(() => {
     if (!kod) return;

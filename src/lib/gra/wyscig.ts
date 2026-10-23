@@ -6,11 +6,11 @@
 export const MAX_W_WYSCIGU = 12;
 
 /**
- * Ranking po pytaniu na TV (i szklanka na telefonie): w quizie z etapami zawsze wyścig po piwo, o ile gracze
- * mieszczą się na torach; prosty quiz bez etapów pokazuje tabelę. Prowadzący już tego nie wybiera.
+ * Ranking po pytaniu na TV (i szklanka na telefonie): zawsze wyścig po piwo, także w quizie bez etapów,
+ * o ile gracze mieszczą się na torach; przy większej liczbie graczy tabela. Prowadzący tego nie wybiera.
  */
-export function rankingJakoWyscig(liczbaEtapow: number, liczbaGraczy: number): boolean {
-  return liczbaEtapow > 0 && liczbaGraczy > 0 && liczbaGraczy <= MAX_W_WYSCIGU;
+export function rankingJakoWyscig(liczbaGraczy: number): boolean {
+  return liczbaGraczy > 0 && liczbaGraczy <= MAX_W_WYSCIGU;
 }
 
 /** Gdzie jest lider, zanim padnie pierwsze pytanie (część trasy). */

@@ -22,7 +22,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     .replace(/\s+/g, " ");
   // kreator nie pokazuje już drużyn (każdy gra sam); tryb zostaje w bazie dla starszych gier
   const tryb = dane.get("tryb") === "druzyny" ? "druzyny" : "solo";
-  // czas na odpowiedź dla wszystkich pytań; bonus za szybkość jest zawsze (bez limitu liczy się kolejność),
+  // czas na odpowiedź dla wszystkich pytań; bonus za szybkość jest zawsze (bez limitu maleje przez 30–60 s),
   // a limit tylko odlicza czas, po którym nie da się już odpowiedzieć
   const czasPole = String(dane.get("czas_s") ?? "");
   const czas_s = czasPole === "bez" ? null : Number(czasPole);

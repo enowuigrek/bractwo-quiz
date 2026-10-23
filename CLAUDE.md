@@ -21,7 +21,8 @@ Zasady:
 - Strony gry (`/[kod]`, `/tv`, `/pilot`) nasłuchują przez `useNasluch` z `src/lib/gra/nasluch.ts`: Broadcast + zapasowe odpytywanie. Nie polegaj na samym Realtime.
 - Next nie uruchomi drugiego `next dev` w tym samym katalogu. Gdy jakiś już działa, podgląd otwieraj konfiguracją `dev-dzialajacy` z `.claude/launch.json`.
 - Sekrety tylko w `.env.local` (poza repo) i na Vercelu. Lista zmiennych jest w `.env.example`.
-- OpenAI (`OPENAI_API_KEY`) przerabia zdjęcia nagród (`/api/nagroda`: tylko zalogowany panel, limit 40 dziennie) i selfie graczy (`/api/awatar`: przed dołączeniem, gdy gracz kliknie „W stylu Bractwa”, limit 40 na grę w tabeli `przerobki_ai`, niska jakość). Każde wywołanie kosztuje, więc nowe użycia API OpenAI zawsze z limitem i nigdy bez wyraźnej prośby użytkownika w aplikacji.
+- OpenAI (`OPENAI_API_KEY`) przerabia tylko zdjęcia nagród (`/api/nagroda`: tylko zalogowany panel, limit 40 dziennie). Przeróbka selfie graczy jest wyłączona (23.10, nie działała na produkcji). Każde wywołanie kosztuje, więc nowe użycia API OpenAI zawsze z limitem i nigdy bez wyraźnej prośby użytkownika w aplikacji.
+- Ekrany TV po wdrożeniu przeładowują się same (`useNowaWersja`, `/api/wersja`), ale dopiero poza pytaniem i serią. Przy teście zaraz po wdrożeniu odśwież TV ręcznie albo poczekaj minutę.
 - Telewizor w lokalu to Samsung (Tizen, Samsung Internet na Chrome 120). Nie przycinaj niczego na TV przez `clip-path` (Samsung go nie stosował i szklanka była pełna), tylko blokami z `overflow: hidden`. Ruch rób przejściami CSS albo `motion`, ale bez animowania `clip-path`.
 - `/api/keepalive` (Vercel Cron raz dziennie) trzyma bazę obudzoną i łączy się z Realtime, żeby istniały partycje `realtime.messages`. Nie usuwaj części z Realtime. Lista przed eventem i scenariusz testu są w `docs/TEST.md`.
 - Domena `bractwopiwne.pl` jest w Hostido, a poczta w Google Workspace. Rekordów MX nie ruszamy.
