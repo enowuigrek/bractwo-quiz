@@ -85,7 +85,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
                 <span>1</span> Zeskanuj telefonem kod QR, który pojawi się na tym ekranie.
               </li>
               <li>
-                <span>2</span> Wpisz swoje imię albo nick.
+                <span>2</span> Wpisz swoje imię albo nick. Możesz też dodać selfie, które pokaże się na tym ekranie.
               </li>
               <li>
                 <span>3</span> Odpowiadaj na telefonie. Im szybciej dobrze odpowiesz, tym więcej punktów!

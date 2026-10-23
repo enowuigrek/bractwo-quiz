@@ -231,7 +231,7 @@ function Poczekalnia({
             </p>
             {gracze.length === 0 ? (
               <p className="tv-zacheta">
-                Zeskanuj kod telefonem i wpisz {druzyny ? "nazwę drużyny" : "imię albo nick"}.
+                Zeskanuj kod telefonem i wpisz {druzyny ? "nazwę drużyny" : "imię albo nick"}. Możesz też dodać selfie.
                 <br />
                 Czekamy na {druzyny ? "pierwsze drużyny" : "pierwszych graczy"}…
               </p>
