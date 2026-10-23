@@ -1052,11 +1052,6 @@
   width: auto;
 }
 
-.plansza-haslo {
-  font-size: 84px !important;
-  color: var(--zloto);
-  text-shadow: var(--glow-md);
-}
 
 .plansze-kropki {
   list-style: none;
@@ -1158,7 +1153,7 @@
   box-shadow: var(--glow-lg);
 }
 
-/* Gościnny browar (kranoprzejęcie) obok logo Bractwa i lokalu */
+/* Gościnny browar (kranoprzejęcie): logo po znaku × obok logo lokalu */
 .tv-loga-x {
   font-size: 56px;
   font-weight: var(--w-semibold);

@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { LITERY, liczbaCzesci, opisOdpowiedzi, opisRozwiazania, ulamek } from "@/lib/zadania";
-import { sekundy, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../../../wyniki";
+import { sekundy } from "@/lib/czas";
+import { wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../../../wyniki";
 
 export const metadata: Metadata = { title: "Gracz · Bractwo Quiz" };
 

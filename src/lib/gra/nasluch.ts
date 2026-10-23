@@ -166,10 +166,6 @@ export function useKoniecPytania(kod: string, stan: Pick<StanSesji, "faza" | "fa
   }, [kod, poKoncu, tik]);
 }
 
-/** Czas odpowiedzi do wyświetlenia, np. „3,4 s”. */
-export function sekundy(ms: number): string {
-  return `${(ms / 1000).toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`;
-}
 
 /** Bezpieczny dostęp do localStorage (tryb prywatny, zablokowane dane). */
 export const pamiec = {

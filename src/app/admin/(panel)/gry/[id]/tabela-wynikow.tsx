@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { sekundy, type WynikGracza } from "../wyniki";
+import { sekundy } from "@/lib/czas";
+import type { WynikGracza } from "../wyniki";
 
 /** Tabela końcowa gry. Kliknięcie w wiersz otwiera historię odpowiedzi gracza. */
 export function TabelaWynikow({ graId, wyniki, liczbaPytan }: { graId: string; wyniki: WynikGracza[]; liczbaPytan: number }) {

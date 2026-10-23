@@ -290,6 +290,13 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - W kreatorze przykład nagrody to „Lane Piwo gratis” (nigdzie „piwo z kija”).
 - Sprawdzone na localhost z tymczasową grą VVPD (usunięta): QR powrotu, usunięcie gracza, wynik po czasie i po ostatniej odpowiedzi, wszystkie nowe typy na telefonie, TV i pilocie, ekran odpowiedzi, podium, odbiór nagrody, sekcja nagród i historia w panelu, plansza z podium Piwiarni (tylko podgląd). Przycisku plansz na pilocie nie klikałem na prawdziwym lokalu, akcja `plansze` sprawdzona SQL-em.
 
+### Quiz o serialach, lokal „Dom” i porządki (23.10)
+
+- **Quiz „Seriale · quiz testowy (Claude)”**: 15 pytań, wszystkie rodzaje na przemian (7 × jedna odpowiedź, 3 × kilka, 3 × kolejność, 2 × pary). Rozwiązania sprawdzone funkcją `wewn.ocena`.
+- **Lokal „Dom”** (Częstochowa, ekran `/ekran/dom`) z logo `public/loga/dom.svg`: złoty dom w kole, do testów w domu.
+- **Porządki:** `sekundy` w jednym miejscu (`src/lib/czas.ts`, wcześniej dwie kopie), pole na kod przeniesione do `/ekran` (jedyne użycie), usunięte nieużywane `IkonaNowaKarta`, reeksport `DaneWybor`, klasy `.waska` i `.plansza-haslo`, nadpisania CSS scalone z oryginalnymi regułami. Nieaktualne komentarze poprawione.
+- W bazie zostaje nieużywana `public.gracze_sesji` (zastąpiona przez `lista_graczy`): MCP odrzuca `drop function`. Nic nie psuje (zwraca nicki jak `lista_graczy`), można ją usunąć ręcznie w SQL Editorze Supabase.
+
 ### Punktacja, zapowiedź quizu i udostępnianie (23.10)
 
 **Punktacja (ustalone 23.10):**

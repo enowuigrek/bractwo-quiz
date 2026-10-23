@@ -6,12 +6,12 @@ import {
   fazaTeraz,
   komunikatBledu,
   pobierzStan,
-  sekundy,
   useCzasSerwera,
   useKoniecPytania,
   useNasluch,
 } from "@/lib/gra/nasluch";
 import { Awatar } from "@/components/awatar";
+import { sekundy } from "@/lib/czas";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW } from "@/lib/zadania";

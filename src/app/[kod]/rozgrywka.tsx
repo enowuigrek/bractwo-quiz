@@ -2,7 +2,8 @@
 /* eslint-disable @next/next/no-img-element -- grafiki pytań z bucketu Supabase */
 
 import { useState } from "react";
-import { fazaTeraz, komunikatBledu, sekundy } from "@/lib/gra/nasluch";
+import { sekundy } from "@/lib/czas";
+import { fazaTeraz, komunikatBledu } from "@/lib/gra/nasluch";
 import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, liczbaCzesci, ulamek, type DaneOdpowiedzi } from "@/lib/zadania";

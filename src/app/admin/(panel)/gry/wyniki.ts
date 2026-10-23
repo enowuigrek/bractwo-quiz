@@ -83,8 +83,3 @@ export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<Wy
   });
   return wiersze;
 }
-
-/** Czas do wyświetlenia, np. „3,4 s”. */
-export function sekundy(ms: number): string {
-  return `${(ms / 1000).toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`;
-}

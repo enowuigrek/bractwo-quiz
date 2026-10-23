@@ -3,7 +3,7 @@
 import { motion, MotionConfig } from "motion/react";
 import type { CSSProperties } from "react";
 import { Awatar } from "@/components/awatar";
-import { sekundy } from "@/lib/gra/nasluch";
+import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
 import { LITERY, liczbaCzesci, ulamek } from "@/lib/zadania";
 

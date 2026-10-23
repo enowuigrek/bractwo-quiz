@@ -20,8 +20,6 @@ export type Quiz = {
 
 import type { ZadanieDane } from "./zadania";
 
-export type { DaneWybor } from "./zadania";
-
 /** Zadanie quizu: `typ` + `dane` (kształt zależny od typu, patrz src/lib/zadania.ts). */
 export type Zadanie = {
   id: string;

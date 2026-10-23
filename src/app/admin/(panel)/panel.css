@@ -59,8 +59,7 @@ html:has(.panel) {
 }
 
 /* Formularze nie rozlewają się na całą szerokość desktopu */
-.panel .formularz,
-.panel .waska {
+.panel .formularz {
   max-width: 640px;
 }
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LogoQuiz } from "@/components/logo-quiz";
-import { WpiszKod } from "../wpisz-kod";
+import { WpiszKod } from "./wpisz-kod";
 
 export const metadata: Metadata = { title: "Ekran · Bractwo Quiz" };
 
