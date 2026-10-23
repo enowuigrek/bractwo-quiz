@@ -2365,6 +2365,108 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Licznik dopingu pod nickiem finalisty w serii: podskakuje przy każdym okrzyku */
+.drogi-finalu-doping {
+  font-size: 24px;
+  color: var(--zloto);
+  font-variant-numeric: tabular-nums;
+  animation: doping-skok 0.5s var(--ease-wjazd);
+}
+
+@keyframes doping-skok {
+  0% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Okrzyk kibica (okrzyki.tsx): dymek nad awatarem finalisty, unosi się i znika po 3,5 s.
+   Punkt zaczepienia to róg dymku przy awatarze: zwykle prawy dolny (dymek po lewej), `.z-prawej` lewy dolny. */
+.okrzyk {
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  /* nowy dymek przy tym samym finaliście podsuwa starsze wyżej */
+  transition: top 0.3s var(--ease-std);
+}
+
+.okrzyk-dymek {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  white-space: nowrap;
+  padding: 10px 22px;
+  border-radius: 28px 28px 6px 28px;
+  background: var(--piana);
+  color: var(--na-zlocie);
+  font-size: 32px;
+  font-weight: var(--w-black);
+  line-height: 1.2;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.7);
+  transform-origin: 100% 100%;
+  animation: okrzyk-lot 3.5s ease-out forwards;
+}
+
+.okrzyk.z-prawej .okrzyk-dymek {
+  right: auto;
+  left: 0;
+  border-radius: 28px 28px 28px 6px;
+  transform-origin: 0 100%;
+}
+
+.okrzyk-kibic {
+  color: var(--bursztyn);
+}
+
+.okrzyk-dymek .awatar {
+  border: 3px solid var(--na-zlocie);
+}
+
+@keyframes okrzyk-lot {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  8% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.05);
+  }
+  14% {
+    transform: translateY(-10px) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .okrzyk-dymek {
+    animation-name: okrzyk-znika;
+  }
+
+  .drogi-finalu-doping {
+    animation: none;
+  }
+
+  @keyframes okrzyk-znika {
+    0%,
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
 /* Prawda / fałsz na TV: dwa wysokie kafle */
 .tv-odp-pf .tv-odp {
   min-height: 300px;

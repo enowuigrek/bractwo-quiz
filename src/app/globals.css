@@ -1706,6 +1706,111 @@ html:has(.kolumna) {
   text-align: center;
 }
 
+/* Kibicowanie w serii finału (kibic.tsx): wybór finalisty i hasła z jego awatarem */
+.kibic-tytul {
+  margin: 4px 0 12px;
+  font-size: var(--fs-h3);
+}
+
+.kibic-finalisci {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.kibic-finalista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 4px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-card);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.kibic-finalista span:last-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kibic-finalista.wybrany {
+  color: var(--zloto);
+  border-color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.kibic-hasla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.odp.kibic-haslo {
+  justify-content: center;
+  min-height: 64px;
+  padding: 8px 6px;
+  text-align: center;
+  font-size: var(--fs-small);
+}
+
+.odp.kibic-haslo:disabled {
+  opacity: 0.45;
+}
+
+.odp.kibic-haslo:not(:disabled):active {
+  border-color: var(--zloto);
+  background: var(--kamien3);
+}
+
+.haslo-kibica {
+  display: inline;
+  line-height: 1.5;
+}
+
+.haslo-kibica-awatar {
+  vertical-align: middle;
+  margin: 0 3px;
+}
+
+.kibic-odstep {
+  height: 4px;
+  margin-top: 14px;
+  border-radius: var(--r-pill);
+  background: var(--kamien);
+  overflow: hidden;
+}
+
+.kibic-odstep > div {
+  height: 100%;
+  background: var(--zloto);
+  transform-origin: left;
+  transition: transform 0.25s linear;
+}
+
+.kibic-podpis {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.kibice-finalisty {
+  margin: 14px 0 0;
+  text-align: center;
+  color: var(--zloto);
+  font-weight: var(--w-semibold);
+}
+
 /* Podpowiedzi odsłaniane w trakcie pytania */
 .gra-podpowiedzi {
   list-style: none;

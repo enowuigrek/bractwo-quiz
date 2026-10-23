@@ -99,10 +99,12 @@ export type StanSesji = {
   quiz: { tytul: string; liczba_zadan: number; liczba_etapow: number } | null;
   /** Etap bieżącego pytania, a w fazie `etap` ten, który się zaczyna (null: quiz bez etapów). */
   etap: EtapWidoczny | null;
-  /** Finał trójki: kto odpowiada (null: wszyscy). */
-  finalisci: GraczNaLiscie[] | null;
+  /** Finał trójki: kto odpowiada (null: wszyscy); `kibice`: ilu graczy wysłało finaliście okrzyk. */
+  finalisci: (GraczNaLiscie & { kibice?: number })[] | null;
   /** Faza `seria`: postęp grających na żywo (ile odpowiedzi, suma ocen dobrych odpowiedzi). */
   seria: SeriaGracz[] | null;
+  /** Faza `seria`: okrzyki kibiców z ostatnich 8 s, od najstarszego (dymki na TV). */
+  okrzyki?: Okrzyk[] | null;
   faza: FazaWidoczna;
   faza_od: string | null;
   faza_do: string | null;
@@ -139,7 +141,17 @@ export type AkcjaPilota =
   "otworz" | "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "werble" | "podium" | "tabela" | "koniec" | "plansze";
 
 /** Gracz w trwającej serii (`StanSesji.seria`). */
-export type SeriaGracz = { nick: string; zdjecie: string | null; odpowiedzi: number; dobre: number };
+export type SeriaGracz = {
+  nick: string;
+  zdjecie: string | null;
+  odpowiedzi: number;
+  dobre: number;
+  /** Ile okrzyków dostał od kibiców. */
+  doping?: number;
+};
+
+/** Okrzyk kibica w serii finału (`kibicuj`); `haslo` to numer z `HASLA` w src/lib/gra/okrzyki.ts. */
+export type Okrzyk = { id: string; kibic: string; finalista: string; haslo: number; utworzono: string };
 
 /** Pytanie serii z `seria_pytania` (bez rozwiązania). */
 export type PytanieSerii = Pick<ZadanieWidoczne, "id" | "nr" | "typ" | "tresc" | "grafika_url" | "dane">;

@@ -5,13 +5,15 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { LogoNaglowka } from "./logo";
+import { OkrzykiNaDrogach } from "./okrzyki";
 
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
  * do pełnej szklanki. Każda dobra odpowiedź to krok (dobre / liczba pytań). Przed startem odliczanie
  * w nagłówku (drogi i gracze zostają widoczne), po nim w tym samym miejscu czas do końca serii.
  * Dane: `StanSesji.seria`, odświeżane po każdej odpowiedzi. W trybie „Pijany finał” pod koniec awatary drżą,
- * a po serii ten sam ekran z tym samym nagłówkiem przechodzi w chaos (pijany.tsx).
+ * a po serii ten sam ekran z tym samym nagłówkiem przechodzi w chaos (pijany.tsx). Kibice spoza finału
+ * wysyłają okrzyki: dymki nad drogami (okrzyki.tsx) i licznik dopingu 📣 pod nickiem.
  */
 export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const e = stan.etap;
@@ -35,6 +37,14 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         <NaglowekSerii stan={stan} teraz={teraz} />
 
         <DrogiFinalu
+          nad={
+            <OkrzykiNaDrogach
+              okrzyki={stan.okrzyki ?? []}
+              gracze={gracze}
+              polozenie={gracze.map((g) => Math.min(1, g.dobre / n))}
+              teraz={teraz}
+            />
+          }
           opoznienie={0}
           trwanie={0.9}
           szklanka={<Szklanka przed={1} teraz={1} doKonca={0} />}
@@ -45,7 +55,17 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             teraz: Math.min(1, g.dobre / n),
             lider: g.dobre > 0 && g.dobre === najlepszy,
             // bez numeru pytania: widać tylko, kto jedzie szybciej, ciekawiej do samego końca
-            podpis: <span>{g.nick}</span>,
+            podpis: (
+              <>
+                <span>{g.nick}</span>
+                {/* key: przy każdym nowym okrzyku licznik podskakuje */}
+                {!!g.doping && (
+                  <span key={g.doping} className="drogi-finalu-doping">
+                    📣 {g.doping}
+                  </span>
+                )}
+              </>
+            ),
           }))}
         />
       </div>

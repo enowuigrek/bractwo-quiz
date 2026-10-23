@@ -13,6 +13,7 @@ import {
   OdpowiedzPrawdaFalsz,
   OdpowiedzWielokrotna,
 } from "./odpowiadanie";
+import { Kibicowanie } from "./kibic";
 import { czyKibic, type Ja } from "./rozgrywka";
 
 /**
@@ -38,7 +39,7 @@ function jakoZadanie(p: PytanieSerii): ZadanieWidoczne {
 
 /**
  * Telefon w serii (faza `seria`): pytania etapu jedno po drugim we własnym tempie. Po odpowiedzi od razu
- * następne, bez wyniku (wynik i ranking po całej serii). Kibice w finale tylko patrzą na TV.
+ * następne, bez wyniku (wynik i ranking po całej serii). Kibice w finale wysyłają okrzyki (kibic.tsx).
  */
 export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; teraz: number }) {
   const [pytania, ustawPytania] = useState<PytanieSerii[] | null>(null);
@@ -69,18 +70,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   }, [wystartowala, pytania, kibic, ja.token]);
 
   const e = stan.etap;
-  if (kibic) {
-    return (
-      <>
-        <p className="etykieta gra-pasek">
-          <span>{e?.nazwa ?? "Seria"}</span>
-        </p>
-        <p className="gra-kibic">
-          Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj, kto pierwszy dobiegnie do piwa!
-        </p>
-      </>
-    );
-  }
+  if (kibic) return <Kibicowanie stan={stan} ja={ja} teraz={teraz} />;
 
   if (!wystartowala) {
     return (

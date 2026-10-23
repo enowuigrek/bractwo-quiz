@@ -14,6 +14,14 @@ import { UdostepnijWynik } from "./udostepnij";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 
+/** „Kibicowała Ci 1 osoba”, „Kibicowały Ci 3 osoby”, „Kibicowało Ci 7 osób”. */
+function kibicowalo(n: number): string {
+  if (n === 1) return "Kibicowała Ci 1 osoba";
+  const d = n % 10;
+  const s = n % 100;
+  return d >= 2 && d <= 4 && (s < 12 || s > 14) ? `Kibicowały Ci ${n} osoby` : `Kibicowało Ci ${n} osób`;
+}
+
 type Props = {
   /** Stan gry: tytuł, okazja, lokal i browar do grafiki z wynikiem. */
   stan: StanSesji;
@@ -74,8 +82,11 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
     />
   ) : null;
 
+  // finalista po serii: ilu graczy mu kibicowało (okrzyki z kibic.tsx)
+  const kibice = stan.finalisci?.find((f) => f.nick === nick)?.kibice ?? 0;
   const podziekowanie = (
     <>
+      {kibice > 0 && <p className="kibice-finalisty">📣 {kibicowalo(kibice)}!</p>}
       <p className="podziekowanie">
         Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
       </p>

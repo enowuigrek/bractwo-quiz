@@ -8,7 +8,7 @@ import type { FazaWidoczna, StanSesji } from "./typy";
  * Zdarzenia z bazy: na temacie `sesja:<KOD>` (patrz `wewn.rozglos`) oraz `gra`
  * na temacie `lokal:<adres_ekranu>` (patrz `wewn.po_zmianie_gry_lokalu`).
  */
-export type Zdarzenie = "stan" | "gracz" | "odpowiedz" | "gra";
+export type Zdarzenie = "stan" | "gracz" | "odpowiedz" | "okrzyk" | "gra";
 
 /**
  * Trzyma dane strony gry w zgodzie z bazą. Woła `pobierz`:

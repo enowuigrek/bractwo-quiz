@@ -50,17 +50,22 @@ export type GraczNaDrodze = {
   podpis: React.ReactNode;
 };
 
-/** Drogi z graczami; `szklanka` stoi po prawej, gdzie drogi się zbiegają. */
+/**
+ * Drogi z graczami; `szklanka` stoi po prawej, gdzie drogi się zbiegają. `nad`: warstwa nad graczami
+ * w pikselach planszy (dymki okrzyków kibiców w serii).
+ */
 export function DrogiFinalu({
   gracze,
   szklanka,
   opoznienie = 0.8,
   trwanie = 2.4,
+  nad,
 }: {
   gracze: GraczNaDrodze[];
   szklanka: React.ReactNode;
   opoznienie?: number;
   trwanie?: number;
+  nad?: React.ReactNode;
 }) {
   const lista = drogi(gracze.length);
   const awatar = awatarNaDrogach(lista);
@@ -86,6 +91,7 @@ export function DrogiFinalu({
           </motion.div>
         );
       })}
+      {nad}
     </div>
   );
 }

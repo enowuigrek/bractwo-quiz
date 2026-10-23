@@ -126,7 +126,8 @@ export function Tv({ kod, qr, host }: Props) {
     }
   }, [kod]);
 
-  useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
+  // okrzyk: kibic w serii finału (dymek nad drogą finalisty)
+  useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz", "okrzyk"]);
   useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
 
   const liczy =
