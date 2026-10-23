@@ -1,27 +1,48 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import type { StanFormularza, Zadanie } from "@/lib/typy";
-import { LITERY, NAZWY_TYPOW, TYPY_ZADAN, type TypZadania } from "@/lib/zadania";
+import { napisMnoznika } from "@/lib/etapy";
+import type { Etap, StanFormularza, Zadanie } from "@/lib/typy";
+import { LITERY, NAZWY_TYPOW, PRAWDA_FALSZ, TYPY_ZADAN, liczbaZJednostka, type TypZadania } from "@/lib/zadania";
 import { bezResetu } from "../../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../../_komponenty/grafika";
 import { KomunikatFormularza } from "../../../_komponenty/stan";
 import { zapiszZadanie } from "../../akcje";
 import { LIMITY } from "../../limity";
 
-type Props = { quizId: string; zadanie?: Zadanie };
+type Props = {
+  quizId: string;
+  zadanie?: Zadanie;
+  etapy: Etap[];
+  /** Etap dla nowego pytania (np. ostatni). */
+  domyslnyEtap: string | null;
+};
 
 /** Wiersz edytora: `a` to odpowiedź / element / lewa strona pary, `b` prawa strona pary. */
 type Wiersz = { klucz: number; a: string; b: string };
 
 const OPISY: Record<TypZadania, string> = {
   wybor: "Odpowiedzi (kliknij literę poprawnej)",
+  prawda_falsz: "Zdanie w polu „Pytanie” jest…",
   wielokrotny: "Odpowiedzi (zaznacz literami wszystkie poprawne)",
   kolejnosc: "Elementy we właściwej kolejności (gracze zobaczą je pomieszane)",
   pary: "Pary (prawa strona zostanie pomieszana)",
+  szacowanie: "Liczba do odgadnięcia",
 };
 
-const MIN_WIERSZY: Record<TypZadania, number> = { wybor: 2, wielokrotny: 2, kolejnosc: 3, pary: 2 };
+const MIN_WIERSZY: Record<TypZadania, number> = {
+  wybor: 2,
+  prawda_falsz: 0,
+  wielokrotny: 2,
+  kolejnosc: 3,
+  pary: 2,
+  szacowanie: 0,
+};
+
+/** Pola szacowania jako tekst (przecinek albo kropka), zamiana na liczby na serwerze. */
+type PolaLiczby = { min: string; max: string; krok: string; tolerancja: string; jednostka: string; poprawna: string };
+
+const liczbaNaTekst = (n: number) => String(n).replace(".", ",");
 
 /** Wiersze i rozwiązanie z zapisanego zadania (kolejność i pary w poprawnym ułożeniu). */
 function poczatek(zadanie?: Zadanie): { wiersze: string[][]; poprawna: number | null; zaznaczone: number[] } {
@@ -29,6 +50,10 @@ function poczatek(zadanie?: Zadanie): { wiersze: string[][]; poprawna: number | 
   switch (zadanie.typ) {
     case "wybor":
       return { wiersze: zadanie.dane.odpowiedzi.map((o) => [o]), poprawna: zadanie.dane.poprawna, zaznaczone: [] };
+    case "prawda_falsz":
+      return { wiersze: [[""], [""], [""], [""]], poprawna: zadanie.dane.poprawna, zaznaczone: [] };
+    case "szacowanie":
+      return { wiersze: [[""], [""], [""], [""]], poprawna: null, zaznaczone: [] };
     case "wielokrotny":
       return { wiersze: zadanie.dane.odpowiedzi.map((o) => [o]), poprawna: null, zaznaczone: zadanie.dane.poprawna };
     case "kolejnosc":
@@ -45,11 +70,13 @@ function poczatek(zadanie?: Zadanie): { wiersze: string[][]; poprawna: number | 
 /** Indeksy wierszy, których tekst powtarza się (bez względu na wielkość liter). */
 function powtorzenia(teksty: string[]): Set<number> {
   const klucze = teksty.map((t) => t.trim().toLocaleLowerCase("pl"));
-  return new Set(klucze.map((k, i) => (k && klucze.indexOf(k) !== klucze.lastIndexOf(k) ? i : -1)).filter((i) => i >= 0));
+  return new Set(
+    klucze.map((k, i) => (k && klucze.indexOf(k) !== klucze.lastIndexOf(k) ? i : -1)).filter((i) => i >= 0),
+  );
 }
 
 /** Edytor zadania: typ, pytanie i wiersze zależne od typu, jedna grafika. */
-export function EdytorZadania({ quizId, zadanie }: Props) {
+export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(
     zapiszZadanie.bind(null, quizId, zadanie?.id ?? null),
     {},
@@ -58,26 +85,47 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
   const start = poczatek(zadanie);
   const [typ, setTyp] = useState<TypZadania>(zadanie?.typ ?? "wybor");
   // klucze, żeby React nie mieszał pól przy usuwaniu wierszy ze środka
-  const [wiersze, setWiersze] = useState<Wiersz[]>(() =>
-    start.wiersze.map(([a, b = ""], klucz) => ({ klucz, a, b })),
-  );
+  const [wiersze, setWiersze] = useState<Wiersz[]>(() => start.wiersze.map(([a, b = ""], klucz) => ({ klucz, a, b })));
   const [nastepnyKlucz, setNastepnyKlucz] = useState(start.wiersze.length);
   const [poprawna, setPoprawna] = useState<number | null>(start.poprawna);
   const [zaznaczone, setZaznaczone] = useState<number[]>(start.zaznaczone);
+  const [liczba, setLiczba] = useState<PolaLiczby>(() =>
+    zadanie?.typ === "szacowanie"
+      ? {
+          min: liczbaNaTekst(zadanie.dane.min),
+          max: liczbaNaTekst(zadanie.dane.max),
+          krok: liczbaNaTekst(zadanie.dane.krok),
+          tolerancja: liczbaNaTekst(zadanie.dane.tolerancja),
+          jednostka: zadanie.dane.jednostka ?? "",
+          poprawna: liczbaNaTekst(zadanie.dane.poprawna),
+        }
+      : { min: "", max: "", krok: "1", tolerancja: "", jednostka: "", poprawna: "" },
+  );
+  const [podpowiedzi, setPodpowiedzi] = useState<string[]>(() => zadanie?.dane.podpowiedzi ?? []);
+  const [odslaniaj, setOdslaniaj] = useState(zadanie?.dane.odslaniaj ?? false);
 
   const powtorzoneA = powtorzenia(wiersze.map((w) => w.a));
   const powtorzoneB = typ === "pary" ? powtorzenia(wiersze.map((w) => w.b)) : new Set<number>();
   const minimum = MIN_WIERSZY[typ];
 
   // dane do zapisu; kolejność i pary miesza serwer
-  const dane =
+  const daneTypu =
     typ === "wybor"
       ? { odpowiedzi: wiersze.map((w) => w.a), poprawna }
-      : typ === "wielokrotny"
-        ? { odpowiedzi: wiersze.map((w) => w.a), poprawna: [...zaznaczone].sort((x, y) => x - y) }
-        : typ === "kolejnosc"
-          ? { elementy: wiersze.map((w) => w.a) }
-          : { pary: wiersze.map((w) => [w.a, w.b]) };
+      : typ === "prawda_falsz"
+        ? { poprawna }
+        : typ === "szacowanie"
+          ? liczba
+          : typ === "wielokrotny"
+            ? { odpowiedzi: wiersze.map((w) => w.a), poprawna: [...zaznaczone].sort((x, y) => x - y) }
+            : typ === "kolejnosc"
+              ? { elementy: wiersze.map((w) => w.a) }
+              : { pary: wiersze.map((w) => [w.a, w.b]) };
+  const dane = { ...daneTypu, podpowiedzi, odslaniaj };
+  const zLiczbami = typ === "szacowanie";
+  const zWierszami = typ !== "prawda_falsz" && !zLiczbami;
+  // podgląd tolerancji: domyślnie ćwierć zakresu
+  const zakres = Number(liczba.max.replace(",", ".")) - Number(liczba.min.replace(",", "."));
 
   function zmienTyp(nowy: TypZadania) {
     setTyp(nowy);
@@ -128,6 +176,21 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
       <input type="hidden" name="typ" value={typ} />
       <input type="hidden" name="dane" value={JSON.stringify(dane)} />
 
+      {etapy.length > 0 && (
+        <div>
+          <label htmlFor="etap_id">Etap</label>
+          <select id="etap_id" name="etap_id" className="pole" defaultValue={zadanie?.etap_id ?? domyslnyEtap ?? ""}>
+            {etapy.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.nr}. {e.nazwa} ({napisMnoznika(e.mnoznik)}
+                {e.czas_s ? `, ${e.czas_s} s` : ""}
+                {e.finalowy ? ", finał trójki" : ""})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <fieldset>
         <legend>Rodzaj pytania</legend>
         <div className="wybor-czasu">
@@ -154,111 +217,167 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
         />
       </div>
 
-      <fieldset>
-        <legend>{OPISY[typ]}</legend>
-        <div className="odpowiedzi">
-          {wiersze.map((w, i) => {
-            const poleA = (
-              <input
-                className={`pole${powtorzoneA.has(i) ? " pole-zle" : ""}`}
-                aria-invalid={powtorzoneA.has(i) || undefined}
-                value={w.a}
-                onChange={(e) => zmien(i, "a", e.target.value)}
-                required
-                maxLength={LIMITY.odpowiedz}
-                aria-label={typ === "pary" ? `Para ${i + 1}, lewa strona` : `Wiersz ${i + 1}`}
-              />
-            );
-            if (typ === "pary") {
-              return (
-                <div key={w.klucz} className="odpowiedz odpowiedz-para">
-                  {poleA}
-                  <span className="odpowiedz-laczenie" aria-hidden>
-                    ↔
-                  </span>
-                  <input
-                    className={`pole${powtorzoneB.has(i) ? " pole-zle" : ""}`}
-                    aria-invalid={powtorzoneB.has(i) || undefined}
-                    value={w.b}
-                    onChange={(e) => zmien(i, "b", e.target.value)}
-                    required
-                    maxLength={LIMITY.odpowiedz}
-                    aria-label={`Para ${i + 1}, prawa strona`}
-                  />
-                  {przyciskUsun(i)}
-                </div>
-              );
-            }
-            if (typ === "kolejnosc") {
-              return (
-                <div key={w.klucz} className="odpowiedz odpowiedz-kolejnosc">
-                  <span className="odpowiedz-litera">{i + 1}</span>
-                  {poleA}
-                  <span className="odpowiedz-strzalki">
-                    <button
-                      type="button"
-                      className="przycisk-maly ikona"
-                      onClick={() => przesun(i, -1)}
-                      disabled={i === 0}
-                      aria-label={`Przesuń wiersz ${i + 1} wyżej`}
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      className="przycisk-maly ikona"
-                      onClick={() => przesun(i, 1)}
-                      disabled={i === wiersze.length - 1}
-                      aria-label={`Przesuń wiersz ${i + 1} niżej`}
-                    >
-                      ↓
-                    </button>
-                  </span>
-                  {przyciskUsun(i)}
-                </div>
-              );
-            }
-            return (
-              <div key={w.klucz} className="odpowiedz">
-                <label className="odpowiedz-litera" title="Poprawna odpowiedź">
-                  {typ === "wybor" ? (
-                    <input
-                      type="radio"
-                      name="poprawna_wybor"
-                      checked={poprawna === i}
-                      onChange={() => setPoprawna(i)}
-                      required
-                      aria-label={`Odpowiedź ${LITERY[i]} jest poprawna`}
-                    />
-                  ) : (
-                    <input
-                      type="checkbox"
-                      checked={zaznaczone.includes(i)}
-                      onChange={(e) =>
-                        setZaznaczone((z) => (e.target.checked ? [...z, i] : z.filter((j) => j !== i)))
-                      }
-                      aria-label={`Odpowiedź ${LITERY[i]} jest poprawna`}
-                    />
-                  )}
-                  {LITERY[i]}
-                </label>
-                {poleA}
-                {przyciskUsun(i)}
+      {typ === "prawda_falsz" && (
+        <fieldset>
+          <legend>{OPISY[typ]}</legend>
+          <div className="wybor-czasu">
+            {PRAWDA_FALSZ.map((napis, i) => (
+              <label key={napis} className={`wybor-czasu-opcja${poprawna === i ? " wybrana" : ""}`}>
+                <input type="radio" name="pf" checked={poprawna === i} onChange={() => setPoprawna(i)} required />
+                {napis}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      {zLiczbami && (
+        <fieldset>
+          <legend>{OPISY[typ]}</legend>
+          <div className="pola-liczby">
+            {(
+              [
+                ["poprawna", "Poprawna liczba", "np. 1516"],
+                ["jednostka", "Jednostka (opcjonalnie)", "np. %, IBU, rok"],
+                ["min", "Suwak od", "np. 1400"],
+                ["max", "Suwak do", "np. 1700"],
+                ["krok", "Krok suwaka", "1"],
+                [
+                  "tolerancja",
+                  "Zero punktów od odległości",
+                  Number.isFinite(zakres) && zakres > 0 ? liczbaZJednostka(zakres / 4) : "ćwierć zakresu",
+                ],
+              ] as const
+            ).map(([pole, napis, przyklad]) => (
+              <div key={pole}>
+                <label htmlFor={`l-${pole}`}>{napis}</label>
+                <input
+                  id={`l-${pole}`}
+                  className="pole"
+                  inputMode={pole === "jednostka" ? "text" : "decimal"}
+                  value={liczba[pole]}
+                  onChange={(e) => setLiczba((l) => ({ ...l, [pole]: e.target.value }))}
+                  placeholder={przyklad}
+                  required={pole !== "jednostka" && pole !== "tolerancja"}
+                  maxLength={pole === "jednostka" ? 12 : 16}
+                />
               </div>
-            );
-          })}
-        </div>
-        {(powtorzoneA.size > 0 || powtorzoneB.size > 0) && (
-          <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>
-            Zaznaczone na czerwono wiersze są takie same. Popraw je przed zapisem.
+            ))}
+          </div>
+          <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
+            Gracze ustawiają liczbę suwakiem. Trafienie (co do kroku) to pełne punkty, potem coraz mniej, aż do zera w
+            podanej odległości (puste: ćwierć zakresu).
           </p>
-        )}
-        {wiersze.length < LIMITY.maxOdpowiedzi && (
-          <button type="button" className="przycisk-maly" onClick={dodaj} style={{ marginTop: 10 }}>
-            + {typ === "pary" ? "para" : typ === "kolejnosc" ? "element" : "odpowiedź"}
-          </button>
-        )}
-      </fieldset>
+        </fieldset>
+      )}
+
+      {zWierszami && (
+        <fieldset>
+          <legend>{OPISY[typ]}</legend>
+          <div className="odpowiedzi">
+            {wiersze.map((w, i) => {
+              const poleA = (
+                <input
+                  className={`pole${powtorzoneA.has(i) ? " pole-zle" : ""}`}
+                  aria-invalid={powtorzoneA.has(i) || undefined}
+                  value={w.a}
+                  onChange={(e) => zmien(i, "a", e.target.value)}
+                  required
+                  maxLength={LIMITY.odpowiedz}
+                  aria-label={typ === "pary" ? `Para ${i + 1}, lewa strona` : `Wiersz ${i + 1}`}
+                />
+              );
+              if (typ === "pary") {
+                return (
+                  <div key={w.klucz} className="odpowiedz odpowiedz-para">
+                    {poleA}
+                    <span className="odpowiedz-laczenie" aria-hidden>
+                      ↔
+                    </span>
+                    <input
+                      className={`pole${powtorzoneB.has(i) ? " pole-zle" : ""}`}
+                      aria-invalid={powtorzoneB.has(i) || undefined}
+                      value={w.b}
+                      onChange={(e) => zmien(i, "b", e.target.value)}
+                      required
+                      maxLength={LIMITY.odpowiedz}
+                      aria-label={`Para ${i + 1}, prawa strona`}
+                    />
+                    {przyciskUsun(i)}
+                  </div>
+                );
+              }
+              if (typ === "kolejnosc") {
+                return (
+                  <div key={w.klucz} className="odpowiedz odpowiedz-kolejnosc">
+                    <span className="odpowiedz-litera">{i + 1}</span>
+                    {poleA}
+                    <span className="odpowiedz-strzalki">
+                      <button
+                        type="button"
+                        className="przycisk-maly ikona"
+                        onClick={() => przesun(i, -1)}
+                        disabled={i === 0}
+                        aria-label={`Przesuń wiersz ${i + 1} wyżej`}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="przycisk-maly ikona"
+                        onClick={() => przesun(i, 1)}
+                        disabled={i === wiersze.length - 1}
+                        aria-label={`Przesuń wiersz ${i + 1} niżej`}
+                      >
+                        ↓
+                      </button>
+                    </span>
+                    {przyciskUsun(i)}
+                  </div>
+                );
+              }
+              return (
+                <div key={w.klucz} className="odpowiedz">
+                  <label className="odpowiedz-litera" title="Poprawna odpowiedź">
+                    {typ === "wybor" ? (
+                      <input
+                        type="radio"
+                        name="poprawna_wybor"
+                        checked={poprawna === i}
+                        onChange={() => setPoprawna(i)}
+                        required
+                        aria-label={`Odpowiedź ${LITERY[i]} jest poprawna`}
+                      />
+                    ) : (
+                      <input
+                        type="checkbox"
+                        checked={zaznaczone.includes(i)}
+                        onChange={(e) =>
+                          setZaznaczone((z) => (e.target.checked ? [...z, i] : z.filter((j) => j !== i)))
+                        }
+                        aria-label={`Odpowiedź ${LITERY[i]} jest poprawna`}
+                      />
+                    )}
+                    {LITERY[i]}
+                  </label>
+                  {poleA}
+                  {przyciskUsun(i)}
+                </div>
+              );
+            })}
+          </div>
+          {(powtorzoneA.size > 0 || powtorzoneB.size > 0) && (
+            <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>
+              Zaznaczone na czerwono wiersze są takie same. Popraw je przed zapisem.
+            </p>
+          )}
+          {wiersze.length < LIMITY.maxOdpowiedzi && (
+            <button type="button" className="przycisk-maly" onClick={dodaj} style={{ marginTop: 10 }}>
+              + {typ === "pary" ? "para" : typ === "kolejnosc" ? "element" : "odpowiedź"}
+            </button>
+          )}
+        </fieldset>
+      )}
 
       <PoleGrafiki
         nazwa="grafika"
@@ -266,6 +385,56 @@ export function EdytorZadania({ quizId, zadanie }: Props) {
         obecna={zadanie?.grafika_url}
         podpowiedz="Pokazuje się na TV i telefonach razem z pytaniem. PNG, JPG, WebP albo SVG, do 5 MB."
       />
+      <label className="pole-wyboru">
+        <input type="checkbox" checked={odslaniaj} onChange={(e) => setOdslaniaj(e.target.checked)} />
+        <span>
+          <strong>Odsłaniana grafika:</strong> na początku rozmyta, wyostrza się do końca czasu. Dobre do „zgadnij po
+          etykiecie”.
+        </span>
+      </label>
+
+      <fieldset>
+        <legend>Podpowiedzi (opcjonalnie, odsłaniają się po kolei w trakcie pytania)</legend>
+        <div className="odpowiedzi">
+          {podpowiedzi.map((p, i) => (
+            <div key={i} className="odpowiedz">
+              <span className="odpowiedz-litera">{i + 1}</span>
+              <input
+                className="pole"
+                value={p}
+                onChange={(e) => setPodpowiedzi((l) => l.map((x, j) => (j === i ? e.target.value : x)))}
+                maxLength={LIMITY.odpowiedz}
+                aria-label={`Podpowiedź ${i + 1}`}
+              />
+              <button
+                type="button"
+                className="przycisk-maly ikona niebezpieczny"
+                onClick={() => setPodpowiedzi((l) => l.filter((_, j) => j !== i))}
+                aria-label={`Usuń podpowiedź ${i + 1}`}
+                data-podpis="Usuń"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+        {podpowiedzi.length < LIMITY.maxPodpowiedzi && (
+          <button
+            type="button"
+            className="przycisk-maly"
+            onClick={() => setPodpowiedzi((l) => [...l, ""])}
+            style={{ marginTop: podpowiedzi.length ? 10 : 0 }}
+          >
+            + podpowiedź
+          </button>
+        )}
+        {podpowiedzi.length > 0 && (
+          <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
+            Pierwsza widać od startu, kolejne co równy kawałek czasu (bez limitu czasu: co 10 s). Z bonusem za szybkość
+            późniejsza odpowiedź daje mniej punktów.
+          </p>
+        )}
+      </fieldset>
 
       <KomunikatFormularza stan={stan} />
       <button type="submit" className="przycisk zloty" disabled={trwa}>

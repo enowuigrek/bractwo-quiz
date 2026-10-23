@@ -1,0 +1,209 @@
+"use client";
+
+import { useActionState, useState } from "react";
+import { CZASY_ETAPU, LIMITY_ETAPU, MNOZNIKI, napisMnoznika, SZABLONY_ETAPOW } from "@/lib/etapy";
+import type { Etap, StanFormularza } from "@/lib/typy";
+import { NAZWY_TYPOW } from "@/lib/zadania";
+import { bezResetu } from "../../_komponenty/bez-resetu";
+import { IkonaEdytuj } from "../../_komponenty/ikony";
+import { KomunikatFormularza } from "../../_komponenty/stan";
+import { dodajEtap, zapiszEtap } from "../akcje";
+
+type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy">;
+
+const PUSTY: Pola = { nazwa: "", opis: "", mnoznik: 1, czas_s: null, finalowy: false };
+
+/** Formularz etapu: nowy (z szablonem) albo edycja istniejącego. */
+function FormularzEtapu({
+  quizId,
+  etap,
+  onGotowe,
+  onAnuluj,
+}: {
+  quizId: string;
+  etap?: Etap;
+  onGotowe: () => void;
+  onAnuluj?: () => void;
+}) {
+  const [pola, ustawPola] = useState<Pola>(etap ?? PUSTY);
+  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(async (poprzedni, dane) => {
+    const wynik = etap ? await zapiszEtap(quizId, etap.id, poprzedni, dane) : await dodajEtap(quizId, poprzedni, dane);
+    if (wynik.ok) {
+      if (!etap) ustawPola(PUSTY);
+      onGotowe();
+    }
+    return wynik;
+  }, {});
+  const zmien = (zmiana: Partial<Pola>) => ustawPola((p) => ({ ...p, ...zmiana }));
+  const id = etap?.id ?? "nowy";
+
+  return (
+    <form {...bezResetu(akcja)} className="karta formularz etap-formularz">
+      {!etap && (
+        <div>
+          <span className="etykieta-pola">Szablon (wypełnia pola, potem możesz wszystko zmienić)</span>
+          <div className="wybor-czasu">
+            {SZABLONY_ETAPOW.map((s) => (
+              <button
+                key={s.klucz}
+                type="button"
+                className={`wybor-czasu-opcja${pola.nazwa === s.nazwa ? " wybrana" : ""}`}
+                title={`Pasuje: ${s.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", ")}`}
+                onClick={() => zmien({ ...s })}
+              >
+                {s.nazwa}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div>
+        <label htmlFor={`nazwa-${id}`}>Nazwa etapu</label>
+        <input
+          id={`nazwa-${id}`}
+          name="nazwa"
+          className="pole"
+          value={pola.nazwa}
+          onChange={(e) => zmien({ nazwa: e.target.value })}
+          required
+          maxLength={LIMITY_ETAPU.nazwa}
+          placeholder="np. Rozgrzewka"
+        />
+      </div>
+      <div>
+        <label htmlFor={`opis-${id}`}>Zasady na planszy etapu (jedno, dwa zdania)</label>
+        <textarea
+          id={`opis-${id}`}
+          name="opis"
+          className="pole"
+          value={pola.opis ?? ""}
+          onChange={(e) => zmien({ opis: e.target.value })}
+          maxLength={LIMITY_ETAPU.opis}
+          rows={2}
+        />
+      </div>
+      <fieldset>
+        <legend>Punkty</legend>
+        <div className="wybor-czasu">
+          {MNOZNIKI.map((m) => (
+            <label key={m} className={`wybor-czasu-opcja${pola.mnoznik === m ? " wybrana" : ""}`}>
+              <input
+                type="radio"
+                name="mnoznik"
+                value={m}
+                checked={pola.mnoznik === m}
+                onChange={() => zmien({ mnoznik: m })}
+              />
+              {napisMnoznika(m)}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Czas na odpowiedź</legend>
+        <div className="wybor-czasu">
+          {CZASY_ETAPU.map((c) => (
+            <label key={c ?? "gra"} className={`wybor-czasu-opcja${pola.czas_s === c ? " wybrana" : ""}`}>
+              <input
+                type="radio"
+                name="czas_s"
+                value={c ?? ""}
+                checked={pola.czas_s === c}
+                onChange={() => zmien({ czas_s: c })}
+              />
+              {c === null ? "jak w grze" : `${c} s`}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <label className="pole-wyboru">
+        <input
+          type="checkbox"
+          name="finalowy"
+          value="1"
+          checked={pola.finalowy}
+          onChange={(e) => zmien({ finalowy: e.target.checked })}
+        />
+        <span>
+          <strong>Finał trójki:</strong> odpowiadają tylko trzej najlepsi, reszta kibicuje. Najlepiej jako ostatni etap.
+        </span>
+      </label>
+      <KomunikatFormularza stan={stan} />
+      <div className="quiz-naglowek-przyciski">
+        <button type="submit" className="przycisk-maly zloty" disabled={trwa}>
+          {trwa ? "Zapisuję…" : etap ? "Zapisz etap" : "Dodaj etap"}
+        </button>
+        {onAnuluj && (
+          <button type="button" className="przycisk-maly" onClick={onAnuluj} disabled={trwa}>
+            Anuluj
+          </button>
+        )}
+      </div>
+    </form>
+  );
+}
+
+/** „+ Dodaj etap” pod listą pytań: rozwija formularz z szablonami. */
+export function NowyEtap({ quizId, pierwszy }: { quizId: string; pierwszy: boolean }) {
+  const [otwarty, ustawOtwarty] = useState(false);
+  if (!otwarty) {
+    return (
+      <button type="button" className="przycisk" onClick={() => ustawOtwarty(true)}>
+        + Dodaj etap
+      </button>
+    );
+  }
+  return (
+    <>
+      {pierwszy && (
+        <p className="pomocniczy">
+          Pierwszy etap dostanie wszystkie obecne pytania. Potem dodaj kolejne etapy i przenieś do nich pytania
+          strzałkami.
+        </p>
+      )}
+      <FormularzEtapu quizId={quizId} onGotowe={() => ustawOtwarty(false)} onAnuluj={() => ustawOtwarty(false)} />
+    </>
+  );
+}
+
+/** Nagłówek etapu nad jego pytaniami: nazwa, mnożnik, czas, finał; ołówek otwiera edycję w miejscu. */
+export function NaglowekEtapu({ quizId, etap, akcje }: { quizId: string; etap: Etap; akcje: React.ReactNode }) {
+  const [edycja, ustawEdycje] = useState(false);
+  if (edycja) {
+    return (
+      <FormularzEtapu
+        quizId={quizId}
+        etap={etap}
+        onGotowe={() => ustawEdycje(false)}
+        onAnuluj={() => ustawEdycje(false)}
+      />
+    );
+  }
+  return (
+    <div className="etap-naglowek">
+      <div className="lista-glowna">
+        <h3 className="etap-tytul">
+          <span className="etap-nr">Etap {etap.nr}</span> {etap.nazwa}
+        </h3>
+        <p className="etap-znaczki">
+          <span className="znaczek aktywny">punkty {napisMnoznika(etap.mnoznik)}</span>
+          <span className="znaczek">{etap.czas_s ? `${etap.czas_s} s` : "czas jak w grze"}</span>
+          {etap.finalowy && <span className="znaczek aktywny">finał trójki</span>}
+        </p>
+        {etap.opis && <p className="lista-opis">{etap.opis}</p>}
+      </div>
+      <div className="lista-akcje">
+        <button
+          type="button"
+          className="przycisk-maly ikona"
+          onClick={() => ustawEdycje(true)}
+          aria-label={`Edytuj etap ${etap.nr}`}
+          data-podpis="Edytuj"
+        >
+          <IkonaEdytuj />
+        </button>
+        {akcje}
+      </div>
+    </div>
+  );
+}

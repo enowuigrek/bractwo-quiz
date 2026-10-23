@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import type { Quiz, Zadanie } from "@/lib/typy";
+import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
 import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { przesunZadanie, usunZadanie } from "../akcje";
+import { przesunEtap, przesunZadanie, usunEtap, usunZadanie } from "../akcje";
+import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
 
@@ -18,13 +19,68 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
   const { id } = await params;
   const db = supabaseAdmin();
 
-  const [{ data: quiz }, { data: zadania }, { count: aktywneGry }] = await Promise.all([
+  const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }] = await Promise.all([
     db.from("quizy").select("id, tytul, opis, utworzono").eq("id", id).maybeSingle<Quiz>(),
     db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
+    db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
     db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
   ]);
   if (!quiz) notFound();
   const lista = zadania ?? [];
+  const etapy = etapyZBazy ?? [];
+  // grupy do pokazania: pytania bez etapu (quiz bez etapów) i po kolei etapy z ich pytaniami
+  const bezEtapu = lista.filter((z) => !z.etap_id || !etapy.some((e) => e.id === z.etap_id));
+  const grupy: { etap: Etap | null; zadania: Zadanie[] }[] = [
+    ...(bezEtapu.length || !etapy.length ? [{ etap: null, zadania: bezEtapu }] : []),
+    ...etapy.map((e) => ({ etap: e, zadania: lista.filter((z) => z.etap_id === e.id) })),
+  ];
+
+  const wiersz = (z: Zadanie) => {
+    const i = lista.indexOf(z);
+    return (
+      <li key={z.id}>
+        <span className="krok-nr" style={{ minWidth: "1.6em" }}>
+          {i + 1}.
+        </span>
+        {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
+        <div className="lista-glowna">
+          <div className="lista-tytul">
+            <Link href={`/admin/quizy/${quiz.id}/zadania/${z.id}`}>{z.tresc}</Link>
+          </div>
+          <div className="lista-opis">
+            {NAZWY_TYPOW[z.typ]} · {opisRozwiazania(z)}
+            {z.dane.podpowiedzi?.length ? ` · podpowiedzi: ${z.dane.podpowiedzi.length}` : ""}
+            {z.dane.odslaniaj ? " · odsłaniana grafika" : ""}
+          </div>
+        </div>
+        <div className="lista-akcje">
+          <form action={przesunZadanie.bind(null, quiz.id, z.id, "gora")}>
+            <button className="przycisk-maly ikona" disabled={i === 0} aria-label="Przesuń wyżej" data-podpis="Wyżej">
+              ↑
+            </button>
+          </form>
+          <form action={przesunZadanie.bind(null, quiz.id, z.id, "dol")}>
+            <button
+              className="przycisk-maly ikona"
+              disabled={i === lista.length - 1}
+              aria-label="Przesuń niżej"
+              data-podpis="Niżej"
+            >
+              ↓
+            </button>
+          </form>
+          <PrzyciskPotwierdz
+            akcja={usunZadanie.bind(null, quiz.id, z.id)}
+            pytanie={`Usunąć pytanie ${i + 1}?`}
+            tytul="Usuń"
+            className="przycisk-maly ikona niebezpieczny"
+          >
+            <IkonaKosz />
+          </PrzyciskPotwierdz>
+        </div>
+      </li>
+    );
+  };
 
   return (
     <main>
@@ -33,65 +89,77 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       </p>
       <NaglowekQuizu quiz={quiz} />
       {!!aktywneGry && (
-        <p className="blad">
-          Ten quiz jest teraz w trwającej grze. Zmiany w pytaniach gracze zobaczą od razu.
-        </p>
+        <p className="blad">Ten quiz jest teraz w trwającej grze. Zmiany w pytaniach gracze zobaczą od razu.</p>
       )}
 
       <section className="panel-sekcja">
-        <h2>Pytania</h2>
-        {lista.length > 0 ? (
-          <ol className="lista">
-            {lista.map((z, i) => (
-              <li key={z.id}>
-                <span className="krok-nr" style={{ minWidth: "1.6em" }}>
-                  {i + 1}.
-                </span>
-                {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
-                <div className="lista-glowna">
-                  <div className="lista-tytul">
-                    <Link href={`/admin/quizy/${quiz.id}/zadania/${z.id}`}>{z.tresc}</Link>
-                  </div>
-                  <div className="lista-opis">
-                    {NAZWY_TYPOW[z.typ]} · {opisRozwiazania(z)}
-                  </div>
-                </div>
-                <div className="lista-akcje">
-                  <form action={przesunZadanie.bind(null, quiz.id, z.id, "gora")}>
-                    <button className="przycisk-maly ikona" disabled={i === 0} aria-label="Przesuń wyżej" data-podpis="Wyżej">
-                      ↑
-                    </button>
-                  </form>
-                  <form action={przesunZadanie.bind(null, quiz.id, z.id, "dol")}>
-                    <button
-                      className="przycisk-maly ikona"
-                      disabled={i === lista.length - 1}
-                      aria-label="Przesuń niżej"
-                      data-podpis="Niżej"
-                    >
-                      ↓
-                    </button>
-                  </form>
-                  <PrzyciskPotwierdz
-                    akcja={usunZadanie.bind(null, quiz.id, z.id)}
-                    pytanie={`Usunąć pytanie ${i + 1}?`}
-                    tytul="Usuń"
-                    className="przycisk-maly ikona niebezpieczny"
-                  >
-                    <IkonaKosz />
-                  </PrzyciskPotwierdz>
-                </div>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="lista-pusta">Quiz nie ma jeszcze pytań.</p>
+        <h2>{etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
+        {etapy.length > 0 && (
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            Przed każdym etapem TV pokazuje planszę z zasadami, a prowadzący startuje etap z pilota. Strzałka na granicy
+            etapu przenosi pytanie do sąsiedniego etapu.
+          </p>
         )}
-        <p style={{ marginTop: 16 }}>
+        {lista.length === 0 && etapy.length === 0 && <p className="lista-pusta">Quiz nie ma jeszcze pytań.</p>}
+        {grupy.map(({ etap, zadania: wEtapie }) => (
+          <div key={etap?.id ?? "bez-etapu"} className="etap-blok">
+            {etap && (
+              <NaglowekEtapu
+                quizId={quiz.id}
+                etap={etap}
+                akcje={
+                  <>
+                    <form action={przesunEtap.bind(null, quiz.id, etap.id, "gora")}>
+                      <button
+                        className="przycisk-maly ikona"
+                        disabled={etap.nr === 1}
+                        aria-label={`Przesuń etap ${etap.nr} wyżej`}
+                        data-podpis="Wyżej"
+                      >
+                        ↑
+                      </button>
+                    </form>
+                    <form action={przesunEtap.bind(null, quiz.id, etap.id, "dol")}>
+                      <button
+                        className="przycisk-maly ikona"
+                        disabled={etap.nr === etapy.length}
+                        aria-label={`Przesuń etap ${etap.nr} niżej`}
+                        data-podpis="Niżej"
+                      >
+                        ↓
+                      </button>
+                    </form>
+                    <PrzyciskPotwierdz
+                      akcja={usunEtap.bind(null, quiz.id, etap.id)}
+                      pytanie={
+                        wEtapie.length
+                          ? `Usunąć etap „${etap.nazwa}”? Jego pytania przejdą do sąsiedniego etapu.`
+                          : `Usunąć etap „${etap.nazwa}”?`
+                      }
+                      tytul="Usuń etap"
+                      className="przycisk-maly ikona niebezpieczny"
+                    >
+                      <IkonaKosz />
+                    </PrzyciskPotwierdz>
+                  </>
+                }
+              />
+            )}
+            {wEtapie.length > 0 ? (
+              <ol className="lista">{wEtapie.map(wiersz)}</ol>
+            ) : (
+              etap && <p className="etap-pusty">Brak pytań w tym etapie. Dodaj nowe albo przenieś strzałkami.</p>
+            )}
+          </div>
+        ))}
+        <p style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 12 }}>
           <Link href={`/admin/quizy/${quiz.id}/zadania/nowe`} className="przycisk">
             + Dodaj pytanie
           </Link>
         </p>
+        <div style={{ marginTop: 12 }}>
+          <NowyEtap quizId={quiz.id} pierwszy={etapy.length === 0} />
+        </div>
       </section>
 
       <section className="panel-sekcja quiz-zapisz">

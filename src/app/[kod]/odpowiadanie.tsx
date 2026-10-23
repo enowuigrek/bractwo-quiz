@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
-import { LITERY, type DaneOdpowiedzi } from "@/lib/zadania";
+import { LITERY, liczbaZJednostka, type DaneOdpowiedzi } from "@/lib/zadania";
 
 // Odpowiadanie na telefonie w nowych typach pytań. Każdy komponent dostaje `key={zadanie.id}`,
 // więc zaznaczenia czyszczą się przy następnym pytaniu. `wyslana`: odpowiedź już zapisana (blokuje zmiany).
@@ -13,6 +13,100 @@ type Props = {
   zablokowane: boolean;
   onWyslij: (dane: DaneOdpowiedzi) => void;
 };
+
+/** Prawda / fałsz: dwa duże przyciski, jedno stuknięcie wysyła odpowiedź. */
+export function OdpowiedzPrawdaFalsz({ z, wyslana, zablokowane, onWyslij }: Props) {
+  const wybrana = wyslana?.odpowiedz ?? null;
+  return (
+    <div className="odp-pf">
+      {(z.dane.odpowiedzi ?? []).map((o, i) => (
+        <button
+          key={i}
+          className={`odp-pf-przycisk ${i === 0 ? "prawda" : "falsz"}${
+            wybrana === null ? "" : i === wybrana ? " wybrana" : " przygaszona"
+          }`}
+          disabled={wybrana !== null || zablokowane}
+          onClick={() => onWyslij({ odpowiedz: i })}
+        >
+          <span aria-hidden>{i === 0 ? "✓" : "✗"}</span>
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Wartość z zakresu przyciągnięta do kroku (bez ogonów typu 0,30000000004). */
+function naKrok(x: number, min: number, max: number, krok: number): number {
+  const n = Math.round((x - min) / krok);
+  const wynik = Math.min(max, Math.max(min, min + n * krok));
+  return Number(wynik.toFixed(6));
+}
+
+/** Szacowanie: suwak z dużą liczbą i przyciskami −/+, potem „Zatwierdź”. */
+export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij }: Props) {
+  const min = z.dane.min ?? 0;
+  const max = z.dane.max ?? 100;
+  const krok = z.dane.krok ?? 1;
+  const [wartosc, ustaw] = useState(() => naKrok((min + max) / 2, min, max, krok));
+  const [ruszona, ustawRuszona] = useState(false);
+  const pokaz = wyslana?.liczba ?? wartosc;
+  const koniec = !!wyslana || zablokowane;
+  const zmien = (x: number) => {
+    ustaw(naKrok(x, min, max, krok));
+    ustawRuszona(true);
+  };
+  return (
+    <div className="odp-liczba">
+      <p className="odp-liczba-wartosc" aria-live="polite">
+        {liczbaZJednostka(pokaz, z.dane.jednostka)}
+      </p>
+      <div className="odp-liczba-suwak">
+        <button
+          type="button"
+          className="odp-liczba-krok"
+          disabled={koniec || pokaz <= min}
+          onClick={() => zmien(wartosc - krok)}
+          aria-label="Mniej"
+        >
+          −
+        </button>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={krok}
+          value={pokaz}
+          disabled={koniec}
+          onChange={(e) => zmien(Number(e.target.value))}
+          aria-label="Twoja liczba"
+        />
+        <button
+          type="button"
+          className="odp-liczba-krok"
+          disabled={koniec || pokaz >= max}
+          onClick={() => zmien(wartosc + krok)}
+          aria-label="Więcej"
+        >
+          +
+        </button>
+      </div>
+      <p className="odp-liczba-zakres">
+        <span>{liczbaZJednostka(min)}</span>
+        <span>{liczbaZJednostka(max)}</span>
+      </p>
+      {!wyslana && (
+        <button
+          className="przycisk zloty odp-zatwierdz"
+          disabled={koniec || !ruszona}
+          onClick={() => onWyslij({ liczba: wartosc })}
+        >
+          {ruszona ? "Zatwierdź" : "Przesuń suwak"}
+        </button>
+      )}
+    </div>
+  );
+}
 
 /** Wielokrotny wybór: zaznacz kafelki, potem „Zatwierdź”. */
 export function OdpowiedzWielokrotna({ z, wyslana, zablokowane, onWyslij }: Props) {
@@ -253,6 +347,23 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
 /** Rozwiązanie po wyniku: co było dobrze, a co nie (nowe typy). */
 export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowiedzi | null }) {
   const p = z.dane.poprawna;
+  if (z.typ === "szacowanie" && typeof p === "number") {
+    const twoja = moja?.liczba;
+    const roznica = twoja === undefined ? null : Number(Math.abs(twoja - p).toFixed(6));
+    return (
+      <div className="odp-liczba-wynik">
+        <p>
+          Poprawna: <strong className="ok">{liczbaZJednostka(p, z.dane.jednostka)}</strong>
+        </p>
+        {twoja !== undefined && (
+          <p className="pomocniczy">
+            Ty: {liczbaZJednostka(twoja, z.dane.jednostka)}
+            {roznica ? ` (o ${liczbaZJednostka(roznica)} ${twoja > p ? "za dużo" : "za mało"})` : " (w punkt!)"}
+          </p>
+        )}
+      </div>
+    );
+  }
   if (z.typ === "wielokrotny" && Array.isArray(p)) {
     return (
       <ol className="odp-lista">

@@ -392,6 +392,18 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - Loga są w `public/loga/` (`piwiarnia-w-alejach.png`, `ppr.png`): kwadrat 800×800, przycięte do koła, z przezroczystością na zewnątrz. Oba są w oryginalnych kolorach (logo Piwiarni w Alejach nie odwracamy). Piwiarnia w Alejach ma dodany biały okrąg na zewnątrz, oddzielony czarną szczeliną, tak jak na ich Instagramie. Bez niego czarna obwódka ginęła na czarnym tle. Oryginały są w `docs/loga/`.
 - Logo Bractwa jest w `public/loga/bractwo.svg`: czarne, z viewBox przyciętym do samego logo. Na ciemnym tle robimy je białym przez `filter: invert(1)`. Komponent `LogoQuiz` (`src/components/logo-quiz.tsx`) to logo + złoty napis „Quiz” i zastępuje tekst „Bractwo Quiz” w interfejsie. Tytuł karty przeglądarki zostaje tekstem.
 
+### Etapy, finał trójki i nowe typy pytań (23.10) ✅
+
+- Migracja `20261023112811_etapy`: tabela `etapy` (nazwa, zasady, mnożnik ×1–×3, własny czas albo czas gry, `finalowy`), `zadania.etap_id`, faza `etap`, `sesje.finalisci`. Funkcja `admin_uporzadkuj_quiz` numeruje pytania po kolei etapami; panel woła ją po każdej zmianie.
+- Przed pierwszym pytaniem etapu TV pokazuje planszę: nazwa, zasady, mnożnik, czas, liczba pytań, droga przez etapy i telefon z animacją, na którym palec pokazuje, jak odpowiadać (`ekran/_ekran/demo.tsx`, po jednej pętli na typ). Telefon pokazuje to samo krócej. Prowadzący startuje etap z pilota („Start etapu”), wcześniej może wrócić do rankingu.
+- Mnożnik etapu mnoży punkty w `zapisz_odpowiedz`. Minusów za błędy świadomie nie ma.
+- Finał trójki: przy wejściu do etapu `finalowy` baza wybiera 3 najlepszych (remis: krótszy łączny czas). Pozostali widzą pytania na telefonie z dopiskiem, że kibicują, a baza odrzuca ich odpowiedzi (`kibic`). Pytanie kończy się, gdy odpowiedzą finaliści. Przy 3 graczach i mniej grają wszyscy.
+- Wyścig po piwo zmienia się z etapem: szklanka rośnie i jest bliżej (krótsze tory), a w finale trzy drogi zbiegają się pod szklanką na środku (lider środkiem, drugi z lewej, trzeci z prawej).
+- Nowe typy: `prawda_falsz` (dwa duże przyciski, na TV dwa kafle z rozkładem) i `szacowanie` (suwak z −/+ na telefonie, na TV oś z kropkami odpowiedzi i złotą kreską poprawnej, „najbliżej” trzy osoby). Szacowanie: trafienie co do kroku = pełne punkty, dalej liniowo do zera w odległości `tolerancja` (domyślnie ćwierć zakresu).
+- Dodatki do każdego pytania: podpowiedzi (do 4, odsłaniane po kolei co czas/liczba sekund; baza wysyła tylko te, których czas minął) i odsłaniana grafika (rozmyta, wyostrza się do końca czasu).
+- Panel: etapy nad pytaniami (edycja w miejscu, strzałki, usuwanie przenosi pytania do sąsiada), szablony etapów (Rozgrzewka, Błyskawica, Kilka dobrych, Strzał liczbowy, Połącz i ułóż, Degustacja na ślepo, Finał), w edytorze pytania wybór etapu, nowe typy, podpowiedzi i odsłanianie.
+- Quizy Piwo, Seriale i Filmy dostały etapy i nowe pytania (4 × prawda/fałsz, 3 × szacowanie). Zostały quizami testowymi.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

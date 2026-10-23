@@ -19,7 +19,14 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
     .from("sesje")
     .select("id, kod, quiz_id, zadanie_nr, tryb, quizy(tytul)")
     .eq("id", id)
-    .maybeSingle<{ id: string; kod: string; quiz_id: string; zadanie_nr: number; tryb: string; quizy: { tytul: string } | null }>();
+    .maybeSingle<{
+      id: string;
+      kod: string;
+      quiz_id: string;
+      zadanie_nr: number;
+      tryb: string;
+      quizy: { tytul: string } | null;
+    }>();
   if (!gra) notFound();
 
   const [wyniki, zadania, { data: odpowiedzi }] = await Promise.all([
@@ -47,7 +54,8 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
       </p>
       <h1 style={{ marginBottom: 4 }}>{ja.nick}</h1>
       <p className="pomocniczy" style={{ marginTop: 0 }}>
-        {ja.miejsce}. miejsce z {wyniki.length} · {ja.punkty.toLocaleString("pl-PL")} pkt · dobrze {ja.dobre}/{zadania.length}
+        {ja.miejsce}. miejsce z {wyniki.length} · {ja.punkty.toLocaleString("pl-PL")} pkt · dobrze {ja.dobre}/
+        {zadania.length}
         {ja.sredniCzasMs !== null && ` · średni czas ${sekundy(ja.sredniCzasMs)}`}
       </p>
 
@@ -77,7 +85,10 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
                         <>
                           <span>
                             {opisOdpowiedzi(z, o.dane)}
-                            {czesciowo && ` (częściowo: ${ulamek(o.ocena ?? 0, liczbaCzesci(z.typ, z.dane))})`}
+                            {czesciowo &&
+                              (z.typ === "szacowanie"
+                                ? ` (blisko: ${Math.round((o.ocena ?? 0) * 100)}% punktów)`
+                                : ` (częściowo: ${ulamek(o.ocena ?? 0, liczbaCzesci(z.typ, z.dane))})`)}
                           </span>
                           <span className="historia-czas">{sekundy(o.czas_ms)}</span>
                         </>
@@ -85,9 +96,7 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
                         <span className="pomocniczy">Brak odpowiedzi</span>
                       )}
                     </div>
-                    {stan !== "dobrze" && (
-                      <div className="lista-opis">{opisRozwiazania(z)}</div>
-                    )}
+                    {stan !== "dobrze" && <div className="lista-opis">{opisRozwiazania(z)}</div>}
                   </div>
                   <span className="historia-punkty">{o ? (o.punkty > 0 ? `+${o.punkty}` : "0") : "–"}</span>
                 </li>

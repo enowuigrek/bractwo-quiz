@@ -6,7 +6,8 @@ import { wymagajAdmina } from "@/lib/admin";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
-import { czyTypZadania, type ZadanieDane } from "@/lib/zadania";
+import { CZASY_ETAPU, LIMITY_ETAPU, MNOZNIKI } from "@/lib/etapy";
+import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
 import { LIMITY } from "./limity";
 
 function tekst(dane: FormData, pole: string): string {
@@ -40,7 +41,10 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
   if (opis.length > LIMITY.opis) return { blad: `Opis może mieć najwyżej ${LIMITY.opis} znaków.` };
 
-  const { error } = await supabaseAdmin().from("quizy").update({ tytul, opis: opis || null }).eq("id", id);
+  const { error } = await supabaseAdmin()
+    .from("quizy")
+    .update({ tytul, opis: opis || null })
+    .eq("id", id);
   if (error) return { blad: `Nie udało się zapisać: ${error.message}` };
   // „Zapisz quiz” na dole edycji: zapis i powrót do listy
   if (dane.get("wroc")) redirect("/admin/quizy");
@@ -87,13 +91,50 @@ function bladListy(teksty: unknown, min: number, nazwa: string): string | null {
   }
   if (lista.some((t) => !t)) return "Uzupełnij wszystkie pola albo usuń puste.";
   if (lista.some((t) => t.length > LIMITY.odpowiedz)) return `Pole może mieć najwyżej ${LIMITY.odpowiedz} znaków.`;
-  if (new Set(lista.map((t) => t.toLocaleLowerCase("pl"))).size !== lista.length) return "Wiersze nie mogą się powtarzać.";
+  if (new Set(lista.map((t) => t.toLocaleLowerCase("pl"))).size !== lista.length)
+    return "Wiersze nie mogą się powtarzać.";
   return null;
 }
 
 const przytnij = (t: unknown) => String(t).trim();
 
+/** Podpowiedzi (puste pomijamy) i odsłanianie grafiki: wspólne dla wszystkich typów. */
+function odczytajDodatki(surowe: Record<string, unknown>): { blad: string } | Dodatki {
+  const lista = Array.isArray(surowe.podpowiedzi) ? surowe.podpowiedzi : [];
+  if (lista.some((t) => typeof t !== "string")) return { blad: "Nieprawidłowe podpowiedzi." };
+  const podpowiedzi = (lista as string[]).map((t) => t.trim()).filter(Boolean);
+  if (podpowiedzi.length > LIMITY.maxPodpowiedzi) {
+    return { blad: `Pytanie może mieć najwyżej ${LIMITY.maxPodpowiedzi} podpowiedzi.` };
+  }
+  if (podpowiedzi.some((t) => t.length > LIMITY.odpowiedz)) {
+    return { blad: `Podpowiedź może mieć najwyżej ${LIMITY.odpowiedz} znaków.` };
+  }
+  const dodatki: Dodatki = {};
+  if (podpowiedzi.length) dodatki.podpowiedzi = podpowiedzi;
+  if (surowe.odslaniaj === true) dodatki.odslaniaj = true;
+  return dodatki;
+}
+
+function liczbaZPola(x: unknown): number | null {
+  const n = typeof x === "number" ? x : typeof x === "string" && x.trim() ? Number(x.replace(",", ".")) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
 function odczytajZadanie(dane: FormData): { blad: string } | ({ tresc: string } & ZadanieDane) {
+  const wynik = odczytajTresc(dane);
+  if ("blad" in wynik) return wynik;
+  let surowe: Record<string, unknown>;
+  try {
+    surowe = JSON.parse(String(dane.get("dane") ?? "{}"));
+  } catch {
+    return { blad: "Nieprawidłowe dane pytania." };
+  }
+  const dodatki = odczytajDodatki(surowe);
+  if ("blad" in dodatki) return dodatki;
+  return { ...wynik, dane: { ...wynik.dane, ...dodatki } } as { tresc: string } & ZadanieDane;
+}
+
+function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & ZadanieDane) {
   const tresc = tekst(dane, "tresc");
   if (!tresc) return { blad: "Wpisz treść pytania." };
   if (tresc.length > LIMITY.tresc) return { blad: `Pytanie może mieć najwyżej ${LIMITY.tresc} znaków.` };
@@ -107,7 +148,26 @@ function odczytajZadanie(dane: FormData): { blad: string } | ({ tresc: string } 
     return { blad: "Nieprawidłowe dane pytania." };
   }
 
-  // czas na odpowiedź ustawia się przy uruchamianiu gry, nie w pytaniu
+  // czas na odpowiedź ustawia się przy uruchamianiu gry albo w etapie, nie w pytaniu
+  if (typ === "prawda_falsz") {
+    if (surowe.poprawna !== 0 && surowe.poprawna !== 1) return { blad: "Zaznacz, czy zdanie jest prawdą czy fałszem." };
+    return { tresc, typ, dane: { odpowiedzi: PRAWDA_FALSZ, poprawna: surowe.poprawna } };
+  }
+
+  if (typ === "szacowanie") {
+    const [min, max, krok, poprawna] = [surowe.min, surowe.max, surowe.krok, surowe.poprawna].map(liczbaZPola);
+    if (min === null || max === null || min >= max)
+      return { blad: "Podaj zakres: najmniejsza liczba mniejsza od największej." };
+    if (krok === null || krok <= 0) return { blad: "Krok musi być większy od zera (np. 1 albo 0,1)." };
+    if ((max - min) / krok > 100_000)
+      return { blad: "Za duży zakres przy takim kroku. Zwiększ krok albo zmniejsz zakres." };
+    if (poprawna === null || poprawna < min || poprawna > max) return { blad: "Poprawna liczba musi być w zakresie." };
+    const tolerancja = liczbaZPola(surowe.tolerancja) ?? (max - min) / 4;
+    if (tolerancja <= 0) return { blad: "Odległość do zera punktów musi być większa od zera." };
+    const jednostka = typeof surowe.jednostka === "string" ? surowe.jednostka.trim().slice(0, 12) || null : null;
+    return { tresc, typ, dane: { min, max, krok, tolerancja, jednostka, poprawna } };
+  }
+
   if (typ === "wybor" || typ === "wielokrotny") {
     const blad = bladListy(surowe.odpowiedzi, LIMITY.minOdpowiedzi, "odpowiedzi");
     if (blad) return { blad };
@@ -118,7 +178,8 @@ function odczytajZadanie(dane: FormData): { blad: string } | ({ tresc: string } 
       return { tresc, typ, dane: { odpowiedzi, poprawna: surowe.poprawna as number } };
     }
     const poprawna = [...new Set(Array.isArray(surowe.poprawna) ? surowe.poprawna : [])];
-    if (poprawna.length === 0 || !poprawna.every(wRamach)) return { blad: "Zaznacz co najmniej jedną poprawną odpowiedź." };
+    if (poprawna.length === 0 || !poprawna.every(wRamach))
+      return { blad: "Zaznacz co najmniej jedną poprawną odpowiedź." };
     return { tresc, typ, dane: { odpowiedzi, poprawna: (poprawna as number[]).sort((a, b) => a - b) } };
   }
 
@@ -159,6 +220,13 @@ export async function zapiszZadanie(
   const odczyt = odczytajZadanie(dane);
   if ("blad" in odczyt) return odczyt;
 
+  // etap z listy etapów tego quizu (pusty: quiz bez etapów)
+  const etapId = tekst(dane, "etap_id") || null;
+  if (etapId) {
+    const { data: etap } = await db.from("etapy").select("id").eq("id", etapId).eq("quiz_id", quizId).maybeSingle();
+    if (!etap) return { blad: "Wybierz etap z listy." };
+  }
+
   const grafika = plikZFormularza(dane, "grafika");
   if (grafika) {
     const blad = bladGrafiki(grafika);
@@ -177,7 +245,7 @@ export async function zapiszZadanie(
     staraGrafika = data.grafika_url;
   }
 
-  const zmiany: Record<string, unknown> = { ...odczyt };
+  const zmiany: Record<string, unknown> = { ...odczyt, etap_id: etapId };
   try {
     if (grafika) zmiany.grafika_url = await wyslijGrafike(grafika, "zadania");
     else if (dane.get("grafika_usun")) zmiany.grafika_url = null;
@@ -203,6 +271,8 @@ export async function zapiszZadanie(
     return { blad: `Nie udało się zapisać: ${error.message}` };
   }
   if ("grafika_url" in zmiany && staraGrafika) await usunGrafike(staraGrafika);
+  // pytanie trafia na swoje miejsce w etapie (nowe na koniec etapu)
+  await uporzadkuj(quizId);
 
   redirect(`/admin/quizy/${quizId}`);
 }
@@ -220,17 +290,144 @@ export async function usunZadanie(quizId: string, zadanieId: string): Promise<vo
   redirect(`/admin/quizy/${quizId}`);
 }
 
-/** Zamienia zadanie z sąsiadem wyżej albo niżej. */
+/** Numeruje etapy 1..n i ustawia pytania etapami (`admin_uporzadkuj_quiz`). */
+async function uporzadkuj(quizId: string): Promise<void> {
+  const { error } = await supabaseAdmin().rpc("admin_uporzadkuj_quiz", { p_quiz: quizId });
+  if (error) throw new Error(`Nie udało się uporządkować pytań: ${error.message}`);
+}
+
+/**
+ * Zamienia zadanie z sąsiadem wyżej albo niżej. Na granicy etapu pytanie przechodzi do sąsiedniego
+ * etapu (na jego koniec albo początek) zamiast zamieniać się z pytaniem z innego etapu.
+ */
 export async function przesunZadanie(quizId: string, zadanieId: string, kierunek: "gora" | "dol"): Promise<void> {
   await wymagajAdmina();
   const db = supabaseAdmin();
-  const { data: zadania } = await db.from("zadania").select("id").eq("quiz_id", quizId).order("nr");
+  const { data: zadania } = await db.from("zadania").select("id, etap_id").eq("quiz_id", quizId).order("nr");
   const lista = zadania ?? [];
   const i = lista.findIndex((z) => z.id === zadanieId);
   const j = kierunek === "gora" ? i - 1 : i + 1;
   if (i < 0 || j < 0 || j >= lista.length) return;
 
-  const { error } = await db.rpc("admin_zamien_zadania", { p_a: lista[i].id, p_b: lista[j].id });
-  if (error) throw new Error(`Nie udało się zmienić kolejności: ${error.message}`);
+  if (lista[i].etap_id !== lista[j].etap_id) {
+    const { error } = await db.from("zadania").update({ etap_id: lista[j].etap_id }).eq("id", zadanieId);
+    if (error) throw new Error(`Nie udało się przenieść pytania: ${error.message}`);
+    await uporzadkuj(quizId);
+  } else {
+    const { error } = await db.rpc("admin_zamien_zadania", { p_a: lista[i].id, p_b: lista[j].id });
+    if (error) throw new Error(`Nie udało się zmienić kolejności: ${error.message}`);
+  }
+  refresh();
+}
+
+// ---------------------------------------------------------------------------
+// Etapy (src/lib/etapy.ts)
+// ---------------------------------------------------------------------------
+
+function odczytajEtap(
+  dane: FormData,
+):
+  { blad: string } | { nazwa: string; opis: string | null; mnoznik: number; czas_s: number | null; finalowy: boolean } {
+  const nazwa = tekst(dane, "nazwa");
+  const opis = tekst(dane, "opis");
+  if (!nazwa) return { blad: "Podaj nazwę etapu." };
+  if (nazwa.length > LIMITY_ETAPU.nazwa) return { blad: `Nazwa może mieć najwyżej ${LIMITY_ETAPU.nazwa} znaków.` };
+  if (opis.length > LIMITY_ETAPU.opis) return { blad: `Zasady mogą mieć najwyżej ${LIMITY_ETAPU.opis} znaków.` };
+  const mnoznik = Number(tekst(dane, "mnoznik") || 1);
+  if (!(MNOZNIKI as readonly number[]).includes(mnoznik)) return { blad: "Wybierz mnożnik punktów z listy." };
+  const czasTekst = tekst(dane, "czas_s");
+  const czas_s = czasTekst ? Number(czasTekst) : null;
+  if (!CZASY_ETAPU.includes(czas_s)) return { blad: "Wybierz czas z listy." };
+  return { nazwa, opis: opis || null, mnoznik, czas_s, finalowy: dane.get("finalowy") === "1" };
+}
+
+/** Nowy etap na końcu quizu. Pierwszy etap dostaje wszystkie dotychczasowe pytania. */
+export async function dodajEtap(quizId: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
+  await wymagajAdmina();
+  const db = supabaseAdmin();
+  const etap = odczytajEtap(dane);
+  if ("blad" in etap) return etap;
+
+  const { data: ostatni } = await db
+    .from("etapy")
+    .select("nr")
+    .eq("quiz_id", quizId)
+    .order("nr", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const { data: nowy, error } = await db
+    .from("etapy")
+    .insert({ ...etap, quiz_id: quizId, nr: (ostatni?.nr ?? 0) + 1 })
+    .select("id")
+    .single();
+  if (error) return { blad: `Nie udało się dodać etapu: ${error.message}` };
+
+  if (!ostatni) {
+    const { error: e } = await db
+      .from("zadania")
+      .update({ etap_id: nowy.id })
+      .eq("quiz_id", quizId)
+      .is("etap_id", null);
+    if (e) return { blad: `Etap dodany, ale nie udało się przypisać pytań: ${e.message}` };
+  }
+  await uporzadkuj(quizId);
+  refresh();
+  return { ok: "Dodano etap." };
+}
+
+export async function zapiszEtap(
+  quizId: string,
+  etapId: string,
+  _: StanFormularza,
+  dane: FormData,
+): Promise<StanFormularza> {
+  await wymagajAdmina();
+  const etap = odczytajEtap(dane);
+  if ("blad" in etap) return etap;
+  const { error } = await supabaseAdmin().from("etapy").update(etap).eq("id", etapId).eq("quiz_id", quizId);
+  if (error) return { blad: `Nie udało się zapisać etapu: ${error.message}` };
+  refresh();
+  return { ok: "Zapisano." };
+}
+
+/** Usuwa etap; jego pytania przechodzą do poprzedniego etapu (albo następnego, gdy to pierwszy). */
+export async function usunEtap(quizId: string, etapId: string): Promise<void> {
+  await wymagajAdmina();
+  const db = supabaseAdmin();
+  const { data: etapy } = await db.from("etapy").select("id").eq("quiz_id", quizId).order("nr");
+  const lista = etapy ?? [];
+  const i = lista.findIndex((e) => e.id === etapId);
+  if (i < 0) return;
+  const sasiad = lista[i - 1] ?? lista[i + 1] ?? null;
+  const { error: e1 } = await db
+    .from("zadania")
+    .update({ etap_id: sasiad?.id ?? null })
+    .eq("etap_id", etapId);
+  if (e1) throw new Error(`Nie udało się przenieść pytań: ${e1.message}`);
+  const { error } = await db.from("etapy").delete().eq("id", etapId).eq("quiz_id", quizId);
+  if (error) throw new Error(`Nie udało się usunąć etapu: ${error.message}`);
+  await uporzadkuj(quizId);
+  refresh();
+}
+
+/** Zamienia etap z sąsiednim (razem z pytaniami). */
+export async function przesunEtap(quizId: string, etapId: string, kierunek: "gora" | "dol"): Promise<void> {
+  await wymagajAdmina();
+  const db = supabaseAdmin();
+  const { data: etapy } = await db.from("etapy").select("id, nr").eq("quiz_id", quizId).order("nr");
+  const lista = etapy ?? [];
+  const i = lista.findIndex((e) => e.id === etapId);
+  const j = kierunek === "gora" ? i - 1 : i + 1;
+  if (i < 0 || j < 0 || j >= lista.length) return;
+  // numery są unikalne z odroczonym sprawdzaniem, ale każde update to osobna transakcja: najpierw poza zakres
+  const { error: e1 } = await db
+    .from("etapy")
+    .update({ nr: 10_000 + lista[i].nr })
+    .eq("id", lista[i].id);
+  const { error: e2 } = await db.from("etapy").update({ nr: lista[i].nr }).eq("id", lista[j].id);
+  const { error: e3 } = await db.from("etapy").update({ nr: lista[j].nr }).eq("id", lista[i].id);
+  const blad = e1 ?? e2 ?? e3;
+  if (blad) throw new Error(`Nie udało się zmienić kolejności etapów: ${blad.message}`);
+  await uporzadkuj(quizId);
   refresh();
 }

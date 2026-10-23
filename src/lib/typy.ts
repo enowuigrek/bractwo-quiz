@@ -29,7 +29,22 @@ export type Zadanie = {
   grafika_url: string | null;
   /** Nieużywane od czasu „czas przy grze” (zostaje w tabeli). */
   czas_s: number | null;
+  /** Etap pytania (null: quiz bez etapów). */
+  etap_id: string | null;
 } & ZadanieDane;
+
+/** Etap quizu (src/lib/etapy.ts). */
+export type Etap = {
+  id: string;
+  quiz_id: string;
+  nr: number;
+  nazwa: string;
+  opis: string | null;
+  mnoznik: number;
+  /** null: czas z ustawień gry. */
+  czas_s: number | null;
+  finalowy: boolean;
+};
 
 /** Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”. */
 export type Nagroda = { miejsce: 1 | 2 | 3; nagroda: string; instrukcja: string | null };

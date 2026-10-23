@@ -6,6 +6,7 @@ export const LIMITY = {
   odpowiedz: 120,
   minOdpowiedzi: 2,
   maxOdpowiedzi: 6,
+  maxPodpowiedzi: 4,
   minCzas: 5,
   maxCzas: 300,
   /** Do wyboru przy uruchamianiu gry; `null` = bez limitu. */

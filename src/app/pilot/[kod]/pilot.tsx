@@ -17,13 +17,15 @@ import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne
 import { supabase } from "@/lib/supabase/przegladarka";
 import { MAX_W_WYSCIGU } from "@/lib/gra/wyscig";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
-import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
+import { napisMnoznika } from "@/lib/etapy";
+import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
 import { GraczePilota } from "./gracze";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
 const NAZWY: Record<FazaWidoczna, string> = {
   poczekalnia: "Poczekalnia",
+  etap: "Plansza etapu",
   przygotuj: "Odliczanie",
   pytanie: "Pytanie trwa",
   wynik: "Wynik",
@@ -166,7 +168,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   // `przygotuj` przechodzi w `pytanie` sam, gdy minie `faza_od`; nie czekamy na odpytanie bazy
   const { faza, doStartu, doKonca, bezLimitu } = fazaTeraz(stan, teraz);
-  const wszyscy = stan.liczba_graczy > 0 && stan.liczba_odpowiedzi >= stan.liczba_graczy;
+  // w finale trójki odpowiadają tylko finaliści
+  const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
+  const wszyscy = grajacy > 0 && stan.liczba_odpowiedzi >= grajacy;
   const z = stan.zadanie;
   const liczba = stan.quiz?.liczba_zadan ?? 0;
   const druzyny = stan.tryb === "druzyny";
@@ -174,8 +178,13 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     ? { akcja: "podium" as const, napis: "Pokaż podium" }
     : {
         akcja: "nastepne" as const,
-        napis: z ? `Następne pytanie (${z.lp + 1}/${liczba})` : "Start quizu",
+        napis: stan.nastepny_etap
+          ? `Następny etap: ${stan.nastepny_etap.nazwa}`
+          : z
+            ? `Następne pytanie (${z.lp + 1}/${liczba})`
+            : "Start quizu",
       };
+  const etap = stan.etap;
 
   return (
     <>
@@ -195,50 +204,98 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </section>
       )}
 
-      {z && faza !== "poczekalnia" && faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
+      {faza === "etap" && etap && (
         <section className="karta" style={{ marginTop: 18 }}>
-          <p
-            className="etykieta"
-            style={{
-              marginTop: 0,
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>
-              Pytanie {z.lp}/{liczba}
-            </span>
-            {faza === "przygotuj" && (
-              <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>
-            )}
-            {faza === "pytanie" && (
-              <span className="gra-kod">
-                {bezLimitu
-                  ? "bez limitu"
-                  : doKonca > 0
-                    ? `${Math.ceil(doKonca / 1000)} s`
-                    : wszyscy
-                      ? "wszyscy odpowiedzieli"
-                      : "czas minął"}
-              </span>
-            )}
+          <p className="etykieta" style={{ marginTop: 0 }}>
+            Etap {etap.nr} z {etap.liczba} · {etap.liczba_pytan} pyt.
           </p>
-          <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
-          <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
-          <p style={{ margin: "14px 0 0" }}>
-            Odpowiedziało{" "}
-            <strong className="gra-kod">
-              {stan.liczba_odpowiedzi}/{stan.liczba_graczy}
-            </strong>
-            {z.liczba_poprawnych !== undefined && (
-              <>
-                {" · "}
-                {z.typ === "wybor" ? "dobrze" : "w pełni dobrze"} <strong className="ok">{z.liczba_poprawnych}</strong>
-              </>
-            )}
+          <p
+            style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 6px", color: "var(--zloto)" }}
+          >
+            {etap.nazwa}
+          </p>
+          {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
+          <p className="pomocniczy" style={{ margin: 0 }}>
+            Punkty {napisMnoznika(etap.mnoznik)} · {etap.czas_s ? `${etap.czas_s} s na odpowiedź` : "bez limitu czasu"}{" "}
+            · {etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", ")}
+          </p>
+          {stan.finalisci && (
+            <p style={{ margin: "10px 0 0" }}>
+              <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
+            </p>
+          )}
+          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+            TV pokazuje planszę z zasadami i animacją. Wytłumacz etap i wystartuj, kiedy wszyscy będą gotowi.
           </p>
         </section>
       )}
+
+      {z &&
+        faza !== "poczekalnia" &&
+        faza !== "etap" &&
+        faza !== "koniec" &&
+        faza !== "podium" &&
+        faza !== "tabela" && (
+          <section className="karta" style={{ marginTop: 18 }}>
+            <p
+              className="etykieta"
+              style={{
+                marginTop: 0,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>
+                Pytanie {z.lp}/{liczba}
+              </span>
+              {faza === "przygotuj" && (
+                <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>
+              )}
+              {faza === "pytanie" && (
+                <span className="gra-kod">
+                  {bezLimitu
+                    ? "bez limitu"
+                    : doKonca > 0
+                      ? `${Math.ceil(doKonca / 1000)} s`
+                      : wszyscy
+                        ? "wszyscy odpowiedzieli"
+                        : "czas minął"}
+                </span>
+              )}
+            </p>
+            {etap && (
+              <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+                {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
+                {stan.finalisci ? " · finał trójki" : ""}
+              </p>
+            )}
+            <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
+            <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
+            {stan.wszystkie_podpowiedzi.length > 0 && (
+              <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
+                {stan.wszystkie_podpowiedzi.map((p, i) => (
+                  <li key={i} className={i < z.podpowiedzi.length ? "poprawna" : undefined}>
+                    <span className="pilot-litera">P{i + 1}</span>
+                    {p}
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p style={{ margin: "14px 0 0" }}>
+              Odpowiedziało{" "}
+              <strong className="gra-kod">
+                {stan.liczba_odpowiedzi}/{grajacy}
+              </strong>
+              {z.liczba_poprawnych !== undefined && (
+                <>
+                  {" · "}
+                  {jedenWybor(z.typ) ? "dobrze" : z.typ === "szacowanie" ? "w punkt" : "w pełni dobrze"}{" "}
+                  <strong className="ok">{z.liczba_poprawnych}</strong>
+                </>
+              )}
+            </p>
+          </section>
+        )}
 
       {faza !== "poczekalnia" && (
         <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
@@ -265,6 +322,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
       {/* rodzaj następnego pytania zawsze: rodzaje się mieszają, prowadzący uprzedza graczy przed startem */}
       {stan.nastepne_typ &&
+        !stan.nastepny_etap &&
         (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
           <p className="pilot-zapowiedz" role="status">
             <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed
@@ -321,6 +379,19 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             Otwórz poczekalnię (QR na TV)
           </button>
         )}
+        {faza === "etap" && (
+          <>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
+              Start etapu (pierwsze pytanie)
+            </button>
+            {z && (
+              <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
+                Wróć do rankingu
+              </button>
+            )}
+          </>
+        )}
+
         {faza === "poczekalnia" && (
           <button
             className={`przycisk${stan.poczekalnia_otwarta ? " zloty" : ""}`}
@@ -492,6 +563,25 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 /** Pytanie na pilocie z rozwiązaniem (prowadzący widzi je od początku). */
 function RozwiazaniePilota({ z, poprawna }: { z: ZadanieWidoczne; poprawna: PilotStan["poprawna"] }) {
   const p = Array.isArray(poprawna) ? poprawna : null;
+  if (z.typ === "szacowanie" && typeof poprawna === "number") {
+    return (
+      <>
+        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+          {NAZWY_TYPOW[z.typ]} · zakres {liczbaZJednostka(z.dane.min ?? 0)}–{liczbaZJednostka(z.dane.max ?? 0)}
+        </p>
+        <ol className="pilot-odpowiedzi">
+          <li className="poprawna">
+            Poprawna: <strong>{liczbaZJednostka(poprawna, z.dane.jednostka)}</strong>
+          </li>
+          {z.najblizej?.map((n) => (
+            <li key={n.nick}>
+              {n.nick}: {liczbaZJednostka(n.liczba, z.dane.jednostka)}
+            </li>
+          ))}
+        </ol>
+      </>
+    );
+  }
   if (z.typ === "kolejnosc" && p) {
     return (
       <>

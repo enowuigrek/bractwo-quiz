@@ -1449,3 +1449,211 @@ html:has(.kolumna) {
   opacity: 0.4;
   cursor: default;
 }
+
+/* Etapy na telefonie: plansza etapu, mnożnik w pasku, finał trójki */
+.gra-mnoznik {
+  color: var(--zloto);
+}
+
+.etap-nazwa {
+  color: var(--zloto);
+  margin: 4px 0 8px;
+}
+
+.etap-opis {
+  margin: 0 0 14px;
+  font-size: var(--fs-body);
+  line-height: 1.4;
+}
+
+.etap-cechy {
+  list-style: none;
+  margin: 0 0 var(--card-pad);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.etap-cechy li {
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+}
+
+.etap-cechy li.zloty {
+  border-color: var(--zloto);
+  color: var(--zloto);
+}
+
+.etap-final {
+  margin-bottom: var(--card-pad);
+}
+
+.gra-kibic {
+  padding: 14px var(--card-pad);
+  border-radius: var(--r-card);
+  border: 2px dashed var(--zloto);
+  color: var(--piana);
+  font-weight: var(--w-semibold);
+  text-align: center;
+}
+
+/* Podpowiedzi odsłaniane w trakcie pytania */
+.gra-podpowiedzi {
+  list-style: none;
+  margin: 0 0 var(--card-pad);
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.gra-podpowiedzi li {
+  padding: 8px 12px;
+  border-left: 3px solid var(--zloto);
+  background: var(--kamien);
+  border-radius: 0 var(--r-pole) var(--r-pole) 0;
+  font-weight: var(--w-semibold);
+  animation: wjazd-werdyktu 0.5s var(--ease-wjazd) both;
+}
+
+.gra-podpowiedzi li span {
+  display: block;
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--zloto);
+}
+
+.gra-grafika {
+  transition: filter 0.3s linear;
+}
+
+/* Prawda / fałsz: dwa duże przyciski obok siebie */
+.odp-pf {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.odp-pf-przycisk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 140px;
+  font: inherit;
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: var(--kamien);
+  border: 3px solid var(--kamien2);
+  border-radius: var(--r-card);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.odp-pf-przycisk span {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.odp-pf-przycisk.prawda {
+  border-color: var(--chmiel-ciemny);
+}
+
+.odp-pf-przycisk.prawda span {
+  color: var(--chmiel);
+}
+
+.odp-pf-przycisk.falsz {
+  border-color: rgba(226, 115, 90, 0.6);
+}
+
+.odp-pf-przycisk.falsz span {
+  color: var(--czerwien);
+}
+
+.odp-pf-przycisk.wybrana {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.odp-pf-przycisk.przygaszona {
+  opacity: 0.4;
+}
+
+.odp-pf-przycisk:disabled {
+  cursor: default;
+}
+
+/* Szacowanie: duża liczba, suwak z −/+ i zakres pod spodem */
+.odp-liczba-wartosc {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 56px;
+  font-weight: var(--w-black);
+  letter-spacing: -0.02em;
+  color: var(--zloto);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.odp-liczba-suwak {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.odp-liczba-suwak input[type="range"] {
+  width: 100%;
+  height: 44px;
+  accent-color: var(--zloto);
+}
+
+.odp-liczba-krok {
+  width: 52px;
+  height: 52px;
+  font: inherit;
+  font-size: 28px;
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: var(--kamien2);
+  border: 0;
+  border-radius: var(--r-round);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.odp-liczba-krok:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.odp-liczba-zakres {
+  display: flex;
+  justify-content: space-between;
+  margin: 2px 0 0;
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.odp-liczba-wynik {
+  padding: 12px var(--card-pad);
+  border-radius: var(--r-pole);
+  background: var(--kamien);
+  border: 2px solid var(--chmiel);
+  text-align: center;
+}
+
+.odp-liczba-wynik p {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: var(--w-semibold);
+}

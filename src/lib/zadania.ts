@@ -1,12 +1,32 @@
 // Typy zadań: kształt `dane` każdego typu, nazwy i podpowiedzi. Wspólne dla panelu, TV i telefonów.
 // Rozwiązanie każdego typu jest w `dane.poprawna` i baza ukrywa je do fazy `wynik`
-// (ocena: `wewn.ocena` w supabase/migrations/20261022162605_typy_pytan.sql).
+// (ocena: `wewn.ocena`, ostatnio w supabase/migrations/20261023112811_etapy.sql).
 
-export const TYPY_ZADAN = ["wybor", "wielokrotny", "kolejnosc", "pary"] as const;
+export const TYPY_ZADAN = ["wybor", "prawda_falsz", "wielokrotny", "kolejnosc", "pary", "szacowanie"] as const;
 export type TypZadania = (typeof TYPY_ZADAN)[number];
+
+/**
+ * Dodatki do pytania każdego typu: podpowiedzi odsłaniane po kolei w trakcie pytania (baza wysyła tylko
+ * te, których czas już minął, w `ZadanieWidoczne.podpowiedzi`) i grafika, która na TV wyostrza się z czasem.
+ */
+export type Dodatki = { podpowiedzi?: string[]; odslaniaj?: boolean };
 
 /** Jedna poprawna odpowiedź (indeks). Odpowiedź gracza: `{ odpowiedz: 2 }`. */
 export type DaneWybor = { odpowiedzi: string[]; poprawna: number };
+/** Prawda / fałsz: jak `wybor` z odpowiedziami „Prawda”, „Fałsz” (`poprawna` 0 albo 1). */
+export type DanePrawdaFalsz = DaneWybor;
+/**
+ * Szacowanie liczby z zakresu `min`–`max` co `krok`. Pełne punkty za trafienie, dalej coraz mniej,
+ * aż do zera w odległości `tolerancja`. Odpowiedź gracza: `{ liczba: 1516 }`.
+ */
+export type DaneSzacowanie = {
+  min: number;
+  max: number;
+  krok: number;
+  tolerancja: number;
+  jednostka: string | null;
+  poprawna: number;
+};
 /** Kilka poprawnych (indeksy). Odpowiedź gracza: `{ odpowiedzi: [0, 2] }`. */
 export type DaneWielokrotny = { odpowiedzi: string[]; poprawna: number[] };
 /**
@@ -18,10 +38,12 @@ export type DaneKolejnosc = { elementy: string[]; poprawna: number[] };
 export type DanePary = { lewe: string[]; prawe: string[]; poprawna: number[] };
 
 export type ZadanieDane =
-  | { typ: "wybor"; dane: DaneWybor }
-  | { typ: "wielokrotny"; dane: DaneWielokrotny }
-  | { typ: "kolejnosc"; dane: DaneKolejnosc }
-  | { typ: "pary"; dane: DanePary };
+  | { typ: "wybor"; dane: DaneWybor & Dodatki }
+  | { typ: "prawda_falsz"; dane: DanePrawdaFalsz & Dodatki }
+  | { typ: "wielokrotny"; dane: DaneWielokrotny & Dodatki }
+  | { typ: "kolejnosc"; dane: DaneKolejnosc & Dodatki }
+  | { typ: "pary"; dane: DanePary & Dodatki }
+  | { typ: "szacowanie"; dane: DaneSzacowanie & Dodatki };
 
 /** Dane widziane przez TV i telefony: `poprawna` dochodzi dopiero od fazy `wynik`. */
 export type DaneWidoczne = {
@@ -29,26 +51,56 @@ export type DaneWidoczne = {
   elementy?: string[];
   lewe?: string[];
   prawe?: string[];
+  min?: number;
+  max?: number;
+  krok?: number;
+  tolerancja?: number;
+  jednostka?: string | null;
+  odslaniaj?: boolean;
   poprawna?: number | number[];
 };
 
 /** Odpowiedź gracza (kształt zależny od typu). */
-export type DaneOdpowiedzi = { odpowiedz?: number; odpowiedzi?: number[]; kolejnosc?: number[]; pary?: number[] };
+export type DaneOdpowiedzi = {
+  odpowiedz?: number;
+  odpowiedzi?: number[];
+  kolejnosc?: number[];
+  pary?: number[];
+  liczba?: number;
+};
 
 export const NAZWY_TYPOW: Record<TypZadania, string> = {
   wybor: "Jedna odpowiedź",
+  prawda_falsz: "Prawda / fałsz",
   wielokrotny: "Kilka odpowiedzi",
   kolejnosc: "Kolejność",
   pary: "Pary",
+  szacowanie: "Szacowanie liczby",
 };
 
 /** Podpowiedź dla graczy na TV i telefonie. */
 export const PODPOWIEDZI_TYPOW: Record<TypZadania, string> = {
   wybor: "Wybierz jedną odpowiedź",
+  prawda_falsz: "Prawda czy fałsz?",
   wielokrotny: "Zaznacz wszystkie poprawne",
   kolejnosc: "Ułóż we właściwej kolejności",
   pary: "Połącz w pary",
+  szacowanie: "Podaj liczbę: im bliżej, tym więcej punktów",
 };
+
+/** Odpowiedzi pytania prawda / fałsz (kolejność jak w `dane.odpowiedzi`). */
+export const PRAWDA_FALSZ = ["Prawda", "Fałsz"];
+
+/** Typy z jedną odpowiedzią do stuknięcia (litery, rozkład głosów, „dobrze odpowiedziało”). */
+export function jedenWybor(typ: TypZadania): boolean {
+  return typ === "wybor" || typ === "prawda_falsz";
+}
+
+/** Liczba w polskim zapisie z jednostką, np. „1516”, „5,2 %”. */
+export function liczbaZJednostka(n: number, jednostka?: string | null): string {
+  const tekst = n.toLocaleString("pl-PL", { maximumFractionDigits: 2, useGrouping: Math.abs(n) >= 10000 });
+  return jednostka ? `${tekst} ${jednostka}` : tekst;
+}
 
 export const LITERY = "ABCDEF";
 
@@ -61,6 +113,10 @@ export function opisRozwiazania(z: ZadanieDane): string {
   switch (z.typ) {
     case "wybor":
       return `Poprawna: ${LITERY[z.dane.poprawna]}. ${z.dane.odpowiedzi[z.dane.poprawna] ?? "?"}`;
+    case "prawda_falsz":
+      return `Poprawna: ${z.dane.odpowiedzi[z.dane.poprawna] ?? "?"}`;
+    case "szacowanie":
+      return `Poprawna: ${liczbaZJednostka(z.dane.poprawna, z.dane.jednostka)} (zakres ${liczbaZJednostka(z.dane.min)}–${liczbaZJednostka(z.dane.max)})`;
     case "wielokrotny":
       return `Poprawne: ${z.dane.poprawna.map((i) => `${LITERY[i]}. ${z.dane.odpowiedzi[i]}`).join(", ")}`;
     case "kolejnosc":
@@ -76,6 +132,10 @@ export function opisOdpowiedzi(z: ZadanieDane, o: DaneOdpowiedzi): string {
   switch (z.typ) {
     case "wybor":
       return o.odpowiedz === undefined ? brak : `${LITERY[o.odpowiedz]}. ${z.dane.odpowiedzi[o.odpowiedz] ?? brak}`;
+    case "prawda_falsz":
+      return o.odpowiedz === undefined ? brak : (z.dane.odpowiedzi[o.odpowiedz] ?? brak);
+    case "szacowanie":
+      return o.liczba === undefined ? brak : liczbaZJednostka(o.liczba, z.dane.jednostka);
     case "wielokrotny":
       return (o.odpowiedzi ?? []).map((i) => `${LITERY[i]}. ${z.dane.odpowiedzi[i] ?? "?"}`).join(", ");
     case "kolejnosc":

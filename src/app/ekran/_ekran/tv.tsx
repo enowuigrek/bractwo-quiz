@@ -15,7 +15,11 @@ import { useBezWygaszacza, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { LITERY, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
+import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
+import { napisMnoznika } from "@/lib/etapy";
+import { rozmycie, useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
+import { EtapTv } from "./etap";
+import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { Plansze } from "./plansze";
@@ -108,6 +112,7 @@ export function Tv({ kod, qr, host }: Props) {
   }, [kod]);
 
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
+  useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
 
   const liczy = stan?.faza === "przygotuj" || stan?.faza === "pytanie";
   const teraz = useCzasSerwera(przesuniecie, liczy, stan?.faza === "przygotuj" ? 100 : 250);
@@ -139,6 +144,8 @@ export function Tv({ kod, qr, host }: Props) {
             />
           ) : stan.faza === "poczekalnia" ? (
             <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
+          ) : stan.faza === "etap" ? (
+            <EtapTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
           ) : stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik" ? (
             <Pytanie stan={stan} teraz={teraz} />
           ) : stan.faza === "odpowiedzi" ? (
@@ -280,6 +287,9 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       </div>
     );
   const liczba = stan.quiz?.liczba_zadan ?? "?";
+  const etap = stan.etap;
+  const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
+  const opisEtapu = etap ? ` · ${etap.nazwa}${etap.mnoznik !== 1 ? ` ${napisMnoznika(etap.mnoznik)}` : ""}` : "";
 
   if (faza === "przygotuj") {
     return (
@@ -287,6 +297,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         <Loga lokal={stan.lokal} browar={stan.browar} />
         <p className="tv-okazja">
           Pytanie {z.lp}/{liczba}
+          {opisEtapu}
         </p>
         <p className="tv-odliczanie">{Math.max(1, Math.ceil(doStartu / 1000))}</p>
         <p className="tv-duzy">Przygotuj się!</p>
@@ -301,11 +312,13 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const rozklad = wynik ? z.rozklad : null;
   const najwiecej = Math.max(1, ...(rozklad ?? [0]));
   const zostalo = z.czas_s ? Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000))) : 0;
+  const rozmyta = rozmycie({ ...stan, faza }, teraz);
   return (
     <div className="tv-pytanie">
       <header className="tv-pytanie-gora">
         <p className="tv-okazja">
           Pytanie {z.lp}/{liczba}
+          {opisEtapu}
         </p>
         {wynik ? (
           <p className="tv-zegar tv-zegar-wynik">Wynik</p>
@@ -325,10 +338,35 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 
       <h1 className="tv-tresc">{z.tresc}</h1>
       {z.typ !== "wybor" && !wynik && <p className="tv-typ-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
+      {z.podpowiedzi.length > 0 && (
+        <ol className="tv-podpowiedzi">
+          {z.podpowiedzi.map((p, i) => (
+            <li key={i}>
+              <span>{i + 1}</span>
+              {p}
+            </li>
+          ))}
+          {!wynik &&
+            Array.from({ length: z.liczba_podpowiedzi - z.podpowiedzi.length }, (_, i) => (
+              <li key={`ukryta-${i}`} className="ukryta">
+                <span>{z.podpowiedzi.length + i + 1}</span>…
+              </li>
+            ))}
+        </ol>
+      )}
 
       <div className={`tv-pytanie-srodek${z.grafika_url ? " z-grafika" : ""}`}>
-        {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-pytanie-grafika" />}
-        {z.typ === "kolejnosc" ? (
+        {z.grafika_url && (
+          <img
+            src={z.grafika_url}
+            alt=""
+            className={`tv-pytanie-grafika${z.dane.odslaniaj ? " odslaniana" : ""}`}
+            style={rozmyta ? { filter: `blur(${rozmyta}px)` } : undefined}
+          />
+        )}
+        {z.typ === "szacowanie" ? (
+          <OsLiczbowa z={z} wynik={wynik} />
+        ) : z.typ === "kolejnosc" ? (
           <ol className={`tv-odp-lista tv-odp-jedna${(z.dane.elementy?.length ?? 0) > 4 ? " gesto" : ""}`}>
             {(wynik && Array.isArray(p) ? p : (z.dane.elementy ?? []).map((_, i) => i)).map((idx, pozycja) => (
               <li key={idx} className={`tv-odp${wynik ? " poprawna" : ""}`}>
@@ -369,14 +407,18 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             </div>
           )
         ) : (
-          <ol className={`tv-odp-lista${(z.dane.odpowiedzi?.length ?? 0) > 4 ? " gesto" : ""}`}>
+          <ol
+            className={`tv-odp-lista${z.typ === "prawda_falsz" ? " tv-odp-pf" : ""}${
+              (z.dane.odpowiedzi?.length ?? 0) > 4 ? " gesto" : ""
+            }`}
+          >
             {(z.dane.odpowiedzi ?? []).map((o, i) => {
               const klasa = !wynik ? "" : czyPoprawna(i) ? " poprawna" : " przygaszona";
               const ile = rozklad?.[i] ?? 0;
               return (
                 <li key={i} className={`tv-odp${klasa}`}>
                   {rozklad && <span className="tv-odp-slupek" style={{ transform: `scaleX(${ile / najwiecej})` }} />}
-                  <span className="tv-odp-litera">{LITERY[i]}</span>
+                  <span className="tv-odp-litera">{z.typ === "prawda_falsz" ? (i === 0 ? "✓" : "✗") : LITERY[i]}</span>
                   <span className="tv-odp-tekst">{o}</span>
                   {rozklad && <span className="tv-odp-ile">{ile}</span>}
                 </li>
@@ -390,9 +432,9 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         {wynik ? (
           <>
             <span>
-              {z.typ === "wybor" ? "Dobrze odpowiedziało" : "W pełni dobrze"}{" "}
+              {jedenWybor(z.typ) ? "Dobrze odpowiedziało" : z.typ === "szacowanie" ? "W punkt" : "W pełni dobrze"}{" "}
               <strong className="tv-dobrze">
-                {z.liczba_poprawnych ?? 0}/{stan.liczba_graczy}
+                {z.liczba_poprawnych ?? 0}/{grajacy}
               </strong>
             </span>
             {z.najszybszy && (
@@ -406,11 +448,15 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             <span>
               Odpowiedziało{" "}
               <strong className="tv-zloto">
-                {stan.liczba_odpowiedzi}/{stan.liczba_graczy}
+                {stan.liczba_odpowiedzi}/{grajacy}
               </strong>
             </span>
             {czasMinal ? (
               <span className="tv-podpowiedz">Za chwilę wynik…</span>
+            ) : stan.finalisci ? (
+              <span className="tv-podpowiedz">
+                Finał: odpowiadają <strong className="tv-zloto">{stan.finalisci.map((f) => f.nick).join(", ")}</strong>
+              </span>
             ) : (
               <span className="tv-podpowiedz">
                 Odpowiadaj na telefonie · kod gry <strong className="tv-zloto">{stan.kod}</strong>
@@ -424,6 +470,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 }
 
 function kluczEkranu(stan: StanSesji): string {
+  if (stan.faza === "etap") return `etap:${stan.etap?.id ?? ""}`;
   const pytanie = stan.faza === "przygotuj" || stan.faza === "pytanie" || stan.faza === "wynik";
   return `${pytanie ? "pytanie" : stan.faza}:${stan.zadanie?.nr ?? 0}`;
 }

@@ -3,11 +3,20 @@
 
 import { useState } from "react";
 import { sekundy } from "@/lib/czas";
+import { napisMnoznika } from "@/lib/etapy";
+import { rozmycie } from "@/lib/gra/dodatki";
 import { fazaTeraz, komunikatBledu } from "@/lib/gra/nasluch";
 import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { LITERY, PODPOWIEDZI_TYPOW, liczbaCzesci, ulamek, type DaneOdpowiedzi } from "@/lib/zadania";
-import { OdpowiedzKolejnosc, OdpowiedzPary, OdpowiedzWielokrotna, Rozwiazanie } from "./odpowiadanie";
+import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor, liczbaCzesci, ulamek, type DaneOdpowiedzi } from "@/lib/zadania";
+import {
+  OdpowiedzKolejnosc,
+  OdpowiedzLiczba,
+  OdpowiedzPary,
+  OdpowiedzPrawdaFalsz,
+  OdpowiedzWielokrotna,
+  Rozwiazanie,
+} from "./odpowiadanie";
 
 const POWODY: Record<Exclude<ZapisOdpowiedzi, { przyjeta: true }>["powod"], string> = {
   po_czasie: "Za późno, czas minął.",
@@ -15,7 +24,13 @@ const POWODY: Record<Exclude<ZapisOdpowiedzi, { przyjeta: true }>["powod"], stri
   nie_teraz: "To pytanie już się skończyło.",
   inne_zadanie: "To pytanie już się skończyło.",
   juz_odpowiedziano: "Twoja odpowiedź jest już zapisana.",
+  kibic: "W finale odpowiadają tylko finaliści.",
 };
+
+/** Finał trójki, a ten gracz nie jest w trójce: patrzy i kibicuje. */
+export function czyKibic(stan: StanSesji, nick: string): boolean {
+  return !!stan.finalisci && !stan.finalisci.some((f) => f.nick === nick);
+}
 
 export type Ja = { nick: string; token: string };
 
@@ -49,6 +64,8 @@ export function Rozgrywka({
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   const liczba = stan.quiz?.liczba_zadan ?? "?";
+  const kibic = czyKibic(stan, ja.nick);
+  const etap = stan.etap;
 
   if (!z) {
     return <p className="pomocniczy">Patrz na telewizor.</p>;
@@ -66,6 +83,7 @@ export function Rozgrywka({
     <p className="etykieta gra-pasek">
       <span>
         Pytanie {z.lp}/{liczba}
+        {etap && etap.mnoznik !== 1 && <span className="gra-mnoznik"> · punkty {napisMnoznika(etap.mnoznik)}</span>}
       </span>
       {faza === "pytanie" && (
         <span className="gra-kod">
@@ -90,7 +108,7 @@ export function Rozgrywka({
           <span className="odliczanie-liczba">{Math.max(1, Math.ceil(doStartu / 1000))}</span>
           <span>Przygotuj się!</span>
           {/* rodzaj pytania już w odliczaniu, żeby nikt nie był zaskoczony parami czy kolejnością */}
-          <span className="odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</span>
+          <span className="odliczanie-typ">{kibic ? "Finał: tym razem kibicujesz" : PODPOWIEDZI_TYPOW[z.typ]}</span>
         </div>
       </>
     );
@@ -129,17 +147,47 @@ export function Rozgrywka({
 
   if (faza === "pytanie") {
     const zostalo = z.czas_s ? Math.max(0, Math.min(1, doKonca / (z.czas_s * 1000))) : 0;
+    const pasek = z.czas_s ? (
+      <div className="gra-czas" aria-hidden>
+        <div style={{ transform: `scaleX(${zostalo})` }} />
+      </div>
+    ) : null;
+    // finał trójki: reszta widzi pytanie, ale nie odpowiada
+    if (kibic) {
+      return (
+        <>
+          {naglowek}
+          {pasek}
+          <Pytanie stan={stan} teraz={teraz} />
+          <p className="gra-kibic">
+            Finał! Odpowiadają {stan.finalisci?.map((f) => f.nick).join(", ")}. Kibicuj i patrz na telewizor.
+          </p>
+        </>
+      );
+    }
     return (
       <>
         {naglowek}
-        {z.czas_s ? (
-          <div className="gra-czas" aria-hidden>
-            <div style={{ transform: `scaleX(${zostalo})` }} />
-          </div>
-        ) : null}
-        <Pytanie stan={stan} />
+        {pasek}
+        <Pytanie stan={stan} teraz={teraz} />
         {z.typ !== "wybor" && <p className="gra-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
-        {z.typ === "wielokrotny" ? (
+        {z.typ === "prawda_falsz" ? (
+          <OdpowiedzPrawdaFalsz
+            key={z.id}
+            z={z}
+            wyslana={moja}
+            zablokowane={czasMinal || wysylam}
+            onWyslij={(d) => void odpowiedz(d)}
+          />
+        ) : z.typ === "szacowanie" ? (
+          <OdpowiedzLiczba
+            key={z.id}
+            z={z}
+            wyslana={moja}
+            zablokowane={czasMinal || wysylam}
+            onWyslij={(d) => void odpowiedz(d)}
+          />
+        ) : z.typ === "wielokrotny" ? (
           <OdpowiedzWielokrotna
             key={z.id}
             z={z}
@@ -202,7 +250,7 @@ export function Rozgrywka({
             ) : (
               "Wszyscy odpowiedzieli. Za chwilę wynik…"
             )
-          ) : z.typ === "wybor" ? (
+          ) : jedenWybor(z.typ) ? (
             "Wybierz odpowiedź."
           ) : (
             ""
@@ -222,7 +270,12 @@ export function Rozgrywka({
   return (
     <>
       {naglowek}
-      {!gotowe ? (
+      {kibic ? (
+        <div className="werdykt czesciowo">
+          <span className="werdykt-tytul">Finał trójki</span>
+          <span className="pomocniczy">Tym razem kibicujesz. Wynik na telewizorze.</span>
+        </div>
+      ) : !gotowe ? (
         <p className="pomocniczy">Liczę punkty…</p>
       ) : ocena?.poprawna ? (
         <div className="werdykt dobrze">
@@ -234,7 +287,9 @@ export function Rozgrywka({
         </div>
       ) : czesciowa ? (
         <div className="werdykt czesciowo">
-          <span className="werdykt-tytul">Częściowo: {ulamek(ocena.ocena ?? 0, liczbaCzesci(z.typ, z.dane))}</span>
+          <span className="werdykt-tytul">
+            {z.typ === "szacowanie" ? "Blisko!" : `Częściowo: ${ulamek(ocena.ocena ?? 0, liczbaCzesci(z.typ, z.dane))}`}
+          </span>
           <span className="werdykt-punkty">+{ocena.punkty} pkt</span>
           <span className="pomocniczy">
             w <span className="czas-odp">{sekundy(ocena.czas_ms)}</span>
@@ -261,7 +316,7 @@ export function Rozgrywka({
       {/* po wyniku bez grafiki i ciaśniej, żeby ekran mieścił się bez przewijania */}
       <div className="gra-wynik">
         <Pytanie stan={stan} bezGrafiki />
-        {z.typ !== "wybor" ? (
+        {!jedenWybor(z.typ) ? (
           <Rozwiazanie z={z} moja={moja} />
         ) : (
           <ol className="odp-lista">
@@ -270,7 +325,7 @@ export function Rozgrywka({
               return (
                 <li key={i}>
                   <div className={`odp${klasa}`}>
-                    <span className="odp-litera">{LITERY[i]}</span>
+                    <span className="odp-litera">{z.typ === "prawda_falsz" ? (i === 0 ? "✓" : "✗") : LITERY[i]}</span>
                     <span className="odp-tekst">{o}</span>
                     {i === poprawna && <span className="ok">✓</span>}
                   </div>
@@ -284,13 +339,31 @@ export function Rozgrywka({
   );
 }
 
-function Pytanie({ stan, bezGrafiki = false }: { stan: StanSesji; bezGrafiki?: boolean }) {
+/** Treść pytania, grafika (odsłaniana wyostrza się z czasem) i podpowiedzi, które już się odsłoniły. */
+function Pytanie({ stan, bezGrafiki = false, teraz }: { stan: StanSesji; bezGrafiki?: boolean; teraz?: number }) {
   const z = stan.zadanie;
   if (!z) return null;
+  const rozmyta = teraz === undefined ? 0 : rozmycie(stan, teraz);
   return (
     <>
       <h2 className="gra-pytanie">{z.tresc}</h2>
-      {z.grafika_url && !bezGrafiki && <img src={z.grafika_url} alt="" className="gra-grafika" />}
+      {z.grafika_url && !bezGrafiki && (
+        <img
+          src={z.grafika_url}
+          alt=""
+          className="gra-grafika"
+          style={rozmyta ? { filter: `blur(${rozmyta / 2}px)` } : undefined}
+        />
+      )}
+      {z.podpowiedzi.length > 0 && (
+        <ol className="gra-podpowiedzi" aria-label="Podpowiedzi">
+          {z.podpowiedzi.map((p, i) => (
+            <li key={i}>
+              <span>Podpowiedź {i + 1}</span> {p}
+            </li>
+          ))}
+        </ol>
+      )}
     </>
   );
 }

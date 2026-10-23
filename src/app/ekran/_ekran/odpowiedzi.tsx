@@ -5,7 +5,7 @@ import type { CSSProperties } from "react";
 import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
-import { LITERY, liczbaCzesci, ulamek } from "@/lib/zadania";
+import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/lib/zadania";
 
 /**
  * Ile kolumn w ramce, żeby 30 graczy zmieściło się na scenie 1920×1080.
@@ -42,11 +42,19 @@ function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null })
   if (!o.dane) return <span className="tv-odpowiedzi-tekst tv-odpowiedzi-bez">brak odpowiedzi</span>;
   if (!z) return null;
   const idx = o.dane.odpowiedz;
-  if (z.typ === "wybor" && idx !== undefined) {
+  if (jedenWybor(z.typ) && idx !== undefined) {
     return (
       <>
-        <span className="tv-odpowiedzi-litera">{LITERY[idx]}</span>
+        {z.typ === "wybor" && <span className="tv-odpowiedzi-litera">{LITERY[idx]}</span>}
         <span className="tv-odpowiedzi-tekst">{z.dane.odpowiedzi?.[idx]}</span>
+      </>
+    );
+  }
+  if (z.typ === "szacowanie" && o.dane.liczba !== undefined) {
+    return (
+      <>
+        <span className="tv-odpowiedzi-tekst">{liczbaZJednostka(o.dane.liczba, z.dane.jednostka)}</span>
+        {o.punkty ? <span className="tv-odpowiedzi-tekst">+{o.punkty}</span> : null}
       </>
     );
   }

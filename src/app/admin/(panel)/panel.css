@@ -1016,3 +1016,81 @@ a.przycisk {
   gap: 8px 14px;
   margin-bottom: 16px;
 }
+
+/* Etapy quizu: nagłówek etapu nad jego pytaniami, formularz z szablonami */
+.etykieta-pola {
+  display: block;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--szary);
+  margin-bottom: 6px;
+}
+
+.formularz label.pole-wyboru {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  color: var(--piana);
+  font-weight: var(--w-regular);
+  cursor: pointer;
+}
+
+.pole-wyboru input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  flex: none;
+  accent-color: var(--zloto);
+}
+
+.etap-blok + .etap-blok {
+  margin-top: 28px;
+}
+
+.etap-naglowek {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-btn-sm);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  margin-bottom: 8px;
+}
+
+.etap-tytul {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: var(--w-black);
+  overflow-wrap: anywhere;
+}
+
+.etap-nr {
+  color: var(--zloto);
+  margin-right: 4px;
+}
+
+.etap-znaczki {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 4px;
+}
+
+.etap-formularz {
+  margin-bottom: 8px;
+}
+
+.etap-pusty {
+  color: var(--szary);
+  font-size: var(--fs-small);
+  padding: 4px 0 8px;
+}
+
+/* Szacowanie w edytorze pytania: pola liczb w dwóch kolumnach */
+.pola-liczby {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}

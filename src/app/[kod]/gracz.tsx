@@ -9,6 +9,8 @@ import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } f
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
 import { godzinaStartu } from "@/lib/gra/zapowiedz";
+import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
+import { EtapGracza } from "./etap";
 import { KoniecGracza } from "./fanfara";
 import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { ZdjecieGracza } from "./zdjecie-gracza";
@@ -86,6 +88,7 @@ export function Gracz({ kod }: { kod: string }) {
   }, [kod, wyrzuc]);
 
   useNasluch(kod, pobierz, ["stan", "gracz"]);
+  useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
 
   // Powrót po odświeżeniu: token z localStorage, `dolacz` sprawdza, że to ta sama gra.
   // Powrót na innym telefonie: QR z pilota prowadzi na `/<kod>#powrot=<token>` (fragment nie trafia na serwer).
@@ -158,23 +161,23 @@ export function Gracz({ kod }: { kod: string }) {
           </>
         ) : (
           <>
-          {usuniety && (
-            <p className="blad" role="alert">
-              Prowadzący usunął Cię z gry. Możesz dołączyć jeszcze raz.
-            </p>
-          )}
-          <Dolacz
-            kod={kod}
-            stan={stan}
-            onDolaczono={(d) => {
-              pamiec.zapisz(kluczTokenu(kod), d.token);
-              tokenRef.current = d.token;
-              nickRef.current = d.nick;
-              ustawUsuniety(false);
-              ustawJa({ nick: d.nick, token: d.token });
-              void pobierz();
-            }}
-          />
+            {usuniety && (
+              <p className="blad" role="alert">
+                Prowadzący usunął Cię z gry. Możesz dołączyć jeszcze raz.
+              </p>
+            )}
+            <Dolacz
+              kod={kod}
+              stan={stan}
+              onDolaczono={(d) => {
+                pamiec.zapisz(kluczTokenu(kod), d.token);
+                tokenRef.current = d.token;
+                nickRef.current = d.nick;
+                ustawUsuniety(false);
+                ustawJa({ nick: d.nick, token: d.token });
+                void pobierz();
+              }}
+            />
           </>
         )}
       </>
@@ -277,8 +280,19 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
           {blad}
         </p>
       )}
-      <button type="submit" className="przycisk zloty" style={{ marginTop: 18 }} disabled={!nick.trim() || !!wysylam || pelna}>
-        {pelna ? "Komplet graczy" : wysylam === "zdjecie" ? "Wysyłam zdjęcie…" : wysylam ? "Dołączam…" : "Dołącz do gry"}
+      <button
+        type="submit"
+        className="przycisk zloty"
+        style={{ marginTop: 18 }}
+        disabled={!nick.trim() || !!wysylam || pelna}
+      >
+        {pelna
+          ? "Komplet graczy"
+          : wysylam === "zdjecie"
+            ? "Wysyłam zdjęcie…"
+            : wysylam
+              ? "Dołączam…"
+              : "Dołącz do gry"}
       </button>
     </form>
   );
@@ -359,6 +373,10 @@ function WGrze({
         </section>
       </>
     );
+  }
+
+  if (stan.faza === "etap") {
+    return <EtapGracza stan={stan} nick={ja.nick} />;
   }
 
   if (stan.faza === "ranking") {
