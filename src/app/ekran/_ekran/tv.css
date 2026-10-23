@@ -1731,11 +1731,16 @@
 /* piana na powierzchni nalewanego piwa */
 .wyscig-piana {
   position: absolute;
-  height: 26px;
-  translate: 0 -55%;
-  border-radius: 50% / 40%;
-  background: radial-gradient(ellipse at 50% 60%, #fffaf0 0%, #f4ecd8 55%, rgba(244, 236, 216, 0.6) 80%, transparent 100%);
-  filter: blur(1px);
+  min-height: 10px;
+  translate: 0 -70%;
+  border-radius: 40% / 30%;
+  background:
+    radial-gradient(circle at 20% 35%, rgba(255, 255, 255, 0.9) 0 3%, transparent 4%),
+    radial-gradient(circle at 63% 28%, rgba(255, 255, 255, 0.8) 0 2.5%, transparent 3.5%),
+    radial-gradient(circle at 82% 55%, rgba(255, 255, 255, 0.7) 0 2%, transparent 3%),
+    linear-gradient(180deg, #fffaf0 0%, #f4ecd8 55%, rgba(236, 220, 180, 0.85) 85%, rgba(227, 172, 63, 0) 100%);
+  box-shadow: 0 -2px 8px rgba(255, 250, 240, 0.35);
+  filter: blur(0.6px);
   pointer-events: none;
 }
 

@@ -256,13 +256,21 @@ function Szklanka({
     top: `${poziom(cz)}%`,
     left: `${bok(poziom(cz))}%`,
     right: `${bok(poziom(cz))}%`,
+    // piana rośnie razem z piwem: cienka warstwa na dnie, gruba czapa pod koniec
+    height: `${1.5 + 5 * cz}%`,
     opacity: cz > 0 && cz < 1 ? 1 : 0,
   });
   const babelkiOd = (cz: number) => (cz >= 1 ? POD_PIANA : Math.min(DNO, poziom(cz) + 2));
   return (
     <div className={`wyscig-szklanka${nagroda ? " z-nagroda" : ""}`} aria-hidden>
       <div className="wyscig-szklo">
-        <img src="/grafiki/szklanka.webp" alt="" className="wyscig-szklanka-pusta" />
+        {/* pusta szklanka bez piany z grafiki: piana tworzy się dopiero na nalewanym piwie */}
+        <img
+          src="/grafiki/szklanka.webp"
+          alt=""
+          className="wyscig-szklanka-pusta"
+          style={{ clipPath: `inset(${POD_PIANA - 3}% 0 0 0)` }}
+        />
         <motion.img
           src="/grafiki/szklanka.webp"
           alt=""
