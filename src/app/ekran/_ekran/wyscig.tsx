@@ -200,6 +200,21 @@ const poziom = (cz: number) => DNO - (DNO - GORA) * cz;
 /** Szklanka zwęża się ku dołowi: odstęp piany od boków obrazka na danym poziomie. */
 const bok = (y: number) => 6 + Math.max(0, y - 35) * 0.18;
 
+/** Pełna szklanka: piana z grafiki kończy się mniej więcej tu (procent wysokości), bąbelki tylko niżej. */
+const POD_PIANA = 24;
+
+/**
+ * Bąbelki w piwie: stałe położenia i tempo (bez losowania, żeby nie skakały przy odświeżeniu),
+ * `x` w procentach szerokości szklanki, `r` średnica w px, `t` czas wznoszenia, `d` opóźnienie startu.
+ */
+const BABELKI = Array.from({ length: 18 }, (_, i) => ({
+  x: 24 + ((i * 37) % 52),
+  r: 6 + ((i * 5) % 9),
+  t: 2.6 + ((i * 7) % 10) * 0.28,
+  d: -((i * 1.3) % 4.2),
+  w: ((i % 3) - 1) * 6,
+}));
+
 function Szklanka({ przed, teraz, doKonca }: { przed: number; teraz: number; doKonca: number }) {
   const nalewanie = { delay: START_S, duration: RUCH_S + 0.6, ease: [0.22, 1, 0.36, 1] as const };
   // pas piany tylko w trakcie: pusta szklanka nie ma piany, a pełna ma swoją z grafiki
@@ -209,6 +224,7 @@ function Szklanka({ przed, teraz, doKonca }: { przed: number; teraz: number; doK
     right: `${bok(poziom(cz))}%`,
     opacity: cz > 0 && cz < 1 ? 1 : 0,
   });
+  const babelkiOd = (cz: number) => (cz >= 1 ? POD_PIANA : Math.min(DNO, poziom(cz) + 2));
   return (
     <div className="wyscig-szklanka" aria-hidden>
       <div className="wyscig-szklo">
@@ -221,6 +237,28 @@ function Szklanka({ przed, teraz, doKonca }: { przed: number; teraz: number; doK
           animate={{ clipPath: `inset(${poziom(teraz)}% 0 0 0)` }}
           transition={nalewanie}
         />
+        {/* bąbelki unoszą się od dna, widać je tylko w nalanym piwie (pod pianą) */}
+        <motion.div
+          className="wyscig-babelki"
+          initial={{ clipPath: `inset(${babelkiOd(przed)}% 0 ${100 - DNO}% 0)` }}
+          animate={{ clipPath: `inset(${babelkiOd(teraz)}% 0 ${100 - DNO}% 0)` }}
+          transition={nalewanie}
+        >
+          {BABELKI.map((b, i) => (
+            <span
+              key={i}
+              style={
+                {
+                  left: `${b.x}%`,
+                  "--r": `${b.r}px`,
+                  "--t": `${b.t}s`,
+                  "--d": `${b.d}s`,
+                  "--w": `${b.w}px`,
+                } as React.CSSProperties
+              }
+            />
+          ))}
+        </motion.div>
         <motion.div className="wyscig-piana" initial={piana(przed)} animate={piana(teraz)} transition={nalewanie} />
       </div>
       <p className="wyscig-szklanka-opis">{doKonca ? `jeszcze ${doKonca} ${pytan(doKonca)}` : "Nalane!"}</p>

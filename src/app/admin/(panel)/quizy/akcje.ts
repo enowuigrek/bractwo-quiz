@@ -6,7 +6,15 @@ import { wymagajAdmina } from "@/lib/admin";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
-import { CZASY_ETAPU, LIMITY_ETAPU, MNOZNIKI } from "@/lib/etapy";
+import {
+  CZASY_ETAPU,
+  LIMITY_ETAPU,
+  MAX_ETAPOW,
+  MAX_PLAN_PYTAN,
+  MNOZNIKI,
+  SZABLONY_ETAPOW,
+  typDomyslny,
+} from "@/lib/etapy";
 import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
 import { LIMITY } from "./limity";
 
@@ -24,12 +32,45 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
   if (!tytul) return { blad: "Podaj tytuł quizu." };
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
 
-  const { data, error } = await supabaseAdmin()
+  // etapy z szablonu quizu: [{ szablon, pytania }] po kolei
+  let surowe: unknown;
+  try {
+    surowe = JSON.parse(String(dane.get("etapy") ?? "[]"));
+  } catch {
+    return { blad: "Nieprawidłowe etapy." };
+  }
+  const lista = Array.isArray(surowe) ? surowe : [];
+  if (lista.length > MAX_ETAPOW) return { blad: `Quiz może mieć najwyżej ${MAX_ETAPOW} etapów.` };
+  const etapy = [];
+  for (const [i, e] of lista.entries()) {
+    const szablon = SZABLONY_ETAPOW.find((s) => s.klucz === (e as { szablon?: unknown })?.szablon);
+    const pytania = Number((e as { pytania?: unknown })?.pytania);
+    if (!szablon || !Number.isInteger(pytania) || pytania < 1 || pytania > MAX_PLAN_PYTAN) {
+      return { blad: "Nieprawidłowe etapy." };
+    }
+    etapy.push({
+      nr: i + 1,
+      nazwa: szablon.nazwa,
+      opis: szablon.opis,
+      mnoznik: szablon.mnoznik,
+      czas_s: szablon.czas_s,
+      finalowy: szablon.finalowy,
+      plan_pytan: pytania,
+      typ_domyslny: typDomyslny(szablon),
+    });
+  }
+
+  const db = supabaseAdmin();
+  const { data, error } = await db
     .from("quizy")
     .insert({ tytul, opis: tekst(dane, "opis") || null })
     .select("id")
     .single();
   if (error) return { blad: `Nie udało się utworzyć quizu: ${error.message}` };
+  if (etapy.length) {
+    const { error: e } = await db.from("etapy").insert(etapy.map((e) => ({ ...e, quiz_id: data.id })));
+    if (e) return { blad: `Quiz utworzony, ale bez etapów: ${e.message}` };
+  }
   redirect(`/admin/quizy/${data.id}`);
 }
 
@@ -274,6 +315,8 @@ export async function zapiszZadanie(
   // pytanie trafia na swoje miejsce w etapie (nowe na koniec etapu)
   await uporzadkuj(quizId);
 
+  // „Zapisz i dodaj następne”: od razu kolejne pytanie w tym samym etapie
+  if (dane.get("dalej")) redirect(`/admin/quizy/${quizId}/zadania/nowe${etapId ? `?etap=${etapId}` : ""}`);
   redirect(`/admin/quizy/${quizId}`);
 }
 
@@ -324,10 +367,17 @@ export async function przesunZadanie(quizId: string, zadanieId: string, kierunek
 // Etapy (src/lib/etapy.ts)
 // ---------------------------------------------------------------------------
 
-function odczytajEtap(
-  dane: FormData,
-):
-  { blad: string } | { nazwa: string; opis: string | null; mnoznik: number; czas_s: number | null; finalowy: boolean } {
+type PolaEtapu = {
+  nazwa: string;
+  opis: string | null;
+  mnoznik: number;
+  czas_s: number | null;
+  finalowy: boolean;
+  plan_pytan: number | null;
+  typ_domyslny: string | null;
+};
+
+function odczytajEtap(dane: FormData): { blad: string } | PolaEtapu {
   const nazwa = tekst(dane, "nazwa");
   const opis = tekst(dane, "opis");
   if (!nazwa) return { blad: "Podaj nazwę etapu." };
@@ -338,7 +388,35 @@ function odczytajEtap(
   const czasTekst = tekst(dane, "czas_s");
   const czas_s = czasTekst ? Number(czasTekst) : null;
   if (!CZASY_ETAPU.includes(czas_s)) return { blad: "Wybierz czas z listy." };
-  return { nazwa, opis: opis || null, mnoznik, czas_s, finalowy: dane.get("finalowy") === "1" };
+  const planTekst = tekst(dane, "plan_pytan");
+  const plan_pytan = planTekst ? Number(planTekst) : null;
+  if (plan_pytan !== null && (!Number.isInteger(plan_pytan) || plan_pytan < 1 || plan_pytan > MAX_PLAN_PYTAN)) {
+    return { blad: `Liczba pytań w etapie: od 1 do ${MAX_PLAN_PYTAN} (albo puste).` };
+  }
+  const typ = dane.get("typ_domyslny");
+  return {
+    nazwa,
+    opis: opis || null,
+    mnoznik,
+    czas_s,
+    finalowy: dane.get("finalowy") === "1",
+    plan_pytan,
+    typ_domyslny: czyTypZadania(typ) ? typ : null,
+  };
+}
+
+/** −/+ przy etapie: zmienia planowaną liczbę pytań (bez planu: zaczyna od liczby obecnych pytań). */
+export async function zmienPlanEtapu(quizId: string, etapId: string, o: 1 | -1): Promise<void> {
+  await wymagajAdmina();
+  const db = supabaseAdmin();
+  const { data: etap } = await db.from("etapy").select("plan_pytan").eq("id", etapId).eq("quiz_id", quizId).single();
+  if (!etap) return;
+  const { count } = await db.from("zadania").select("id", { count: "exact", head: true }).eq("etap_id", etapId);
+  const teraz = etap.plan_pytan ?? Math.max(1, count ?? 0);
+  const nowy = Math.min(MAX_PLAN_PYTAN, Math.max(1, teraz + o));
+  const { error } = await db.from("etapy").update({ plan_pytan: nowy }).eq("id", etapId);
+  if (error) throw new Error(`Nie udało się zmienić liczby pytań: ${error.message}`);
+  refresh();
 }
 
 /** Nowy etap na końcu quizu. Pierwszy etap dostaje wszystkie dotychczasowe pytania. */

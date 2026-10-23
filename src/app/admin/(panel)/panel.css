@@ -1094,3 +1094,115 @@ a.przycisk {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
+
+/* Szablony nowego quizu i plan pytań w etapach */
+.szablony-quizu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.formularz label.szablon-quizu {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--r-btn-sm);
+  border: 2px solid var(--kamien2);
+  background: var(--kamien);
+  cursor: pointer;
+}
+
+.szablon-quizu input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.szablon-quizu strong {
+  color: var(--piana);
+  font-size: var(--fs-body);
+}
+
+.szablon-quizu span {
+  color: var(--szary);
+  font-weight: var(--w-regular);
+}
+
+.szablon-quizu.wybrany {
+  border-color: var(--zloto);
+  box-shadow: var(--glow-md);
+}
+
+.szablon-quizu:has(input:focus-visible) {
+  outline: 3px solid var(--zloto);
+  outline-offset: 3px;
+}
+
+.etapy-szablonu-akcje {
+  align-items: center;
+}
+
+.etapy-szablonu-liczba {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: var(--w-black);
+  color: var(--zloto);
+  font-variant-numeric: tabular-nums;
+}
+
+.etapy-szablonu-dodaj {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.etapy-szablonu-dodaj .pole {
+  max-width: 260px;
+}
+
+.pole.pole-waskie {
+  max-width: 120px;
+}
+
+.etap-plan {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.etap-plan .przycisk-maly {
+  min-height: 0;
+  padding: 0 8px;
+  line-height: 1.4;
+}
+
+.etap-brakujace {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.etap-brakujace li {
+  padding: 9px 0 9px 2.2em;
+  border-bottom: 1px dashed var(--kamien2);
+}
+
+.etap-brakujace a {
+  color: var(--szary);
+  text-decoration: none;
+  font-weight: var(--w-semibold);
+}
+
+.etap-brakujace a:hover {
+  color: var(--zloto);
+}
+
+.etap-brakujace-dodaj {
+  border-bottom: 0 !important;
+}
+
+.edytor-przyciski {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

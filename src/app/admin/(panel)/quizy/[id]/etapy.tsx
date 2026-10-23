@@ -1,7 +1,15 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CZASY_ETAPU, LIMITY_ETAPU, MNOZNIKI, napisMnoznika, SZABLONY_ETAPOW } from "@/lib/etapy";
+import {
+  CZASY_ETAPU,
+  LIMITY_ETAPU,
+  MAX_PLAN_PYTAN,
+  MNOZNIKI,
+  napisMnoznika,
+  SZABLONY_ETAPOW,
+  typDomyslny,
+} from "@/lib/etapy";
 import type { Etap, StanFormularza } from "@/lib/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { bezResetu } from "../../_komponenty/bez-resetu";
@@ -9,9 +17,17 @@ import { IkonaEdytuj } from "../../_komponenty/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { dodajEtap, zapiszEtap } from "../akcje";
 
-type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy">;
+type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy" | "plan_pytan" | "typ_domyslny">;
 
-const PUSTY: Pola = { nazwa: "", opis: "", mnoznik: 1, czas_s: null, finalowy: false };
+const PUSTY: Pola = {
+  nazwa: "",
+  opis: "",
+  mnoznik: 1,
+  czas_s: null,
+  finalowy: false,
+  plan_pytan: null,
+  typ_domyslny: null,
+};
 
 /** Formularz etapu: nowy (z szablonem) albo edycja istniejącego. */
 function FormularzEtapu({
@@ -39,6 +55,7 @@ function FormularzEtapu({
 
   return (
     <form {...bezResetu(akcja)} className="karta formularz etap-formularz">
+      <input type="hidden" name="typ_domyslny" value={pola.typ_domyslny ?? ""} />
       {!etap && (
         <div>
           <span className="etykieta-pola">Szablon (wypełnia pola, potem możesz wszystko zmienić)</span>
@@ -49,7 +66,17 @@ function FormularzEtapu({
                 type="button"
                 className={`wybor-czasu-opcja${pola.nazwa === s.nazwa ? " wybrana" : ""}`}
                 title={`Pasuje: ${s.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", ")}`}
-                onClick={() => zmien({ ...s })}
+                onClick={() =>
+                  zmien({
+                    nazwa: s.nazwa,
+                    opis: s.opis,
+                    mnoznik: s.mnoznik,
+                    czas_s: s.czas_s,
+                    finalowy: s.finalowy,
+                    typ_domyslny: typDomyslny(s),
+                    plan_pytan: pola.plan_pytan ?? 3,
+                  })
+                }
               >
                 {s.nazwa}
               </button>
@@ -116,6 +143,19 @@ function FormularzEtapu({
           ))}
         </div>
       </fieldset>
+      <div>
+        <label htmlFor={`plan-${id}`}>Ile pytań ma mieć etap (opcjonalnie)</label>
+        <input
+          id={`plan-${id}`}
+          name="plan_pytan"
+          type="number"
+          className="pole pole-waskie"
+          min={1}
+          max={MAX_PLAN_PYTAN}
+          value={pola.plan_pytan ?? ""}
+          onChange={(e) => zmien({ plan_pytan: e.target.value ? Number(e.target.value) : null })}
+        />
+      </div>
       <label className="pole-wyboru">
         <input
           type="checkbox"
@@ -167,7 +207,21 @@ export function NowyEtap({ quizId, pierwszy }: { quizId: string; pierwszy: boole
 }
 
 /** Nagłówek etapu nad jego pytaniami: nazwa, mnożnik, czas, finał; ołówek otwiera edycję w miejscu. */
-export function NaglowekEtapu({ quizId, etap, akcje }: { quizId: string; etap: Etap; akcje: React.ReactNode }) {
+export function NaglowekEtapu({
+  quizId,
+  etap,
+  akcje,
+  pytan,
+  plan,
+}: {
+  quizId: string;
+  etap: Etap;
+  akcje: React.ReactNode;
+  /** Ile pytań etap ma teraz. */
+  pytan: number;
+  /** −/+ planowanej liczby pytań (formularze z akcjami serwera). */
+  plan: React.ReactNode;
+}) {
   const [edycja, ustawEdycje] = useState(false);
   if (edycja) {
     return (
@@ -189,6 +243,11 @@ export function NaglowekEtapu({ quizId, etap, akcje }: { quizId: string; etap: E
           <span className="znaczek aktywny">punkty {napisMnoznika(etap.mnoznik)}</span>
           <span className="znaczek">{etap.czas_s ? `${etap.czas_s} s` : "czas jak w grze"}</span>
           {etap.finalowy && <span className="znaczek aktywny">finał trójki</span>}
+          <span className={`znaczek${etap.plan_pytan && pytan >= etap.plan_pytan ? " aktywny" : ""}`}>
+            pytania {pytan}
+            {etap.plan_pytan ? ` z ${etap.plan_pytan}` : ""}
+          </span>
+          {plan}
         </p>
         {etap.opis && <p className="lista-opis">{etap.opis}</p>}
       </div>

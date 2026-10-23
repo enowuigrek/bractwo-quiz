@@ -16,6 +16,8 @@ type Props = {
   etapy: Etap[];
   /** Etap dla nowego pytania (np. ostatni). */
   domyslnyEtap: string | null;
+  /** Rodzaj nowego pytania (z etapu, do którego jest dodawane). */
+  domyslnyTyp?: TypZadania;
 };
 
 /** Wiersz edytora: `a` to odpowiedź / element / lewa strona pary, `b` prawa strona pary. */
@@ -76,14 +78,14 @@ function powtorzenia(teksty: string[]): Set<number> {
 }
 
 /** Edytor zadania: typ, pytanie i wiersze zależne od typu, jedna grafika. */
-export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap }: Props) {
+export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTyp }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(
     zapiszZadanie.bind(null, quizId, zadanie?.id ?? null),
     {},
   );
 
   const start = poczatek(zadanie);
-  const [typ, setTyp] = useState<TypZadania>(zadanie?.typ ?? "wybor");
+  const [typ, setTyp] = useState<TypZadania>(zadanie?.typ ?? domyslnyTyp ?? "wybor");
   // klucze, żeby React nie mieszał pól przy usuwaniu wierszy ze środka
   const [wiersze, setWiersze] = useState<Wiersz[]>(() => start.wiersze.map(([a, b = ""], klucz) => ({ klucz, a, b })));
   const [nastepnyKlucz, setNastepnyKlucz] = useState(start.wiersze.length);
@@ -437,9 +439,15 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap }: Props) {
       </fieldset>
 
       <KomunikatFormularza stan={stan} />
-      <button type="submit" className="przycisk zloty" disabled={trwa}>
-        {trwa ? "Zapisuję…" : zadanie ? "Zapisz pytanie" : "Dodaj pytanie"}
-      </button>
+      <div className="edytor-przyciski">
+        <button type="submit" className="przycisk zloty" disabled={trwa}>
+          {trwa ? "Zapisuję…" : zadanie ? "Zapisz pytanie" : "Dodaj pytanie"}
+        </button>
+        {/* od razu kolejne pytanie w tym samym etapie, bez wracania do listy */}
+        <button type="submit" name="dalej" value="1" className="przycisk" disabled={trwa}>
+          {zadanie ? "Zapisz i dodaj nowe" : "Dodaj i następne"}
+        </button>
+      </div>
     </form>
   );
 }

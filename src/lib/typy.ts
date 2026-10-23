@@ -18,7 +18,7 @@ export type Quiz = {
   utworzono: string;
 };
 
-import type { ZadanieDane } from "./zadania";
+import type { TypZadania, ZadanieDane } from "./zadania";
 
 /** Zadanie quizu: `typ` + `dane` (kształt zależny od typu, patrz src/lib/zadania.ts). */
 export type Zadanie = {
@@ -44,6 +44,10 @@ export type Etap = {
   /** null: czas z ustawień gry. */
   czas_s: number | null;
   finalowy: boolean;
+  /** Ile pytań ma mieć etap (z szablonu quizu), null: bez planu. */
+  plan_pytan: number | null;
+  /** Rodzaj podsuwany przy dodawaniu pytania do etapu. */
+  typ_domyslny: TypZadania | null;
 };
 
 /** Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”. */

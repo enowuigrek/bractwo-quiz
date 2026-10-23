@@ -7,7 +7,7 @@ import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
 import { IkonaKosz } from "../../_komponenty/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { przesunEtap, przesunZadanie, usunEtap, usunZadanie } from "../akcje";
+import { przesunEtap, przesunZadanie, usunEtap, usunZadanie, zmienPlanEtapu } from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
@@ -107,6 +107,30 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
               <NaglowekEtapu
                 quizId={quiz.id}
                 etap={etap}
+                pytan={wEtapie.length}
+                plan={
+                  <span className="etap-plan">
+                    <form action={zmienPlanEtapu.bind(null, quiz.id, etap.id, -1)}>
+                      <button
+                        className="przycisk-maly ikona"
+                        disabled={(etap.plan_pytan ?? wEtapie.length) <= 1}
+                        aria-label={`Mniej pytań w etapie ${etap.nr}`}
+                        data-podpis="Mniej pytań"
+                      >
+                        −
+                      </button>
+                    </form>
+                    <form action={zmienPlanEtapu.bind(null, quiz.id, etap.id, 1)}>
+                      <button
+                        className="przycisk-maly ikona"
+                        aria-label={`Więcej pytań w etapie ${etap.nr}`}
+                        data-podpis="Więcej pytań"
+                      >
+                        +
+                      </button>
+                    </form>
+                  </span>
+                }
                 akcje={
                   <>
                     <form action={przesunEtap.bind(null, quiz.id, etap.id, "gora")}>
@@ -145,10 +169,23 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                 }
               />
             )}
-            {wEtapie.length > 0 ? (
-              <ol className="lista">{wEtapie.map(wiersz)}</ol>
-            ) : (
-              etap && <p className="etap-pusty">Brak pytań w tym etapie. Dodaj nowe albo przenieś strzałkami.</p>
+            {wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
+            {etap && (
+              // miejsca na brakujące pytania z planu etapu, każde prowadzi do nowego pytania w tym etapie
+              <ol className="etap-brakujace">
+                {Array.from({ length: Math.max(0, (etap.plan_pytan ?? 0) - wEtapie.length) }, (_, i) => (
+                  <li key={i}>
+                    <Link href={`/admin/quizy/${quiz.id}/zadania/nowe?etap=${etap.id}`}>
+                      + pytanie {wEtapie.length + i + 1} z {etap.plan_pytan}
+                    </Link>
+                  </li>
+                ))}
+                {(etap.plan_pytan ?? 0) <= wEtapie.length && (
+                  <li className="etap-brakujace-dodaj">
+                    <Link href={`/admin/quizy/${quiz.id}/zadania/nowe?etap=${etap.id}`}>+ pytanie w tym etapie</Link>
+                  </li>
+                )}
+              </ol>
             )}
           </div>
         ))}

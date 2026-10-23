@@ -36,7 +36,7 @@ Etapy z planszą, mnożnikiem i finałem trójki są od 23.10 (PLAN.md). Na pó�
 
 ## Organizacyjne
 
-- Szablony quizów (np. „Dzień Porteru”), które kopiuje się przed eventem.
+- Szablony quizów z gotowymi pytaniami (np. „Dzień Porteru”), które kopiuje się przed eventem. (Szablony z samymi etapami i liczbą pytań są od 23.10.)
 - Biblioteka pytań wspólna dla wszystkich quizów, z tagami (style, historia, chmiele).
 - Tryb próbny („na sucho”), który nie zapisuje wyników.
 - **Zmiana nicku** przez gracza przed startem quizu.

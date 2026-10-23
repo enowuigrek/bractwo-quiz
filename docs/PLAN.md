@@ -403,6 +403,9 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 - Dodatki do każdego pytania: podpowiedzi (do 4, odsłaniane po kolei co czas/liczba sekund; baza wysyła tylko te, których czas minął) i odsłaniana grafika (rozmyta, wyostrza się do końca czasu).
 - Panel: etapy nad pytaniami (edycja w miejscu, strzałki, usuwanie przenosi pytania do sąsiada), szablony etapów (Rozgrzewka, Błyskawica, Kilka dobrych, Strzał liczbowy, Połącz i ułóż, Degustacja na ślepo, Finał), w edytorze pytania wybór etapu, nowe typy, podpowiedzi i odsłanianie.
 - Quizy Piwo, Seriale i Filmy dostały etapy i nowe pytania (4 × prawda/fałsz, 3 × szacowanie). Zostały quizami testowymi.
+- Szablony quizu (migracja `20261023115224_plan_etapu`: `etapy.plan_pytan`, `etapy.typ_domyslny`): przy tworzeniu quizu wybór szablonu (Klasyczny pub quiz, Krótki, Degustacja, Bez etapów), a potem zmiana etapów i liczby pytań (−/+, kolejność, usuwanie, dodawanie). Na stronie quizu etap pokazuje „pytania 2 z 6”, −/+ zmienia plan, a brakujące pytania to linki „+ pytanie 3 z 6”. Nowe pytanie z etapu zaczyna od rodzaju z szablonu etapu, „Dodaj i następne” od razu otwiera kolejne w tym samym etapie.
+- Bąbelki w szklance wyścigu: unoszą się od dna, widać je tylko w nalanym piwie (pod pianą).
+- Finał wyścigu: drogi kończą się przed szklanką, a pod nią jest miękka poświata zamiast obręczy, żeby nic nie zasłaniało szkła.
 
 ## Zadania dla ciebie (dzień 0)
 

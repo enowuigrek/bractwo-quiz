@@ -9,9 +9,14 @@ import { EdytorZadania } from "../edytor";
 export const metadata: Metadata = { title: "Pytanie · Bractwo Quiz" };
 
 /** `/admin/quizy/[id]/zadania/nowe` dodaje pytanie, a z identyfikatorem edytuje istniejące. */
-export default async function StronaZadania({ params }: PageProps<"/admin/quizy/[id]/zadania/[zadanie]">) {
+export default async function StronaZadania({
+  params,
+  searchParams,
+}: PageProps<"/admin/quizy/[id]/zadania/[zadanie]">) {
   await wymagajAdmina();
   const { id, zadanie: zadanieId } = await params;
+  // `?etap=<id>`: nowe pytanie w tym etapie (z listy pytań albo po „Dodaj i następne”)
+  const { etap: etapZAdresu } = await searchParams;
   const db = supabaseAdmin();
   const nowe = zadanieId === "nowe";
 
@@ -23,19 +28,22 @@ export default async function StronaZadania({ params }: PageProps<"/admin/quizy/
     db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
   ]);
   if (!quiz || (!nowe && !zadanie)) notFound();
+  const lista = etapy ?? [];
+  const wybrany = lista.find((e) => e.id === etapZAdresu) ?? lista.at(-1) ?? null;
 
   return (
     <main>
       <p className="okruchy">
         <Link href={`/admin/quizy/${quiz.id}`}>← {quiz.tytul}</Link>
       </p>
-      <h1>{nowe ? "Nowe pytanie" : "Edycja pytania"}</h1>
+      <h1>{nowe ? (wybrany ? `Nowe pytanie: ${wybrany.nazwa}` : "Nowe pytanie") : "Edycja pytania"}</h1>
       <section className="karta">
         <EdytorZadania
           quizId={quiz.id}
           zadanie={zadanie ?? undefined}
-          etapy={etapy ?? []}
-          domyslnyEtap={etapy?.at(-1)?.id ?? null}
+          etapy={lista}
+          domyslnyEtap={wybrany?.id ?? null}
+          domyslnyTyp={wybrany?.typ_domyslny ?? undefined}
         />
       </section>
     </main>
