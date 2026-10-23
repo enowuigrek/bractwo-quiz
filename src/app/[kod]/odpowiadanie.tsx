@@ -37,9 +37,11 @@ export function OdpowiedzPrawdaFalsz({
           }`}
           disabled={wybrana !== null || zablokowane}
           onClick={() => onWyslij({ odpowiedz: i })}
+          // okrągłe (seria): same znaki, napis tylko dla czytników ekranu
+          aria-label={okragle ? o : undefined}
         >
           <span aria-hidden>{i === 0 ? "✓" : "✗"}</span>
-          {o}
+          {!okragle && o}
         </button>
       ))}
     </div>

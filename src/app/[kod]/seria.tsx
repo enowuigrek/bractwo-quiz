@@ -140,7 +140,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
         <span className="gra-kod">{Math.ceil(zostalo / 1000)} s</span>
       </p>
       {pasek}
-      <h2 className="gra-pytanie">{z.tresc}</h2>
+      {/* miejsce na trzy linie: przyciski stoją w jednym miejscu, czy pytanie ma jedną linię, czy dwie */}
+      <h2 className="gra-pytanie seria-pytanie">{z.tresc}</h2>
       {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
       {z.typ === "prawda_falsz" ? (
         <OdpowiedzPrawdaFalsz key={z.id} {...wspolne} okragle />
