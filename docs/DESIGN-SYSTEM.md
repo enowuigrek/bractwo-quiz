@@ -162,6 +162,7 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 - Wjazdy: `cubic-bezier(.2,.9,.25,1.1)`, z lekkim przestrzeleniem.
 - Wszystkie animacje mają wyłączenie w `prefers-reduced-motion: reduce`.
+- Tło ekranów TV (Quiz) nie jest martwą czernią: na czarnym `--bg` bardzo wolno dryfują dwie, trzy ciepłe plamy światła jak od świec (złoto 11%, bursztyn 7%, 70–110 s), a z dołu unoszą się złote bąbelki jak w kuflu (22 sztuki, 16–30 s). Tylko transformacje i przezroczystość, tekst zawsze czytelny.
 
 **Baner / stopka maila.** Proporcje ok. 5:2. Tło grafitowe z ukośnymi liśćmi chmielu ton na tonie. Białe logo u góry z lewej, kolumna kontaktów u góry z prawej, szyszka chmielu w prawym dolnym rogu, która wychodzi poza kadr. Nagłówek jubileuszowy (zwężony) siedzi u dołu z lewej. Złota tu nie ma: na grafikach drukowanych marka jest monochromatyczna, a jedynym kolorem jest zieleń chmielu.
 

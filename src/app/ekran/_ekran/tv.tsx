@@ -19,6 +19,7 @@ import { LITERY, PODPOWIEDZI_TYPOW } from "@/lib/zadania";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { Plansze } from "./plansze";
+import { TloTv } from "./tlo";
 import { PodiumTv, RankingTv } from "./ranking";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
@@ -46,6 +47,7 @@ export function Scena({ children, bezLogoWRogu = false }: { children: React.Reac
   const [dx, dy] = usePrzesuniecieOled();
   return (
     <div className="tv">
+      <TloTv />
       <div
         className="scena"
         style={{
