@@ -100,7 +100,6 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
             <p className="etykieta gra-pasek">
               <span>
                 Seria · pytanie {wSerii + nr + 1}/{wSerii || liczba}
-                {p.efekt !== "brak" && <span className="seria-utrudnienie"> · utrudnienie!</span>}
               </span>
               <span className="gra-kod" style={zegar === null ? { visibility: "hidden" } : undefined}>
                 {zegar} s

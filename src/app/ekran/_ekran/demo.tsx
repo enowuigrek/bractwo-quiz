@@ -53,7 +53,6 @@ function Kafel({
   znak,
   tekst,
   stan,
-  duzy = false,
 }: {
   x: number;
   y: number;
@@ -62,12 +61,10 @@ function Kafel({
   znak?: string;
   tekst: string;
   stan?: "wybrany" | "para0" | "para1" | "para2";
-  /** Duży kafel prawda / fałsz: znak nad napisem. */
-  duzy?: boolean;
 }) {
   return (
     <div
-      className={`demo-kafel${duzy ? " duzy" : ""}${stan ? ` ${stan}` : ""}`}
+      className={`demo-kafel${stan ? ` ${stan}` : ""}`}
       style={{ left: x, top: y, width: w, height: h }}
     >
       {znak !== undefined && <span className="demo-znak">{znak}</span>}
@@ -120,18 +117,15 @@ function scena(typ: TypZadania, t: number): Scena {
       const srodek = (i: number) => ({ x: 20 + 80 + i * 180, y: 350 });
       return {
         tresc: "Porter bałtycki to piwo ciemne.",
-        elementy: ["Prawda", "Fałsz"].map((o, i) => (
-          <Kafel
+        // jak na telefonie w serii: płaskie koła, zielone ✓ i czerwone ✗, bez napisów
+        elementy: ["prawda", "falsz"].map((o, i) => (
+          <div
             key={o}
-            x={20 + i * 180}
-            y={250}
-            w={160}
-            h={200}
-            duzy
-            znak={i === 0 ? "✓" : "✗"}
-            tekst={o}
-            stan={i === 0 && poStuku(0.35) ? "wybrany" : undefined}
-          />
+            className={`demo-kolo ${o}${i === 0 && poStuku(0.35) ? " wybrany" : ""}`}
+            style={{ left: srodek(i).x - 70, top: srodek(i).y - 70 }}
+          >
+            {i === 0 ? "✓" : "✗"}
+          </div>
         )),
         sciezka: [
           { t: 0, ...SPOCZYNEK },

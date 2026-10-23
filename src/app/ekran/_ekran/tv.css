@@ -1985,13 +1985,6 @@
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
-.demo-kafel.duzy {
-  flex-direction: column;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: var(--w-black);
-}
-
 .demo-znak {
   flex: none;
   display: grid;
@@ -2978,4 +2971,34 @@
     transform: none;
     transition: opacity 0.8s ease-in;
   }
+}
+
+/* Demo prawda/fałsz na planszy etapu (demo.tsx): te same płaskie koła co na telefonie w serii */
+.demo-kolo {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 68px;
+  font-weight: var(--w-black);
+  line-height: 1;
+  color: #14110d;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.45),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.12);
+  transition: transform 0.1s;
+}
+
+.demo-kolo.prawda {
+  background: var(--chmiel);
+}
+
+.demo-kolo.falsz {
+  background: var(--czerwien);
+}
+
+.demo-kolo.wybrany {
+  transform: scale(0.92);
 }

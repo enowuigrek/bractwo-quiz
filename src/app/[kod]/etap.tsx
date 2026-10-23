@@ -30,7 +30,6 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
             : "Kto pierwszy, ten lepszy"}
         </li>
         {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
-        {e.seria && e.finalowy && <li>Od połowy pytań utrudnienia</li>}
         {e.typy.map((t) => (
           <li key={t}>{NAZWY_TYPOW[t]}</li>
         ))}

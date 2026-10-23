@@ -2206,10 +2206,7 @@ html:has(.kolumna) {
   transform: scale(0.92);
 }
 
-/* Utrudnienia w drugiej połowie finału (seria.tsx): każde pytanie od połowy robi co innego */
-.seria-utrudnienie {
-  color: var(--zloto);
-}
+/* Utrudnienia w drugiej połowie finału (seria.tsx): każde pytanie od połowy robi co innego, bez zapowiedzi */
 
 .utrudnienie-drzenie .seria-pytanie {
   animation: drzenie-pytania 0.14s linear infinite;

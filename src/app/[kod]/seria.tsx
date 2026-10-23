@@ -143,7 +143,6 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
       <p className="etykieta gra-pasek">
         <span>
           Seria · pytanie {ktore}/{pytania.length}
-          {efekt && <span className="seria-utrudnienie"> · utrudnienie!</span>}
         </span>
         <span className="gra-kod">{Math.ceil(zostalo / 1000)} s</span>
       </p>
