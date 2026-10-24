@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { grafikaWyniku, pobierz, type DaneWyniku } from "@/lib/grafika-wyniku";
+import { grafikaWyniku, udostepnij, type DaneWyniku } from "@/lib/grafika-wyniku";
 import { BRACTWO_INSTAGRAM } from "@/lib/konta";
 
 type Props = {
@@ -11,22 +11,24 @@ type Props = {
 };
 
 /**
- * Po quizie: grafika z wynikiem „na pamiątkę” do pobrania (jeden przycisk; kto chce, sam ją udostępni)
- * i konta do oznaczenia. Strona nie może sama oznaczyć kont ani dodać relacji, więc nicki są do skopiowania.
+ * Po quizie: grafika z wynikiem „na pamiątkę” (jeden przycisk) i konta do oznaczenia. Przycisk otwiera systemowe
+ * udostępnianie, bo tylko stamtąd iPhone zapisuje obraz do Zdjęć (zwykłe pobranie trafia do Plików); stamtąd też
+ * od razu do relacji. Bez udostępniania w przeglądarce (komputer) po prostu pobiera plik. Strona nie może sama oznaczyć kont ani dodać relacji, więc nicki są do skopiowania.
  */
 export function UdostepnijWynik({ wynik, konta }: Props) {
   const [trwa, ustawTrwa] = useState(false);
   const [komunikat, ustawKomunikat] = useState<string | null>(null);
   const oznaczenia = [...new Set([BRACTWO_INSTAGRAM, ...konta].filter((k): k is string => !!k))].map((k) => `@${k}`);
 
+  const tekstPosta = [`${wynik.miejsce}. miejsce w quizie ${wynik.tytul}!`, ...oznaczenia].join(" ");
   const nazwa = `quiz-${wynik.miejsce}-miejsce.png`;
 
   async function naPamiatke() {
     ustawTrwa(true);
     ustawKomunikat(null);
     try {
-      pobierz(await grafikaWyniku({ ...wynik, oznaczenia }), nazwa);
-      ustawKomunikat("Grafika pobrana na pamiątkę.");
+      const co = await udostepnij(await grafikaWyniku({ ...wynik, oznaczenia }), nazwa, tekstPosta);
+      if (co === "pobrano") ustawKomunikat("Grafika pobrana na pamiątkę.");
     } catch (e) {
       ustawKomunikat((e as Error).message);
     }
