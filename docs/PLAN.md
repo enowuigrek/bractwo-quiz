@@ -710,6 +710,13 @@ Ustalone z Łukaszem: prawdziwy finał ma być dłuższy niż pijany (60 s), a w
 - **Wideo wybuchu:** w ostatnich 0,7 s klipu obraz zjeżdża w dół (`.pijany-wideo.splywa`), jakby piana spłynęła z ekranu.
 - Sprawdzone na grze testowej (5 graczy): przewagi 3/2/0, pozycje na TV, koniec serii po 12. kroku, ranking ze zwycięzcą wyścigu na 1. miejscu (mimo przewagi innych), werble.
 
+### Quiz „Muzyka ponadczasowa” (24.10) ✅
+
+Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `20261024190636_quiz_muzyka_ponadczasowa`). Etapy skopiowane jeden do jednego z Piwnego quizu (nazwy, opisy, czasy, odpadanie, finał jako wyścig 180 s), treść przez historię muzyki od baroku po hip-hop, trudność rośnie w każdym etapie.
+- Rozgrzewka 10 pytań i ciekawostka „Serce wróciło do Warszawy” (Chopin), trzy pytania z grafiką (saksofon, kaseta, organy z odsłanianiem). „Kilka dobrych”: 8 pytań z 1, 2, 3 albo 4 dobrymi. Strzał liczbowy: 5 pytań, poprawna nigdy w środku suwaka. Walka o finał: ciekawostka „Woodstock 1969” i 6 zadań na zmianę kolejność i pary. Finał: pula 30 prawda/fałsz (15 + 15).
+- Grafiki z OpenAI (`scripts/grafiki.mjs`, `public/grafiki/pytania/{saksofon,kaseta,organy,chopin,woodstock}.webp`).
+- Pijany finał jest wspólny dla wszystkich quizów, więc tu też idą pytania o piwie. Do ułożenia przy projektowaniu pijanego finału.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

@@ -108,6 +108,34 @@ const GRAFIKI = {
       "quiet monastery courtyard with a few old wooden beer barrels by the wall.",
     STYL_ZDJECIA,
   ),
+  // quiz „Muzyka ponadczasowa”
+  "muz-saksofon": zdjecie(
+    "saksofon.webp",
+    "A golden alto saxophone lying on a dark velvet surface, dramatic warm side light, smoky jazz club atmosphere, " +
+      "very dark background, the whole instrument visible.",
+  ),
+  "muz-kaseta": zdjecie(
+    "kaseta.webp",
+    "A vintage audio compact cassette tape on a dark wooden table, the magnetic tape and two reels visible through " +
+      "the window, blank label without any writing, warm light, dark background.",
+  ),
+  "muz-organy": zdjecie(
+    "organy.webp",
+    "Close view of the tall metal pipes of a grand church pipe organ, rows of shiny pipes, warm candle light, " +
+      "dark cathedral interior.",
+  ),
+  "muz-chopin": zdjecie(
+    "chopin.webp",
+    "A black grand piano with an open lid in an elegant 19th-century salon lit by candles, sheet music on the stand " +
+      "without readable notes, tall windows, warm evening light.",
+    STYL_ZDJECIA,
+  ),
+  "muz-woodstock": zdjecie(
+    "woodstock.webp",
+    "An empty muddy festival field on a gentle hillside at dawn after a huge rock festival, a simple wooden stage " +
+      "in the distance, morning mist, scattered blankets, summer 1969 atmosphere.",
+    STYL_ZDJECIA,
+  ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
     "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +
