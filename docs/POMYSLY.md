@@ -36,6 +36,7 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 - Efekt „piany” przy wejściu nowego gracza do poczekalni (złoty blask na liderze rankingu już jest).
 - Odliczanie jako napełniający się kufel zamiast paska.
 - Dźwięki (start, koniec czasu, werble po finale, fanfara przy podium) z wyciszeniem na pilocie. Teraz TV jest cicha, a werble to sam obraz.
+- **Pijany finał, pytania per quiz (do uporządkowania):** 24.10 na próbę z „Muzyką ponadczasową” jest prowizorka: tabela `pijane_pytania_quizu` (migracja `20261024193848`), którą funkcja `pijane_pytania` bierze zamiast wspólnej listy, gdy quiz gry ma tam wiersze. Panel jej nie pokazuje (wpisane migracją). Przy projekcie pijanego finału: wybór puli w panelu (wspólna albo własna quizu) i edycja obu.
 - **Pijany finał, „wyniki ankiety”:** zliczanie odpowiedzi z dogrywki i zabawne napisy na TV (np. „83% uważa, że szklanka jest pełna”). Od 23.10 TV pokazuje w dogrywce tylko chaos z awatarami, a odpowiedzi nigdzie nie idą.
 - **Kilka klipów wybuchu (pomysł Łukasza z 24.10):** więcej wersji `pekniecie.mp4` i losowanie jednej na grę (z kodu gry, żeby TV po przeładowaniu dostał ten sam). Przy każdym klipie sprawdzić `WYBUCH_S` (osobny dla klipu).
 - **Pijany finał, pękająca szklanka (wideo AI, pomysł Łukasza z 24.10; zrobione 24.10, opis w PLAN.md):** pod koniec dogrywki, gdy nagłówek jest już nieostry, a awatary latają, szklanka na TV pęka i piwo rozlewa się po ekranie, a potem jest wygaszenie i werble jak teraz. Wykonalne, ok. pół dnia z próbami. Plan:

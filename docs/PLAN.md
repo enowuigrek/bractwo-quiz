@@ -716,7 +716,8 @@ Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `202610241
 - Rozgrzewka 10 pytań i ciekawostka „Serce wróciło do Warszawy” (Chopin), trzy pytania z grafiką (saksofon, kaseta, organy z odsłanianiem). „Kilka dobrych”: 8 pytań z 1, 2, 3 albo 4 dobrymi. Strzał liczbowy: 5 pytań, poprawna nigdy w środku suwaka. Walka o finał: ciekawostka „Woodstock 1969” i 6 zadań na zmianę kolejność i pary. Finał: pula 30 prawda/fałsz (15 + 15).
 - Grafiki z OpenAI (`scripts/grafiki.mjs`, `public/grafiki/pytania/{saksofon,kaseta,organy,chopin,woodstock}.webp`).
 - **Więcej współczesnej muzyki** (migracja `20261024193522_muzyka_wspolczesna`): R&B, hip-hop (też polski: Taco Hemingway, Quebonafide, Kękę) i pop zamiast części pytań o Beatlesów i klasykę, 20 zmienionych zadań we wszystkich etapach. Z finału zniknęły zdania, które powtarzały pytania z etapów albo ciekawostkę (Nobel Dylana, śmierć Chopina, „Bohemian Rhapsody”, reggae, „Cztery pory roku”).
-- Pijany finał jest wspólny dla wszystkich quizów, więc tu też idą pytania o piwie. Do ułożenia przy projektowaniu pijanego finału.
+- **Własny pijany finał** (prowizorka na próbę, migracja `20261024193848_pijane_pytania_quizu`, opis w POMYSLY.md): 10 pytań bez piwa, zaczyna się zdaniami o muzyce (Freddie Mercury, refreny), potem jak zwykle coraz dziwniej. Piwny quiz bez zmian.
+- Wcześniej pijany finał był wspólny dla wszystkich quizów (pytania o piwie także tu). Do ułożenia przy projektowaniu pijanego finału.
 
 ### Uwagi po teście 24.10 wieczorem ✅
 
