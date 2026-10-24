@@ -104,7 +104,6 @@ export function NaglowekSerii({
   zegar?: number | null;
 }) {
   const e = stan.etap;
-  const n = Math.max(1, e?.liczba_pytan ?? 1);
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const przedStartem = teraz < od;
@@ -113,7 +112,7 @@ export function NaglowekSerii({
   return (
     <header className="tv-ranking-gora">
       <h1>{e?.finalowy ? "Finał: seria pytań" : (e?.nazwa ?? "Seria pytań")}</h1>
-      <p className="tv-okazja">{przedStartem ? "Przygotujcie telefony!" : `Pytań: ${n} · kto pierwszy do piwa`}</p>
+      <p className="tv-okazja">{przedStartem ? "Przygotujcie telefony!" : "Kto pierwszy do piwa"}</p>
       {przedStartem ? (
         <p className="tv-zegar tv-seria-odliczanie" aria-live="polite">
           <span>Start za</span> {Math.max(1, Math.ceil((od - teraz) / 1000))}

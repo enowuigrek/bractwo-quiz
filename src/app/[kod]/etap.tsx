@@ -17,7 +17,9 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
         <span>
           Etap {e.nr} z {e.liczba}
         </span>
-        <span className="gra-kod">{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} pyt.`}</span>
+        {!e.finalowy && (
+          <span className="gra-kod">{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} pyt.`}</span>
+        )}
       </p>
       <h1 className="etap-nazwa">{e.nazwa}</h1>
       {e.opis && <p className="etap-opis">{e.opis}</p>}

@@ -72,7 +72,8 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                     : "Kto pierwszy, ten lepszy"}
               </li>
               {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
-              <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>
+              {/* w finale bez liczby pytań: seria prawda/fałsz leci szybko, a liczba tylko straszy */}
+              {!e.finalowy && <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>}
             </motion.ul>
             {/* odpadanie: walka o finał (trójka) albo próg po etapie z `etap.przechodzi` (src/app/pilot/[kod]/progi.tsx) */}
             {e.final_po_etapie ? (

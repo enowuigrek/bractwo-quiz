@@ -680,6 +680,12 @@ Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, pr
 - **Pętla muzyki bez nakładania:** ostatnie 1,2 s utwór cichnie, gra do końca pliku, 0,7 s ciszy i rusza od `petlaOd` (wcześniej 2,5 s przenikania, które na TV brzmiało jak dwa utwory naraz).
 - Pytanie 17 (polskie tradycje): grodziskie wróciło jako dobra odpowiedź (migracja `20261024174740_grodziskie_w_polskich_tradycjach`), zamiast koźlaka.
 
+### Finał bez liczby pytań, dłuższa cisza przed wybuchem, zwycięzca przy szklance (24.10) ✅
+
+- W finale nigdzie nie ma liczby pytań: plansza finału bez „Pytań: 14”, nagłówek serii na TV „Kto pierwszy do piwa”, telefon „Pytanie 8” (bez „/14”), a pijany finał liczy dalej „Pytanie 15, 16…” (zamiast 15/14). Liczba pytań zostaje na planszach zwykłych etapów.
+- Pijany finał: telefony gasną i muzyka cichnie 7,5 s przed końcem (`GASNIECIE_S`), wybuch dalej 3 s przed końcem, więc 4,5 s ciszy zamiast 2,5 s; pilot daje 9 s (`WYLEWANIE_S`, migracja `20261024180529_pijany_dluzsza_cisza_i_seria_w_pijanym`).
+- Zwycięzca serii widać przy szklance, zanim zacznie się chaos: `stan_sesji` wydaje stan serii także w fazie `pijany` (wcześniej TV pokazywał miejsca bez ostatniego kroku zwycięzcy).
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

@@ -122,7 +122,8 @@ export function Tv({ kod, qr, host }: Props) {
         if (error) throw error;
         ustawRanking(data as WierszRankingu[]);
       }
-      if (stan.faza === "seria" && stan.seria) {
+      // w pijanym finale baza podaje stan serii z ostatnim krokiem zwycięzcy (stoi przy szklance)
+      if ((stan.faza === "seria" || stan.faza === "pijany") && stan.seria) {
         ustawOstatniaSerie({ etap: stan.etap?.id ?? null, gracze: stan.seria });
       }
       ustawStan(stan);
@@ -556,9 +557,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 type ZapamietanaSeria = { etap: string | null; gracze: SeriaGracz[] };
 
 /**
- * Kto lata w pijanym finale i skąd rusza: z miejsc, na których TV ostatnio widział serię (bez ostatniego
- * kroku zwycięzcy, bo seria kończy się razem z nim, więc nic nie zdradza). Po przeładowaniu TV
- * finaliści (albo wszyscy) startują z połowy drogi.
+ * Kto lata w pijanym finale i skąd rusza: z miejsc na końcu serii, zwycięzca przy szklance (od 24.10 widać,
+ * że już dobiegł, zanim zacznie się chaos). Bez danych serii finaliści (albo wszyscy) startują z połowy drogi.
  */
 function graczePijani(stan: StanSesji, seria: ZapamietanaSeria | null, gracze: GraczNaLiscie[]): GraczPijany[] {
   const n = Math.max(1, stan.etap?.liczba_pytan ?? 1);

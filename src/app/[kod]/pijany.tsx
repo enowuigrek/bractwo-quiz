@@ -22,7 +22,7 @@ type Reakcja = { dobrze: boolean; wybrana: 0 | 1; komentarz: string | null; ms: 
 
 /**
  * Telefon w trybie „Pijany finał” (faza `pijany`): dogrywka po finale, która nic nie liczy. Tryb jest ukryty
- * przed graczami: telefon wygląda jak dalsza seria, tylko numeracja leci za koniec (pytanie 15/14, 16/14…).
+ * przed graczami: telefon wygląda jak dalsza seria, a numeracja leci dalej (pytanie 15, 16…).
  * Każdy odpowiada we własnym tempie na pytania z `pijane_pytania` (cała pula, a gdy się skończy, od nowa);
  * odpowiedzi nigdzie nie idą. Po każdej odpowiedzi reakcja: błysk w losowym kolorze, drżenie albo puls
  * przycisku i czasem komentarz na środku ekranu („Serio?”), coraz dłużej (1 s → 3,5 s), więc nie da się tego
@@ -36,7 +36,7 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
   const [reakcja, ustawReakcja] = useState<Reakcja | null>(null);
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
-  // numeracja ciągnie się dalej po serii: 15/14, 16/14…
+  // numeracja ciągnie się dalej po serii: 15, 16…
   const wSerii = stan.etap?.liczba_pytan ?? 0;
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
           <div key={nr}>
             <p className="etykieta gra-pasek">
               <span>
-                Seria · pytanie {wSerii + nr + 1}/{wSerii || liczba}
+                Pytanie {wSerii + nr + 1}
               </span>
               <span className="gra-kod" style={zegar === null ? { visibility: "hidden" } : undefined}>
                 {zegar} s

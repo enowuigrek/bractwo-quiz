@@ -50,16 +50,17 @@ export function czasReakcjiPijanej(poziom: number): number {
  * `GASNIECIE_S` przed końcem telefony gasną z błyskiem i urywa się muzyka na TV, `WYBUCH_PRZED_S` przed
  * końcem szklanka wybucha w wideo na TV, a z końcem fazy przychodzą werble.
  */
-export const GASNIECIE_S = 5.5;
+export const GASNIECIE_S = 7.5;
 export const WYBUCH_PRZED_S = 3;
 
 /**
  * Wideo pękającej szklanki na koniec dogrywki (TV, `ekran/_ekran/pijany.tsx`). Pilot (`werble`) skraca fazę
- * do `teraz + 7 s` (`WYLEWANIE_S`, musi się zgadzać z bazą), więc i wtedy mieści się gaśnięcie, cisza i wybuch.
+ * do `teraz + 9 s` (`WYLEWANIE_S`, musi się zgadzać z bazą), więc i wtedy mieści się gaśnięcie, cisza i wybuch.
+ * Między zgaszeniem telefonów a wybuchem 4,5 s ciszy (24.10: 2,5 s to było za szybko).
  * TV startuje klip tak, żeby wybuch (`WYBUCH_S` klipu) wypadł `WYBUCH_PRZED_S` przed końcem fazy.
  * Nowy klip wystarczy podmienić w `public/wideo/pekniecie.mp4`, a przy innym momencie wybuchu zmienić `WYBUCH_S`.
  */
-export const WYLEWANIE_S = 7;
+export const WYLEWANIE_S = 9;
 export const WIDEO_WYLEWANIA = "/wideo/pekniecie.mp4";
 /** Sekunda klipu, w której szklanka wybucha: wtedy interfejs TV się rozpada (nagłówek w górę, awatary na boki). */
 export const WYBUCH_S = 1.5;
