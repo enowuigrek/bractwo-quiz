@@ -356,16 +356,22 @@
   height: 100%;
 }
 
-.tv-wstep-tytul {
-  margin: 4px 0 18px;
-  font-size: 120px;
+/* tekst niżej i z oddechem: nad drogą etapów jest dużo miejsca (24.10: było ciasno pod nagłówkiem) */
+.tv-wstep > .tv-okazja {
+  margin-top: 70px;
+}
+
+.tv .tv-wstep-tytul {
+  margin: 14px 0 34px;
+  font-size: 128px;
+  line-height: 1;
 }
 
 .tv-wstep-opis {
   margin: 0;
-  max-width: 1500px;
-  font-size: 40px;
-  line-height: 1.35;
+  max-width: 1450px;
+  font-size: 44px;
+  line-height: 1.5;
   color: var(--piana);
 }
 
