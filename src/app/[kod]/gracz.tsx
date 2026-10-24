@@ -401,11 +401,12 @@ function WGrze({
   }
 
   if (stan.faza === "pijany") {
-    return <PijanyFinal stan={stan} teraz={teraz} token={ja.token} />;
+    return <PijanyFinal stan={stan} teraz={teraz} />;
   }
 
   if (stan.faza === "werble") {
-    return <Werble />;
+    // po pijanym finale telefon już zgasł z błyskiem (pijany.tsx): teraz tylko napis wchodzi na czerni
+    return <Werble blysk={!stan.pijany_final} />;
   }
 
   if (stan.faza === "etap") {

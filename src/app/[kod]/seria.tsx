@@ -33,6 +33,19 @@ function utrudnienie(nr: number, liczba: number, typ: string): string | null {
   return typ !== "prawda_falsz" && NA_PRZYCISKACH.includes(efekt) ? "drzenie" : efekt;
 }
 
+/**
+ * Ile trwa ocena po odpowiedzi w finale (błysk tła, puls albo drżenie przycisku); przyciski stoją wtedy
+ * zablokowane. Krótko w pierwszej połowie, a od utrudnień coraz dłużej: 0,4 s → 1 s na ostatnim pytaniu.
+ * Każdy finalista dostaje przy tym samym pytaniu to samo, więc wyścig zostaje uczciwy.
+ */
+function czasOceny(nr: number, liczba: number): number {
+  const polowa = Math.ceil(liczba / 2);
+  if (nr < polowa) return 400;
+  return Math.round(600 + (400 * (nr - polowa)) / Math.max(1, liczba - 1 - polowa));
+}
+
+type Ocena = { id: string; dane: DaneOdpowiedzi; dobrze: boolean; ms: number };
+
 /** Pytanie serii w kształcie, którego oczekują komponenty odpowiadania. */
 function jakoZadanie(p: PytanieSerii): ZadanieWidoczne {
   return { ...p, lp: 0, czas_s: null, podpowiedzi: [], liczba_podpowiedzi: 0, podpowiedzi_co_s: null };
@@ -47,6 +60,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   const [odpowiedziane, ustawOdpowiedziane] = useState<string[]>([]);
   const [wysylam, ustawWysylam] = useState(false);
   const [blad, ustawBlad] = useState<string | null>(null);
+  // finał: chwila oceny po odpowiedzi, zanim pojawi się następne pytanie
+  const [ocena, ustawOcena] = useState<Ocena | null>(null);
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const wystartowala = teraz >= od;
@@ -102,7 +117,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   }
 
   async function odpowiedz(dane: DaneOdpowiedzi) {
-    if (!teraz_ || wysylam) return;
+    if (!teraz_ || wysylam || ocena) return;
     ustawWysylam(true);
     ustawBlad(null);
     const { data, error } = await supabase().rpc("zapisz_odpowiedz_serii", {
@@ -116,7 +131,15 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
       return;
     }
     const wynik = data as ZapisOdpowiedzi;
-    if (wynik.przyjeta || wynik.powod === "juz_odpowiedziano") {
+    if (wynik.przyjeta && e?.finalowy && wynik.poprawna !== undefined && pytania) {
+      const id = teraz_.id;
+      const ms = czasOceny(pytania.indexOf(teraz_), pytania.length);
+      ustawOcena({ id, dane, dobrze: wynik.poprawna, ms });
+      setTimeout(() => {
+        ustawOdpowiedziane((l) => [...l, id]);
+        ustawOcena(null);
+      }, ms);
+    } else if (wynik.przyjeta || wynik.powod === "juz_odpowiedziano") {
       ustawOdpowiedziane((l) => [...l, teraz_.id]);
     } else {
       ustawBlad(wynik.powod === "po_czasie" ? "Koniec czasu." : "Ta odpowiedź nie przeszła.");
@@ -124,7 +147,14 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   }
 
   const z = jakoZadanie(teraz_);
-  const wspolne = { z, wyslana: null, zablokowane: wysylam, onWyslij: (d: DaneOdpowiedzi) => void odpowiedz(d) };
+  const oceniane = ocena?.id === z.id ? ocena : null;
+  const wspolne = {
+    z,
+    // w czasie oceny wybrany przycisk zostaje podświetlony (`wybrana`), reszta przygasa
+    wyslana: oceniane?.dane ?? null,
+    zablokowane: wysylam || !!oceniane,
+    onWyslij: (d: DaneOdpowiedzi) => void odpowiedz(d),
+  };
   // tylko w finale: od połowy pytań utrudnienia (numer pytania w serii, nie liczba odpowiedzi gracza)
   const efekt = e?.finalowy ? utrudnienie(pytania.indexOf(teraz_), pytania.length, z.typ) : null;
 
@@ -137,7 +167,22 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
         <span className="gra-kod">{Math.ceil(zostalo / 1000)} s</span>
       </p>
       {pasek}
-      <div key={z.id} className={efekt ? `utrudnienie-${efekt}` : undefined}>
+      {oceniane && (
+        <div
+          className={`seria-blysk ${oceniane.dobrze ? "dobrze" : "zle"}`}
+          style={{ "--ocena-ms": `${oceniane.ms}ms` } as React.CSSProperties}
+          aria-hidden
+        />
+      )}
+      <div
+        key={z.id}
+        className={
+          [efekt ? `utrudnienie-${efekt}` : "", oceniane ? (oceniane.dobrze ? "ocena-dobrze" : "ocena-zle") : ""]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+        style={oceniane ? ({ "--ocena-ms": `${oceniane.ms}ms` } as React.CSSProperties) : undefined}
+      >
         {/* miejsce na trzy linie: przyciski stoją w jednym miejscu, czy pytanie ma jedną linię, czy dwie */}
         <h2 className="gra-pytanie seria-pytanie">{z.tresc}</h2>
         {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
@@ -155,7 +200,11 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
           <ol className="odp-lista" key={z.id}>
             {(z.dane.odpowiedzi ?? []).map((o, i) => (
               <li key={i}>
-                <button className="odp" disabled={wysylam} onClick={() => void odpowiedz({ odpowiedz: i })}>
+                <button
+                  className={`odp${oceniane ? (oceniane.dane.odpowiedz === i ? " wybrana" : " przygaszona") : ""}`}
+                  disabled={wysylam || !!oceniane}
+                  onClick={() => void odpowiedz({ odpowiedz: i })}
+                >
                   <span className="odp-litera">{LITERY[i]}</span>
                   <span className="odp-tekst">{o}</span>
                 </button>

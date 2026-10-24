@@ -98,7 +98,13 @@ export type StanSesji = {
   muzyka: boolean;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
-  quiz: { tytul: string; liczba_zadan: number; liczba_etapow: number } | null;
+  quiz: {
+    tytul: string;
+    liczba_zadan: number;
+    liczba_etapow: number;
+    /** Maksimum punktów przed finałem (1000 × mnożnik za pytanie): skala wyścigu. */
+    max_przed_finalem: number;
+  } | null;
   /** Etap bieżącego pytania, a w fazie `etap` ten, który się zaczyna (null: quiz bez etapów). */
   etap: EtapWidoczny | null;
   /** Finał trójki: kto odpowiada (null: wszyscy); `kibice`: ilu graczy wysłało finaliście okrzyk. */
@@ -175,7 +181,8 @@ export type Dolaczenie = { token: string; nick: string; powrot: boolean };
 
 /** Odpowiedź `zapisz_odpowiedz`. Nie mówi, czy odpowiedź jest poprawna. */
 export type ZapisOdpowiedzi =
-  | { przyjeta: true; czas_ms: number }
+  /** `poprawna` tylko z serii (`zapisz_odpowiedz_serii`): animacja oceny po odpowiedzi w finale. */
+  | { przyjeta: true; czas_ms: number; poprawna?: boolean }
   | {
       przyjeta: false;
       powod: "nie_teraz" | "inne_zadanie" | "za_wczesnie" | "po_czasie" | "juz_odpowiedziano" | "kibic";

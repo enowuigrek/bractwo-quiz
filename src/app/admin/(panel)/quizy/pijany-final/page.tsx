@@ -12,7 +12,7 @@ export default async function PijanyFinal() {
   await wymagajGlownego();
   const { data, error } = await supabaseAdmin()
     .from("pijane_pytania")
-    .select("nr, tresc, efekt")
+    .select("nr, tresc, efekt, komentarz_prawda, komentarz_falsz")
     .order("nr")
     .returns<PijanePytanie[]>();
 
@@ -26,10 +26,13 @@ export default async function PijanyFinal() {
       <h1>Pijany finał</h1>
       <p className="pomocniczy">
         Dogrywka po finale serią, gdy przy uruchamianiu gry włączysz „Pijany finał”. Wynik jest już ustalony, a gracze
-        odpowiadają prawda/fałsz na 8 pytań wylosowanych z tej listy, w jej kolejności (w każdej grze inne; do 90 s, nic się nie liczy). Gracze o tym nie wiedzą: telefon
-        wygląda jak dalsza seria (pytanie 15/14, 16/14…), a TV dalej pokazuje finał, tylko wszystko się psuje. Ekran
-        telefonu faluje coraz mocniej, a każde pytanie ma swój przeszkadzacz. Wstawki: <code>{"{za_barem}"}</code> (imię
-        z kreatora gry; bez niego pytanie odpada) i <code>{"{lokal}"}</code>.
+        przez 60 s odpowiadają prawda/fałsz na pytania z tej listy (cała lista, w każdej grze w trochę innej
+        kolejności; nic się nie liczy). Po każdej odpowiedzi telefon reaguje coraz dłużej: błysk w losowym kolorze,
+        drżenie przycisku i komentarz przelatujący przez ekran (własny z pól poniżej albo ogólny, np. „Serio?”). Gracze
+        o tym nie wiedzą: telefon wygląda jak dalsza seria (pytanie 15/14, 16/14…), a TV dalej pokazuje finał, tylko
+        wszystko się psuje. Na koniec telefony gasną, muzyka cichnie, a na TV wybucha szklanka. Wstawki:{" "}
+        <code>{"{za_barem}"}</code> (imię z kreatora gry; bez niego pytanie odpada) i <code>{"{lokal}"}</code>, także
+        w komentarzach.
       </p>
       {error ? (
         <p className="blad">Nie udało się pobrać pytań: {error.message}</p>

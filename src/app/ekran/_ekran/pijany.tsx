@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import { ogloszWybuch, useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import type { StanSesji } from "@/lib/gra/typy";
-import { WIDEO_WYLEWANIA, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { WIDEO_WYLEWANIA, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
@@ -173,8 +173,8 @@ export function PijanyTv({
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
   const [gra, ustawGra] = useState(false);
-  const [dlugosc, ustawDlugosc] = useState<number | null>(null);
-  const przedKoncem = dlugosc ? Math.min(WYLEWANIE_S, Math.max(1, dlugosc - 1)) : WYLEWANIE_S;
+  // wybuch (`WYBUCH_S` klipu) wypada `WYBUCH_PRZED_S` przed końcem fazy, po chwili ciszy od zgaszenia telefonów
+  const przedKoncem = Math.min(WYLEWANIE_S, WYBUCH_PRZED_S + WYBUCH_S);
   const czasWylewania = teraz >= od && do_ - teraz <= przedKoncem * 1000;
   // dźwięk wybuchu tylko przy włączonej muzyce i gdy przeglądarka już pozwoliła grać (muzyka.tsx)
   const dzwiek = useDzwiekOdblokowany() && stan.muzyka;
@@ -202,7 +202,6 @@ export function PijanyTv({
             muted
             playsInline
             preload="auto"
-            onLoadedMetadata={(e) => ustawDlugosc(e.currentTarget.duration)}
             onPlaying={() => ustawGra(true)}
             onTimeUpdate={(e) => {
               if (!wybuch && e.currentTarget.currentTime >= WYBUCH_S) {

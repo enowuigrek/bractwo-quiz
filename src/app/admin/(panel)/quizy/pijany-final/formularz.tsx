@@ -6,16 +6,25 @@ import type { StanFormularza } from "@/lib/typy";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { zapiszPijanePytania } from "./akcje";
 
-type Wiersz = { klucz: number; tresc: string; efekt: EfektPijany };
+type Wiersz = { klucz: number; tresc: string; efekt: EfektPijany; komentarzPrawda: string; komentarzFalsz: string };
 
 let licznik = 0;
 const nowyKlucz = () => ++licznik;
 
-/** Lista pytań pijanego finału: treść, przeszkadzacz, kolejność; zapis całości jednym przyciskiem. */
+/**
+ * Lista pytań pijanego finału: treść, przeszkadzacz, komentarze po ✓ i ✗, kolejność; zapis całości jednym
+ * przyciskiem.
+ */
 export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszPijanePytania, {});
   const [wiersze, ustawWiersze] = useState<Wiersz[]>(() =>
-    pytania.map((p) => ({ klucz: nowyKlucz(), tresc: p.tresc, efekt: p.efekt })),
+    pytania.map((p) => ({
+      klucz: nowyKlucz(),
+      tresc: p.tresc,
+      efekt: p.efekt,
+      komentarzPrawda: p.komentarz_prawda ?? "",
+      komentarzFalsz: p.komentarz_falsz ?? "",
+    })),
   );
 
   const zmien = (i: number, zmiana: Partial<Wiersz>) =>
@@ -32,7 +41,14 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
       <input
         type="hidden"
         name="pytania"
-        value={JSON.stringify(wiersze.map(({ tresc, efekt }) => ({ tresc, efekt })))}
+        value={JSON.stringify(
+          wiersze.map(({ tresc, efekt, komentarzPrawda, komentarzFalsz }) => ({
+            tresc,
+            efekt,
+            komentarz_prawda: komentarzPrawda,
+            komentarz_falsz: komentarzFalsz,
+          })),
+        )}
       />
       <ol className="lista pijane-pytania">
         {wiersze.map((w, i) => (
@@ -59,6 +75,24 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
                   </option>
                 ))}
               </select>
+              <div className="pijane-komentarze">
+                <input
+                  className="pole"
+                  value={w.komentarzPrawda}
+                  maxLength={LIMITY_PIJANE.komentarz}
+                  onChange={(e) => zmien(i, { komentarzPrawda: e.target.value })}
+                  aria-label={`Komentarz po ✓ w pytaniu ${i + 1}`}
+                  placeholder="Komentarz po ✓ (opcjonalny)"
+                />
+                <input
+                  className="pole"
+                  value={w.komentarzFalsz}
+                  maxLength={LIMITY_PIJANE.komentarz}
+                  onChange={(e) => zmien(i, { komentarzFalsz: e.target.value })}
+                  aria-label={`Komentarz po ✗ w pytaniu ${i + 1}`}
+                  placeholder="Komentarz po ✗ (opcjonalny)"
+                />
+              </div>
             </div>
             <div className="lista-akcje">
               <button
@@ -96,7 +130,12 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
           type="button"
           className="przycisk"
           disabled={wiersze.length >= LIMITY_PIJANE.pytan}
-          onClick={() => ustawWiersze((l) => [...l, { klucz: nowyKlucz(), tresc: "", efekt: "brak" }])}
+          onClick={() =>
+            ustawWiersze((l) => [
+              ...l,
+              { klucz: nowyKlucz(), tresc: "", efekt: "brak", komentarzPrawda: "", komentarzFalsz: "" },
+            ])
+          }
         >
           + pytanie
         </button>

@@ -48,6 +48,8 @@ export type GraczNaDrodze = {
   teraz: number;
   lider: boolean;
   podpis: React.ReactNode;
+  /** Seria: ostatnia odpowiedź (awatar podskakuje na zielono albo trzęsie się na czerwono); `nr` restartuje animację. */
+  ocena?: { dobrze: boolean; nr: number };
 };
 
 /**
@@ -86,7 +88,13 @@ export function DrogiFinalu({
             animate={{ left: b.x, top: b.y }}
             transition={{ delay: opoznienie + i * 0.12, duration: trwanie, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
+            {g.ocena ? (
+              <div key={g.ocena.nr} className={`drogi-ocena ${g.ocena.dobrze ? "dobrze" : "zle"}`}>
+                <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
+              </div>
+            ) : (
+              <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
+            )}
             <span className="drogi-finalu-podpis">{g.podpis}</span>
           </motion.div>
         );

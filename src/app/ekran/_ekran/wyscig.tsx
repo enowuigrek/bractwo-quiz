@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
-import { naTrasie } from "@/lib/gra/wyscig";
+import { naTrasie, naTrasieFinalu } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { Licznik } from "./ranking";
@@ -25,8 +25,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const n = stan.quiz?.liczba_zadan ?? 0;
   const lp = z?.lp ?? 0;
   const wiersze = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
-  const lider = Math.max(0, ...wiersze.map((w) => w.punkty));
-  const liderPrzed = Math.max(0, ...wiersze.map((w) => w.punkty - w.zdobyte));
+  const maks = stan.quiz?.max_przed_finalem ?? 0;
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   const odstep = wiersze.length > 8 ? 6 : 12;
   // etap przed finałem: kreska „strefa finału” pod 3. miejscem (zabiera trochę wysokości torów)
@@ -78,8 +77,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
           <div className="wyscig-tory" style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}>
             {wiersze.map((w, i) => {
-              const przed = naTrasie(w.punkty - w.zdobyte, liderPrzed, lp - 1, n) * 100;
-              const teraz = naTrasie(w.punkty, lider, lp, n) * 100;
+              const przed = naTrasie(w.punkty - w.zdobyte, maks) * 100;
+              const teraz = naTrasie(w.punkty, maks) * 100;
               const prowadzi = w.miejsce === 1 && w.punkty > 0;
               const wiersz = (
                 <div key={w.nick} className={`wyscig-wiersz${prowadzi ? " lider" : ""}`}>
@@ -147,8 +146,8 @@ function FinalWyscigu({ wiersze, lp, n }: { wiersze: WierszRankingu[]; lp: numbe
       gracze={wiersze.map((w) => ({
         nick: w.nick,
         zdjecie: w.zdjecie,
-        przed: naTrasie(w.punkty - w.zdobyte, liderPrzed, lp - 1, n),
-        teraz: naTrasie(w.punkty, lider, lp, n),
+        przed: naTrasieFinalu(w.punkty - w.zdobyte, liderPrzed, lp - 1, n),
+        teraz: naTrasieFinalu(w.punkty, lider, lp, n),
         lider: w.miejsce === 1 && w.punkty > 0,
         podpis: (
           <>

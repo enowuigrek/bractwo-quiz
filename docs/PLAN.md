@@ -16,7 +16,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Telefon** (`/<kod>`): nick i selfie, wszystkie typy odpowiedzi, „Pytanie 8” bez sumy, ranking ze szklanką, w finale koła ✓/✗ i utrudnienia bez zapowiedzi, kibic stuka hasła z awatarem finalisty, pijany finał udający dalszą serię (15/14…), medal, karta nagrody z pieczątką „Odebrana”, „Pobierz na pamiątkę” (od 24.10 bez „Udostępnij wynik”).
 - **Pilot** (`/pilot/<kod>?t=…`): włącznik muzyki na TV pod nagłówkiem, przyciski zawsze na górze, „Zakończ grę” na dole; w pijanym finale zwycięzca, podium, odliczanie i „Zakończ i pokaż werble”.
 
-**Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (walka o finał: 3 najlepszych) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (do 90 s albo do pierwszego gracza, który skończy pytania; nic nie liczy) → werble → podium (odsłania prowadzący).
+**Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (walka o finał: 3 najlepszych) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (stałe 60 s, nic nie liczy; na koniec telefony gasną, cisza i wybuch szklanki na TV) → werble → podium (odsłania prowadzący).
 
 **Najważniejsze pliki:**
 - Baza: `supabase/migrations/`. Funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `ranking`, `dokoncz_pytanie`, `pijane_pytania`, `zakoncz_pijany`, `kibicuj`, `wewn.zakoncz_serie`, `wewn.zamknij_serie_jesli_gotowe`. `stan_sesji` i `pilot_akcja` były ostatnio zmieniane podmianą fragmentów (`20261023182659_pijany_final.sql`, `20261023191228_okrzyki_kibicow.sql`), więc całą treść bierz z bazy (`select pg_get_functiondef(…)`).
@@ -619,6 +619,20 @@ Pomysł Łukasza: wideo wybuchu ma dźwięk, więc przez cały quiz na TV może 
 - Koniec gry na telefonie: jeden przycisk „Pobierz grafikę na pamiątkę” na całą szerokość. Otwiera systemowe udostępnianie (na iPhonie tylko stamtąd „Zapisz obraz” trafia do Zdjęć), na komputerze pobiera plik. Osobne „Udostępnij wynik” zniknęło.
 - Nagłówek telefonu bez kodu gry.
 - Przegląd dubli (jak dawne podwójne werble): odliczanie serii na telefonie nie powtarza już zasad z planszy etapu (samo „Seria startuje!”), kibic przed startem nie wymienia znowu finalistów („Za chwilę start. Wtedy możesz kibicować!”), a na planszy finału serią kibic czyta, że będzie dopingował (wcześniej nieaktualne „Pytania i tak zobaczysz tutaj”). Zostawione świadomie: miejsce i punkty na ekranie wyniku i zaraz potem w rankingu (prowadzący może pominąć ranking).
+
+### Dłuższy pijany finał, ocena w finale, uczciwy wyścig (24.10) ✅
+
+Po teście Łukasza: pijany finał dało się szybko przeklikać i czekać na wybuch. Ustalenia i zmiany:
+- **Wyścig w zwykłych etapach** (migracja `20261024134413_wyscig_max_punktow`): położenie tylko z własnych punktów w stałej skali (`naTrasie` w `src/lib/gra/wyscig.ts`: 75% maksimum przed finałem, które podaje `stan_sesji` jako `quiz.max_przed_finalem`). Zła odpowiedź = stoi w miejscu, szybka dobra = większy krok, nikt się nie cofa; bardzo dobry gracz staje przy szklance tuż przed finałem. Finał pytaniami (nie serią) ma swój wyścig jak dotąd (`naTrasieFinalu`).
+- **Ocena w finale serią** (migracja `20261024134525_seria_zwraca_poprawna`: `zapisz_odpowiedz_serii` zwraca `poprawna`; TV i tak pokazuje to od razu krokiem na drodze): na telefonie błysk na zielono albo czerwono, przycisk pulsuje albo się trzęsie, przyciski stoją. 0,4 s, od połowy (utrudnienia) coraz dłużej, do 1 s na ostatnim (`czasOceny` w `[kod]/seria.tsx`). Każdy finalista ma przy tym samym pytaniu to samo, więc wyścig jest uczciwy. Na TV awatar podskakuje z zieloną poświatą albo trzęsie się z czerwoną (`ocena` w `drogi.tsx`, liczona w `ekran/_ekran/seria.tsx` z różnicy `odpowiedzi`/`dobre`).
+- **Pijany finał od nowa** (migracja `20261024134843_pijany_staly_czas_komentarze`):
+  - stały czas 60 s (było: do 90 s albo do pierwszego gracza na przedostatnim pytaniu; `zakoncz_pijany` zostaje w bazie nieużywana);
+  - każda gra dostaje całą pulę pytań w kolejności z listy z losowym przesunięciem 0..4 (z id gry); gdy ktoś przejdzie wszystkie, lecą od nowa;
+  - po każdej odpowiedzi reakcja coraz dłuższa (1 s → 3,5 s, `czasReakcjiPijanej`): błysk w losowym kolorze, puls albo drżenie przycisku, komentarz przelatujący przez ekran (własny z `komentarz_prawda`/`komentarz_falsz` albo czasem ogólny z `KOMENTARZE_OGOLNE`); `--poziom` liczony z czasu, nie z numeru pytania;
+  - koniec według zegara, wszystkim naraz (`src/lib/pijany.ts`): 5,5 s przed końcem (`GASNIECIE_S`) telefony gasną z błyskiem bez napisu i urywa się muzyka na TV, 3 s przed końcem (`WYBUCH_PRZED_S`) szklanka wybucha w wideo (klip rusza 4,5 s przed końcem), z końcem fazy werble (na telefonie bez drugiego błysku). Pilot „Zakończ i pokaż werble” daje 7 s, więc mieści tę samą sekwencję.
+  - panel: przy każdym pytaniu pola „Komentarz po ✓” i „Komentarz po ✗” (do 80 znaków, wstawki jak w treści), do 40 pytań.
+- **Do zrobienia razem z Łukaszem:** nowe pytania pijanego finału z komentarzami, kolejnością i przeszkadzaczami (pola już są, ogólna pula komentarzy w `KOMENTARZE_OGOLNE` też do ustalenia), potem efekty dźwiękowe.
+- Sprawdzone lokalnie: reakcja 2,3 s w połowie dogrywki z komentarzem i zablokowanymi przyciskami, gaśnięcie telefonu bez napisu, werble bez drugiego błysku. Nie sprawdzone na żywo: ocena w finale serią (telefon i TV) i cała sekwencja końca na TV z muzyką.
 
 ## Zadania dla ciebie (dzień 0)
 

@@ -716,7 +716,8 @@ html:has(.kolumna) {
 }
 
 /* ciąg dalszy werbli (telefon przed odsłoną miejsca): od razu widoczne, bez błysku */
-.werble.dalej .werble-blysk {
+.werble.dalej .werble-blysk,
+.werble.bez-blysku .werble-blysk {
   display: none;
 }
 
@@ -2197,6 +2198,137 @@ html:has(.kolumna) {
 }
 
 /* przyciski zamienione miejscami: ✗ z lewej, ✓ z prawej (kolory i znaki zostają) */
+/* Finał (seria): ocena po odpowiedzi. Błysk tła na zielono albo czerwono, wybrany przycisk pulsuje (dobrze)
+   albo się trzęsie (źle). Długość z seria.tsx (`--ocena-ms`): 0,4 s, od utrudnień do 1 s. */
+.seria-blysk {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  animation: seria-blysk var(--ocena-ms, 400ms) ease-out both;
+}
+
+.seria-blysk.dobrze {
+  background: radial-gradient(circle at 50% 65%, color-mix(in srgb, var(--chmiel) 45%, transparent), transparent 70%);
+}
+
+.seria-blysk.zle {
+  background: radial-gradient(circle at 50% 65%, color-mix(in srgb, var(--czerwien) 45%, transparent), transparent 70%);
+}
+
+@keyframes seria-blysk {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.ocena-dobrze .wybrana {
+  animation: ocena-puls var(--ocena-ms, 400ms) ease-out;
+}
+
+.ocena-zle .wybrana {
+  animation: ocena-trzes var(--ocena-ms, 400ms) linear;
+}
+
+@keyframes ocena-puls {
+  0%,
+  100% {
+    scale: 1;
+  }
+  35% {
+    scale: 1.12;
+  }
+  65% {
+    scale: 0.97;
+  }
+}
+
+@keyframes ocena-trzes {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  15%,
+  55% {
+    translate: -9px 0;
+  }
+  35%,
+  75% {
+    translate: 9px 0;
+  }
+}
+
+/* Pijany finał: ta sama reakcja, ale powtarzana przez całą (coraz dłuższą) chwilę, i komentarz, który
+   wlatuje z boku, kołysze się na środku i wylatuje drugą stroną (pijany.tsx, `--powtorzenia`, `--strona`). */
+.pijany-blysk {
+  animation: seria-blysk calc(var(--ocena-ms) / var(--powtorzenia)) ease-out var(--powtorzenia) both;
+}
+
+.pijane-przyciski.ocena-dobrze .wybrana {
+  animation: ocena-puls calc(var(--ocena-ms) / var(--powtorzenia)) ease-out var(--powtorzenia);
+}
+
+.pijane-przyciski.ocena-zle .wybrana {
+  animation: ocena-trzes calc(var(--ocena-ms) / var(--powtorzenia)) linear var(--powtorzenia);
+}
+
+.pijany-komentarz {
+  position: fixed;
+  top: 38%;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  margin: 0;
+  padding: 0 var(--gutter);
+  text-align: center;
+  font-size: 2.6rem;
+  font-weight: var(--w-black);
+  line-height: 1.1;
+  color: var(--zloto);
+  text-shadow:
+    0 0 18px rgba(0, 0, 0, 0.9),
+    4px 4px 0 rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  animation: przelot-komentarza var(--ocena-ms) ease-in-out both;
+}
+
+@keyframes przelot-komentarza {
+  0% {
+    transform: translateX(calc(var(--strona) * 110vw)) rotate(calc(var(--strona) * 14deg));
+  }
+  22% {
+    transform: translateX(0) rotate(-6deg) scale(1.1);
+  }
+  45% {
+    transform: translateX(calc(var(--strona) * -3vw)) rotate(5deg) scale(1);
+  }
+  70% {
+    transform: translateX(calc(var(--strona) * 3vw)) rotate(-4deg) scale(1.05);
+  }
+  100% {
+    transform: translateX(calc(var(--strona) * -110vw)) rotate(calc(var(--strona) * -14deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocena-dobrze .wybrana,
+  .ocena-zle .wybrana,
+  .pijane-przyciski.ocena-dobrze .wybrana,
+  .pijane-przyciski.ocena-zle .wybrana {
+    animation: none;
+  }
+
+  .pijany-komentarz {
+    animation: none;
+  }
+}
+
 .utrudnienie-zamiana .odp-pf .prawda {
   order: 2;
 }
@@ -2305,8 +2437,17 @@ html:has(.kolumna) {
   gap: 8px;
 }
 
+/* komentarze po ✓ i ✗ pod treścią i efektem, na całą szerokość */
+.pijane-komentarze {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
 @media (max-width: 640px) {
-  .pijane-pytanie {
+  .pijane-pytanie,
+  .pijane-komentarze {
     grid-template-columns: 1fr;
   }
 }

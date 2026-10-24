@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { MotionConfig } from "motion/react";
-import type { StanSesji } from "@/lib/gra/typy";
+import type { SeriaGracz, StanSesji } from "@/lib/gra/typy";
 import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { LogoNaglowka } from "./logo";
@@ -23,6 +24,20 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const przedStartem = teraz < od;
   const najlepszy = Math.max(0, ...gracze.map((g) => g.dobre));
+
+  // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie
+  // danych, w czasie renderu, jak zaleca React dla wartości wyprowadzonych z poprzednich propsów)
+  const [poprzednia, ustawPoprzednia] = useState<SeriaGracz[] | null>(stan.seria);
+  const [oceny, ustawOceny] = useState<Record<string, { dobrze: boolean; nr: number }>>({});
+  if (stan.seria !== poprzednia) {
+    const zmiany: Record<string, { dobrze: boolean; nr: number }> = {};
+    for (const g of stan.seria ?? []) {
+      const p = poprzednia?.find((x) => x.nick === g.nick);
+      if (p && g.odpowiedzi > p.odpowiedzi) zmiany[g.nick] = { dobrze: g.dobre > p.dobre, nr: g.odpowiedzi };
+    }
+    ustawPoprzednia(stan.seria);
+    if (Object.keys(zmiany).length) ustawOceny((o) => ({ ...o, ...zmiany }));
+  }
   // „Pijany finał”: od połowy drogi lidera (albo czasu serii) awatary zaczynają drżeć, coraz mocniej
   const postepCzasu = stan.faza_do ? (teraz - od) / Math.max(1, do_ - od) : 0;
   const drzenie =
@@ -54,6 +69,7 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             przed: 0,
             teraz: Math.min(1, g.dobre / n),
             lider: g.dobre > 0 && g.dobre === najlepszy,
+            ocena: oceny[g.nick],
             // bez numeru pytania: widać tylko, kto jedzie szybciej, ciekawiej do samego końca
             podpis: (
               <>

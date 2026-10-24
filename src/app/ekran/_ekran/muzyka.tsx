@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { naWybuch, odblokujDzwiek } from "@/lib/gra/dzwiek";
+import { GASNIECIE_S } from "@/lib/pijany";
 import type { StanSesji } from "@/lib/gra/typy";
 
 /**
@@ -62,8 +63,9 @@ function utworFazy(stan: StanSesji): Utwor | null {
  * na zmianę: zmiana utworu i powrót pętli to przenikanie z jednego na drugi, więc nie ma dziury na końcu pliku.
  * Stałe, bo Safari pozwala grać tylko elementom, które raz zagrały po geście; nowy element zostałby zablokowany.
  * W pijanym finale muzyka coraz bardziej się psuje: zwalnia i obniża się jak rozciągana taśma
- * (`preservesPitch = false`), faluje głośnością i ma krótkie dziury, a urywa się w chwili wybuchu szklanki
- * w wideo (`naWybuch`). Bez przewijania (`currentTime`): telewizor po takim skoku potrafił ucichnąć.
+ * (`preservesPitch = false`), faluje głośnością i ma krótkie dziury, a urywa się razem z gaśnięciem telefonów
+ * (`GASNIECIE_S` przed końcem), żeby przed wybuchem szklanki była chwila ciszy; `naWybuch` to zapas na wypadek,
+ * gdyby zegar TV się spóźniał. Bez przewijania (`currentTime`): telewizor po takim skoku potrafił ucichnąć.
  * Przeglądarka nie zagra bez gestu, więc gdy w poczekalni długo jest cicho, na dole jest prośba o OK na pilocie TV.
  */
 export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
@@ -255,6 +257,12 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     if (grany.current !== "final" || a.paused || zatrzymana.current || !stan.faza_od || !stan.faza_do) return;
     const od = Date.parse(stan.faza_od);
     const do_ = Date.parse(stan.faza_do);
+    // telefony gasną: muzyka urywa się razem z nimi, potem cisza i wybuch szklanki
+    if (do_ - teraz <= GASNIECIE_S * 1000) {
+      zatrzymana.current = true;
+      a.pause();
+      return;
+    }
     const poziom = Math.min(1, Math.max(0, (teraz - od) / Math.max(1, do_ - od)));
     a.playbackRate = Math.max(0.5, 1 - 0.3 * poziom + 0.05 * poziom * Math.sin(teraz / 700));
     // dziura trwa jedno tyknięcie (250 ms), potem głośność wraca, falując

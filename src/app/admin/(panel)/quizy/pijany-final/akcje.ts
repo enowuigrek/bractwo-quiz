@@ -25,12 +25,22 @@ export async function zapiszPijanePytania(_: StanFormularza, dane: FormData): Pr
       .trim()
       .replace(/\s+/g, " ");
     const efekt = (p as { efekt?: unknown })?.efekt;
+    // komentarze po ✓ i ✗: puste = bez własnego (wtedy czasem ogólny)
+    const komentarz = (pole: "komentarz_prawda" | "komentarz_falsz") =>
+      String((p as Record<string, unknown>)?.[pole] ?? "")
+        .trim()
+        .replace(/\s+/g, " ") || null;
+    const komentarzPrawda = komentarz("komentarz_prawda");
+    const komentarzFalsz = komentarz("komentarz_falsz");
     if (!tresc) return { blad: `Pytanie ${i + 1} jest puste.` };
     if (tresc.length > LIMITY_PIJANE.tresc) {
       return { blad: `Pytanie ${i + 1} może mieć najwyżej ${LIMITY_PIJANE.tresc} znaków.` };
     }
     if (!czyEfektPijany(efekt)) return { blad: `Wybierz efekt w pytaniu ${i + 1}.` };
-    wiersze.push({ nr: i + 1, tresc, efekt });
+    if ((komentarzPrawda?.length ?? 0) > LIMITY_PIJANE.komentarz || (komentarzFalsz?.length ?? 0) > LIMITY_PIJANE.komentarz) {
+      return { blad: `Komentarz w pytaniu ${i + 1} może mieć najwyżej ${LIMITY_PIJANE.komentarz} znaków.` };
+    }
+    wiersze.push({ nr: i + 1, tresc, efekt, komentarz_prawda: komentarzPrawda, komentarz_falsz: komentarzFalsz });
   }
 
   // cała lista od nowa: usunięcie starej i wpisanie nowej (pytania nie mają odpowiedzi ani historii)

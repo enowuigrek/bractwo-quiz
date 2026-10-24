@@ -2924,6 +2924,59 @@
   transition: rotate 1.2s cubic-bezier(0.15, 0.85, 0.3, 1);
 }
 
+/* Seria na TV: ostatnia odpowiedź finalisty. Dobra: awatar podskakuje z zieloną poświatą, zła: trzęsie się
+   z czerwoną. Krótko, żeby nie zasłaniało jazdy (seria.tsx, `ocena` w drogi.tsx). */
+.drogi-ocena {
+  border-radius: 50%;
+}
+
+.drogi-ocena.dobrze {
+  animation: drogi-ocena-dobrze 0.9s var(--ease-wjazd) both;
+}
+
+.drogi-ocena.zle {
+  animation: drogi-ocena-zle 0.9s linear both;
+}
+
+@keyframes drogi-ocena-dobrze {
+  0% {
+    translate: 0 0;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--chmiel) 0%, transparent);
+  }
+  30% {
+    translate: 0 -22px;
+    box-shadow: 0 0 34px 10px color-mix(in srgb, var(--chmiel) 80%, transparent);
+  }
+  100% {
+    translate: 0 0;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--chmiel) 0%, transparent);
+  }
+}
+
+@keyframes drogi-ocena-zle {
+  0%,
+  100% {
+    translate: 0 0;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--czerwien) 0%, transparent);
+  }
+  15%,
+  55% {
+    translate: -12px 0;
+    box-shadow: 0 0 34px 10px color-mix(in srgb, var(--czerwien) 80%, transparent);
+  }
+  35%,
+  75% {
+    translate: 12px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drogi-ocena.dobrze,
+  .drogi-ocena.zle {
+    animation-name: none;
+  }
+}
+
 /* Wideo pękającej szklanki: cała scena 1920×1080 nad wszystkim, czarne tło klipu znika (screen) */
 .pijany-wideo {
   position: absolute;
