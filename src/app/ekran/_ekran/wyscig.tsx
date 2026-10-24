@@ -5,7 +5,7 @@ import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
-import { naTrasie, naTrasieFinalu } from "@/lib/gra/wyscig";
+import { MAX_W_WYSCIGU, NA_TORACH_W_TLOKU, naTrasie, naTrasieFinalu } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
@@ -25,19 +25,26 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const z = stan.zadanie;
   const n = stan.quiz?.liczba_zadan ?? 0;
   const lp = z?.lp ?? 0;
-  const wiersze = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
+  const wszyscy = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
+  // przy dużej grupie tory ma czołówka, a reszta stoi w pasku małych awatarów pod torami
+  const wiersze = wszyscy.length > MAX_W_WYSCIGU ? wszyscy.slice(0, NA_TORACH_W_TLOKU) : wszyscy;
+  const reszta = wszyscy.slice(wiersze.length);
   const maks = stan.quiz?.max_przed_finalem ?? 0;
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   const odstep = wiersze.length > 8 ? 6 : 12;
   // odcięcie po etapie: kreska pod ostatnim, kto gra dalej (walka o finał: pod 3. miejscem, inaczej próg
-  // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów
+  // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów. Gdy kreska wypada w pasku reszty, stoi tam.
   const odciecie = odciecieEtapu(stan);
-  const strefaFinalu = odciecie !== null && wiersze.length > odciecie;
+  const strefaFinalu = odciecie !== null && wszyscy.length > odciecie && odciecie <= wiersze.length;
   const koniecEtapu = !!stan.etap && stan.ostatnie_w_etapie && !stan.etap.finalowy;
   const tor = Math.min(
     92,
     Math.floor(
-      (700 - (strefaFinalu ? 34 : 0) - (koniecEtapu ? KONIEC_ETAPU_PX : 0) - (wiersze.length - 1) * odstep) /
+      (700 -
+        (strefaFinalu ? 34 : 0) -
+        (koniecEtapu ? KONIEC_ETAPU_PX : 0) -
+        (reszta.length ? RESZTA_PX : 0) -
+        (wiersze.length - 1) * odstep) /
         Math.max(1, wiersze.length),
     ),
   );
@@ -85,7 +92,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
               const teraz = naTrasie(w.punkty, maks) * 100;
               const prowadzi = w.miejsce === 1 && w.punkty > 0;
               // pod kreską (zagrożony) albo właśnie ją przeskoczył w którąś stronę
-              const kreska = wzgledemKreski(w, odciecie, wiersze.length);
+              const kreska = wzgledemKreski(w, odciecie, wszyscy.length);
               const wiersz = (
                 <div key={w.nick} className={`wyscig-wiersz${prowadzi ? " lider" : ""}${kreska ? ` ${kreska}` : ""}`}>
                   <span className="wyscig-miejsce">{w.miejsce}.</span>
@@ -140,6 +147,9 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                 wiersz
               );
             })}
+            {reszta.length > 0 && (
+              <Reszta reszta={reszta} odciecie={odciecie !== null && !strefaFinalu ? odciecie : null} />
+            )}
           </div>
 
           <Szklanka
@@ -151,6 +161,46 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         </div>
       </div>
     </MotionConfig>
+  );
+}
+
+/** Wysokość paska reszty graczy z odstępem (odejmowana od miejsca na tory). */
+const RESZTA_PX = 78;
+/** Ile małych awatarów mieści pasek; dalsi tylko w liczbie. */
+const W_PASKU = 26;
+
+/**
+ * Pasek pod torami przy dużej grupie: kto nie ma toru, stoi tu małym awatarem w kolejności miejsc. Gdy kreska
+ * odpadania wypada wśród nich, między awatarami jest przerywana kreska.
+ */
+function Reszta({ reszta, odciecie }: { reszta: WierszRankingu[]; odciecie: number | null }) {
+  const widoczni = reszta.slice(0, W_PASKU);
+  const od = reszta[0].miejsce;
+  return (
+    <motion.div
+      className="wyscig-reszta"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: START_S, duration: 0.5 }}
+    >
+      <span className="wyscig-reszta-opis">
+        {od}.–{reszta[reszta.length - 1].miejsce}.
+      </span>
+      <div className="wyscig-reszta-awatary">
+        {widoczni.map((w, i) => (
+          <Fragment key={w.nick}>
+            {odciecie !== null && i > 0 && reszta[i - 1].miejsce <= odciecie && w.miejsce > odciecie && (
+              <span className="wyscig-reszta-kreska" aria-hidden />
+            )}
+            <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={44} />
+          </Fragment>
+        ))}
+        {reszta.length > widoczni.length && (
+          <span className="wyscig-reszta-wiecej">+{reszta.length - widoczni.length}</span>
+        )}
+      </div>
+      <span className="wyscig-reszta-opis">jeszcze {reszta.length} w grze</span>
+    </motion.div>
   );
 }
 

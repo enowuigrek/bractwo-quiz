@@ -724,6 +724,7 @@ Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `202610241
 - **Koniec etapu** na rankingu i wyścigu TV: duży złoty pasek „Koniec etapu N · nazwa” pod nagłówkiem (`KoniecEtapu` w `ranking.tsx`), wyścig zmniejsza tory o jego wysokość.
 - **Muzyka:** pliki `etap-2.mp3` i `etap-3.mp3` zamienione miejscami.
 - **Finał na telefonie:** zła odpowiedź tylko drży, bez czerwonej obwódki (na zielonym kole „Prawda” wyglądała źle).
+- **Wyścig przy dużej grupie:** ranking po pytaniu to zawsze wyścig (wcześniej od 13 graczy była lista). Do 12 graczy każdy ma tor, powyżej tor ma pierwsza dziesiątka (`NA_TORACH_W_TLOKU`), a reszta stoi w pasku małych awatarów pod torami (do 26, dalsi jako „+N”), z przerywaną kreską odpadania, gdy wypada wśród nich. Sprawdzone przy 30 graczach (tor 56 px, z paskiem „Koniec etapu” też się mieści).
 
 ## Zadania dla ciebie (dzień 0)
 

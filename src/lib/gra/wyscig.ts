@@ -2,15 +2,18 @@
 // do zdobycia przed finałem), więc zła odpowiedź = stoisz w miejscu, a szybka dobra = większy krok niż wolna.
 // Do 24.10 skala szła za liderem i przesuwała wszystkich, także tych, którzy odpowiedzieli źle.
 
-/** Ile torów mieści wyścig na TV; przy większej liczbie graczy zostaje tabela. */
+/** Ile torów mieści wyścig na TV; przy większej liczbie graczy tory ma czołówka, a reszta stoi w pasku pod nimi. */
 export const MAX_W_WYSCIGU = 12;
 
+/** Ilu graczy ma tor, gdy wszyscy się nie mieszczą (reszta w pasku małych awatarów). */
+export const NA_TORACH_W_TLOKU = 10;
+
 /**
- * Ranking po pytaniu na TV (i szklanka na telefonie): zawsze wyścig po piwo, także w quizie bez etapów,
- * o ile gracze mieszczą się na torach; przy większej liczbie graczy tabela. Prowadzący tego nie wybiera.
+ * Ranking po pytaniu na TV (i szklanka na telefonie): zawsze wyścig po piwo, także w quizie bez etapów i przy
+ * dużej grupie (od 24.10; wcześniej powyżej 12 graczy była tabela). Prowadzący tego nie wybiera.
  */
 export function rankingJakoWyscig(liczbaGraczy: number): boolean {
-  return liczbaGraczy > 0 && liczbaGraczy <= MAX_W_WYSCIGU;
+  return liczbaGraczy > 0;
 }
 
 /**

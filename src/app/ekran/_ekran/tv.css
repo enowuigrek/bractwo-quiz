@@ -3179,6 +3179,50 @@
   box-shadow: inset 0 0 0 3px var(--chmiel);
 }
 
+/* duża grupa: kto nie ma toru, stoi w pasku pod torami (wysokość z odstępem = RESZTA_PX w wyscig.tsx) */
+.wyscig-reszta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 64px;
+  margin-top: 8px;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid color-mix(in srgb, var(--zloto) 35%, transparent);
+}
+
+.wyscig-reszta-opis {
+  flex: none;
+  color: var(--szary);
+  font-size: 24px;
+  font-weight: var(--w-black);
+  white-space: nowrap;
+}
+
+.wyscig-reszta-awatary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.wyscig-reszta-kreska {
+  flex: none;
+  align-self: stretch;
+  margin: 6px 6px;
+  border-left: 3px dashed var(--zloto);
+}
+
+.wyscig-reszta-wiecej {
+  flex: none;
+  color: var(--piana);
+  font-size: 24px;
+  font-weight: var(--w-black);
+}
+
 .wyscig-strefa-finalu {
   margin: 0;
   height: 22px;
