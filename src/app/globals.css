@@ -1537,15 +1537,14 @@ html:has(.kolumna) {
   margin-top: 18px;
 }
 
-/* „Udostępnij wynik” i „Pobierz na pamiątkę” obok siebie */
+/* „Pobierz na pamiątkę”: jeden przycisk na całą szerokość, napis w jednym wierszu */
 .udostepnij-przyciski {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
 }
 
 .udostepnij-przyciski .przycisk {
-  padding-inline: 10px;
+  width: 100%;
+  white-space: nowrap;
 }
 
 /* podziękowanie z oddechem pod przyciskiem (i pod kontami do oznaczenia) */
