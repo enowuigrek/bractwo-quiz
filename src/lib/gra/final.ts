@@ -1,18 +1,25 @@
-// Finał jako wyścig (od 24.10): szklanka jest `META_FINALU` kroków od startu, dobra odpowiedź to krok, a finaliści
-// startują z przewagą 0–3 kroków według punktów sprzed finału (`gracze.start_finalu`, baza: `wewn.ustaw_start_finalu`,
-// `wewn.meta_finalu`, koniec w `wewn.zamknij_serie_jesli_gotowe`, podium według wyścigu w `wewn.ranking`).
+// Finał jako wyścig (od 24.10): szklanka jest `META_FINALU` kroków od startu, dobra odpowiedź to krok naprzód, zła
+// krok w tył (za linię startu się nie cofa), a finaliści startują z przewagą 0–3 kroków według punktów sprzed finału
+// (`gracze.start_finalu`, baza: `wewn.ustaw_start_finalu`, `wewn.meta_finalu`, `wewn.kroki_finalu`, koniec w
+// `wewn.zamknij_serie_jesli_gotowe` także po wyczerpaniu puli, podium według wyścigu w `wewn.ranking`).
 
 import type { SeriaGracz } from "./typy";
 
 /** Musi się zgadzać z `wewn.meta_finalu()` w bazie. */
 export const META_FINALU = 12;
 
-/** Ile kroków ma finalista: przewaga + dobre odpowiedzi. */
-export function krokiFinalu(g: Pick<SeriaGracz, "dobre" | "start">): number {
-  return (g.start ?? 0) + g.dobre;
+type PostepFinalisty = Pick<SeriaGracz, "dobre" | "odpowiedzi" | "start" | "kroki">;
+
+/**
+ * Ile kroków ma finalista: z bazy (`kroki`, kolejność odpowiedzi i odbicie od startu), a bez niej w przybliżeniu
+ * przewaga + dobre − złe, nie mniej niż zero.
+ */
+export function krokiFinalu(g: PostepFinalisty): number {
+  if (g.kroki !== undefined) return g.kroki;
+  return Math.max(0, (g.start ?? 0) + 2 * g.dobre - g.odpowiedzi);
 }
 
 /** Położenie na drodze 0..1 (1 = przy szklance). */
-export function naDrodzeFinalu(g: Pick<SeriaGracz, "dobre" | "start">): number {
+export function naDrodzeFinalu(g: PostepFinalisty): number {
   return Math.min(1, krokiFinalu(g) / META_FINALU);
 }

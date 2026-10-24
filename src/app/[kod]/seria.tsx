@@ -108,8 +108,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   if (!pytania) return <p className="pomocniczy">Ładuję pytania…</p>;
   const teraz_ = pytania.find((p) => !odpowiedziane.includes(p.id));
   const ktore = odpowiedziane.length + 1;
-  // własne kroki w wyścigu (przewaga + dobre) z serii, którą widzi też TV
-  const mojeKroki = krokiFinalu(stan.seria?.find((g) => g.nick === ja.nick) ?? { dobre: 0, start: 0 });
+  // własne kroki w wyścigu (przewaga, +1 za dobrą, −1 za złą) z serii, którą widzi też TV
+  const mojeKroki = krokiFinalu(stan.seria?.find((g) => g.nick === ja.nick) ?? { dobre: 0, odpowiedzi: 0, start: 0 });
 
   // koniec pytań albo czasu: bez „Gotowe!”, który mignąłby zwycięzcy i zdradził koniec. Zwykle od razu
   // ciemny ekran werbli; w pijanym finale sam pasek, z którego płynnie wychodzi „pytanie 15/14”

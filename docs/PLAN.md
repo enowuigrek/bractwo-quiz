@@ -35,7 +35,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
 - Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
-- Gry testowe do usunięcia w panelu: JBXR, GDWX, QLLV, CFKE, QMRS, BTGX.
+- Gry testowe do usunięcia w panelu: JBXR, GDWX, QLLV, CFKE, QMRS, BTGX, JLUL.
 
 **Następny krok:** dźwięki i pijany finał (25.10), potem test na żywo na spotkaniu Kręgu 28.10.
 
@@ -62,6 +62,12 @@ Lista do wybrania z Łukaszem (styl „bar”: kapsel, nalewanie, brzęk szkła,
 8. Werble przed podium i fanfara przy odsłonie miejsc.
 
 Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo proste tony z Web Audio do tykania), głośność względem muzyki, czy efekty grają też na ekranie lokalu między grami (raczej nie).
+
+### Zgłoszone wieczorem 24.10 (do zrobienia)
+
+- **Pijany finał powtarzał pytania** w teście muzycznym (pula 10 pytań, telefon po końcu puli zaczyna od nowa) i chyba trwał dłużej niż 60 s. Do sprawdzenia, a pytań ma być tyle, żeby w jednej grze żadne się nie powtórzyło (albo bez powtórek po wyczerpaniu).
+- **Wyniki gry w panelu:** „Pytań w grze: 63” i „Dobrze 31/63” liczą ciekawostki i całą pulę finału; trzeba liczyć tylko zadane pytania.
+- **Kreator z zapowiedzią (zrobione 24.10, niesprawdzone w przeglądarce):** przełącznik „najpierw zapowiedź”, po włączeniu data i godzina (domyślnie godzinę od teraz, w górę do 5 min), jeden przycisk „Uruchom grę”. Do kliknięcia w panelu.
 
 ### Pijany finał
 
@@ -764,6 +770,8 @@ Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `202610241
 - **Nazwy etapów jako wieczór w barze** (migracje `20261024194544_nazwy_etapow_wieczor_w_barze`, `20261024195856_nazwa_etapu_jakos_sie_ulozy`, pomysł Łukasza; 4. etap był po drodze „Poskładaj się” i „Poskłada się jakoś”): Na jedno → Jednak więcej → Ile? → Jakoś się ułoży → Jeszcze zdążę, w obu quizach, z dopasowanymi opisami 1., 2. i 4. etapu. Na planszy wstępu każda nazwa w jednej linii.
 - **Ikony etapów** (migracja `20261024195230_ikony_etapow`, kolumna `etapy.ikona`, w `plan_etapow` i `etap_json`): szklanka shaker (Na jedno), deska degustacyjna (Jednak więcej), menzurka z piwem (Ile?), podstawka pocięta na puzzle (Jakoś się ułoży), kran z kieszonkowym zegarkiem (Jeszcze zdążę). Na planszy wstępu nad numerem etapu, na planszy etapu przed nazwą. Grafiki `public/grafiki/etapy/` ze `scripts/grafiki.mjs`: gpt-image-2 nie robi przezroczystego tła, więc przedmiot stoi na magencie, którą skrypt wycina (`bezMagenty`). Etap bez ikony wygląda jak dotąd; w panelu ikony jeszcze nie da się wybrać.
 - **Drobne w treści:** pytanie o jęczmień „Co to? Warzy się z tego większość piw.”, pinta ze zdjęciem szklanki, „pils” zamiast „pilzner” w 9 zadaniach, w ciekawostce o grodziskim tradycja z ok. 1301 roku i statut z 1601 roku (burmistrz próbował każdą beczkę; rok 1301 to data z tradycji, nie z dokumentu).
+- **Finał: zła odpowiedź to krok w tył** (migracja `20261024200758_final_kara_za_zla_odpowiedz`): zgadywanie w prawda/fałsz daje średnio zero. Za linię startu się nie cofa (`wewn.kroki_finalu`, odbicie od zera), przewagę z etapów można stracić. Finał kończy się też, gdy któryś finalista odpowie na całą pulę; wygrywa najbliższy piwa. Opis planszy finału mówi „zła to krok w tył”. Sprawdzone SQL-em na grze testowej (odbicie od startu, utrata przewagi, koniec po puli, ranking według kroków).
+- **Grafika podium w panelu:** „Pobierz grafikę podium”; na komputerze (też Safari na Macu) zawsze pobiera plik, okno udostępniania tylko na urządzeniach dotykowych.
 - **Wyścig przy dużej grupie:** ranking po pytaniu to zawsze wyścig (wcześniej od 13 graczy była lista). Do 12 graczy każdy ma tor, powyżej tor ma pierwsza dziesiątka (`NA_TORACH_W_TLOKU`), a reszta stoi w pasku małych awatarów pod torami (do 26, dalsi jako „+N”), z przerywaną kreską odpadania, gdy wypada wśród nich. Sprawdzone przy 30 graczach (tor 56 px, z paskiem „Koniec etapu” też się mieści).
 
 ## Zadania dla ciebie (dzień 0)

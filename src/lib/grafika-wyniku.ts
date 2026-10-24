@@ -269,12 +269,13 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
 }
 
 /**
- * Udostępnia grafikę systemowym „Udostępnij” (na telefonie: Instagram, Facebook, Messenger…),
- * a gdzie się nie da (komputer), pobiera ją jako plik. Zwraca, co się stało.
+ * Udostępnia grafikę systemowym „Udostępnij” (na telefonie: Zapisz obraz, Instagram, Facebook, Messenger…),
+ * a na komputerze (także Safari na Macu, który umie udostępniać) po prostu pobiera plik. Zwraca, co się stało.
  */
 export async function udostepnij(blob: Blob, nazwa: string, tekstPosta: string): Promise<"udostepniono" | "pobrano" | "anulowano"> {
   const plik = new File([blob], nazwa, { type: "image/png" });
-  if (navigator.canShare?.({ files: [plik] })) {
+  const dotykowy = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+  if (dotykowy && navigator.canShare?.({ files: [plik] })) {
     try {
       await navigator.share({ files: [plik], text: tekstPosta });
       return "udostepniono";

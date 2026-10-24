@@ -534,7 +534,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </p>
           <ol className="pilot-odpowiedzi">
             {(stan.seria ?? []).map((g) =>
-              // finał: kroki do szklanki (przewaga + dobre), zwykła seria: odpowiedzi z liczby pytań
+              // finał: kroki do szklanki (przewaga, +1 za dobrą, −1 za złą), zwykła seria: odpowiedzi z liczby pytań
               etap.finalowy ? (
                 <li key={g.nick} className={krokiFinalu(g) >= META_FINALU ? "poprawna" : undefined}>
                   {g.nick}: {Math.round(krokiFinalu(g) * 10) / 10}/{META_FINALU} kroków (przewaga {g.start ?? 0}),{" "}

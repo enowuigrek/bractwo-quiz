@@ -38,10 +38,23 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   const [ileNagrod, setIleNagrod] = useState(0);
   // pijany finał domyślnie włączony (tylko główny go widzi; obsługa nie wysyła tego pola)
   const [pijany, setPijany] = useState(true);
-  // start: osobno data i godzina (czas lokalny przeglądarki); bez daty to dziś. Do serwera idzie ISO.
+  // zapowiedź: włączona pokazuje na ekranie lokalu godzinę i odliczanie, wyłączona od razu poczekalnię z QR.
+  // Data i godzina (czas lokalny przeglądarki) dopiero po włączeniu, domyślnie godzinę od teraz. Do serwera idzie ISO.
+  const [zapowiedz, setZapowiedz] = useState(false);
   const [dataStartu, setDataStartu] = useState("");
   const [godzinaStartu, setGodzinaStartu] = useState("");
-  const startIso = godzinaStartu ? isoStartu(dataStartu, godzinaStartu) : "";
+  const startIso = zapowiedz && godzinaStartu ? isoStartu(dataStartu, godzinaStartu) : "";
+
+  function przelaczZapowiedz(wlacz: boolean) {
+    setZapowiedz(wlacz);
+    if (wlacz && !godzinaStartu) {
+      // godzina od teraz, zaokrąglona do 5 minut w górę
+      const za = new Date(Date.now() + 60 * 60 * 1000);
+      za.setMinutes(Math.ceil(za.getMinutes() / 5) * 5, 0, 0);
+      setDataStartu(za.toLocaleDateString("sv-SE"));
+      setGodzinaStartu(za.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }));
+    }
+  }
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
@@ -237,33 +250,42 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
           )}
 
           <fieldset>
-            <legend>Start quizu (opcjonalnie)</legend>
-            <div className="wiersz-pol start-pola">
-              <div>
-                <label htmlFor="start_data">Data</label>
-                <input
-                  id="start_data"
-                  type="date"
-                  className="pole"
-                  value={dataStartu}
-                  onChange={(e) => setDataStartu(e.target.value)}
-                />
+            <legend>Zapowiedź</legend>
+            <label className="przelacznik">
+              <input type="checkbox" checked={zapowiedz} onChange={(e) => przelaczZapowiedz(e.target.checked)} />{" "}
+              najpierw zapowiedź z godziną startu
+            </label>
+            {zapowiedz && (
+              <div className="wiersz-pol start-pola" style={{ marginTop: 10 }}>
+                <div>
+                  <label htmlFor="start_data">Data</label>
+                  <input
+                    id="start_data"
+                    type="date"
+                    className="pole"
+                    value={dataStartu}
+                    onChange={(e) => setDataStartu(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="start_godzina">Godzina</label>
+                  <input
+                    id="start_godzina"
+                    type="time"
+                    className="pole"
+                    value={godzinaStartu}
+                    onChange={(e) => setGodzinaStartu(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="start_godzina">Godzina</label>
-                <input
-                  id="start_godzina"
-                  type="time"
-                  className="pole"
-                  value={godzinaStartu}
-                  onChange={(e) => setGodzinaStartu(e.target.value)}
-                />
-              </div>
-            </div>
+            )}
             <input type="hidden" name="planowany_start" value={startIso} />
+            <input type="hidden" name="start_tryb" value={zapowiedz ? "zapowiedz" : "teraz"} />
             <p className="podpowiedz">
-              Potrzebny do zapowiedzi: ekran lokalu pokaże godzinę i odliczanie, a prowadzący widzi je na pilocie. Bez
-              daty quiz jest dziś.
+              {zapowiedz
+                ? "Ekran lokalu pokaże godzinę i odliczanie, a QR pojawi się, gdy prowadzący otworzy poczekalnię na pilocie."
+                : "Bez zapowiedzi TV od razu pokazuje poczekalnię z kodem QR."}
             </p>
           </fieldset>
 
@@ -318,24 +340,10 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
 
           <KomunikatFormularza stan={stan} />
           <div className="kreator-przyciski">
-            <button type="submit" name="start_tryb" value="teraz" className="przycisk zloty" disabled={trwa}>
-              {trwa ? "Zapisuję…" : "Uruchom grę"}
-            </button>
-            <button
-              type="submit"
-              name="start_tryb"
-              value="zapowiedz"
-              className="przycisk"
-              disabled={trwa || !startIso}
-              title={startIso ? undefined : "Najpierw ustaw godzinę startu"}
-            >
-              Zapowiedz na ekranie lokalu
+            <button type="submit" className="przycisk zloty" disabled={trwa || (zapowiedz && !startIso)}>
+              {trwa ? "Zapisuję…" : zapowiedz ? "Uruchom grę z zapowiedzią" : "Uruchom grę"}
             </button>
           </div>
-          <p className="podpowiedz">
-            „Uruchom grę” od razu pokazuje na TV kod QR. „Zapowiedz” pokazuje na ekranie lokalu godzinę i odliczanie, a QR
-            pojawi się, gdy prowadzący otworzy poczekalnię na pilocie.
-          </p>
         </>
       )}
     </form>

@@ -184,6 +184,8 @@ export type SeriaGracz = {
   dobre: number;
   /** Finał jako wyścig: przewaga na starcie w krokach (0–3, src/lib/gra/final.ts). */
   start?: number;
+  /** Finał jako wyścig: kroki do szklanki z bazy (przewaga, +1 za dobrą, −1 za złą, nie mniej niż 0). */
+  kroki?: number;
   /** Ile okrzyków dostał od kibiców. */
   doping?: number;
 };

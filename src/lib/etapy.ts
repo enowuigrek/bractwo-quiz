@@ -85,7 +85,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     klucz: "final",
     nazwa: "Finał",
     opis:
-      "Trzej najlepsi ścigają się do piwa: każda dobra odpowiedź to krok, a lider ma kilka kroków przewagi. Kto pierwszy dobiegnie, wygrywa.",
+      "Trzej najlepsi ścigają się do piwa: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Lider ma kilka kroków przewagi. Kto pierwszy dobiegnie, wygrywa.",
     mnoznik: 2,
     czas_s: 180,
     finalowy: true,

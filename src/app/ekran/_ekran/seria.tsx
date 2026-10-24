@@ -12,7 +12,7 @@ import { OkrzykiNaDrogach } from "./okrzyki";
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
  * do pełnej szklanki. Każda dobra odpowiedź to krok; w finale 12 kroków z przewagą 0–3 według punktów
- * sprzed finału (src/lib/gra/final.ts), w zwykłej serii dobre / liczba pytań. Przed startem odliczanie
+ * sprzed finału, a zła cofa o krok (src/lib/gra/final.ts), w zwykłej serii dobre / liczba pytań. Przed startem odliczanie
  * w nagłówku (drogi i gracze zostają widoczne), po nim w tym samym miejscu czas do końca serii.
  * Dane: `StanSesji.seria`, odświeżane po każdej odpowiedzi. W trybie „Pijany finał” pod koniec awatary drżą,
  * a po serii ten sam ekran z tym samym nagłówkiem przechodzi w chaos (pijany.tsx). Kibice spoza finału
