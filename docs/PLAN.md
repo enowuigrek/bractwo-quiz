@@ -649,7 +649,7 @@ Po teście Łukasza: pijany finał dało się szybko przeklikać i czekać na wy
 - Pary: łączyć można od dowolnej kolumny (prawy, potem lewy też działa); podpowiedź pod pytaniem i na planszy etapu mówi o jednej i drugiej kolumnie.
 - TV po wybuchu szklanki: werble bez błysku (ekran jest już ciemny po wideo), sam napis wchodzi na czerni. Błysk gaśnięcia zostaje tylko na telefonach.
 - Komentarze pijanego finału prostsze: kremowy napis na środku, wyskakuje i znika (bez przelotu z boku i obrotów). Treści ustalimy przy układaniu pytań.
-- Quiz „Piwo - quiz testowy”: etap 2 „Kilka dobrych” ma 8 pytań zamiast 2 (migracja `20261024151457_piwo_dluzszy_etap_2`, wybrane z Łukaszem: style z Belgii, kwaśne style, fermentacja spontaniczna, miasta, które dały nazwę stylowi, polskie tradycje, słowa oznaczające mocniejszą wersję). Teraz: rozgrzewka 1–10, kilka dobrych 11–18, strzał liczbowy 19–21, połącz i ułóż 22–23, finał 24–37.
+- Quiz „Piwo - quiz testowy”: etap 2 „Kilka dobrych” ma 8 pytań zamiast 2 (migracja `20261024151457_piwo_dluzszy_etap_2`, wybrane z Łukaszem: style z Belgii, kwaśne style, fermentacja spontaniczna, miasta, które dały nazwę stylowi, polskie tradycje, słowa oznaczające mocniejszą wersję). Etap 4 „Połącz i ułóż” ma 6 pytań zamiast 2 (migracja `20261024160025_piwo_dluzszy_etap_4`: wydarzenia od najstarszego, styl ↔ wyróżnik, od najjaśniejszego do najciemniejszego, chmiel ↔ kraj; powtórki z innymi etapami celowe, „umysł szuka daty”). Teraz: rozgrzewka 1–10, kilka dobrych 11–18, strzał liczbowy 19–21, połącz i ułóż 22–27, finał 28–41.
 - Dalej (z Łukaszem): pytania pijanego finału z komentarzami, potem efekty dźwiękowe.
 
 ## Zadania dla ciebie (dzień 0)
