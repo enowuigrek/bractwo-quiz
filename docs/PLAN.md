@@ -715,6 +715,7 @@ Ustalone z Łukaszem: prawdziwy finał ma być dłuższy niż pijany (60 s), a w
 Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `20261024190636_quiz_muzyka_ponadczasowa`). Etapy skopiowane jeden do jednego z Piwnego quizu (nazwy, opisy, czasy, odpadanie, finał jako wyścig 180 s), treść przez historię muzyki od baroku po hip-hop, trudność rośnie w każdym etapie.
 - Rozgrzewka 10 pytań i ciekawostka „Serce wróciło do Warszawy” (Chopin), trzy pytania z grafiką (saksofon, kaseta, organy z odsłanianiem). „Kilka dobrych”: 8 pytań z 1, 2, 3 albo 4 dobrymi. Strzał liczbowy: 5 pytań, poprawna nigdy w środku suwaka. Walka o finał: ciekawostka „Woodstock 1969” i 6 zadań na zmianę kolejność i pary. Finał: pula 30 prawda/fałsz (15 + 15).
 - Grafiki z OpenAI (`scripts/grafiki.mjs`, `public/grafiki/pytania/{saksofon,kaseta,organy,chopin,woodstock}.webp`).
+- **Więcej współczesnej muzyki** (migracja `20261024193522_muzyka_wspolczesna`): R&B, hip-hop (też polski: Taco Hemingway, Quebonafide, Kękę) i pop zamiast części pytań o Beatlesów i klasykę, 20 zmienionych zadań we wszystkich etapach. Z finału zniknęły zdania, które powtarzały pytania z etapów albo ciekawostkę (Nobel Dylana, śmierć Chopina, „Bohemian Rhapsody”, reggae, „Cztery pory roku”).
 - Pijany finał jest wspólny dla wszystkich quizów, więc tu też idą pytania o piwie. Do ułożenia przy projektowaniu pijanego finału.
 
 ### Uwagi po teście 24.10 wieczorem ✅
