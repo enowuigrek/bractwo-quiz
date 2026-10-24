@@ -108,7 +108,7 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Pilot (Quiz).** Przyciski akcji zawsze od razu pod nagłówkiem, nad kartą pytania, odpowiedziami i listą graczy, żeby nie uciekały w dół, gdy lista rośnie. „Zakończ grę” (niebezpieczny) osobno na samym dole strony, z dala od zwykłych akcji.
 
-**Koniec gry na telefonie (Quiz).** „Udostępnij wynik” (złoty) i „Pobierz na pamiątkę” (zwykły) obok siebie, po połowie szerokości. Obie dają tę samą grafikę 1080×1920.
+**Koniec gry na telefonie (Quiz).** Jeden złoty przycisk „Pobierz na pamiątkę” (grafika 1080×1920), pod nim konta do oznaczenia z „Kopiuj”. Bez osobnego „Udostępnij wynik” (od 24.10): kto pobierze, sam udostępni.
 
 ## Linki do skopiowania
 

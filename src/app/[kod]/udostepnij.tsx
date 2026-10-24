@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { grafikaWyniku, pobierz, udostepnij, type DaneWyniku } from "@/lib/grafika-wyniku";
+import { grafikaWyniku, pobierz, type DaneWyniku } from "@/lib/grafika-wyniku";
 import { BRACTWO_INSTAGRAM } from "@/lib/konta";
 
 type Props = {
@@ -11,32 +11,18 @@ type Props = {
 };
 
 /**
- * Po quizie: gotowa grafika z wynikiem do relacji (systemowe „Udostępnij” na telefonie, na komputerze pobranie),
- * obok ta sama grafika „na pamiątkę” prosto do pobrania, i konta do oznaczenia. Strona nie może sama oznaczyć kont ani dodać relacji, więc nicki są do skopiowania.
+ * Po quizie: grafika z wynikiem „na pamiątkę” do pobrania (jeden przycisk; kto chce, sam ją udostępni)
+ * i konta do oznaczenia. Strona nie może sama oznaczyć kont ani dodać relacji, więc nicki są do skopiowania.
  */
 export function UdostepnijWynik({ wynik, konta }: Props) {
-  const [trwa, ustawTrwa] = useState<false | "dziel" | "pobierz">(false);
+  const [trwa, ustawTrwa] = useState(false);
   const [komunikat, ustawKomunikat] = useState<string | null>(null);
   const oznaczenia = [...new Set([BRACTWO_INSTAGRAM, ...konta].filter((k): k is string => !!k))].map((k) => `@${k}`);
-  const tekstPosta = [`${wynik.miejsce}. miejsce w quizie ${wynik.tytul}!`, ...oznaczenia].join(" ");
 
   const nazwa = `quiz-${wynik.miejsce}-miejsce.png`;
 
-  async function dziel() {
-    ustawTrwa("dziel");
-    ustawKomunikat(null);
-    try {
-      const blob = await grafikaWyniku({ ...wynik, oznaczenia });
-      const co = await udostepnij(blob, nazwa, tekstPosta);
-      if (co === "pobrano") ustawKomunikat("Grafika pobrana. Dodaj ją do relacji albo posta.");
-    } catch (e) {
-      ustawKomunikat((e as Error).message);
-    }
-    ustawTrwa(false);
-  }
-
   async function naPamiatke() {
-    ustawTrwa("pobierz");
+    ustawTrwa(true);
     ustawKomunikat(null);
     try {
       pobierz(await grafikaWyniku({ ...wynik, oznaczenia }), nazwa);
@@ -57,13 +43,10 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
   }
 
   return (
-    <section className="udostepnij" aria-label="Udostępnij wynik">
+    <section className="udostepnij" aria-label="Wynik na pamiątkę">
       <div className="udostepnij-przyciski">
-        <button type="button" className="przycisk zloty" disabled={!!trwa} onClick={() => void dziel()}>
-          {trwa === "dziel" ? "Przygotowuję…" : "Udostępnij wynik"}
-        </button>
-        <button type="button" className="przycisk" disabled={!!trwa} onClick={() => void naPamiatke()}>
-          {trwa === "pobierz" ? "Przygotowuję…" : "Pobierz na pamiątkę"}
+        <button type="button" className="przycisk zloty" disabled={trwa} onClick={() => void naPamiatke()}>
+          {trwa ? "Przygotowuję…" : "Pobierz na pamiątkę"}
         </button>
       </div>
       {oznaczenia.length > 0 && (
