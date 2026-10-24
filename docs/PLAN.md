@@ -32,7 +32,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na kilku prawdziwych telefonach naraz: bonus z czasu bez limitu, kibicowanie przy wielu kibicach (TV pobiera stan po każdym okrzyku), pijany finał.
 - Samsung w lokalu: czy nie gaśnie (wideo czuwania 720p) i czy latające awatary pijanego finału idą płynnie.
 - Białe paski Safari przy werblach: poprawione na ślepo (błysk nie dotyka krawędzi), do sprawdzenia na iPhonie.
-- Muzyka na TV: kod jest, utwory z Suno dopiero do wrzucenia do `public/muzyka/` (nazwy w sekcji „Muzyka na TV”). Na Samsungu nie sprawdzona.
+- Muzyka na TV: są cztery utwory z Suno, brakuje `podium.mp3` (podium na razie gra w ciszy). Na Samsungu nie sprawdzona.
 - Lampy błyskowej przy selfie nie da się wyłączyć ze strony (systemowy aparat); pomysł na własny podgląd z kamery jest w `docs/POMYSLY.md`.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
 
@@ -608,6 +608,7 @@ Pomysł Łukasza: wideo wybuchu ma dźwięk, więc przez cały quiz na TV może 
 - **TV** (`ekran/_ekran/muzyka.tsx`, `MuzykaTv`): pięć utworów w `public/muzyka/`: `poczekalnia.mp3` (poczekalnia), `pytania.mp3` (zwykłe etapy), `przed-finalem.mp3` (etap walki o finał), `final.mp3` (finał serią i pijany finał), `podium.mp3` (podium, tabela, koniec; gra raz, reszta w pętli). Werble to cisza. Przy zmianie utworu 1,5 s przenikania. Brakujący plik po prostu nie gra, więc utwory można dodawać po kolei.
 - **Pijany finał:** muzyka finału rozciąga się jak taśma (`preservesPitch = false`, tempo spada do ok. 0,7 i faluje), coraz częściej się zacina (cofnięcie o 0,35 s), a od 5,8 s przed końcem zwalnia do zera i staje 4,2 s przed końcem, czyli tuż przed wideo. Wtedy wideo gra **z dźwiękiem wybuchu** (`pekniecie.mp4` ma teraz ścieżkę AAC), ale tylko gdy muzyka jest włączona i przeglądarka już pozwoliła grać (`src/lib/gra/dzwiek.ts`). Potem werble w ciszy.
 - **Zgoda przeglądarki:** bez gestu przeglądarka nie zagra. Gdy odmówi, na dole TV jest złota prośba „🔊 Naciśnij OK na pilocie telewizora, żeby włączyć muzykę”; pierwsze naciśnięcie klawisza albo kliknięcie odblokowuje dźwięk do końca wizyty na stronie (po przeładowaniu TV trzeba raz jeszcze).
+- **Utwory (24.10):** `poczekalnia`, `pytania` (nu-jazz/downtempo, bez instrumentów biesiadnych), `przed-finalem`, `final` (szybki i mroczny) z Suno. Obróbka ffmpeg: przycięta cisza na końcach (żeby pętla nie miała dziury), 0,3 s wejścia i 1 s wyciszenia, `loudnorm` do −16 LUFS, MP3 160 kb/s 44,1 kHz. Brakuje `podium.mp3`.
 - Sprawdzone lokalnie z tonami testowymi: utwór według fazy, przenikanie, zwalnianie i zacięcia w pijanym finale, stop przed wideo, przełącznik w pilocie. Na Samsungu nie sprawdzone (czy `preservesPitch` działa i czy OK na pilocie odblokowuje dźwięk).
 
 ## Zadania dla ciebie (dzień 0)
