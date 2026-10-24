@@ -649,28 +649,6 @@ html:has(.kolumna) {
   display: none;
 }
 
-/* Koniec quizu na telefonie: kropki „czekamy” przed odsłoną miejsca, potem medal dla pierwszej trójki */
-.odslona {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-.odslona .werble-kropki {
-  margin-bottom: 12px;
-}
-
-.odslona h1 {
-  animation: pulsowanie-werbli 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes pulsowanie-werbli {
-  to {
-    transform: scale(1.06);
-    color: var(--zloto);
-  }
-}
 
 /* Werble po finale (components/werble.tsx): ekran gaśnie jak wyłączany telewizor, potem wolno wchodzi napis.
    Na telefonie zasłania całą stronę, na TV całą scenę (.duzy). */
@@ -735,6 +713,16 @@ html:has(.kolumna) {
   gap: 8px;
   opacity: 0;
   animation: wejscie-werbli 3s ease-in 1.8s forwards;
+}
+
+/* ciąg dalszy werbli (telefon przed odsłoną miejsca): od razu widoczne, bez błysku */
+.werble.dalej .werble-blysk {
+  display: none;
+}
+
+.werble.dalej .werble-tresc {
+  opacity: 1;
+  animation: none;
 }
 
 @keyframes wejscie-werbli {
@@ -830,8 +818,7 @@ html:has(.kolumna) {
 /* przy ograniczonym ruchu bez migania: kropki stoją, błysk znika od razu */
 @media (prefers-reduced-motion: reduce) {
   .werble-kropki span,
-  .werble-tresc::before,
-  .odslona h1 {
+  .werble-tresc::before {
     animation: none;
   }
 

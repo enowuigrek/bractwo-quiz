@@ -34,6 +34,8 @@ export const LIMITY_PIJANE = { pytan: 20, tresc: 200 } as const;
  */
 export const WYLEWANIE_S = 7;
 export const WIDEO_WYLEWANIA = "/wideo/pekniecie.mp4";
+/** Sekunda klipu, w której szklanka wybucha: wtedy interfejs TV się rozpada (nagłówek w górę, awatary na boki). */
+export const WYBUCH_S = 1.5;
 
 /**
  * Sekundy na zegarze w pijanym finale (TV i telefon pokazują to samo, bo liczą z czasu serwera). Zegar

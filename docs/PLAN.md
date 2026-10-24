@@ -588,6 +588,17 @@ Pomysł Łukasza (plan w `docs/POMYSLY.md`). Działa z pierwszym klipem; Łukasz
 - **Obróbka nowego klipu** (ffmpeg jest z Homebrew): usunięcie znaku wodnego Klinga z prawego dolnego rogu, bez dźwięku, dane na początku pliku:
   `ffmpeg -i klip.mp4 -vf "delogo=x=1112:y=662:w=150:h=46" -an -c:v libx264 -preset slow -crf 20 -pix_fmt yuv420p -movflags +faststart public/wideo/pekniecie.mp4` (współrzędne dla 1280×720; przy innej rozdzielczości przelicz). Klip do 8 s, bez zmian w kodzie.
 
+### Wybuch szklanki, losowe pytania, wspólny koniec (24.10) ✅
+
+Po kolejnym teście Łukasza:
+- **Nowy klip** `public/wideo/pekniecie.mp4` (Kling 4.0, Keyframes, 5 s): szklanka pęka po ok. 1 s, wybucha po ok. 1,5 s, piwo zalewa ekran, koniec prawie czarny. Obróbka jak w sekcji wyżej (`delogo`, bez dźwięku). Pierwszy klip (tylko zbliżenie) wypadł.
+- **Rozpad interfejsu przy wybuchu** (`WYBUCH_S` = 1,5 s klipu w `src/lib/pijany.ts`, przy nowym klipie sprawdzić ten moment): nagłówek wylatuje w górę i znika, awatary odlatują od szklanki poza ekran (pętla klatek w `ekran/_ekran/pijany.tsx`, 1700 px/s, bez odbijania) i kręcą się (`.tv-pijany.wybuch`).
+- **Wspólny koniec:** koniec rusza, gdy ktoś dojdzie do **przedostatniego** pytania (`zakoncz_pijany`, 7 s do werbli). Kto skończy wcześniej, nie gaśnie sam: czeka z samym paskiem, a werble przychodzą wszystkim naraz (także tym, którzy nie skończyli).
+- **Losowe pytania** (migracja `20261024075052_pijane_pytania_losowo`): z puli w panelu każda gra dostaje 8 wylosowanych, w kolejności z listy (chaos dalej narasta); losowanie z id gry, więc wszyscy gracze tej gry mają te same. Pytanie z `{za_barem}` bez imienia odpada przed losowaniem.
+- **Mignięcie na start:** gdy TV wchodzi w pijany finał, ekran kilka razy nierówno gaśnie (`mrugniecie-tv`, 1,8 s), jak psujący się telewizor.
+- **Telefon po „Pokaż podium”:** zamiast osobnej planszy „Werble… Zaraz poznasz swoje miejsce!” te same werble co wcześniej (`<Werble dalej />`: bez błysku i bez wejścia), więc do odsłony miejsca nic się nie zmienia.
+- Sprawdzone lokalnie: 8 pytań z puli 10, skrócenie czasu przy przedostatnim, sam pasek po skończeniu, werble wszystkim, podium z tymi samymi werblami, wideo z wybuchem i rozpadem (zrzuty: pęknięta szklanka z awatarami, potem tylko piwo).
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

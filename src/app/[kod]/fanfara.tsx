@@ -8,7 +8,7 @@ import type { MojWynik, Nagroda, StanSesji } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { Kropki } from "@/components/werble";
+import { Werble } from "@/components/werble";
 import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
 
@@ -99,16 +99,8 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
     </>
   );
 
-  if (!odslonieto) {
-    return (
-      <div className="odslona">
-        <Kropki />
-        <p className="nadtytul">{nick}</p>
-        <h1>Werble…</h1>
-        <p>Zaraz poznasz swoje miejsce!</p>
-      </div>
-    );
-  }
+  // przed odsłoną miejsca te same werble co po finale, bez zmiany ekranu
+  if (!odslonieto) return <Werble dalej />;
 
   if (moj && miejsce && miejsce <= 3) {
     return (

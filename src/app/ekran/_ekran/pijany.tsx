@@ -4,8 +4,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji } from "@/lib/gra/typy";
-import { WIDEO_WYLEWANIA, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
-import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze } from "./drogi";
+import { WIDEO_WYLEWANIA, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
 
@@ -24,6 +24,8 @@ const SPADANIE_S = 18;
 const LOT_S = 24;
 /** Z drogi zostaje tyle, ile przejechał gracz, razy to (cofają się w stronę startu). */
 const COFNIECIE = 0.3;
+/** Prędkość odlotu awatarów od wybuchu szklanki w px/s. */
+const ODLOT = 1700;
 /** Prędkość lotu w px/s: na początku powoli, pod koniec fazy szybciej. */
 const PREDKOSC = { od: 80, do: 240 };
 /** Miejsce nad awatarem na podpis z nickiem, żeby przy górnej krawędzi nie wychodził poza planszę. */
@@ -59,21 +61,27 @@ export function PijanyTv({
   const lista = drogi(gracze.length);
   const awatar = awatarNaDrogach(lista);
 
+  // wybuch w wideo pękającej szklanki: interfejs się rozpada (niżej przy wideo)
+  const [wybuch, ustawWybuch] = useState(false);
+
   // pętla klatek czyta zawsze najnowsze dane, a nie startuje od nowa przy każdym odświeżeniu stanu
-  const dane = useRef({ gracze, od, do_, przesuniecie });
+  const dane = useRef({ gracze, od, do_, przesuniecie, wybuch });
   useEffect(() => {
-    dane.current = { gracze, od, do_, przesuniecie };
+    dane.current = { gracze, od, do_, przesuniecie, wybuch };
   });
   const elementy = useRef(new Map<string, HTMLDivElement>());
 
   useLayoutEffect(() => {
     const ruch = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const loty = new Map<string, Lot>();
+    // wybuch: każdy odlatuje od szklanki z miejsca, w którym był w tej chwili
+    const ostatnie = new Map<string, { x: number; y: number }>();
+    const odloty = new Map<string, Lot>();
     let poprzednia = performance.now();
     let klatka = 0;
 
     const ustaw = () => {
-      const { gracze, od, do_, przesuniecie } = dane.current;
+      const { gracze, od, do_, przesuniecie, wybuch } = dane.current;
       const chwila = performance.now();
       // po schowanej karcie bez skoku przez pół planszy
       const dt = Math.min(0.1, (chwila - poprzednia) / 1000);
@@ -97,6 +105,20 @@ export function PijanyTv({
         if (!ruch) {
           // ograniczony ruch: od razu cofnięci, bez lotu
           p = punktNaDrodze(lista[i], cel);
+        } else if (wybuch) {
+          let o = odloty.get(g.nick);
+          if (!o) {
+            const s = ostatnie.get(g.nick) ?? punktNaDrodze(lista[i], cel);
+            const dx = s.x - SZKLANKA_FINALU.x;
+            const dy = s.y - SZKLANKA_FINALU.y;
+            const d = Math.hypot(dx, dy) || 1;
+            o = { x: s.x, y: s.y, vx: dx / d, vy: dy / d - 0.25 };
+            odloty.set(g.nick, o);
+          }
+          // bez odbijania: lecą poza ekran
+          o.x += o.vx * ODLOT * dt;
+          o.y += o.vy * ODLOT * dt;
+          p = o;
         } else if (t < LOT_S) {
           const u = lagodnie(ograniczone((t - COFANIE_S) / (LOT_S - COFANIE_S)));
           p = punktNaDrodze(lista[i], g.start + (cel - g.start) * u);
@@ -126,6 +148,7 @@ export function PijanyTv({
           }
           p = l;
         }
+        ostatnie.set(g.nick, { x: p.x, y: p.y });
         el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
       });
     };
@@ -158,7 +181,7 @@ export function PijanyTv({
 
   return (
     <div
-      className={`tv-wyscig tv-seria tv-pijany${gra ? " wylewa" : ""}`}
+      className={`tv-wyscig tv-seria tv-pijany${gra ? " wylewa" : ""}${wybuch ? " wybuch" : ""}`}
       style={{ "--poziom": poziom } as React.CSSProperties}
       ref={(el) => {
         if (el && !scena) ustawScene(el.closest(".scena"));
@@ -175,6 +198,9 @@ export function PijanyTv({
             preload="auto"
             onLoadedMetadata={(e) => ustawDlugosc(e.currentTarget.duration)}
             onPlaying={() => ustawGra(true)}
+            onTimeUpdate={(e) => {
+              if (!wybuch && e.currentTarget.currentTime >= WYBUCH_S) ustawWybuch(true);
+            }}
           />,
           scena,
         )}

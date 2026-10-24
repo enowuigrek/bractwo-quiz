@@ -26,7 +26,7 @@ export default async function PijanyFinal() {
       <h1>Pijany finał</h1>
       <p className="pomocniczy">
         Dogrywka po finale serią, gdy przy uruchamianiu gry włączysz „Pijany finał”. Wynik jest już ustalony, a gracze
-        odpowiadają prawda/fałsz na te pytania po kolei (90 s, nic się nie liczy). Gracze o tym nie wiedzą: telefon
+        odpowiadają prawda/fałsz na 8 pytań wylosowanych z tej listy, w jej kolejności (w każdej grze inne; do 90 s, nic się nie liczy). Gracze o tym nie wiedzą: telefon
         wygląda jak dalsza seria (pytanie 15/14, 16/14…), a TV dalej pokazuje finał, tylko wszystko się psuje. Ekran
         telefonu faluje coraz mocniej, a każde pytanie ma swój przeszkadzacz. Wstawki: <code>{"{za_barem}"}</code> (imię
         z kreatora gry; bez niego pytanie odpada) i <code>{"{lokal}"}</code>.
