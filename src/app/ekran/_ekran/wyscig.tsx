@@ -8,7 +8,7 @@ import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import { naTrasie, naTrasieFinalu } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
-import { Licznik } from "./ranking";
+import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
 import { LogoNaglowka } from "./logo";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
@@ -33,9 +33,13 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów
   const odciecie = odciecieEtapu(stan);
   const strefaFinalu = odciecie !== null && wiersze.length > odciecie;
+  const koniecEtapu = !!stan.etap && stan.ostatnie_w_etapie && !stan.etap.finalowy;
   const tor = Math.min(
     92,
-    Math.floor((700 - (strefaFinalu ? 34 : 0) - (wiersze.length - 1) * odstep) / Math.max(1, wiersze.length)),
+    Math.floor(
+      (700 - (strefaFinalu ? 34 : 0) - (koniecEtapu ? KONIEC_ETAPU_PX : 0) - (wiersze.length - 1) * odstep) /
+        Math.max(1, wiersze.length),
+    ),
   );
   const ruch = (i: number) => ({ delay: START_S + i * 0.08, duration: RUCH_S, ease: [0.22, 1, 0.36, 1] as const });
   const etap = stan.etap;
@@ -49,13 +53,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const naglowek = (
     <header className="tv-ranking-gora">
       <h1>{etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
-      {z && (
-        <p className="tv-okazja">
-          {etap && stan.ostatnie_w_etapie
-            ? `Koniec etapu ${etap.nr}: ${etap.nazwa}`
-            : `${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}
-        </p>
-      )}
+      {z && <p className="tv-okazja">{`${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}</p>}
       <LogoNaglowka />
     </header>
   );
@@ -78,6 +76,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
     <MotionConfig reducedMotion="user">
       <div className="tv-wyscig">
         {naglowek}
+        <KoniecEtapu stan={stan} />
 
         <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
           <div className="wyscig-tory" style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}>

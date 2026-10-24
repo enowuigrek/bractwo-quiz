@@ -717,6 +717,14 @@ Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `202610241
 - Grafiki z OpenAI (`scripts/grafiki.mjs`, `public/grafiki/pytania/{saksofon,kaseta,organy,chopin,woodstock}.webp`).
 - Pijany finał jest wspólny dla wszystkich quizów, więc tu też idą pytania o piwie. Do ułożenia przy projektowaniu pijanego finału.
 
+### Uwagi po teście 24.10 wieczorem ✅
+
+- **Ciekawostki po pytaniu, którego dotyczą** (migracja `20261024191331_ciekawostki_po_pytaniach`), nigdy na końcu etapu. Piwny quiz: po porterze „Piwna powódź w Londynie” (1814, browar Meux), po trapistach „Piwo zza klasztornych murów” (przeniesiona z walki o finał), po grodziskim „Polski szampan”, po fermentacji spontanicznej „Piwo z otwartego okna” (koelschip). Muzyka ponadczasowa: Chopin i Woodstock też po swoich pytaniach.
+- **Więcej pytań z grafiką:** zboże (jęczmień) zamiast skrótu IPA, kufel z Oktoberfestu (ile litrów, suwak 0,25–3 l) zamiast roku pierwszego Oktoberfestu. Grafiki `powodz`, `koelschip`, `jeczmien`, `mass` w `public/grafiki/pytania/`.
+- **Koniec etapu** na rankingu i wyścigu TV: duży złoty pasek „Koniec etapu N · nazwa” pod nagłówkiem (`KoniecEtapu` w `ranking.tsx`), wyścig zmniejsza tory o jego wysokość.
+- **Muzyka:** pliki `etap-2.mp3` i `etap-3.mp3` zamienione miejscami.
+- **Finał na telefonie:** zła odpowiedź tylko drży, bez czerwonej obwódki (na zielonym kole „Prawda” wyglądała źle).
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

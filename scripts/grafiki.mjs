@@ -136,6 +136,30 @@ const GRAFIKI = {
       "in the distance, morning mist, scattered blankets, summer 1969 atmosphere.",
     STYL_ZDJECIA,
   ),
+  // Piwny quiz, dokładka 24.10: ciekawostki po pytaniach (porter, fermentacja spontaniczna) i dwa pytania z grafiką
+  "ciek-powodz": zdjecie(
+    "powodz.webp",
+    "A narrow cobblestone street in London in 1814 at dusk, completely flooded knee-deep with dark brown porter beer " +
+      "with creamy foam, the flood flowing between Georgian brick houses, floating wooden debris, gas lamps " +
+      "reflected in the beer. No barrels, no vats, no casks.",
+    STYL_ZDJECIA,
+  ),
+  "ciek-koelschip": zdjecie(
+    "koelschip.webp",
+    "The attic of an old Belgian brewery at night, a wide shallow rectangular open copper vat (coolship) filled with " +
+      "steaming amber wort, old wooden roof beams, wooden louvred shutters open to the cold night air, steam rising.",
+    STYL_ZDJECIA,
+  ),
+  "pyt-jeczmien": zdjecie(
+    "jeczmien.webp",
+    "Close-up of ripe golden two-row barley ears with long awns in a field at sunset, shallow depth of field.",
+    STYL_ZDJECIA,
+  ),
+  "pyt-mass": zdjecie(
+    "mass.webp",
+    "A one-litre dimpled thick glass Bavarian beer mug with a big handle (Masskrug), full of golden lager with a thick " +
+      "white foam head, standing on a wooden table, blurred warm lights of a festival tent behind.",
+  ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
     "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +

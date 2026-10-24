@@ -35,6 +35,28 @@ export function Licznik({ wartosc }: { wartosc: number }) {
  * Ranking po pytaniu. Najpierw stoi kolejność sprzed pytania, a po chwili wiersze
  * przetasowują się na nowe miejsca, punkty doliczają się, a przy nickach pojawia się „+zdobyte”.
  */
+/** Wysokość paska „Koniec etapu” z odstępem (wyścig odejmuje ją od miejsca na tory). */
+export const KONIEC_ETAPU_PX = 104;
+
+/**
+ * Ranking po ostatnim pytaniu etapu: duży pasek pod nagłówkiem, wjeżdża po chwili, żeby było widać, że etap się
+ * skończył (sam podtytuł w nagłówku łatwo przeoczyć).
+ */
+export function KoniecEtapu({ stan }: { stan: StanSesji }) {
+  if (!stan.etap || !stan.ostatnie_w_etapie || stan.etap.finalowy) return null;
+  return (
+    <motion.div
+      className="tv-koniec-etapu"
+      initial={{ opacity: 0, scale: 1.3 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <span>Koniec etapu {stan.etap.nr}</span>
+      <span className="tv-koniec-etapu-nazwa">{stan.etap.nazwa}</span>
+    </motion.div>
+  );
+}
+
 export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
   const [po, ustawPo] = useState(false);
   useEffect(() => {
@@ -61,13 +83,12 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
           <h1>Ranking</h1>
           {z && (
             <p className="tv-okazja">
-              {stan.etap && stan.ostatnie_w_etapie
-                ? `Koniec etapu ${stan.etap.nr}: ${stan.etap.nazwa}`
-                : `po pytaniu ${z.lp}`}
+              {stan.etap && stan.ostatnie_w_etapie ? `${stan.etap.nazwa} · po pytaniu ${z.lp}` : `po pytaniu ${z.lp}`}
             </p>
           )}
           <LogoNaglowka />
         </header>
+        <KoniecEtapu stan={stan} />
 
         {ranking.length === 0 ? (
           <p className="tv-zacheta">Nikt jeszcze nie gra.</p>

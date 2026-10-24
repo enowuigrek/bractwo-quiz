@@ -747,6 +747,34 @@
   margin: 0;
 }
 
+/* koniec etapu: pasek pod nagłówkiem rankingu i wyścigu (wysokość z odstępem = KONIEC_ETAPU_PX) */
+.tv-koniec-etapu {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 80px;
+  margin-top: 24px;
+  padding: 0 48px;
+  box-sizing: border-box;
+  border: 3px solid var(--zloto);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--zloto) 16%, rgba(0, 0, 0, 0.55));
+  box-shadow: var(--glow-md);
+  color: var(--piana);
+  font-family: var(--font-condensed);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 54px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tv-koniec-etapu-nazwa {
+  color: var(--zloto);
+}
+
 .tv-ranking-lista {
   list-style: none;
   margin: 28px 0 0;

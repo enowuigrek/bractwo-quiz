@@ -2257,13 +2257,11 @@ html:has(.kolumna) {
   animation: ocena-puls var(--ocena-ms, 400ms) ease-out;
 }
 
-/* wyższa szczegółowość niż utrudnienia (np. uciekające koła), żeby drżenie zawsze było widać */
+/* wyższa szczegółowość niż utrudnienia (np. uciekające koła), żeby drżenie zawsze było widać; samo drżenie,
+   bez czerwonej obwódki (na zielonym kole „Prawda” wyglądała źle) */
 .ocena-zle .odp-pf .odp-pf-przycisk.wybrana,
 .ocena-zle .wybrana {
   animation: ocena-trzes var(--ocena-ms, 400ms) linear;
-  box-shadow:
-    0 0 0 4px var(--czerwien),
-    0 0 28px 6px color-mix(in srgb, var(--czerwien) 60%, transparent);
 }
 
 @keyframes ocena-puls {
