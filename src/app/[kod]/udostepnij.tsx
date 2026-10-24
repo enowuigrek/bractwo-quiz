@@ -28,7 +28,7 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
     ustawKomunikat(null);
     try {
       const co = await udostepnij(await grafikaWyniku({ ...wynik, oznaczenia }), nazwa, tekstPosta);
-      if (co === "pobrano") ustawKomunikat("Grafika pobrana na pamiątkę.");
+      if (co === "pobrano") ustawKomunikat("Grafika pobrana. Pochwal się nią w social mediach!");
     } catch (e) {
       ustawKomunikat((e as Error).message);
     }
@@ -60,7 +60,7 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
         </p>
       )}
       {komunikat && (
-        <p className="pomocniczy" role="status" style={{ margin: 0 }}>
+        <p className="pomocniczy" role="status" style={{ margin: 0, textAlign: "center" }}>
           {komunikat}
         </p>
       )}
