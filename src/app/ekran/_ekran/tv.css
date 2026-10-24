@@ -356,13 +356,13 @@
   height: 100%;
 }
 
-/* tekst niżej i z oddechem: nad drogą etapów jest dużo miejsca (24.10: było ciasno pod nagłówkiem) */
+/* 25.10: nad tytułem mniej, a więcej między opisem a drogą etapów z ikonami (ikony prawie dotykały tekstu) */
 .tv-wstep > .tv-okazja {
-  margin-top: 70px;
+  margin-top: 0;
 }
 
 .tv .tv-wstep-tytul {
-  margin: 14px 0 34px;
+  margin: 6px 0 16px;
   font-size: 128px;
   line-height: 1;
 }
@@ -377,7 +377,10 @@
 
 .tv-wstep-droga {
   list-style: none;
+  /* odstęp od opisu nawet przy długim tekście (25.10: ikony prawie dotykały tekstu) */
   margin: auto 0 40px;
+  padding-top: 56px;
+  flex-shrink: 0;
   padding: 0;
   display: flex;
   align-items: flex-start;
@@ -424,12 +427,17 @@
   filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.35));
 }
 
-/* ikona etapu przed nazwą na planszy etapu */
+/* ikona etapu przed nazwą na planszy etapu; długa nazwa zawija się obok ikony, nie pod nią */
+.tv .tv-etap-opis h1.z-ikona {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
 .tv-etap-ikona {
+  flex: none;
   height: 150px;
   width: auto;
-  margin-right: 28px;
-  vertical-align: middle;
   filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.4));
 }
 
@@ -443,10 +451,11 @@
   flex: 0 0 160px !important;
 }
 
+/* szklanka na mecie stoi na tej samej linii co numery etapów (dół szklanki przy dole kółek) */
 .tv-wstep-meta img {
   height: 230px;
   width: auto;
-  margin-top: -90px;
+  margin-top: -6px;
   filter: drop-shadow(0 0 30px rgba(227, 172, 63, 0.5));
 }
 
@@ -3494,10 +3503,14 @@
   opacity: 1;
 }
 
-/* koniec klipu: obraz zjeżdża w dół, jakby piana spłynęła z ekranu (transform, bez clip-path) */
-.pijany-wideo.splywa {
-  transform: translateY(105%);
-  transition: transform 1.1s cubic-bezier(0.55, 0, 0.9, 0.4);
+/* koniec klipu: piana spływa w dół i przy tym gaśnie, a wszystko kończy się, zanim klip stanie na ostatniej
+   klatce (start 1,3 s przed końcem w pijany.tsx; do 25.10 zjeżdżała zamrożona klatka) */
+.pijany-wideo.gra.splywa {
+  opacity: 0;
+  transform: translateY(45%);
+  transition:
+    transform 1.1s cubic-bezier(0.45, 0, 0.75, 0.5),
+    opacity 1.1s ease-in;
 }
 
 /* Gdy wideo gra, pod nim nie może być nic jasnego, bo czerń klipu przepuszcza (screen): drogi i ich pasy

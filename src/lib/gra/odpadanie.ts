@@ -45,3 +45,22 @@ export function wzgledemKreski(
   if (!nad && bylNad) return "spadek";
   return nad ? null : "zagrozony";
 }
+
+/**
+ * Najbliższe odcięcie, które kogoś wyrzuci (bieżący etap albo któryś dalej przed finałem): po którym etapie,
+ * ilu gra dalej i czy to wejście do finałowej trójki. Null: nikt już nie odpada (albo trwa finał).
+ */
+export function najblizszeOdciecie(stan: StanSesji): { poEtapie: number; ile: number; final: boolean } | null {
+  if (!stan.etap || stan.etap.finalowy) return null;
+  const plan = stan.plan_etapow ?? [];
+  const final = plan.find((e) => e.finalowy);
+  for (const e of plan) {
+    if (e.nr < stan.etap.nr || e.finalowy) continue;
+    if (final && e.nr === final.nr - 1) {
+      if (stan.w_grze > 3) return { poEtapie: e.nr, ile: 3, final: true };
+    } else if (e.przechodzi !== null && stan.w_grze > e.przechodzi) {
+      return { poEtapie: e.nr, ile: e.przechodzi, final: false };
+    }
+  }
+  return null;
+}

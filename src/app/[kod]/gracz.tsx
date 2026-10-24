@@ -14,7 +14,7 @@ import {
   useNasluch,
   zZegarem,
 } from "@/lib/gra/nasluch";
-import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
+import { najblizszeOdciecie, odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
@@ -447,6 +447,7 @@ function WGrze({
   if (stan.faza === "ranking") {
     const odciecie = odciecieEtapu(stan);
     const kreska = mojWiersz ? wzgledemKreski(mojWiersz, odciecie, stan.w_grze) : null;
+    const nastepne = najblizszeOdciecie(stan);
     return (
       <>
         {/* awatar obok nicku: gracz od razu widzi, że to jego wynik */}
@@ -460,24 +461,26 @@ function WGrze({
         {/* przeskok przez kreskę po tym pytaniu */}
         {kreska === "awans" && <p className="kreska-zmiana awans">▲ Wskakujesz nad kreskę!</p>}
         {kreska === "spadek" && <p className="kreska-zmiana spadek">▼ Spadasz pod kreskę. Odrób to w następnym pytaniu!</p>}
-        {/* etap z odcięciem: walka o miejsce w trójce finału albo o miejsce, które gra dalej */}
-        {mojWiersz && odciecie !== null && stan.w_grze > odciecie && (
-          <p className="etap-uwaga">
-            {mojWiersz.miejsce <= odciecie ? (
-              stan.etap?.final_po_etapie ? (
-                <>
-                  🏆 Jesteś w <strong>finałowej trójce</strong>. Utrzymaj miejsce do końca etapu!
-                </>
-              ) : (
-                <>
-                  Jesteś w <strong>najlepszej {odciecie}</strong>, która gra dalej. Utrzymaj miejsce do końca etapu!
-                </>
-              )
+        {/* najbliższe odcięcie (ten etap albo dalszy): na dobrej drodze czy zagrożony odpadnięciem */}
+        {mojWiersz && nastepne && (
+          <p className={`etap-uwaga ${mojWiersz.miejsce <= nastepne.ile ? "na-drodze" : "zagrozony"}`}>
+            {mojWiersz.miejsce <= nastepne.ile ? (
+              <>
+                {nastepne.final ? "🏆 " : "✅ "}
+                <strong>Na dobrej drodze:</strong>{" "}
+                {nastepne.final ? "jesteś w trójce, która wejdzie do finału" : `jesteś w najlepszej ${nastepne.ile}`}
+                {nastepne.poEtapie === stan.etap?.nr
+                  ? ". Utrzymaj miejsce do końca etapu!"
+                  : `, która gra dalej po ${nastepne.poEtapie}. etapie.`}
+              </>
             ) : (
               <>
-                {stan.etap?.final_po_etapie ? "🏆 Do finału wchodzi 3 najlepszych" : `Dalej gra ${odciecie} najlepszych`}.
-                Do {odciecie}. miejsca brakuje Ci{" "}
-                <strong>{Math.max(1, (punktyWGrze?.[odciecie - 1] ?? 0) - mojWiersz.punkty + 1)} pkt</strong>.
+                ⚠️ <strong>Zagrożony odpadnięciem:</strong>{" "}
+                {nastepne.final
+                  ? `do finału wchodzi 3 najlepszych po ${nastepne.poEtapie}. etapie`
+                  : `po ${nastepne.poEtapie}. etapie gra dalej ${nastepne.ile} najlepszych`}
+                . Do {nastepne.ile}. miejsca brakuje Ci{" "}
+                <strong>{Math.max(1, (punktyWGrze?.[nastepne.ile - 1] ?? 0) - mojWiersz.punkty + 1)} pkt</strong>.
               </>
             )}
           </p>

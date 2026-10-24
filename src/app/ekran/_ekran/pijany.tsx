@@ -211,7 +211,7 @@ export function PijanyTv({
                 ogloszWybuch();
               }
               const v = e.currentTarget;
-              if (!splywa && v.duration && v.duration - v.currentTime <= 0.7) ustawSplywa(true);
+              if (!splywa && v.duration && v.duration - v.currentTime <= 1.3) ustawSplywa(true);
             }}
           />,
           scena,

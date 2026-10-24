@@ -55,9 +55,9 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               Etap {e.nr} z {e.liczba}
               {e.finalowy ? " · finał" : ""}
             </motion.p>
-            <motion.h1 {...wejscie(1)}>
+            <motion.h1 className={e.ikona ? "z-ikona" : undefined} {...wejscie(1)}>
               {e.ikona && <img src={e.ikona} alt="" className="tv-etap-ikona" />}
-              {e.nazwa}
+              <span>{e.nazwa}</span>
             </motion.h1>
             {e.opis && (
               <motion.p className="tv-etap-zasady" {...wejscie(2)}>

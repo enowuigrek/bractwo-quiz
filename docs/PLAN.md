@@ -35,7 +35,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
 - Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
-- Gry testowe do usunięcia w panelu: JBXR, GDWX, QLLV, CFKE, QMRS, BTGX, JLUL.
+- Gry testowe do usunięcia w panelu: JLUL, QDSD (i wcześniejsze, jeśli zostały).
 
 **Następny krok:** dźwięki i pijany finał (25.10), potem test na żywo na spotkaniu Kręgu 28.10.
 
@@ -68,6 +68,15 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 - **Pijany finał powtarzał pytania** w teście muzycznym (pula 10 pytań, telefon po końcu puli zaczyna od nowa) i chyba trwał dłużej niż 60 s. Do sprawdzenia, a pytań ma być tyle, żeby w jednej grze żadne się nie powtórzyło (albo bez powtórek po wyczerpaniu).
 - **Wyniki gry w panelu:** „Pytań w grze: 63” i „Dobrze 31/63” liczą ciekawostki i całą pulę finału; trzeba liczyć tylko zadane pytania.
 - **Kreator z zapowiedzią (zrobione 24.10, niesprawdzone w przeglądarce):** przełącznik „najpierw zapowiedź”, po włączeniu data i godzina (domyślnie godzinę od teraz, w górę do 5 min), jeden przycisk „Uruchom grę”. Do kliknięcia w panelu.
+
+### Poprawki 25.10 (po teście 24.10 wieczorem) ✅
+
+- **Wyścig:** szklanka dopiero przy komplecie punktów przed finałem (`SKALA_MAKSIMUM` 0,75 → 1 w `src/lib/gra/wyscig.ts`; w teście 33 tys. z 41,5 tys. po 27 pytaniach stało już przy szklance).
+- **Telefon w rankingu:** „✅ Na dobrej drodze” albo „⚠️ Zagrożony odpadnięciem” względem najbliższego odcięcia, także gdy to odcięcie jest dopiero za kilka etapów (`najblizszeOdciecie` w `src/lib/gra/odpadanie.ts`), z brakującymi punktami.
+- **Plansza wstępu:** więcej miejsca między opisem a ikonami (80 px), szklanka na mecie stoi na linii numerów etapów. **Plansza etapu:** długa nazwa zawija się obok ikony.
+- **Wideo wybuchu:** piana spływa i gaśnie 1,3 s przed końcem klipu (wcześniej zjeżdżała zamrożona ostatnia klatka).
+- **Finał „15/12 kroków”** z testu: pilot i TV miały jeszcze stary kod (wdrożenie kary było w trakcie gry), który liczył przewagę + dobre bez kary. Baza liczyła już z karą i dlatego seria trwała dalej.
+- **Czeka na środki w OpenAI** (25.10: „no credits remaining”): ikona „Jeszcze zdążę” jako klepsydra z piwem i zdjęcie tripla do pytania o moc. Prompty są w `scripts/grafiki.mjs`; po doładowaniu `node scripts/grafiki.mjs etap-jeszcze-zdaze pyt-tripel` i ustawić `grafika_url = '/grafiki/pytania/tripel.webp'` w pytaniu o tripla (cofnięte migracją `20261024224343`, bo pliku nie ma).
 
 ### Pijany finał
 

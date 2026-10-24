@@ -170,8 +170,8 @@ const GRAFIKI = {
   ),
   "etap-jeszcze-zdaze": ikona(
     "jeszcze-zdaze.webp",
-    "A polished brass beer tap with a drop of golden beer falling from the spout, a vintage brass pocket watch with a " +
-      "plain dial without numbers hanging from the tap handle on its chain.",
+    "An antique hourglass with a polished brass frame and turned wooden posts, golden beer with a little white foam " +
+      "instead of sand: the top bulb almost empty, a thin stream of beer running into the nearly full bottom bulb.",
   ),
   "muz-saksofon": zdjecie(
     "saksofon.webp",
@@ -224,6 +224,11 @@ const GRAFIKI = {
     "A full British nonic pint glass (smooth tall glass with the characteristic bulge a few centimetres below the rim, " +
       "no facets, no handle) of amber ale with a creamy head, standing on a dark wooden bar counter of a traditional " +
       "English pub, brass beer taps and warm lights blurred behind.",
+  ),
+  "pyt-tripel": zdjecie(
+    "tripel.webp",
+    "A Belgian tripel, hazy deep golden strong ale with a thick white foam head, in a stemmed Belgian tulip glass on " +
+      "a dark wooden table of a cosy Belgian café, warm lights blurred behind.",
   ),
   "pyt-mass": zdjecie(
     "mass.webp",

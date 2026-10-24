@@ -17,10 +17,11 @@ export function rankingJakoWyscig(liczbaGraczy: number): boolean {
 }
 
 /**
- * Szklankę osiąga się przy tej części maksimum punktów przed finałem (1000 × mnożnik za pytanie): bardzo dobry
- * gracz staje przy szklance tuż przed finałem, a nie dopiero przy komplecie punktów.
+ * Szklankę osiąga się przy tej części maksimum punktów przed finałem (1000 × mnożnik za pytanie). Do 25.10 było 0,75
+ * i bardzo dobry gracz stał przy szklance już kilka pytań przed finałem (test: 33 tys. z 41,5 tys. po 27 pytaniach),
+ * więc teraz przy szklance staje tylko komplet punktów.
  */
-const SKALA_MAKSIMUM = 0.75;
+const SKALA_MAKSIMUM = 1;
 
 /** Położenie na trasie 0..1 w zwykłych etapach: tylko z własnych punktów. */
 export function naTrasie(punkty: number, maxPrzedFinalem: number): number {
