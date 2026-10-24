@@ -17,12 +17,11 @@ import { LogoNaglowka } from "./logo";
 export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
   const e = stan.etap;
   if (!e) return null;
-  // kreski odpadania na drodze przez etapy: pod etapem, po którym się odpada, krótko ilu zostaje („✂ 6”);
-  // całe zdanie jest niżej, przy zasadach
+  // kreski odpadania na drodze przez etapy: pod etapem z progiem krótko, ilu zostaje („✂ 6”); trójki przed
+  // finałem tu nie znaczymy, bo mówi o niej plansza walki o finał. Całe zdanie jest niżej, przy zasadach
   const plan = stan.plan_etapow ?? [];
-  const nrFinalu = plan.find((p) => p.finalowy)?.nr ?? null;
   const progPo = (nr: number) => {
-    const ile = nrFinalu !== null && nr === nrFinalu - 1 ? 3 : (plan.find((p) => p.nr === nr)?.przechodzi ?? null);
+    const ile = plan.find((p) => p.nr === nr)?.przechodzi ?? null;
     return ile === null ? null : `✂ ${ile}`;
   };
   // dalsze odcięcia (bez bieżącego etapu, o nim mówi osobny napis niżej)
