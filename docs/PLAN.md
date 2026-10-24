@@ -635,6 +635,14 @@ Po teście Łukasza: pijany finał dało się szybko przeklikać i czekać na wy
 - **Do zrobienia razem z Łukaszem:** nowe pytania pijanego finału z komentarzami, kolejnością i przeszkadzaczami (pola już są, ogólna pula komentarzy w `KOMENTARZE_OGOLNE` też do ustalenia), potem efekty dźwiękowe.
 - Sprawdzone lokalnie: reakcja 2,3 s w połowie dogrywki z komentarzem i zablokowanymi przyciskami, gaśnięcie telefonu bez napisu, werble bez drugiego błysku. Nie sprawdzone na żywo: ocena w finale serią (telefon i TV) i cała sekwencja końca na TV z muzyką.
 
+### Muzyka narastająca z etapami (24.10) ✅
+
+Łukasz: poczekalnia i pytania brzmiały jak lo-fi z windy, a przejście do „przed finałem” zgrzytało. Nowy zestaw z Suno (prompty bez perkusji w pierwszych etapach, styl noir):
+- `poczekalnia.mp3` (mroczne, spokojne oczekiwanie), `etap-1.mp3` (noir lekko: wyciszona trąbka, kontrabas pizzicato), `etap-2.mp3` (noir z napięciem), `etap-3.mp3` (dawny „przed finałem”, elegancki), `final.mp3` (bez zmian), `podium.mp3` (mroczne zwycięstwo, gra raz).
+- Przypisanie (`utworFazy` w `ekran/_ekran/muzyka.tsx`): etap 1 → etap-1, etap 2 → etap-2, etap 3 i dalej oraz walka o finał → etap-3 (ten sam utwór gra dalej bez przerwy), finał i pijany finał → final, quiz bez etapów → etap-1. `pytania.mp3` i `przed-finalem.mp3` wypadły.
+- Obróbka jak wcześniej (przycięte przed wyciszeniem z Suno, −16 LUFS, MP3 160 kb/s); `petlaOd` za cichym wstępem: poczekalnia 2,5 s, etap-2 i etap-3 4 s.
+- Sprawdzone lokalnie: poczekalnia, etap 1, 2, 3, walka o finał (etap-3 gra dalej, bez restartu), koniec (podium).
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.
