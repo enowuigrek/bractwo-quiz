@@ -34,6 +34,8 @@ const TASMA_STOP_S = 4.2;
  * pilot TV wysyła klawisze.
  */
 const GESTY = ["click", "keydown", "touchend"] as const;
+/** Tyle ciszy (gdy muzyka ma grać), zanim pokażemy prośbę o OK: krótsza przerwa to zwykłe ładowanie utworu. */
+const PROSBA_PO_MS = 2000;
 
 /** Który utwór pasuje do fazy: seria i pijany finał to jeden utwór, więc gra dalej bez przerwy. */
 function utworFazy(stan: StanSesji): Utwor | null {
@@ -74,7 +76,13 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const ostatnieZaciecie = useRef(0);
   /** Pijany finał zatrzymał taśmę przed wybuchem: gest jej nie wznawia. */
   const zatrzymana = useRef(false);
-  const [zablokowana, ustawZablokowana] = useState(false);
+  /**
+   * Od kiedy aktywny odtwarzacz nie gra (`null`: gra). Nie polegamy na odmowie z `play()`: Safari potrafi nie
+   * zagrać bez żadnego błędu, więc prośba wisi zawsze, gdy muzyka ma grać, a od chwili nic nie słychać.
+   */
+  const [cichoOd, ustawCichoOd] = useState<number | null>(null);
+  const slychac = useRef(false);
+  const [prosba, ustawProsbe] = useState(false);
   const cel = stan.muzyka ? utworFazy(stan) : null;
 
   // dwa odtwarzacze na całą wizytę; gest odblokowuje oba naraz (Safari pamięta zgodę per element)
@@ -84,6 +92,21 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       a.preload = "auto";
       a.preservesPitch = false;
       a.volume = 0;
+      // stan grania tylko z aktywnego odtwarzacza; zatrzymana taśma pijanego finału to nie blokada
+      a.addEventListener("playing", () => {
+        if (a !== aktywny.current) return;
+        slychac.current = true;
+        odblokujDzwiek();
+        ustawCichoOd(null);
+        ustawProsbe(false);
+      });
+      for (const zdarzenie of ["pause", "loadstart"]) {
+        a.addEventListener(zdarzenie, () => {
+          if (a !== aktywny.current || zatrzymana.current) return;
+          slychac.current = false;
+          ustawCichoOd((c) => c ?? Date.now());
+        });
+      }
     }
     odtwarzacze.current = lista;
     const przenikaniaTeraz = przenikania.current;
@@ -98,9 +121,12 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     const plynnie = (a: HTMLAudioElement, glosnosc: number, potem?: () => void) => {
       clearInterval(przenikania.current.get(a));
       const krok = (glosnosc - a.volume) / (PRZENIKANIE_MS / 50);
+      // licznik kroków: iPhone nie pozwala stronie zmieniać głośności (`volume` zostaje 1), a bez niego
+      // przenikanie nie skończyłoby się nigdy i stary utwór grałby razem z nowym
+      let kroki = PRZENIKANIE_MS / 50;
       const id = window.setInterval(() => {
         const nowa = a.volume + krok;
-        if ((krok >= 0 && nowa >= glosnosc) || (krok < 0 && nowa <= glosnosc) || krok === 0) {
+        if ((krok >= 0 && nowa >= glosnosc) || (krok < 0 && nowa <= glosnosc) || krok === 0 || --kroki <= 0) {
           a.volume = glosnosc;
           clearInterval(id);
           potem?.();
@@ -115,13 +141,13 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       a
         .play()
         .then(() => {
-          odblokujDzwiek();
-          ustawZablokowana(false);
           if (aktywny.current === a) plynnie(a, GLOSNOSC);
         })
         .catch((e: Error) => {
-          // brak pliku (NotSupportedError) to cisza; brak zgody przeglądarki to prośba o OK na pilocie
-          if (e.name === "NotAllowedError") ustawZablokowana(true);
+          // brak pliku (NotSupportedError) to cisza; każda inna odmowa to od razu prośba o OK na pilocie
+          if (e.name === "NotSupportedError" || a !== aktywny.current) return;
+          slychac.current = false;
+          ustawCichoOd(0);
         });
 
     const zagraj = (utwor: Utwor, od: number) => {
@@ -136,6 +162,9 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       a.playbackRate = stary?.playbackRate ?? 1;
       aktywny.current = a;
       zatrzymana.current = false;
+      // od teraz liczymy ciszę, aż nowy odtwarzacz naprawdę zagra (`playing`)
+      slychac.current = false;
+      ustawCichoOd((c) => c ?? Date.now());
       if (stary) plynnie(stary, 0, () => stary.pause());
       void wystartuj(a);
     };
@@ -171,7 +200,8 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
           })
           .catch(() => undefined);
       }
-      if (a?.paused && !zatrzymana.current) void wystartuj(a);
+      // aktywny, który nie gra (stoi albo Safari po cichu go nie puścił): play() jeszcze raz, już w geście
+      if (a && !slychac.current && !zatrzymana.current) void wystartuj(a);
     };
     for (const a of odtwarzacze.current) a.addEventListener("timeupdate", petla);
     for (const g of GESTY) window.addEventListener(g, gest);
@@ -180,6 +210,13 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       for (const g of GESTY) window.removeEventListener(g, gest);
     };
   }, [cel]);
+
+  // prośba po chwili ciszy; własny minutnik, bo `teraz` poza pytaniami i serią nie tyka
+  useEffect(() => {
+    if (cichoOd === null) return;
+    const id = window.setTimeout(() => ustawProsbe(true), Math.max(0, cichoOd + PROSBA_PO_MS - Date.now()));
+    return () => window.clearTimeout(id);
+  }, [cichoOd]);
 
   // pijany finał: rozciągana taśma, falowanie, zacięcia, a na koniec stop przed wybuchem
   const pijany = stan.faza === "pijany" && cel === "final";
@@ -214,7 +251,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     }
   }, [pijany, teraz, stan.faza_od, stan.faza_do]);
 
-  if (!stan.muzyka || !zablokowana) return null;
+  if (!cel || cichoOd === null || !prosba) return null;
   return (
     <p className="tv-muzyka-podpowiedz" role="status">
       🔊 Naciśnij OK na pilocie telewizora, żeby włączyć muzykę
