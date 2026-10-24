@@ -343,10 +343,71 @@ a.przycisk {
   cursor: pointer;
 }
 
-.przelacznik input {
-  width: 22px;
-  height: 22px;
-  accent-color: var(--zloto);
+/* Przełącznik zamiast checkboxa w ustawieniach tak/nie (`.przelacznik`, `.pole-wyboru`): złota szyna z gałką.
+   Zaznaczanie poprawnych odpowiedzi w edytorze pytań zostaje zwykłym checkboxem (to wybór z listy). */
+.przelacznik input[type="checkbox"],
+.pole-wyboru input[type="checkbox"] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  margin: 0;
+  border: 1px solid var(--kamien3);
+  border-radius: var(--r-pill);
+  background: var(--kamien2);
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.przelacznik input[type="checkbox"]::before,
+.pole-wyboru input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--szary);
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.przelacznik input[type="checkbox"]:checked,
+.pole-wyboru input[type="checkbox"]:checked {
+  border-color: var(--zloto);
+  background: var(--zloto);
+}
+
+.przelacznik input[type="checkbox"]:checked::before,
+.pole-wyboru input[type="checkbox"]:checked::before {
+  transform: translateX(20px);
+  background: var(--na-zlocie);
+}
+
+.przelacznik input[type="checkbox"]:focus-visible,
+.pole-wyboru input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--zloto);
+  outline-offset: 2px;
+}
+
+.przelacznik input[type="checkbox"]:disabled,
+.pole-wyboru input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .przelacznik input[type="checkbox"],
+  .pole-wyboru input[type="checkbox"],
+  .przelacznik input[type="checkbox"]::before,
+  .pole-wyboru input[type="checkbox"]::before {
+    transition: none;
+  }
 }
 
 .podpowiedz {
@@ -1036,12 +1097,9 @@ a.przycisk {
   cursor: pointer;
 }
 
-.pole-wyboru input {
-  width: 20px;
-  height: 20px;
-  margin: 2px 0 0;
-  flex: none;
-  accent-color: var(--zloto);
+/* przełącznik w linii z pierwszym wierszem opisu */
+.pole-wyboru input[type="checkbox"] {
+  margin-top: 1px;
 }
 
 .etap-blok + .etap-blok {

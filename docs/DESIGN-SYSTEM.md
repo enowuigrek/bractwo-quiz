@@ -155,6 +155,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Pieczątka „Odebrana” (Quiz).** Na karcie nagrody po odbiorze: `--czerwien`, podwójna ramka (4 px + wewnętrzna 2 px), obrót −7°, przetarcia z maski szumu SVG (`feTurbulence`), wjazd jak odbicie (od skali 1.8).
 
+**Przełącznik (panel Quiz).** Ustawienia tak/nie (widoczność „tylko dla mnie”, pijany finał, seria i finał trójki w etapie, odsłaniana grafika, usunięcie grafiki) to przełącznik, nie checkbox: szyna 44×24 px z gałką 18 px, wyłączony `--kamien2` z obrysem `--kamien3` i szarą gałką, włączony złoty (`--zloto`) z gałką `--na-zlocie` przesuniętą w prawo, 0,18 s. Focus: złota obwódka 2 px. Klasy `.przelacznik` (sam napis obok) i `.pole-wyboru` (pogrubiona nazwa i opis w kilku liniach). Zaznaczanie poprawnych odpowiedzi w edytorze pytań zostaje zwykłym checkboxem, bo to wybór z listy, a nie ustawienie.
+
 **Pole z błędem (Quiz).** Ramka w `--czerwien` (np. powtórzona odpowiedź), a pod polem komunikat `.blad`.
 
 **Nagłówek z animacją.** Anioł i diabeł wjeżdżają z centrum na boki, logo pojawia się ze `scale(.92)`. Całość trwa 2.8s, krzywa `cubic-bezier(.4,0,.2,1)`. Logo jest białe (`filter: invert(1)` + `mix-blend-mode: screen`).

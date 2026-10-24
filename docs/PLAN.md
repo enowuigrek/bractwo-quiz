@@ -16,7 +16,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Telefon** (`/<kod>`): nick i selfie, wszystkie typy odpowiedzi, „Pytanie 8” bez sumy, ranking ze szklanką, w finale koła ✓/✗ i utrudnienia bez zapowiedzi, kibic stuka hasła z awatarem finalisty, pijany finał udający dalszą serię (15/14…), medal, karta nagrody z pieczątką „Odebrana”, „Pobierz na pamiątkę” (od 24.10 bez „Udostępnij wynik”).
 - **Pilot** (`/pilot/<kod>?t=…`): włącznik muzyki na TV pod nagłówkiem, przyciski zawsze na górze, „Zakończ grę” na dole; w pijanym finale zwycięzca, podium, odliczanie i „Zakończ i pokaż werble”.
 
-**Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (walka o finał: 3 najlepszych) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (stałe 60 s, nic nie liczy; na koniec telefony gasną, cisza i wybuch szklanki na TV) → werble → podium (odsłania prowadzący).
+**Przebieg gry z etapami („Piwny quiz Bractwa”, dawniej „Piwo - quiz testowy”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (walka o finał: 3 najlepszych) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (stałe 60 s, nic nie liczy; na koniec telefony gasną, cisza i wybuch szklanki na TV) → werble → podium (odsłania prowadzący).
 
 **Najważniejsze pliki:**
 - Baza: `supabase/migrations/`. Funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `ranking`, `dokoncz_pytanie`, `pijane_pytania`, `zakoncz_pijany`, `kibicuj`, `wewn.zakoncz_serie`, `wewn.zamknij_serie_jesli_gotowe`. `stan_sesji` i `pilot_akcja` były ostatnio zmieniane podmianą fragmentów (`20261023182659_pijany_final.sql`, `20261023191228_okrzyki_kibicow.sql`), więc całą treść bierz z bazy (`select pg_get_functiondef(…)`).
@@ -651,6 +651,13 @@ Po teście Łukasza: pijany finał dało się szybko przeklikać i czekać na wy
 - Komentarze pijanego finału prostsze: kremowy napis na środku, wyskakuje i znika (bez przelotu z boku i obrotów). Treści ustalimy przy układaniu pytań.
 - Quiz „Piwo - quiz testowy”: etap 2 „Kilka dobrych” ma 8 pytań zamiast 2 (migracja `20261024151457_piwo_dluzszy_etap_2`, wybrane z Łukaszem: style z Belgii, kwaśne style, fermentacja spontaniczna, miasta, które dały nazwę stylowi, polskie tradycje, słowa oznaczające mocniejszą wersję). Etap 4 „Połącz i ułóż” ma 6 pytań zamiast 2 (migracja `20261024160025_piwo_dluzszy_etap_4`: wydarzenia od najstarszego, styl ↔ wyróżnik, od najjaśniejszego do najciemniejszego, chmiel ↔ kraj; powtórki z innymi etapami celowe, „umysł szuka daty”). Teraz: rozgrzewka 1–10, kilka dobrych 11–18, strzał liczbowy 19–21, połącz i ułóż 22–27, finał 28–41.
 - Dalej (z Łukaszem): pytania pijanego finału z komentarzami, potem efekty dźwiękowe.
+
+### Piwny quiz Bractwa, przełączniki, muzyka przy zapowiedzi (24.10) ✅
+
+- **Quiz** (migracja `20261024165957_piwny_quiz_bractwa`): „Piwo - quiz testowy” to teraz „Piwny quiz Bractwa”, przejrzany jak przez eksperta. Mniej stoutu i porteru, nowe pytania o podawanie i degustację (szkło do pszenicznego, skala IBU), strzał liczbowy 5 pytań (pinta, pierwszy Oktoberfest 1810, tripel ok. 8,5%, pierwszy pilzner 1842, Weihenstephan 1040; rok prawa czystości wypadł, bo był już dwa razy), w etapach przeplatają się dziedziny (style, historia, produkcja, surowce, Polska, podawanie), trudność rośnie w etapie, najtrudniejsze pytanie kolejności tuż przed odcięciem trójki. Finał: 7 × prawda i 7 × fałsz, krótkie zdania w drugiej połowie (przeszkadzacze). Układ: rozgrzewka 1–10, kilka dobrych 11–18, strzał liczbowy 19–23, połącz i ułóż 24–29, finał 30–43.
+- **Kreator:** pijany finał domyślnie włączony (widzi go tylko główny; obsługa go nie wysyła).
+- **Przełączniki** zamiast checkboxów w ustawieniach tak/nie panelu (`.przelacznik`, `.pole-wyboru` w `panel.css`; opis w DESIGN-SYSTEM). Zaznaczanie poprawnych odpowiedzi w edytorze zostaje checkboxem.
+- **Muzyka przy zapowiedzi** (migracja `20261024170354_zapowiedz_z_muzyka`: `ekran_lokalu` podaje `zapowiedz.muzyka`): ekran lokalu gra muzykę poczekalni już przy godzinie i odliczaniu. Odtwarzacze są wspólne dla strony (`strona()` w `muzyka.tsx`), więc po otwarciu poczekalni utwór gra dalej bez startu od nowa i bez ponownej zgody przeglądarki. Sprawdzone lokalnie na tymczasowym lokalu „Test muzyki (usuń)” (4,3 s → 12,0 s bez przerwy).
 
 ## Zadania dla ciebie (dzień 0)
 

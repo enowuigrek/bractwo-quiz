@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { przesuniecieZegara, useNasluchTematu } from "@/lib/gra/nasluch";
 import { useNowaWersja } from "@/lib/ekran-tv";
 import type { Zapowiedz } from "@/lib/gra/zapowiedz";
+import { MuzykaTv } from "./muzyka";
 import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
 
@@ -66,6 +67,13 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   return (
     <Scena>
       <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+      {/* zapowiedziana gra: muzyka poczekalni już teraz, a po otwarciu poczekalni gra dalej (muzyka.tsx) */}
+      {zapowiedz?.muzyka && (
+        <MuzykaTv
+          stan={{ faza: "poczekalnia", muzyka: true, etap: null, faza_od: null, faza_do: null }}
+          teraz={0}
+        />
+      )}
     </Scena>
   );
 }

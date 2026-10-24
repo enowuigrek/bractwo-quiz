@@ -38,8 +38,48 @@ const GESTY = ["click", "keydown", "touchend"] as const;
  */
 const PROSBA_PO_MS = 2000;
 
+/** Co z gry jest potrzebne muzyce (ekran lokalu przy zapowiedzi podaje samą poczekalnię). */
+type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza_do">;
+
+/**
+ * Wspólne dla całej strony: dwa odtwarzacze i to, co gra. Zostają, gdy komponent się wymienia (ekran lokalu
+ * przechodzi z zapowiedzi do gry), więc utwór gra dalej bez przerwy i nie traci zgody przeglądarki.
+ */
+type Wspolne = {
+  odtwarzacze: HTMLAudioElement[];
+  aktywny: HTMLAudioElement | null;
+  grany: Utwor | null;
+  przenikania: Map<HTMLAudioElement, number>;
+  /** Muzyka urwana celowo (gaśnięcie przed wybuchem szklanki): gest jej nie wznawia, a cisza to nie blokada. */
+  zatrzymana: boolean;
+  slychac: boolean;
+  zamontowane: number;
+};
+let wspolne: Wspolne | null = null;
+
+function strona(): Wspolne {
+  if (!wspolne) {
+    const odtwarzacze = [new Audio(), new Audio()];
+    for (const a of odtwarzacze) {
+      a.preload = "auto";
+      a.preservesPitch = false;
+      a.volume = 0;
+    }
+    wspolne = {
+      odtwarzacze,
+      aktywny: null,
+      grany: null,
+      przenikania: new Map(),
+      zatrzymana: false,
+      slychac: false,
+      zamontowane: 0,
+    };
+  }
+  return wspolne;
+}
+
 /** Który utwór pasuje do fazy: seria i pijany finał to jeden utwór, więc gra dalej bez przerwy. */
-function utworFazy(stan: StanSesji): Utwor | null {
+function utworFazy(stan: StanMuzyki): Utwor | null {
   switch (stan.faza) {
     case "poczekalnia":
       return "poczekalnia";
@@ -73,20 +113,15 @@ function utworFazy(stan: StanSesji): Utwor | null {
  * (`GASNIECIE_S` przed końcem), żeby przed wybuchem szklanki była chwila ciszy; `naWybuch` to zapas na wypadek,
  * gdyby zegar TV się spóźniał. Bez przewijania (`currentTime`): telewizor po takim skoku potrafił ucichnąć.
  * Przeglądarka nie zagra bez gestu, więc gdy w poczekalni długo jest cicho, na dole jest prośba o OK na pilocie TV.
+ * Ekran lokalu gra muzykę poczekalni już przy zapowiedzi (godzina i odliczanie), a po otwarciu poczekalni ten
+ * sam utwór gra dalej (odtwarzacze są wspólne dla strony, `strona()`).
  */
-export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
-  const odtwarzacze = useRef<HTMLAudioElement[]>([]);
-  const aktywny = useRef<HTMLAudioElement | null>(null);
-  const grany = useRef<Utwor | null>(null);
-  const przenikania = useRef(new Map<HTMLAudioElement, number>());
-  /** Muzyka urwana celowo (wybuch szklanki): gest jej nie wznawia, a cisza to nie blokada. */
-  const zatrzymana = useRef(false);
+export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   /**
    * Od kiedy aktywny odtwarzacz nie gra (`null`: gra). Nie polegamy na odmowie z `play()`: Safari potrafi nie
    * zagrać bez żadnego błędu, więc prośba wisi zawsze, gdy muzyka ma grać, a od chwili nic nie słychać.
    */
   const [cichoOd, ustawCichoOd] = useState<number | null>(null);
-  const slychac = useRef(false);
   const [prosba, ustawProsbe] = useState(false);
   const cel = stan.muzyka ? utworFazy(stan) : null;
   // werble: stary utwór staje od razu, bez przenikania (ekran gaśnie jak wyłączany telewizor)
@@ -95,47 +130,66 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     twardo.current = stan.faza === "werble";
   }, [stan.faza]);
 
-  // dwa odtwarzacze na całą wizytę; gest odblokowuje oba naraz (Safari pamięta zgodę per element)
+  // dwa odtwarzacze na całą stronę; gest odblokowuje oba naraz (Safari pamięta zgodę per element)
   useEffect(() => {
-    const lista = [new Audio(), new Audio()];
-    for (const a of lista) {
-      a.preload = "auto";
-      a.preservesPitch = false;
-      a.volume = 0;
+    const w = strona();
+    w.zamontowane++;
+    const sluchacze: [HTMLAudioElement, string, () => void][] = [];
+    for (const a of w.odtwarzacze) {
       // stan grania tylko z aktywnego odtwarzacza; zatrzymana taśma pijanego finału to nie blokada
-      a.addEventListener("playing", () => {
-        if (a !== aktywny.current) return;
-        slychac.current = true;
-        odblokujDzwiek();
-        ustawCichoOd(null);
-        ustawProsbe(false);
-      });
-      // brak pliku (np. jeszcze nie ma utworu na podium) to zwykła cisza, bez prośby
-      a.addEventListener("error", () => {
-        if (a !== aktywny.current) return;
-        slychac.current = false;
-        ustawCichoOd(null);
-      });
+      sluchacze.push([
+        a,
+        "playing",
+        () => {
+          if (a !== w.aktywny) return;
+          w.slychac = true;
+          odblokujDzwiek();
+          ustawCichoOd(null);
+          ustawProsbe(false);
+        },
+      ]);
+      // brak pliku (np. jeszcze nie ma utworu) to zwykła cisza, bez prośby
+      sluchacze.push([
+        a,
+        "error",
+        () => {
+          if (a !== w.aktywny) return;
+          w.slychac = false;
+          ustawCichoOd(null);
+        },
+      ]);
       for (const zdarzenie of ["pause", "loadstart"]) {
-        a.addEventListener(zdarzenie, () => {
-          if (a !== aktywny.current || zatrzymana.current) return;
-          slychac.current = false;
-          ustawCichoOd((c) => c ?? Date.now());
-        });
+        sluchacze.push([
+          a,
+          zdarzenie,
+          () => {
+            if (a !== w.aktywny || w.zatrzymana) return;
+            w.slychac = false;
+            ustawCichoOd((c) => c ?? Date.now());
+          },
+        ]);
       }
     }
-    odtwarzacze.current = lista;
-    const przenikaniaTeraz = przenikania.current;
+    for (const [a, z, f] of sluchacze) a.addEventListener(z, f);
     return () => {
-      przenikaniaTeraz.forEach((id) => clearInterval(id));
-      lista.forEach((a) => a.pause());
+      for (const [a, z, f] of sluchacze) a.removeEventListener(z, f);
+      w.zamontowane--;
+      // cisza dopiero, gdy po chwili nikt nie przejął muzyki (zapowiedź → gra to wymiana komponentu)
+      window.setTimeout(() => {
+        if (w.zamontowane > 0) return;
+        w.przenikania.forEach((id) => clearInterval(id));
+        w.odtwarzacze.forEach((a) => a.pause());
+        w.aktywny = null;
+        w.grany = null;
+      }, 300);
     };
   }, []);
 
   // zmiana utworu (albo wyłączenie): nowy rusza na wolnym odtwarzaczu, stary cichnie
   useEffect(() => {
+    const w = strona();
     const plynnie = (a: HTMLAudioElement, glosnosc: number, potem?: () => void) => {
-      clearInterval(przenikania.current.get(a));
+      clearInterval(w.przenikania.get(a));
       const krok = (glosnosc - a.volume) / (PRZENIKANIE_MS / 50);
       // licznik kroków: iPhone nie pozwala stronie zmieniać głośności (`volume` zostaje 1), a bez niego
       // przenikanie nie skończyłoby się nigdy i stary utwór grałby razem z nowym
@@ -150,83 +204,84 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
           a.volume = nowa;
         }
       }, 50);
-      przenikania.current.set(a, id);
+      w.przenikania.set(a, id);
     };
 
     const wystartuj = (a: HTMLAudioElement) =>
       a
         .play()
         .then(() => {
-          if (aktywny.current === a) plynnie(a, GLOSNOSC);
+          if (w.aktywny === a) plynnie(a, GLOSNOSC);
         })
         .catch((e: Error) => {
           // brak pliku (NotSupportedError) to cisza; każda inna odmowa to od razu prośba o OK na pilocie
-          if (a !== aktywny.current) return;
+          if (a !== w.aktywny) return;
           if (e.name === "NotSupportedError") return ustawCichoOd(null);
-          slychac.current = false;
+          w.slychac = false;
           ustawCichoOd(0);
         });
 
     const zagraj = (utwor: Utwor, od: number) => {
-      const stary = aktywny.current;
-      const a = odtwarzacze.current.find((o) => o !== stary) ?? odtwarzacze.current[0];
-      if (!a) return;
-      clearInterval(przenikania.current.get(a));
+      const stary = w.aktywny;
+      const a = w.odtwarzacze.find((o) => o !== stary) ?? w.odtwarzacze[0];
+      clearInterval(w.przenikania.get(a));
       const plik = UTWORY[utwor].plik;
       if (!a.src.endsWith(plik)) a.src = plik;
       a.currentTime = od;
       a.volume = 0;
       a.playbackRate = stary?.playbackRate ?? 1;
-      aktywny.current = a;
-      zatrzymana.current = false;
+      w.aktywny = a;
+      w.zatrzymana = false;
       // od teraz liczymy ciszę, aż nowy odtwarzacz naprawdę zagra (`playing`)
-      slychac.current = false;
+      w.slychac = false;
       ustawCichoOd((c) => c ?? Date.now());
       if (stary) plynnie(stary, 0, () => stary.pause());
       void wystartuj(a);
     };
 
-    grany.current = cel;
+    // ten sam utwór już gra (np. zapowiedź przeszła w poczekalnię): gra dalej, bez startu od nowa
+    const juzGra = cel !== null && cel === w.grany && !!w.aktywny && !w.aktywny.paused;
+    w.grany = cel;
     if (!cel) {
-      const stary = aktywny.current;
-      aktywny.current = null;
+      const stary = w.aktywny;
+      w.aktywny = null;
       if (stary && twardo.current) {
-        clearInterval(przenikania.current.get(stary));
+        clearInterval(w.przenikania.get(stary));
         stary.pause();
       } else if (stary) plynnie(stary, 0, () => stary.pause());
       return;
     }
-    zagraj(cel, 0);
+    if (!juzGra) zagraj(cel, 0);
 
     // pętla: przed końcem pliku ten sam utwór od `petlaOd` na drugim odtwarzaczu
     const petla = (e: Event) => {
       const a = e.currentTarget as HTMLAudioElement;
       const od = UTWORY[cel].petlaOd;
-      if (a !== aktywny.current || a.paused || od === null || !a.duration) return;
+      if (a !== w.aktywny || a.paused || od === null || !a.duration) return;
       if (a.duration - a.currentTime <= ZAKLADKA_S) zagraj(cel, od);
     };
     // gest: każdy odtwarzacz dostaje play() w czasie gestu (Safari odblokowuje je osobno): wolny cicho
     // i od razu staje, a stojący aktywny rusza na nowo
     const gest = () => {
-      const a = aktywny.current;
-      for (const o of odtwarzacze.current) {
+      const a = w.aktywny;
+      for (const o of w.odtwarzacze) {
         if (o === a || !o.paused) continue;
         if (!o.src) o.src = UTWORY[cel].plik;
         o.volume = 0;
         void o
           .play()
           .then(() => {
-            if (o !== aktywny.current) o.pause();
+            if (o !== w.aktywny) o.pause();
           })
           .catch(() => undefined);
       }
       // aktywny, który nie gra (stoi albo Safari po cichu go nie puścił): play() jeszcze raz, już w geście
-      if (a && !a.error && !slychac.current && !zatrzymana.current) void wystartuj(a);
+      if (a && !a.error && !w.slychac && !w.zatrzymana) void wystartuj(a);
     };
-    for (const a of odtwarzacze.current) a.addEventListener("timeupdate", petla);
+    for (const a of w.odtwarzacze) a.addEventListener("timeupdate", petla);
     for (const g of GESTY) window.addEventListener(g, gest);
     return () => {
-      for (const a of odtwarzacze.current) a.removeEventListener("timeupdate", petla);
+      for (const a of w.odtwarzacze) a.removeEventListener("timeupdate", petla);
       for (const g of GESTY) window.removeEventListener(g, gest);
     };
   }, [cel]);
@@ -242,9 +297,10 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   useEffect(
     () =>
       naWybuch(() => {
-        zatrzymana.current = true;
-        for (const a of odtwarzacze.current) {
-          clearInterval(przenikania.current.get(a));
+        const w = strona();
+        w.zatrzymana = true;
+        for (const a of w.odtwarzacze) {
+          clearInterval(w.przenikania.get(a));
           a.pause();
         }
       }),
@@ -254,18 +310,19 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   // pijany finał: rozciągana taśma, falująca głośność i krótkie dziury, coraz mocniej (co tyknięcie zegara)
   const pijany = stan.faza === "pijany" && cel === "final";
   useEffect(() => {
-    const a = aktywny.current;
+    const w = strona();
+    const a = w.aktywny;
     if (!a) return;
     if (!pijany) {
       a.playbackRate = 1;
       return;
     }
-    if (grany.current !== "final" || a.paused || zatrzymana.current || !stan.faza_od || !stan.faza_do) return;
+    if (w.grany !== "final" || a.paused || w.zatrzymana || !stan.faza_od || !stan.faza_do) return;
     const od = Date.parse(stan.faza_od);
     const do_ = Date.parse(stan.faza_do);
     // telefony gasną: muzyka urywa się razem z nimi, potem cisza i wybuch szklanki
     if (do_ - teraz <= GASNIECIE_S * 1000) {
-      zatrzymana.current = true;
+      w.zatrzymana = true;
       a.pause();
       return;
     }

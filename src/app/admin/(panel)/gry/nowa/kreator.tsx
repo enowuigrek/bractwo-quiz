@@ -36,7 +36,8 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   const [czas, setCzas] = useState<string>(LIMITY.domyslnyCzas === null ? "bez" : String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
   const [ileNagrod, setIleNagrod] = useState(0);
-  const [pijany, setPijany] = useState(false);
+  // pijany finał domyślnie włączony (tylko główny go widzi; obsługa nie wysyła tego pola)
+  const [pijany, setPijany] = useState(true);
   // start: osobno data i godzina (czas lokalny przeglądarki); bez daty to dziś. Do serwera idzie ISO.
   const [dataStartu, setDataStartu] = useState("");
   const [godzinaStartu, setGodzinaStartu] = useState("");
@@ -219,8 +220,8 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                   po finale dogrywka „Pijany finał”
                 </label>
                 <p className="podpowiedz">
-                  Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze dostają jeszcze kilka pytań, które
-                  nic nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał
+                  Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze przez 60 s odpowiadają jeszcze na
+                  pytania, które nic nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał
                   trwa dalej (pytanie 15/14…). Potem werble i podium. Działa w quizie z finałem serią. Pytania zmieniasz
                   w Quizy → Pijany finał.
                 </p>

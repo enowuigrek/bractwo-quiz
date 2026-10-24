@@ -11,6 +11,8 @@ export type Zapowiedz = {
   tytul: string | null;
   okazja: string | null;
   browar: { nazwa: string; logo_url: string | null } | null;
+  /** Ekran lokalu (`ekran_lokalu`): muzyka poczekalni gra już przy zapowiedzi. */
+  muzyka?: boolean;
 };
 
 /** Godzina startu do wyświetlenia, np. „20:00”. */
