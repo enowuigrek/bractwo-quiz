@@ -264,10 +264,12 @@ export function MuzykaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       return;
     }
     const poziom = Math.min(1, Math.max(0, (teraz - od) / Math.max(1, do_ - od)));
-    a.playbackRate = Math.max(0.5, 1 - 0.3 * poziom + 0.05 * poziom * Math.sin(teraz / 700));
+    // pierwsza połowa dogrywki gra czysto (jak dalsza seria), psucie rośnie dopiero od połowy
+    const psucie = Math.max(0, (poziom - 0.5) / 0.5);
+    a.playbackRate = Math.max(0.5, 1 - 0.3 * psucie + 0.05 * psucie * Math.sin(teraz / 700));
     // dziura trwa jedno tyknięcie (250 ms), potem głośność wraca, falując
-    const dziura = Math.random() < 0.15 * poziom;
-    a.volume = dziura ? 0.03 : GLOSNOSC * (1 - 0.45 * poziom * (0.5 + 0.5 * Math.sin(teraz / 260)));
+    const dziura = Math.random() < 0.15 * psucie;
+    a.volume = dziura ? 0.03 : GLOSNOSC * (1 - 0.45 * psucie * (0.5 + 0.5 * Math.sin(teraz / 260)));
   }, [pijany, teraz, stan.faza_od, stan.faza_do]);
 
   if (!cel || stan.faza !== "poczekalnia" || cichoOd === null || !prosba) return null;

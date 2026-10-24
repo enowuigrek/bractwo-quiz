@@ -20,9 +20,9 @@ export type GraczPijany = { nick: string; zdjecie: string | null; start: number;
  * Sekundy od wejścia w fazę: chwila bezruchu, powolne cofanie od szklanki, spadające drogi, potem lot.
  * Rozłożone na pierwsze pytania dogrywki, żeby chaos narastał stopniowo, a nie od razu.
  */
-const COFANIE_S = 6;
-const SPADANIE_S = 18;
-const LOT_S = 24;
+const COFANIE_S = 8;
+const SPADANIE_S = 30;
+const LOT_S = 36;
 /** Z drogi zostaje tyle, ile przejechał gracz, razy to (cofają się w stronę startu). */
 const COFNIECIE = 0.3;
 /** Prędkość odlotu awatarów od wybuchu szklanki w px/s. */

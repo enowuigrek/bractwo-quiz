@@ -2232,8 +2232,13 @@ html:has(.kolumna) {
   animation: ocena-puls var(--ocena-ms, 400ms) ease-out;
 }
 
+/* wyższa szczegółowość niż utrudnienia (np. uciekające koła), żeby drżenie zawsze było widać */
+.ocena-zle .odp-pf .odp-pf-przycisk.wybrana,
 .ocena-zle .wybrana {
   animation: ocena-trzes var(--ocena-ms, 400ms) linear;
+  box-shadow:
+    0 0 0 4px var(--czerwien),
+    0 0 28px 6px color-mix(in srgb, var(--czerwien) 60%, transparent);
 }
 
 @keyframes ocena-puls {
@@ -2253,14 +2258,21 @@ html:has(.kolumna) {
   0%,
   100% {
     translate: 0 0;
+    rotate: 0deg;
   }
-  15%,
-  55% {
-    translate: -9px 0;
+  10%,
+  50% {
+    translate: -18px 0;
+    rotate: -7deg;
   }
-  35%,
-  75% {
-    translate: 9px 0;
+  30%,
+  70% {
+    translate: 18px 0;
+    rotate: 7deg;
+  }
+  85% {
+    translate: -8px 0;
+    rotate: -3deg;
   }
 }
 
