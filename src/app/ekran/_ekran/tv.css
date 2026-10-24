@@ -305,6 +305,22 @@
   color: var(--szary);
 }
 
+/* Muzyka (muzyka.tsx): przeglądarka nie zagra bez gestu, więc prośba o OK na pilocie TV */
+.tv-muzyka-podpowiedz {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  translate: -50% 0;
+  z-index: 40;
+  margin: 0;
+  padding: 10px 26px;
+  border-radius: var(--r-pill);
+  background: rgba(0, 0, 0, 0.75);
+  font-size: 26px;
+  color: var(--zloto);
+  white-space: nowrap;
+}
+
 /* Przygotuj, pytanie i wynik */
 
 .tv-odliczanie {

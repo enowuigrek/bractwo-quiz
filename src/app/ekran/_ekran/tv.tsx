@@ -23,6 +23,7 @@ import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { PijanyTv, type GraczPijany } from "./pijany";
+import { MuzykaTv } from "./muzyka";
 import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
@@ -195,6 +196,7 @@ export function Tv({ kod, qr, host }: Props) {
           )}
         </div>
       )}
+      {stan && <MuzykaTv stan={stan} teraz={teraz} />}
       {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
     </Scena>
   );

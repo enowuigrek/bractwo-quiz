@@ -38,6 +38,7 @@ Do szybkiego testu podstaw: quiz z 3–4 pytaniami (jedno z grafiką, jedno z 6 
 | 16 | Ktoś odpowie dobrze na wszystko (gra bez „Pijanego finału”) | Seria kończy się od razu: TV gaśnie z błyskiem, telefony robią się czarne, po chwili „Werble…” z kropkami i „Wynik za chwilę.” Pilot: „Pokaż podium”. |
 | 17 | Podium i nagroda | Podium wjeżdża 3 → 2 → 1 ze zdjęciem nagrody. Telefon zwycięzcy: karta nagrody, „Potwierdź odbiór”, potem pieczątka „Odebrana”. |
 | 18 | Gra z „Pijanym finałem” (kreator, najlepiej z imieniem osoby za barem), ktoś dobiega do piwa | Pod koniec serii awatary na TV drżą. Potem nigdzie nie ma napisu „Pijany finał”: TV dalej ma nagłówek finału, awatary cofają się od szklanki, drogi spadają, awatary latają i drżą coraz mocniej. Telefony (wszyscy, też kibice): „Seria · pytanie 15/14” i dalej, ekran faluje, pytanie o osobę za barem klika się samo, zegar wariuje (w górę, w kółko, znika). Kto pierwszy dojdzie do przedostatniego pytania, uruchamia koniec: na TV szklanka pęka i wybucha (wideo), nagłówek wylatuje w górę, awatary odlatują, a po kilku sekundach werble wszystkim naraz, także tym, którzy nie skończyli. Na początku dogrywki TV kilka razy nierówno mignie. Pilot: „Wygrywa: …”, podium z punktami, odliczanie 90 s, „Zakończ i pokaż werble”. Po czasie albo przycisku werble i podium jak zwykle. |
+| 19 | Pilot: Włącz muzykę (gdy w `public/muzyka/` są utwory) | Na TV gra muzyka; jeśli przeglądarka nie pozwala, na dole prośba „Naciśnij OK na pilocie telewizora” i po OK muzyka rusza. Zmienia się przy poczekalni, etapach, finale i podium, w werblach cisza. W pijanym finale zwalnia i się zacina, staje przed wybuchem, a wybuch słychać. |
 
 Do zanotowania po teście (dzień 7):
 - czy bonus za szybkość jest sprawiedliwy (z limitem i bez),
@@ -46,6 +47,7 @@ Do zanotowania po teście (dzień 7):
 - czy na iPhonie przy werblach paski przeglądarki zostają czarne,
 - pijany finał: jak ludzie reagują, czy ktoś zauważył „15/14”, czy 90 s to nie za długo i czy latające awatary idą płynnie na Samsungu,
 - czy telewizor dalej się wygasza (wideo czuwania 720p z dźwiękiem, ustawienia Samsunga wyżej),
+- muzyka: czy nie za głośna przy rozmowach i czy psucie w pijanym finale słychać na głośnikach TV,
 - czy coś na TV jest za małe z końca sali,
 - błędy i dziwne zachowania: kiedy, na jakim telefonie i w jakiej przeglądarce.
 

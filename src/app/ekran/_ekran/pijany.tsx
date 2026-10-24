@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
+import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import type { StanSesji } from "@/lib/gra/typy";
 import { WIDEO_WYLEWANIA, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
@@ -175,6 +176,11 @@ export function PijanyTv({
   const [dlugosc, ustawDlugosc] = useState<number | null>(null);
   const przedKoncem = dlugosc ? Math.min(WYLEWANIE_S, Math.max(1, dlugosc - 1)) : WYLEWANIE_S;
   const czasWylewania = teraz >= od && do_ - teraz <= przedKoncem * 1000;
+  // dźwięk wybuchu tylko przy włączonej muzyce i gdy przeglądarka już pozwoliła grać (muzyka.tsx)
+  const dzwiek = useDzwiekOdblokowany() && stan.muzyka;
+  useEffect(() => {
+    if (wideo.current) wideo.current.muted = !dzwiek;
+  }, [dzwiek, scena]);
   useEffect(() => {
     if (czasWylewania) void wideo.current?.play().catch(() => undefined);
   }, [czasWylewania, scena]);

@@ -94,6 +94,8 @@ export type StanSesji = {
   pijany_final: boolean;
   /** Kto dziś stoi za barem (wstawka {za_barem} w pytaniach pijanego finału). */
   za_barem: string | null;
+  /** Muzyka na TV włączona w pilocie (src/app/ekran/_ekran/muzyka.tsx). */
+  muzyka: boolean;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
   quiz: { tytul: string; liczba_zadan: number; liczba_etapow: number } | null;
@@ -138,7 +140,17 @@ export type GraczPilota = {
 };
 
 export type AkcjaPilota =
-  "otworz" | "nastepne" | "wynik" | "odpowiedzi" | "ranking" | "werble" | "podium" | "tabela" | "koniec" | "plansze";
+  | "otworz"
+  | "nastepne"
+  | "wynik"
+  | "odpowiedzi"
+  | "ranking"
+  | "werble"
+  | "podium"
+  | "tabela"
+  | "koniec"
+  | "plansze"
+  | "muzyka";
 
 /** Gracz w trwającej serii (`StanSesji.seria`). */
 export type SeriaGracz = {

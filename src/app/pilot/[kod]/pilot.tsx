@@ -183,6 +183,13 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       <p className="pomocniczy" style={{ marginTop: 0 }}>
         {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
       </p>
+      {/* muzyka gra tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
+      <p className="pomocniczy" style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
+        {stan.muzyka ? "🔊 Muzyka na TV gra" : "🔇 Muzyka na TV wyłączona"}
+        <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
+          {stan.muzyka ? "Wyłącz" : "Włącz"}
+        </button>
+      </p>
 
       {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy */}
       {bladAkcji && (

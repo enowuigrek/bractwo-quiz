@@ -14,7 +14,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Panel** (`/admin`): dwa hasła. Główne (`ADMIN_HASLO_GLOWNE`, tylko Łukasz) widzi wszystko, wspólne (`ADMIN_HASLO`, obsługa) nie widzi quizów i gier „tylko dla mnie” ani pijanego finału. Lokale z logo i adresem ekranu, quizy z etapami (szablony quizu „Klasyczny pub quiz” i „Bez etapów”), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas, nagrody ze zdjęciem, widoczność, pijany finał z polem „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź), pytania pijanego finału, historia gier, odbiór nagród, grafika podium.
 - **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`, scena 1920×1080): plansze lokalu, zapowiedź, poczekalnia z QR, plansza etapu z demo telefonu, pytanie z odliczaniem 3 s, wynik, odpowiedzi graczy, **wyścig po piwo**, finał trójki jako **seria** (drogi do szklanki, dymki okrzyków kibiców, licznik 📣), ukryty **pijany finał** (chaos pod nagłówkiem finału), **werble**, podium, tabela, koniec. Sam się przeładowuje po wdrożeniu (poza pytaniem, serią i pijanym finałem).
 - **Telefon** (`/<kod>`): nick i selfie, wszystkie typy odpowiedzi, „Pytanie 8” bez sumy, ranking ze szklanką, w finale koła ✓/✗ i utrudnienia bez zapowiedzi, kibic stuka hasła z awatarem finalisty, pijany finał udający dalszą serię (15/14…), medal, karta nagrody z pieczątką „Odebrana”, „Udostępnij wynik” i „Pobierz na pamiątkę”.
-- **Pilot** (`/pilot/<kod>?t=…`): przyciski zawsze na górze, „Zakończ grę” na dole; w pijanym finale zwycięzca, podium, odliczanie i „Zakończ i pokaż werble”.
+- **Pilot** (`/pilot/<kod>?t=…`): włącznik muzyki na TV pod nagłówkiem, przyciski zawsze na górze, „Zakończ grę” na dole; w pijanym finale zwycięzca, podium, odliczanie i „Zakończ i pokaż werble”.
 
 **Przebieg gry z etapami (quiz testowy „Piwo”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (walka o finał: 3 najlepszych) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (do 90 s albo do pierwszego gracza, który skończy pytania; nic nie liczy) → werble → podium (odsłania prowadzący).
 
@@ -32,6 +32,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na kilku prawdziwych telefonach naraz: bonus z czasu bez limitu, kibicowanie przy wielu kibicach (TV pobiera stan po każdym okrzyku), pijany finał.
 - Samsung w lokalu: czy nie gaśnie (wideo czuwania 720p) i czy latające awatary pijanego finału idą płynnie.
 - Białe paski Safari przy werblach: poprawione na ślepo (błysk nie dotyka krawędzi), do sprawdzenia na iPhonie.
+- Muzyka na TV: kod jest, utwory z Suno dopiero do wrzucenia do `public/muzyka/` (nazwy w sekcji „Muzyka na TV”). Na Samsungu nie sprawdzona.
 - Lampy błyskowej przy selfie nie da się wyłączyć ze strony (systemowy aparat); pomysł na własny podgląd z kamery jest w `docs/POMYSLY.md`.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
 
@@ -591,13 +592,23 @@ Pomysł Łukasza (plan w `docs/POMYSLY.md`). Działa z pierwszym klipem; Łukasz
 ### Wybuch szklanki, losowe pytania, wspólny koniec (24.10) ✅
 
 Po kolejnym teście Łukasza:
-- **Nowy klip** `public/wideo/pekniecie.mp4` (Kling 4.0, Keyframes, 5 s): szklanka pęka po ok. 1 s, wybucha po ok. 1,5 s, piwo zalewa ekran, koniec prawie czarny. Obróbka jak w sekcji wyżej (`delogo`, bez dźwięku). Pierwszy klip (tylko zbliżenie) wypadł.
+- **Nowy klip** `public/wideo/pekniecie.mp4` (Kling 4.0, Keyframes, 5 s): szklanka pęka po ok. 1 s, wybucha po ok. 1,5 s, piwo zalewa ekran, koniec prawie czarny. Obróbka jak w sekcji wyżej (`delogo`); od 24.10 z dźwiękiem wybuchu (AAC), który gra tylko przy włączonej muzyce. Pierwszy klip (tylko zbliżenie) wypadł.
 - **Rozpad interfejsu przy wybuchu** (`WYBUCH_S` = 1,5 s klipu w `src/lib/pijany.ts`, przy nowym klipie sprawdzić ten moment): nagłówek wylatuje w górę i znika, awatary odlatują od szklanki poza ekran (pętla klatek w `ekran/_ekran/pijany.tsx`, 1700 px/s, bez odbijania) i kręcą się (`.tv-pijany.wybuch`).
 - **Wspólny koniec:** koniec rusza, gdy ktoś dojdzie do **przedostatniego** pytania (`zakoncz_pijany`, 7 s do werbli). Kto skończy wcześniej, nie gaśnie sam: czeka z samym paskiem, a werble przychodzą wszystkim naraz (także tym, którzy nie skończyli).
 - **Losowe pytania** (migracja `20261024075052_pijane_pytania_losowo`): z puli w panelu każda gra dostaje 8 wylosowanych, w kolejności z listy (chaos dalej narasta); losowanie z id gry, więc wszyscy gracze tej gry mają te same. Pytanie z `{za_barem}` bez imienia odpada przed losowaniem.
 - **Mignięcie na start:** gdy TV wchodzi w pijany finał, ekran kilka razy nierówno gaśnie (`mrugniecie-tv`, 1,8 s), jak psujący się telewizor.
 - **Telefon po „Pokaż podium”:** zamiast osobnej planszy „Werble… Zaraz poznasz swoje miejsce!” te same werble co wcześniej (`<Werble dalej />`: bez błysku i bez wejścia), więc do odsłony miejsca nic się nie zmienia.
 - Sprawdzone lokalnie: 8 pytań z puli 10, skrócenie czasu przy przedostatnim, sam pasek po skończeniu, werble wszystkim, podium z tymi samymi werblami, wideo z wybuchem i rozpadem (zrzuty: pęknięta szklanka z awatarami, potem tylko piwo).
+
+### Muzyka na TV (24.10) ✅ kod, utwory od Łukasza
+
+Pomysł Łukasza: wideo wybuchu ma dźwięk, więc przez cały quiz na TV może grać muzyka (z Suno). Decyzje: muzyka jest **opcjonalna**, włącza ją prowadzący w pilocie (domyślnie wyłączona), a gra bez dźwięku działa jak dotąd.
+- **Baza** (migracja `20261024080014_muzyka`): kolumna `sesje.muzyka` (domyślnie `false`), `stan_sesji` zwraca `muzyka`, `pilot_akcja('muzyka')` przełącza.
+- **Pilot:** pod nagłówkiem „🔊 Muzyka na TV gra” / „🔇 Muzyka na TV wyłączona” z przyciskiem Włącz/Wyłącz.
+- **TV** (`ekran/_ekran/muzyka.tsx`, `MuzykaTv`): pięć utworów w `public/muzyka/`: `poczekalnia.mp3` (poczekalnia), `pytania.mp3` (zwykłe etapy), `przed-finalem.mp3` (etap walki o finał), `final.mp3` (finał serią i pijany finał), `podium.mp3` (podium, tabela, koniec; gra raz, reszta w pętli). Werble to cisza. Przy zmianie utworu 1,5 s przenikania. Brakujący plik po prostu nie gra, więc utwory można dodawać po kolei.
+- **Pijany finał:** muzyka finału rozciąga się jak taśma (`preservesPitch = false`, tempo spada do ok. 0,7 i faluje), coraz częściej się zacina (cofnięcie o 0,35 s), a od 5,8 s przed końcem zwalnia do zera i staje 4,2 s przed końcem, czyli tuż przed wideo. Wtedy wideo gra **z dźwiękiem wybuchu** (`pekniecie.mp4` ma teraz ścieżkę AAC), ale tylko gdy muzyka jest włączona i przeglądarka już pozwoliła grać (`src/lib/gra/dzwiek.ts`). Potem werble w ciszy.
+- **Zgoda przeglądarki:** bez gestu przeglądarka nie zagra. Gdy odmówi, na dole TV jest złota prośba „🔊 Naciśnij OK na pilocie telewizora, żeby włączyć muzykę”; pierwsze naciśnięcie klawisza albo kliknięcie odblokowuje dźwięk do końca wizyty na stronie (po przeładowaniu TV trzeba raz jeszcze).
+- Sprawdzone lokalnie z tonami testowymi: utwór według fazy, przenikanie, zwalnianie i zacięcia w pijanym finale, stop przed wideo, przełącznik w pilocie. Na Samsungu nie sprawdzone (czy `preservesPitch` działa i czy OK na pilocie odblokowuje dźwięk).
 
 ## Zadania dla ciebie (dzień 0)
 
