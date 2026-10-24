@@ -19,8 +19,12 @@ export function kolejneOdciecia(stan: StanSesji, odNr: number): string[] {
   const wynik: string[] = [];
   for (const e of plan) {
     if (e.nr < odNr || e.finalowy) continue;
-    if (final && e.nr === final.nr - 1) wynik.push("do finału wchodzi 3 najlepszych");
-    else if (e.przechodzi !== null) wynik.push(`po ${e.nr}. etapie zostaje ${e.przechodzi}`);
+    // tylko odcięcia, które kogoś wyrzucą przy obecnej liczbie grających
+    if (final && e.nr === final.nr - 1) {
+      if (stan.w_grze > 3) wynik.push("do finału wchodzi 3 najlepszych");
+    } else if (e.przechodzi !== null && stan.w_grze > e.przechodzi) {
+      wynik.push(`po ${e.nr}. etapie zostaje ${e.przechodzi}`);
+    }
   }
   return wynik;
 }

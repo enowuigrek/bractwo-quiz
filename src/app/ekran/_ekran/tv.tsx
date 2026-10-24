@@ -15,6 +15,7 @@ import { Awatar } from "@/components/awatar";
 import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
+import { nastrojFazy, type Nastroj } from "@/lib/gra/nastroj";
 import type { GraczNaLiscie, SeriaGracz, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
@@ -57,16 +58,19 @@ function useSkala() {
 export function Scena({
   children,
   zgaszona = false,
+  nastroj,
 }: {
   children: React.ReactNode;
   /** Werble: czarny ekran bez smug tła (wideo czuwania gra dalej). */
   zgaszona?: boolean;
+  /** Nastrój tła według etapu (src/lib/gra/nastroj.ts); bez niego zwykłe ciepłe tło. */
+  nastroj?: Nastroj;
 }) {
   const skala = useSkala();
   useBezWygaszacza();
   const [dx, dy] = usePrzesuniecieOled();
   return (
-    <div className={`tv${zgaszona ? " zgaszona" : ""}`}>
+    <div className={`tv${zgaszona ? " zgaszona" : ""}`} data-nastroj={nastroj}>
       <TloTv />
       <div
         className="scena"
@@ -151,7 +155,7 @@ export function Tv({ kod, qr, host }: Props) {
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
 
   return (
-    <Scena zgaszona={stan?.faza === "werble"}>
+    <Scena zgaszona={stan?.faza === "werble"} nastroj={stan ? nastrojFazy(stan) : undefined}>
       {!stan ? (
         <div className="tv-srodek">
           <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
@@ -261,13 +265,31 @@ function Poczekalnia({
   const doStartu = useDoStartu(stan.planowany_start, przesuniecie);
   return (
     <div className="poczekalnia">
+      {/* gospodarze obok siebie, równej wielkości: lokal (logo, a bez logo nazwa) | Bractwo (× browar przy
+          kranoprzejęciu); bez powtórzonej nazwy lokalu i małego logo Bractwa po drugiej stronie */}
       <header className="tv-naglowek">
-        <Loga lokal={stan.lokal} browar={stan.browar} />
-        <div className="tv-tytul">
-          {stan.lokal && <p className="tv-lokal">{stan.lokal.nazwa}</p>}
-          {stan.browar && <p className="tv-lokal">Kranoprzejęcie: {stan.browar.nazwa}</p>}
+        <div className="tv-loga tv-loga-poczekalni">
+          {stan.lokal &&
+            (stan.lokal.logo_url ? (
+              <img src={stan.lokal.logo_url} alt={stan.lokal.nazwa} className="tv-logo-lokalu" />
+            ) : (
+              <span className="tv-lokal-nazwa">{stan.lokal.nazwa}</span>
+            ))}
+          {stan.lokal && <span className="tv-loga-kreska" aria-hidden />}
+          <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwa" />
+          {stan.browar && (
+            <>
+              <span className="tv-loga-x" aria-hidden>
+                ×
+              </span>
+              {stan.browar.logo_url ? (
+                <img src={stan.browar.logo_url} alt={stan.browar.nazwa} className="tv-logo-browaru" />
+              ) : (
+                <span className="tv-browar-nazwa">{stan.browar.nazwa}</span>
+              )}
+            </>
+          )}
         </div>
-        <LogoNaglowka />
       </header>
 
       <div className="poczekalnia-tresc">

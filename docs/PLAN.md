@@ -671,6 +671,13 @@ Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, pr
 - **Wyjaśnianie odpadania** (migracja `20261024172737_plan_etapow`: `stan_sesji.plan_etapow`): na TV pod kropkami etapów „✂ 6” / „✂ 3” przy etapach, po których się odpada, a plansza etapu bez odcięcia mówi „Po drodze odpada się: po 3. etapie zostaje 6, do finału wchodzi 3 najlepszych”; telefon na planszy etapu to samo. Liczby z `w_grze` (tylko grający).
 - **Zagrożeni i przeskok przez kreskę** (`src/lib/gra/odpadanie.ts`: `odciecieEtapu`, `wzgledemKreski`, `kolejneOdciecia`): w wyścigu i tabeli gracze pod kreską przygaszeni z czerwonym miejscem; kto przeskoczył kreskę po pytaniu, dostaje plakietkę „▲ nad kreską” (zielona) albo „▼ pod kreską” (czerwona); telefon: „▲ Wskakujesz nad kreskę!” / „▼ Spadasz pod kreskę…”. Sprawdzone lokalnie na scenariuszu (Iza z 10. na 1., Ewa pod kreskę).
 
+### Nastroje etapów i nagłówek poczekalni (24.10) ✅
+
+- **Nastroje TV** (`src/lib/gra/nastroj.ts`, `data-nastroj` na `.tv`, warstwy w `tlo.tsx`, style w `tv.css`): obraz idzie za muzyką. Poczekalnia ciepła jak dotąd; etapy 1–3 noir: ukośne cienie żaluzji w lewym górnym rogu, chłodniejsze smugi światła, w 2. ciemniej; etap 3: czerwony neon z prawej, czasem mrugnie; walka o finał: ciemnoczerwona winieta bijąca jak serce; podium: jaśniejsze złoto. **Finał (seria, pijany finał, werble) bez dodatków**, bo wideo wybuchu w trybie `screen` przepuszcza wszystko, co jasne pod spodem. Same warstwy z przezroczystością i przesunięciem, przejście 2 s (Samsung).
+- **Nagłówek poczekalni:** logo lokalu i logo Bractwa obok siebie, tej samej wysokości (130 px), rozdzielone złotą kreską; bez powtórzonej nazwy lokalu i małego logo po drugiej stronie. Lokal bez logo: jego nazwa. Kranoprzejęcie: × i logo browaru.
+- „Po drodze odpada się” pokazuje tylko odcięcia, które przy obecnej liczbie grających kogoś wyrzucą.
+- Tła z OpenAI (drugi poziom nastrojów) czekają na decyzję Łukasza po zobaczeniu samego CSS.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

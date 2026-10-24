@@ -92,6 +92,34 @@
 
 /* Poczekalnia */
 
+/* nagłówek poczekalni: lokal i Bractwo obok siebie, tej samej wysokości, rozdzielone złotą kreską */
+.tv-loga-poczekalni {
+  gap: 36px;
+}
+
+.tv-logo-bractwa {
+  height: 130px;
+  width: auto;
+}
+
+.tv-loga-poczekalni .tv-logo-lokalu {
+  width: 130px;
+  height: 130px;
+}
+
+.tv-loga-kreska {
+  width: 2px;
+  height: 90px;
+  background: var(--zloto);
+  opacity: 0.5;
+}
+
+.tv-lokal-nazwa {
+  font-size: 44px;
+  font-weight: var(--w-black);
+  color: var(--piana);
+}
+
 .poczekalnia {
   display: flex;
   flex-direction: column;
@@ -1661,10 +1689,133 @@
   }
 }
 
+/* Nastroje etapów (src/lib/gra/nastroj.ts, `data-nastroj` na `.tv`): tło idzie za muzyką. Same warstwy
+   z przezroczystością i przesunięciem (bez animowania filtrów i clip-path, Samsung), przejście 2 s. */
+.tv-zaluzje,
+.tv-winieta {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* cienie żaluzji: ukośne pasy światła z okna w lewym górnym rogu, wolno pełzną (noir) */
+.tv-zaluzje {
+  left: -20vw;
+  top: -40vh;
+  width: 110vw;
+  height: 150vh;
+  rotate: -14deg;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(196, 214, 240, 0.075) 0 26px,
+    transparent 26px 64px
+  );
+  mask-image: radial-gradient(ellipse 55% 50% at 35% 40%, #000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 80%);
+  filter: blur(3px);
+  animation: zaluzje 40s ease-in-out infinite alternate;
+}
+
+@keyframes zaluzje {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 6vw 4vh;
+  }
+}
+
+/* winieta: ciemnoczerwone brzegi pulsujące jak serce (walka o finał) */
+.tv-winieta {
+  inset: 0;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 45%, rgba(110, 14, 10, 0.55) 100%);
+  animation: winieta-serce 1.6s ease-in-out infinite;
+}
+
+@keyframes winieta-serce {
+  0%,
+  100% {
+    scale: 1;
+  }
+  12% {
+    scale: 1.035;
+  }
+  24% {
+    scale: 1;
+  }
+  36% {
+    scale: 1.02;
+  }
+}
+
+/* etapy noir: chłodniejsze smugi, przygaszone świece, żaluzje */
+.tv[data-nastroj="etap1"] .tv-zaluzje,
+.tv[data-nastroj="etap2"] .tv-zaluzje,
+.tv[data-nastroj="etap3"] .tv-zaluzje {
+  opacity: 1;
+}
+
+.tv[data-nastroj="etap1"] .tv-smuga,
+.tv[data-nastroj="etap2"] .tv-smuga,
+.tv[data-nastroj="etap3"] .tv-smuga {
+  filter: blur(18px) hue-rotate(185deg) saturate(0.5);
+}
+
+.tv[data-nastroj="etap2"] .tv-blask,
+.tv[data-nastroj="etap3"] .tv-blask {
+  opacity: 0.6;
+}
+
+.tv[data-nastroj="etap2"] .tv-zaluzje {
+  opacity: 0.8;
+}
+
+/* etap 3: czerwony neon zza okna z prawej, czasem mrugnie jak psujący się szyld */
+.tv[data-nastroj="etap3"] .tv-winieta {
+  opacity: 1;
+  background: radial-gradient(ellipse 38% 65% at 100% 35%, rgba(214, 48, 49, 0.2) 0%, rgba(214, 48, 49, 0.06) 45%, transparent 75%);
+  animation: neon 7s linear infinite;
+}
+
+@keyframes neon {
+  0%,
+  41%,
+  45%,
+  47%,
+  100% {
+    opacity: 1;
+  }
+  43%,
+  46% {
+    opacity: 0.35;
+  }
+}
+
+/* walka o finał: ciemna czerwień i bicie serca */
+.tv[data-nastroj="etap4"] .tv-winieta {
+  opacity: 1;
+}
+
+.tv[data-nastroj="etap4"] .tv-smuga {
+  filter: blur(18px) hue-rotate(-30deg) saturate(1.4);
+  opacity: 0.7;
+}
+
+.tv[data-nastroj="etap4"] .tv-blask {
+  opacity: 0.5;
+}
+
+/* podium: złoto wraca, jaśniej */
+.tv[data-nastroj="podium"] .tv-blask {
+  filter: brightness(1.6);
+}
+
 /* ograniczony ruch: tło stoi, ale wideo czuwania (pod spodem) dalej gra */
 @media (prefers-reduced-motion: reduce) {
   .tv-blask,
-  .tv-smuga {
+  .tv-smuga,
+  .tv-zaluzje,
+  .tv-winieta {
     animation: none;
   }
 }

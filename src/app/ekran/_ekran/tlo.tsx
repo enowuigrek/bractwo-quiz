@@ -28,6 +28,9 @@ export function TloTv() {
       <span className="tv-smuga tv-smuga-1" />
       <span className="tv-smuga tv-smuga-2" />
       <span className="tv-smuga tv-smuga-3" />
+      {/* nastroje etapów (tv.css, [data-nastroj]): cienie żaluzji w etapach noir, winieta w walce o finał */}
+      <span className="tv-zaluzje" />
+      <span className="tv-winieta" />
     </div>
   );
 }
