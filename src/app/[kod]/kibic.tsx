@@ -41,7 +41,7 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
         <p className="gra-kibic">
           {teraz >= do_
             ? "Koniec serii! Patrz na telewizor."
-            : `Finał! Odpowiadają ${finalisci.map((g) => g.nick).join(", ")}. Zaraz możesz im kibicować!`}
+            : "Za chwilę start. Wtedy możesz kibicować!"}
         </p>
       </>
     );

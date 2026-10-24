@@ -77,11 +77,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     return (
       <div className="odliczanie" aria-live="polite">
         <span className="odliczanie-liczba">{Math.max(1, Math.ceil((od - teraz) / 1000))}</span>
+        {/* zasady były przed chwilą na planszy etapu, więc tu samo odliczanie */}
         <span>Seria startuje!</span>
-        <span className="odliczanie-typ">
-          {e?.liczba_pytan ?? ""} pytań, {e?.czas_s ?? 60} s na wszystkie. Każda dobra odpowiedź to krok do piwa, a kto
-          pierwszy do niego dobiegnie, kończy serię.
-        </span>
       </div>
     );
   }

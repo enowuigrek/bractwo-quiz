@@ -48,7 +48,7 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
     <section className="udostepnij" aria-label="Wynik na pamiątkę">
       <div className="udostepnij-przyciski">
         <button type="button" className="przycisk zloty" disabled={trwa} onClick={() => void naPamiatke()}>
-          {trwa ? "Przygotowuję…" : "Pobierz na pamiątkę"}
+          {trwa ? "Przygotowuję…" : "Pobierz grafikę na pamiątkę"}
         </button>
       </div>
       {oznaczenia.length > 0 && (

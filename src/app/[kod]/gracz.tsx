@@ -138,7 +138,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (bladGry && !stan) {
     return (
       <>
-        <Naglowek kod={kod} />
+        <Naglowek />
         <h1>Nie ma takiej gry</h1>
         <p className="pomocniczy">
           Nie znaleźliśmy gry o kodzie <strong className="gra-kod">{kod}</strong>. Sprawdź kod na telewizorze.
@@ -153,7 +153,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!stan || sprawdzamToken) {
     return (
       <>
-        <Naglowek kod={kod} />
+        <Naglowek />
         <p className="pomocniczy">Łączę z grą…</p>
       </>
     );
@@ -162,7 +162,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!ja) {
     return (
       <>
-        <Naglowek kod={kod} />
+        <Naglowek />
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
@@ -205,7 +205,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   return (
     <>
-      <Naglowek kod={kod} />
+      <Naglowek />
       <WGrze
         stan={stan}
         ja={ja}
@@ -220,11 +220,11 @@ export function Gracz({ kod }: { kod: string }) {
   );
 }
 
-function Naglowek({ kod }: { kod: string }) {
+/** Sam znak Quizu: kod gry jest wewnętrzny (gracz wchodzi z QR), więc go nie pokazujemy. */
+function Naglowek() {
   return (
     <header className="gra-naglowek">
       <LogoQuiz wysokosc={40} />
-      <span className="gra-kod">{kod}</span>
     </header>
   );
 }

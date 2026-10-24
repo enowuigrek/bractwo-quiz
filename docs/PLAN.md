@@ -612,6 +612,12 @@ Pomysł Łukasza: wideo wybuchu ma dźwięk, więc przez cały quiz na TV może 
 - **Poprawka po pierwszym teście (24.10):** w Safari muzyka nie ruszała, a w trakcie gry urywała się. Przyczyny: Safari uznaje za zgodę tylko kliknięcie albo klawisz (nie `pointerdown`) i pozwala grać tylko elementom, które raz zagrały w czasie gestu, a każdy utwór był nowym elementem. Do tego TV przeładowywał się po wdrożeniu i znów czekał na zgodę. Teraz są dwa stałe odtwarzacze na zmianę (oba odblokowuje jeden gest), pętla to 2,5 s przenikania na drugi odtwarzacz od `petlaOd` (za cichym wstępem), pliki są przycięte przed wyciszeniem z Suno, a przy grającej muzyce TV przeładowuje się po nowym wdrożeniu dopiero w fazie `koniec`.
 - Sprawdzone lokalnie z tonami testowymi: utwór według fazy, przenikanie, zwalnianie i zacięcia w pijanym finale, stop przed wideo, przełącznik w pilocie. Na Samsungu nie sprawdzone (czy `preservesPitch` działa i czy OK na pilocie odblokowuje dźwięk).
 
+### Drobne po teście muzyki (24.10) ✅
+
+- Koniec gry na telefonie: jeden przycisk „Pobierz grafikę na pamiątkę” na całą szerokość. Otwiera systemowe udostępnianie (na iPhonie tylko stamtąd „Zapisz obraz” trafia do Zdjęć), na komputerze pobiera plik. Osobne „Udostępnij wynik” zniknęło.
+- Nagłówek telefonu bez kodu gry.
+- Przegląd dubli (jak dawne podwójne werble): odliczanie serii na telefonie nie powtarza już zasad z planszy etapu (samo „Seria startuje!”), kibic przed startem nie wymienia znowu finalistów („Za chwilę start. Wtedy możesz kibicować!”), a na planszy finału serią kibic czyta, że będzie dopingował (wcześniej nieaktualne „Pytania i tak zobaczysz tutaj”). Zostawione świadomie: miejsce i punkty na ekranie wyniku i zaraz potem w rankingu (prowadzący może pominąć ranking).
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.
