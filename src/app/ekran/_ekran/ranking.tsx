@@ -50,6 +50,8 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
     .slice(0, W_RANKINGU);
   const reszta = ranking.length - wiersze.length;
   const z = stan.zadanie;
+  // odcięcie po etapie (jak w wyścigu): kreska pod ostatnim, kto gra dalej
+  const odciecie = stan.etap?.final_po_etapie ? 3 : (stan.etap?.przechodzi ?? null);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -80,7 +82,9 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                     initial={{ opacity: 0, x: -60 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 60 }}
-                    className={`tv-ranking-wiersz${po && w.miejsce === 1 ? " lider" : ""}`}
+                    className={`tv-ranking-wiersz${po && w.miejsce === 1 ? " lider" : ""}${
+                      po && odciecie !== null && ranking.length > odciecie && w.miejsce === odciecie ? " granica" : ""
+                    }`}
                   >
                     <span className="tv-ranking-miejsce">{miejsce}.</span>
                     <span className="tv-ranking-nick">

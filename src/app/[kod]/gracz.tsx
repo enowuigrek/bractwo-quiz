@@ -50,8 +50,8 @@ export function Gracz({ kod }: { kod: string }) {
   const [sprawdzamToken, ustawSprawdzamToken] = useState(true);
   const [moj, ustawMoj] = useState<MojWynik | null>(null);
   const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
-  // punkty 3. miejsca: w etapie przed finałem telefon mówi, ile brakuje do finałowej trójki
-  const [punktyTrzeciego, ustawPunktyTrzeciego] = useState<number | null>(null);
+  // punkty grających od najwyższych: w etapie z odcięciem telefon mówi, ile brakuje do miejsca, które przechodzi
+  const [punktyWGrze, ustawPunktyWGrze] = useState<number[] | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [usuniety, ustawUsuniety] = useState(false);
   // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
@@ -94,7 +94,12 @@ export function Gracz({ kod }: { kod: string }) {
             if (r.data) {
               const wiersze = r.data as WierszRankingu[];
               ustawMojWiersz(wiersze.find((w) => w.nick === nowy.nick) ?? null);
-              ustawPunktyTrzeciego([...wiersze].sort((a, b) => b.punkty - a.punkty)[2]?.punkty ?? null);
+              ustawPunktyWGrze(
+                wiersze
+                  .filter((w) => w.odpadl === null)
+                  .map((w) => w.punkty)
+                  .sort((a, b) => b - a),
+              );
             }
           }
         }
@@ -212,7 +217,7 @@ export function Gracz({ kod }: { kod: string }) {
         gracze={gracze}
         moj={moj}
         mojWiersz={mojWiersz}
-        punktyTrzeciego={punktyTrzeciego}
+        punktyWGrze={punktyWGrze}
         przesuniecie={przesuniecie}
         odswiez={pobierz}
       />
@@ -324,7 +329,7 @@ function WGrze({
   gracze,
   moj,
   mojWiersz,
-  punktyTrzeciego,
+  punktyWGrze,
   przesuniecie,
   odswiez,
 }: {
@@ -333,7 +338,7 @@ function WGrze({
   gracze: GraczNaLiscie[];
   moj: MojWynik | null;
   mojWiersz: WierszRankingu | null;
-  punktyTrzeciego: number | null;
+  punktyWGrze: number[] | null;
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
@@ -409,11 +414,21 @@ function WGrze({
     return <Werble blysk={!stan.pijany_final} />;
   }
 
+  // odpadł w etapie przed finałem: do finału tylko patrzy na TV (w finale kibicuje jak reszta, EtapGracza i seria)
+  if (
+    moj?.odpadl != null &&
+    !stan.etap?.finalowy &&
+    ["etap", "przygotuj", "pytanie", "wynik", "odpowiedzi", "ranking"].includes(stan.faza)
+  ) {
+    return <Odpadl nick={ja.nick} moj={moj} />;
+  }
+
   if (stan.faza === "etap") {
     return <EtapGracza stan={stan} nick={ja.nick} />;
   }
 
   if (stan.faza === "ranking") {
+    const odciecie = stan.etap?.final_po_etapie ? 3 : (stan.etap?.przechodzi ?? null);
     return (
       <>
         {/* awatar obok nicku: gracz od razu widzi, że to jego wynik */}
@@ -424,23 +439,30 @@ function WGrze({
         <h1>Ranking</h1>
         {moj && <Miejsce moj={moj} />}
         {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
-        {/* etap przed finałem: walka o miejsce w trójce */}
-        {mojWiersz && stan.etap?.final_po_etapie && stan.liczba_graczy > 3 && (
+        {/* etap z odcięciem: walka o miejsce w trójce finału albo o miejsce, które gra dalej */}
+        {mojWiersz && odciecie !== null && stan.w_grze > odciecie && (
           <p className="etap-uwaga">
-            {mojWiersz.miejsce <= 3 ? (
-              <>
-                🏆 Jesteś w <strong>finałowej trójce</strong>. Utrzymaj miejsce do końca etapu!
-              </>
+            {mojWiersz.miejsce <= odciecie ? (
+              stan.etap?.final_po_etapie ? (
+                <>
+                  🏆 Jesteś w <strong>finałowej trójce</strong>. Utrzymaj miejsce do końca etapu!
+                </>
+              ) : (
+                <>
+                  Jesteś w <strong>najlepszej {odciecie}</strong>, która gra dalej. Utrzymaj miejsce do końca etapu!
+                </>
+              )
             ) : (
               <>
-                🏆 Do finału wchodzi 3 najlepszych. Do 3. miejsca brakuje Ci{" "}
-                <strong>{Math.max(1, (punktyTrzeciego ?? 0) - mojWiersz.punkty + 1)} pkt</strong>.
+                {stan.etap?.final_po_etapie ? "🏆 Do finału wchodzi 3 najlepszych" : `Dalej gra ${odciecie} najlepszych`}.
+                Do {odciecie}. miejsca brakuje Ci{" "}
+                <strong>{Math.max(1, (punktyWGrze?.[odciecie - 1] ?? 0) - mojWiersz.punkty + 1)} pkt</strong>.
               </>
             )}
           </p>
         )}
         {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV */}
-        {mojWiersz && rankingJakoWyscig(stan.liczba_graczy) && (
+        {mojWiersz && rankingJakoWyscig(stan.w_grze) && (
           <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />
         )}
       </>
@@ -448,4 +470,21 @@ function WGrze({
   }
 
   return <Rozgrywka stan={stan} ja={ja} moj={moj} teraz={teraz} odswiez={odswiez} />;
+}
+
+/** Gracz, który odpadł w etapie przed finałem: do końca patrzy na TV, a w finale kibicuje finalistom. */
+function Odpadl({ nick, moj }: { nick: string; moj: MojWynik }) {
+  return (
+    <>
+      <p className="nadtytul gra-ja">
+        <Awatar nick={nick} zdjecie={moj.zdjecie} rozmiar={40} />
+        {nick}
+      </p>
+      <h1>Odpadasz po {moj.odpadl}. etapie</h1>
+      <Miejsce moj={moj} />
+      <p className="etap-uwaga">
+        Dzięki za walkę! Patrz na telewizor i kibicuj. W finale z telefonu dopingujesz finalistów.
+      </p>
+    </>
+  );
 }

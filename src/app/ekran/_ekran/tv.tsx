@@ -146,6 +146,7 @@ export function Tv({ kod, qr, host }: Props) {
         : !["przygotuj", "pytanie", "seria", "pijany", "werble", "podium"].includes(stan.faza)),
   );
 
+  const wGrze = ranking.filter((w) => w.odpadl === null);
   // zapowiedziana gra: zamiast poczekalni z QR plansze z godziną i odliczaniem (jak na ekranie lokalu)
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
 
@@ -192,11 +193,12 @@ export function Tv({ kod, qr, host }: Props) {
           ) : stan.faza === "odpowiedzi" ? (
             <OdpowiedziTv stan={stan} odpowiedzi={odpowiedzi} />
           ) : stan.faza === "ranking" ? (
-            // wyścig po piwo, gdy gracze mieszczą się na torach; inaczej tabela
-            rankingJakoWyscig(ranking.length) ? (
-              <WyscigTv stan={stan} ranking={ranking} />
+            // wyścig po piwo, gdy gracze mieszczą się na torach; inaczej tabela. Bez odpadniętych w etapach
+            // (pełna tabela i podium na końcu mają wszystkich)
+            rankingJakoWyscig(wGrze.length) ? (
+              <WyscigTv stan={stan} ranking={wGrze} />
             ) : (
-              <RankingTv stan={stan} ranking={ranking} />
+              <RankingTv stan={stan} ranking={wGrze} />
             )
           ) : stan.faza === "tabela" ? (
             <TabelaTv stan={stan} ranking={ranking} />

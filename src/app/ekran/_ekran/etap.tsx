@@ -62,12 +62,20 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
               <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>
             </motion.ul>
-            {/* o odpadaniu mówimy tylko w etapie tuż przed finałem: tu gracze walczą o miejsce w trójce */}
-            {e.final_po_etapie && (
+            {/* odpadanie: walka o finał (trójka) albo próg po etapie z `etap.przechodzi` (src/app/pilot/[kod]/progi.tsx) */}
+            {e.final_po_etapie ? (
               <motion.p className="tv-etap-walka" {...wejscie(4)}>
                 🏆 Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału
-                {stan.liczba_graczy > 3 ? `, ${stan.liczba_graczy - 3} odpada i kibicuje` : ""}.
+                {stan.w_grze > 3 ? `, ${stan.w_grze - 3} odpada i kibicuje` : ""}.
               </motion.p>
+            ) : (
+              e.przechodzi !== null &&
+              stan.w_grze > e.przechodzi && (
+                <motion.p className="tv-etap-walka" {...wejscie(4)}>
+                  Odpadanie: po tym etapie gra dalej <strong>{e.przechodzi} najlepszych</strong>,{" "}
+                  {stan.w_grze - e.przechodzi} odpada i kibicuje.
+                </motion.p>
+              )
             )}
             {stan.finalisci && (
               <motion.div className="tv-etap-final" {...wejscie(4)}>

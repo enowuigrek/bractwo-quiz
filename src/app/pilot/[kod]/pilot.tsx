@@ -20,6 +20,7 @@ import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz"
 import { napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
 import { GraczePilota } from "./gracze";
+import { ProgiPilota } from "./progi";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
@@ -157,8 +158,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   // `przygotuj` przechodzi w `pytanie` sam, gdy minie `faza_od`; nie czekamy na odpytanie bazy
   const { faza, doStartu, doKonca, bezLimitu } = fazaTeraz(stan, teraz);
-  // w finale trójki odpowiadają tylko finaliści
-  const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
+  // w finale trójki odpowiadają tylko finaliści, wcześniej wszyscy, którzy nie odpadli
+  const grajacy = stan.finalisci?.length ?? stan.w_grze;
   const wszyscy = grajacy > 0 && stan.liczba_odpowiedzi >= grajacy;
   const z = stan.zadanie;
   const liczba = stan.quiz?.liczba_zadan ?? 0;
@@ -443,6 +444,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         )}
       </section>
 
+      {faza === "poczekalnia" && <ProgiPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
+
       {faza === "poczekalnia" && (
         <section className="karta" style={{ marginTop: 18 }}>
           <p className="etykieta" style={{ marginTop: 0 }}>
@@ -475,6 +478,12 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           {stan.finalisci && (
             <p style={{ margin: "10px 0 0" }}>
               <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
+            </p>
+          )}
+          {!etap.finalowy && (etap.przechodzi !== null || etap.final_po_etapie) && (
+            <p style={{ margin: "10px 0 0" }}>
+              <strong>Odpadanie:</strong> po tym etapie gra dalej{" "}
+              {etap.final_po_etapie ? "trójka (finał)" : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
             </p>
           )}
           <p className="pomocniczy" style={{ margin: "10px 0 0" }}>

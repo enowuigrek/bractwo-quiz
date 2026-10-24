@@ -2614,3 +2614,44 @@ html:has(.kolumna) {
     transform: rotate(180deg);
   }
 }
+
+/* Pilot: odpadanie przed finałem (pilot/[kod]/progi.tsx): etap po lewej, − liczba + po prawej */
+.progi-pilota {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progi-pilota li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+/* na wąskim telefonie nazwa etapu w całości nad przyciskami, nie słowo pod słowem */
+.progi-pilota li > span:first-child {
+  flex: 1 1 12em;
+}
+
+.progi-pilota-wartosc {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.progi-pilota-wartosc strong {
+  min-width: 6.5em;
+  text-align: center;
+  color: var(--zloto);
+}
+
+.progi-pilota-wartosc .przycisk-zdjecie {
+  min-width: 40px;
+  padding-inline: 0;
+  font-size: 1.2rem;
+}

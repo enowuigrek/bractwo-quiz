@@ -28,8 +28,10 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const maks = stan.quiz?.max_przed_finalem ?? 0;
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   const odstep = wiersze.length > 8 ? 6 : 12;
-  // etap przed finałem: kreska „strefa finału” pod 3. miejscem (zabiera trochę wysokości torów)
-  const strefaFinalu = !!stan.etap?.final_po_etapie && wiersze.length > 3;
+  // odcięcie po etapie: kreska pod ostatnim, kto gra dalej (walka o finał: pod 3. miejscem, inaczej próg
+  // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów
+  const odciecie = stan.etap?.final_po_etapie ? 3 : (stan.etap?.przechodzi ?? null);
+  const strefaFinalu = odciecie !== null && wiersze.length > odciecie;
   const tor = Math.min(
     92,
     Math.floor((700 - (strefaFinalu ? 34 : 0) - (wiersze.length - 1) * odstep) / Math.max(1, wiersze.length)),
@@ -110,11 +112,15 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                   </span>
                 </div>
               );
-              // pod 3. torem: kto jest wyżej, wchodzi do finału
-              return strefaFinalu && i === 2 ? (
+              // pod ostatnim, kto przechodzi: kto jest wyżej, gra dalej
+              return strefaFinalu && i === (odciecie ?? 0) - 1 ? (
                 <Fragment key={w.nick}>
                   {wiersz}
-                  <p className="wyscig-strefa-finalu">▲ ta trójka wchodzi do finału ▲</p>
+                  <p className="wyscig-strefa-finalu">
+                    {stan.etap?.final_po_etapie
+                      ? "▲ ta trójka wchodzi do finału ▲"
+                      : `▲ ${odciecie} najlepszych gra dalej ▲`}
+                  </p>
                 </Fragment>
               ) : (
                 wiersz

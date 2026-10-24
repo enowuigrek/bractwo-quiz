@@ -25,6 +25,7 @@ const POWODY: Record<Exclude<ZapisOdpowiedzi, { przyjeta: true }>["powod"], stri
   inne_zadanie: "To pytanie już się skończyło.",
   juz_odpowiedziano: "Twoja odpowiedź jest już zapisana.",
   kibic: "W finale odpowiadają tylko finaliści.",
+  odpadl: "Odpadasz w tym quizie: teraz patrzysz i kibicujesz.",
 };
 
 /** Finał trójki, a ten gracz nie jest w trójce: patrzy i kibicuje. */

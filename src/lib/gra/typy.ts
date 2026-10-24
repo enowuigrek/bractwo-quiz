@@ -69,6 +69,8 @@ export type EtapWidoczny = {
   final_po_etapie: boolean;
   /** Gdzieś dalej w quizie jest finał trójki. */
   final_dalej: boolean;
+  /** Odpadanie: ilu najlepszych gra dalej po tym etapie (null: nikt nie odpada; próg z `sesje.progi`). */
+  przechodzi: number | null;
   liczba_pytan: number;
   /** Rodzaje pytań w etapie, w kolejności pierwszego wystąpienia. */
   typy: TypZadania[];
@@ -118,6 +120,8 @@ export type StanSesji = {
   faza_do: string | null;
   zadanie: ZadanieWidoczne | null;
   liczba_graczy: number;
+  /** Ilu graczy jeszcze gra (bez odpadniętych w etapach przed finałem). */
+  w_grze: number;
   /** Ile osób odpowiedziało na bieżące zadanie. */
   liczba_odpowiedzi: number;
   /** Zegar serwera w chwili odpowiedzi. */
@@ -134,6 +138,12 @@ export type PilotStan = StanSesji & {
   nastepny_etap: EtapWidoczny | null;
   /** Wszystkie podpowiedzi bieżącego pytania (prowadzący widzi je od początku). */
   wszystkie_podpowiedzi: string[];
+  /** Odpadanie: {"nr etapu": ilu przechodzi po nim}, zapisane albo domyślne z liczby graczy. */
+  progi: Record<string, number>;
+  /** Prowadzący zmienił progi (inaczej domyślne, liczone przy starcie). */
+  progi_wlasne: boolean;
+  /** Etapy quizu (do edycji progów). */
+  etapy: { nr: number; nazwa: string; finalowy: boolean }[];
 };
 
 /** Wiersz `pilot_gracze`: token służy do QR, którym gracz wraca do gry na innym telefonie. */
@@ -185,7 +195,7 @@ export type ZapisOdpowiedzi =
   | { przyjeta: true; czas_ms: number; poprawna?: boolean }
   | {
       przyjeta: false;
-      powod: "nie_teraz" | "inne_zadanie" | "za_wczesnie" | "po_czasie" | "juz_odpowiedziano" | "kibic";
+      powod: "nie_teraz" | "inne_zadanie" | "za_wczesnie" | "po_czasie" | "juz_odpowiedziano" | "kibic" | "odpadl";
     };
 
 /** `moj_wynik`: odpowiedź gracza na bieżące zadanie, suma punktów i miejsce. */
@@ -202,6 +212,8 @@ export type MojWynik = {
   punkty: number;
   miejsce: number;
   liczba_graczy: number;
+  /** Po którym etapie gracz odpadł (null: gra dalej). */
+  odpadl: number | null;
 };
 
 /**
@@ -227,4 +239,6 @@ export type WierszRankingu = {
   miejsce: number;
   poprzednie_miejsce: number;
   zdobyte: number;
+  /** Po którym etapie odpadł (null: gra dalej). */
+  odpadl: number | null;
 };

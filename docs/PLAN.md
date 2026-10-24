@@ -659,6 +659,16 @@ Po teście Łukasza: pijany finał dało się szybko przeklikać i czekać na wy
 - **Przełączniki** zamiast checkboxów w ustawieniach tak/nie panelu (`.przelacznik`, `.pole-wyboru` w `panel.css`; opis w DESIGN-SYSTEM). Zaznaczanie poprawnych odpowiedzi w edytorze zostaje checkboxem.
 - **Muzyka przy zapowiedzi** (migracja `20261024170354_zapowiedz_z_muzyka`: `ekran_lokalu` podaje `zapowiedz.muzyka`): ekran lokalu gra muzykę poczekalni już przy godzinie i odliczaniu. Odtwarzacze są wspólne dla strony (`strona()` w `muzyka.tsx`), więc po otwarciu poczekalni utwór gra dalej bez startu od nowa i bez ponownej zgody przeglądarki. Sprawdzone lokalnie na tymczasowym lokalu „Test muzyki (usuń)” (4,3 s → 12,0 s bez przerwy).
 
+### Odpadanie w etapach przed finałem (24.10) ✅
+
+Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, progi zależą od liczby graczy, prowadzący może je zmienić w pilocie przed startem, a odpadnięci tylko patrzą i kibicują.
+- **Progi domyślne** (`wewn.progi_domyslne`, z liczby graczy, tylko w quizie z finałem trójki): do 8 graczy nikt nie odpada przed walką o finał; 9–15: po etapie przed walką o finał zostaje 6; od 16: dwa etapy przed walką o finał zostaje połowa (najmniej 8), etap później 6. Rozgrzewka nigdy nie odcina, walka o finał jak dotąd daje trójkę.
+- **Baza** (migracje `20261024171522`–`20261024171742`, `odpadanie_*`): `sesje.progi` ({"nr etapu": ilu przechodzi}), `gracze.odpadl_po_etapie`; start quizu zapisuje progi (`coalesce(progi, progi_domyslne)`), plansza kolejnego etapu najpierw odcina (`wewn.odetnij`: punkty, czas, kolejność dołączenia, jak przy finalistach), finaliści tylko spośród grających, odpadnięci nie odpowiadają (`powod: odpadl`), pytanie kończy się, gdy odpowiedzą wszyscy grający. `etap_json.przechodzi`, `stan_sesji.w_grze`, `ranking.odpadl`, `moj_wynik.odpadl`, w `pilot_stan` progi i etapy. `ustaw_progi(kod, host_token, progi)` tylko w poczekalni.
+- **Pilot** (`pilot/[kod]/progi.tsx`): w poczekalni karta „Odpadanie przed finałem” z − / + przy etapach od 2. do tego przed walką o finał („wszyscy” albo „zostaje N”), zapis od razu. Na planszy etapu: ile gra dalej.
+- **TV:** plansza etapu z progiem mówi, ilu gra dalej i ilu odpada (walka o finał liczy już tylko grających); w wyścigu i tabeli kreska pod ostatnim, kto przechodzi („▲ 6 najlepszych gra dalej ▲”); odpadnięci znikają z wyścigu (pełna tabela i podium na końcu mają wszystkich).
+- **Telefon:** w rankingu etapu z progiem „Dalej gra N najlepszych. Do N. miejsca brakuje Ci X pkt”; po odcięciu „Odpadasz po N. etapie” z miejscem, do finału, a w finale kibicuje jak reszta.
+- Sprawdzone lokalnie (10 graczy): domyślny próg {3: 6}, zmiana w pilocie, kreska w wyścigu, odcięcie 4 ostatnich przy planszy 4. etapu, „3 odpada” na planszy walki o finał, ekran odpadniętego.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

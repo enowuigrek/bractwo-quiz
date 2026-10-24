@@ -631,6 +631,11 @@
   font-size: 36px;
 }
 
+/* odcięcie po etapie: pod ostatnim, kto gra dalej (ranking.tsx) */
+.tv-ranking-wiersz.granica {
+  box-shadow: 0 6px 0 -2px var(--zloto);
+}
+
 .tv-ranking-wiersz.lider {
   border-color: var(--zloto);
   box-shadow: var(--glow-md);
