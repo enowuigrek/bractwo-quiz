@@ -157,7 +157,8 @@ export function Tv({ kod, qr, host }: Props) {
         </div>
       ) : stan.faza === "werble" ? (
         // po finale ekran gaśnie (bez łagodnego wejścia fazy), podium pokazuje prowadzący
-        <Werble duzy />
+        // po pijanym finale TV jest już ciemny po wideo wybuchu: bez błysku, sam napis wchodzi na czerni
+        <Werble duzy blysk={!stan.pijany_final} />
       ) : (
         // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
         <div key={kluczEkranu(stan)} className="tv-ekran">

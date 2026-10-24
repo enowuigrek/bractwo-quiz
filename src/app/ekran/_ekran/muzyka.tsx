@@ -14,7 +14,9 @@ const UTWORY = {
   poczekalnia: { plik: "/muzyka/poczekalnia.mp3", petlaOd: 2.5 },
   etap1: { plik: "/muzyka/etap-1.mp3", petlaOd: 0 },
   etap2: { plik: "/muzyka/etap-2.mp3", petlaOd: 4 },
+  // do czasu nowego utworu na 3. etap etap-3.mp3 to kopia przed-finalem.mp3
   etap3: { plik: "/muzyka/etap-3.mp3", petlaOd: 4 },
+  przedFinalem: { plik: "/muzyka/przed-finalem.mp3", petlaOd: 4 },
   final: { plik: "/muzyka/final.mp3", petlaOd: 3.6 },
   podium: { plik: "/muzyka/podium.mp3", petlaOd: null },
 } as const;
@@ -53,10 +55,11 @@ function utworFazy(stan: StanSesji): Utwor | null {
       return "podium";
     default:
       // plansza etapu, pytania, wyniki i ranking: według etapu (na planszy to etap, który się zaczyna).
-      // Narasta z etapu na etap: noir lekko, noir z napięciem, potem elegancki etap-3, który gra dalej
-      // (bez przerwy, ten sam utwór) aż do walki o finał. Quiz bez etapów: etap-1.
+      // Narasta z etapu na etap: noir lekko, noir z napięciem, noir z lekkim napięciem w 3. i dalszych,
+      // walka o finał (smyczki i trąbki) i finał. Quiz bez etapów: etap-1.
       if (stan.etap?.finalowy) return "final";
-      if (stan.etap?.final_po_etapie || (stan.etap?.nr ?? 1) >= 3) return "etap3";
+      if (stan.etap?.final_po_etapie) return "przedFinalem";
+      if ((stan.etap?.nr ?? 1) >= 3) return "etap3";
       return stan.etap?.nr === 2 ? "etap2" : "etap1";
   }
 }

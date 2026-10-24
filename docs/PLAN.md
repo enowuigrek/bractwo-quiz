@@ -643,6 +643,14 @@ Po teście Łukasza: pijany finał dało się szybko przeklikać i czekać na wy
 - Obróbka jak wcześniej (przycięte przed wyciszeniem z Suno, −16 LUFS, MP3 160 kb/s); `petlaOd` za cichym wstępem: poczekalnia 2,5 s, etap-2 i etap-3 4 s.
 - Sprawdzone lokalnie: poczekalnia, etap 1, 2, 3, walka o finał (etap-3 gra dalej, bez restartu), koniec (podium).
 
+### Poprawki: muzyka 4. etapu, pary w obie strony, TV po wybuchu (24.10) ✅
+
+- Muzyka: dawny „przed finałem” wraca do etapu walki o finał (`przed-finalem.mp3`, smyczki i trąbki, napięcie przed finałem). 3. etap i dalsze zwykłe dostaną nowy utwór noir z lekkim napięciem (`etap-3.mp3`); do czasu, aż Łukasz go wygeneruje, `etap-3.mp3` to kopia `przed-finalem.mp3`.
+- Pary: łączyć można od dowolnej kolumny (prawy, potem lewy też działa); podpowiedź pod pytaniem i na planszy etapu mówi o jednej i drugiej kolumnie.
+- TV po wybuchu szklanki: werble bez błysku (ekran jest już ciemny po wideo), sam napis wchodzi na czerni. Błysk gaśnięcia zostaje tylko na telefonach.
+- Komentarze pijanego finału prostsze: kremowy napis na środku, wyskakuje i znika (bez przelotu z boku i obrotów). Treści ustalimy przy układaniu pytań.
+- Dalej (z Łukaszem): dłuższy 2. etap quizu „Piwo” (nowe pytania), potem pytania pijanego finału z komentarzami.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

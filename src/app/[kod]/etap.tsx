@@ -35,7 +35,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
         ))}
       </ul>
       {e.typy.includes("pary") && (
-        <p className="etap-uwaga">Łączenie: wybierz element z lewej kolumny, a potem pasujący z prawej.</p>
+        <p className="etap-uwaga">Łączenie: stuknij element z jednej kolumny, a potem pasujący z drugiej.</p>
       )}
       {e.final_po_etapie && (
         <p className="etap-uwaga">

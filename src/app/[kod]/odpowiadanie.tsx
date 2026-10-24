@@ -261,30 +261,39 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   const lewe = z.dane.lewe ?? [];
   const prawe = z.dane.prawe ?? [];
   const [pary, ustawPary] = useState<(number | null)[]>(() => lewe.map(() => null));
-  const [aktywny, ustawAktywny] = useState<number | null>(null);
+  // zaznaczony element czeka na parę z drugiej kolumny; zaczynać można z dowolnej strony
+  const [aktywny, ustawAktywny] = useState<{ strona: "lewy" | "prawy"; i: number } | null>(null);
   const polaczone = wyslana?.pary ?? pary;
   const koniec = !!wyslana || zablokowane;
   const komplet = pary.every((p) => p !== null);
   const { siatka, linie } = useLiniePar(polaczone);
 
+  // lewy i z prawym k w parę (oba tracą wcześniejsze pary)
+  const polacz = (i: number, k: number) => {
+    ustawPary((p) => p.map((x, j) => (j === i ? k : x === k ? null : x)));
+    ustawAktywny(null);
+  };
+
   function stuknijLewy(i: number) {
+    if (aktywny?.strona === "prawy") return polacz(i, aktywny.i);
+    // stuknięcie sparowanego rozłącza parę
     if (pary[i] !== null) {
       ustawPary((p) => p.map((x, j) => (j === i ? null : x)));
       ustawAktywny(null);
       return;
     }
-    ustawAktywny((a) => (a === i ? null : i));
+    ustawAktywny((a) => (a?.strona === "lewy" && a.i === i ? null : { strona: "lewy", i }));
   }
 
   function stuknijPrawy(k: number) {
+    if (aktywny?.strona === "lewy") return polacz(aktywny.i, k);
     const ktory = pary.indexOf(k);
-    if (aktywny === null) {
-      // stuknięcie sparowanego prawego rozłącza parę
-      if (ktory >= 0) ustawPary((p) => p.map((x, j) => (j === ktory ? null : x)));
+    if (ktory >= 0) {
+      ustawPary((p) => p.map((x, j) => (j === ktory ? null : x)));
+      ustawAktywny(null);
       return;
     }
-    ustawPary((p) => p.map((x, j) => (j === aktywny ? k : x === k ? null : x)));
-    ustawAktywny(null);
+    ustawAktywny((a) => (a?.strona === "prawy" && a.i === k ? null : { strona: "prawy", i: k }));
   }
 
   return (
@@ -306,7 +315,9 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
               <li key={i}>
                 <button
                   data-lewy
-                  className={`odp odp-para${aktywny === i ? " aktywna" : ""}${para != null ? ` para-${i % 6}` : ""}`}
+                  className={`odp odp-para${aktywny?.strona === "lewy" && aktywny.i === i ? " aktywna" : ""}${
+                    para != null ? ` para-${i % 6}` : ""
+                  }`}
                   disabled={koniec}
                   onClick={() => stuknijLewy(i)}
                 >
@@ -324,7 +335,9 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
               <li key={k}>
                 <button
                   data-prawy
-                  className={`odp odp-para${lewy >= 0 ? ` para-${lewy % 6}` : ""}`}
+                  className={`odp odp-para${aktywny?.strona === "prawy" && aktywny.i === k ? " aktywna" : ""}${
+                    lewy >= 0 ? ` para-${lewy % 6}` : ""
+                  }`}
                   disabled={koniec}
                   onClick={() => stuknijPrawy(k)}
                 >
@@ -339,9 +352,11 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
       {!wyslana && (
         <>
           <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
-            {aktywny !== null
-              ? `Teraz stuknij parę dla „${lewe[aktywny]}” po prawej.`
-              : "Stuknij element po lewej, potem jego parę po prawej."}
+            {aktywny?.strona === "lewy"
+              ? `Teraz stuknij parę dla „${lewe[aktywny.i]}” po prawej.`
+              : aktywny?.strona === "prawy"
+                ? `Teraz stuknij parę dla „${prawe[aktywny.i]}” po lewej.`
+                : "Stuknij element z jednej kolumny, potem jego parę z drugiej."}
           </p>
           <button
             className="przycisk zloty odp-zatwierdz"

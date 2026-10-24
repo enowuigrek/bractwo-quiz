@@ -18,14 +18,14 @@ const SAMOKLIK_S = 3.2;
 const TAKT_MS = 450;
 
 /** Reakcja na odpowiedź: kolor losowy (tu nic nie jest dobre ani złe), komentarz z pytania albo ogólny. */
-type Reakcja = { dobrze: boolean; wybrana: 0 | 1; komentarz: string | null; ms: number; strona: 1 | -1 };
+type Reakcja = { dobrze: boolean; wybrana: 0 | 1; komentarz: string | null; ms: number };
 
 /**
  * Telefon w trybie „Pijany finał” (faza `pijany`): dogrywka po finale, która nic nie liczy. Tryb jest ukryty
  * przed graczami: telefon wygląda jak dalsza seria, tylko numeracja leci za koniec (pytanie 15/14, 16/14…).
  * Każdy odpowiada we własnym tempie na pytania z `pijane_pytania` (cała pula, a gdy się skończy, od nowa);
  * odpowiedzi nigdzie nie idą. Po każdej odpowiedzi reakcja: błysk w losowym kolorze, drżenie albo puls
- * przycisku i czasem przelatujący komentarz („Serio?”), coraz dłużej (1 s → 3,5 s), więc nie da się tego
+ * przycisku i czasem komentarz na środku ekranu („Serio?”), coraz dłużej (1 s → 3,5 s), więc nie da się tego
  * przeklikać. Cały ekran faluje coraz mocniej z upływem czasu (`--poziom` 0..1), a każde pytanie ma swój
  * przeszkadzacz (src/lib/pijany.ts). Koniec według zegara, wszystkim naraz: `GASNIECIE_S` przed końcem
  * ekran gaśnie z błyskiem (bez napisu, żeby spojrzeli na TV, gdzie zaraz wybucha szklanka), potem werble.
@@ -70,7 +70,6 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
       wybrana: prawda ? 0 : 1,
       komentarz: wlasny ?? ogolny,
       ms,
-      strona: Math.random() < 0.5 ? 1 : -1,
     });
     setTimeout(() => {
       ustawNr((n) => n + 1);
@@ -104,7 +103,7 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
 
   const powtorzenia = reakcja ? Math.max(1, Math.round(reakcja.ms / TAKT_MS)) : 1;
   const zmienneReakcji = reakcja
-    ? ({ "--ocena-ms": `${reakcja.ms}ms`, "--powtorzenia": powtorzenia, "--strona": reakcja.strona } as React.CSSProperties)
+    ? ({ "--ocena-ms": `${reakcja.ms}ms`, "--powtorzenia": powtorzenia } as React.CSSProperties)
     : undefined;
 
   return (
