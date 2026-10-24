@@ -90,6 +90,9 @@ type Scena = { tresc: string; elementy: React.ReactNode; sciezka: Punkt[] };
 function scena(typ: TypZadania, t: number): Scena {
   const poStuku = (chwila: number) => t > chwila + 0.02;
   switch (typ) {
+    // ciekawostka nie ma odpowiedzi, więc nie ma czego pokazywać na telefonie (etap_json jej nie podaje)
+    case "ciekawostka":
+      return { tresc: "", elementy: null, sciezka: [] };
     case "wybor": {
       const odp = ["Pils", "Weizen", "Koźlak", "IPA"];
       return {

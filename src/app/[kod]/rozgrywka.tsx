@@ -73,6 +73,19 @@ export function Rozgrywka({
     return <p className="pomocniczy">Za chwilę następne pytanie.</p>;
   }
 
+  // ciekawostka: plansza bez odpowiedzi, na telefonie to samo co na TV, mniejsze
+  if (z.typ === "ciekawostka") {
+    return (
+      <>
+        <p className="nadtytul">Ciekawostka</p>
+        <h2 className="gra-pytanie">{z.tresc}</h2>
+        {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
+        {z.dane.tekst && <p>{z.dane.tekst}</p>}
+        <p className="pomocniczy">Prowadzący zaraz pójdzie dalej.</p>
+      </>
+    );
+  }
+
   // Odpowiedź z tego telefonu albo, po odświeżeniu strony, zapisana w bazie.
   const mojaZBazy = moj && moj.zadanie_nr === z.nr ? moj.odpowiedz : null;
   const lokalna = wyslana?.zadanieId === z.id ? wyslana : null;

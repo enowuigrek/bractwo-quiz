@@ -90,6 +90,7 @@ function strona(): Wspolne {
 function utworFazy(stan: StanMuzyki): Utwor | null {
   switch (stan.faza) {
     case "poczekalnia":
+    case "wstep":
       return "poczekalnia";
     case "seria":
     case "pijany":

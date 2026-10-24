@@ -407,6 +407,17 @@ function WGrze({
     );
   }
 
+  // wstęp przed 1. etapem: prowadzący opowiada całą drogę, telefon tylko odsyła do TV
+  if (stan.faza === "wstep") {
+    return (
+      <>
+        <p className="nadtytul">{ja.nick}</p>
+        <h1>Zaraz zaczynamy!</h1>
+        <p>Patrz na telewizor: prowadzący opowie, jak wygląda wyścig po piwo.</p>
+      </>
+    );
+  }
+
   if (stan.faza === "seria") {
     return <SeriaGracza stan={stan} ja={ja} teraz={teraz} />;
   }

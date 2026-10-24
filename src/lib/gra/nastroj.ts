@@ -10,6 +10,7 @@ export type Nastroj = "poczekalnia" | "etap1" | "etap2" | "etap3" | "etap4" | "f
 export function nastrojFazy(stan: Pick<StanSesji, "faza" | "etap">): Nastroj {
   switch (stan.faza) {
     case "poczekalnia":
+    case "wstep":
       return "poczekalnia";
     case "seria":
     case "pijany":

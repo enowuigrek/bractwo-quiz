@@ -8,6 +8,8 @@ export type { Nagroda };
 /** Faza widziana przez klientów: `przygotuj` to `pytanie` przed `faza_od`. */
 export type FazaWidoczna =
   | "poczekalnia"
+  /** Quiz z etapami: plansza wstępu przed 1. etapem (cała droga, odpadanie, szklanka); prowadzący opowiada. */
+  | "wstep"
   | "etap"
   | "seria"
   /** Tryb „Pijany finał”: po finale dogrywka bez punktów z chaosem na ekranach (src/lib/pijany.ts). */

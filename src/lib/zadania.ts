@@ -2,7 +2,15 @@
 // Rozwiązanie każdego typu jest w `dane.poprawna` i baza ukrywa je do fazy `wynik`
 // (ocena: `wewn.ocena`, ostatnio w supabase/migrations/20261023112811_etapy.sql).
 
-export const TYPY_ZADAN = ["wybor", "prawda_falsz", "wielokrotny", "kolejnosc", "pary", "szacowanie"] as const;
+export const TYPY_ZADAN = [
+  "wybor",
+  "prawda_falsz",
+  "wielokrotny",
+  "kolejnosc",
+  "pary",
+  "szacowanie",
+  "ciekawostka",
+] as const;
 export type TypZadania = (typeof TYPY_ZADAN)[number];
 
 /**
@@ -36,6 +44,11 @@ export type DaneWielokrotny = { odpowiedzi: string[]; poprawna: number[] };
 export type DaneKolejnosc = { elementy: string[]; poprawna: number[] };
 /** `prawe` pomieszane, `poprawna[i]` = indeks prawego dla i-tego lewego. Odpowiedź: `{ pary: [..] }`. */
 export type DanePary = { lewe: string[]; prawe: string[]; poprawna: number[] };
+/**
+ * Ciekawostka: plansza z grafiką (`grafika_url`), tytułem (`tresc`) i krótkim tekstem, bez odpowiedzi, punktów
+ * i zegara. Nie liczy się do numeracji ani liczby pytań; pilot od razu przechodzi w fazę `wynik`.
+ */
+export type DaneCiekawostka = { tekst: string };
 
 export type ZadanieDane =
   | { typ: "wybor"; dane: DaneWybor & Dodatki }
@@ -43,7 +56,8 @@ export type ZadanieDane =
   | { typ: "wielokrotny"; dane: DaneWielokrotny & Dodatki }
   | { typ: "kolejnosc"; dane: DaneKolejnosc & Dodatki }
   | { typ: "pary"; dane: DanePary & Dodatki }
-  | { typ: "szacowanie"; dane: DaneSzacowanie & Dodatki };
+  | { typ: "szacowanie"; dane: DaneSzacowanie & Dodatki }
+  | { typ: "ciekawostka"; dane: DaneCiekawostka & Dodatki };
 
 /** Dane widziane przez TV i telefony: `poprawna` dochodzi dopiero od fazy `wynik`. */
 export type DaneWidoczne = {
@@ -58,6 +72,8 @@ export type DaneWidoczne = {
   jednostka?: string | null;
   odslaniaj?: boolean;
   poprawna?: number | number[];
+  /** Ciekawostka: tekst pod tytułem. */
+  tekst?: string;
 };
 
 /** Odpowiedź gracza (kształt zależny od typu). */
@@ -76,6 +92,7 @@ export const NAZWY_TYPOW: Record<TypZadania, string> = {
   kolejnosc: "Kolejność",
   pary: "Pary",
   szacowanie: "Szacowanie liczby",
+  ciekawostka: "Ciekawostka",
 };
 
 /** Podpowiedź dla graczy na TV i telefonie. */
@@ -86,6 +103,7 @@ export const PODPOWIEDZI_TYPOW: Record<TypZadania, string> = {
   kolejnosc: "Ułóż we właściwej kolejności",
   pary: "Połącz w pary",
   szacowanie: "Podaj liczbę: im bliżej, tym więcej punktów",
+  ciekawostka: "Patrz na telewizor",
 };
 
 /** Odpowiedzi pytania prawda / fałsz (kolejność jak w `dane.odpowiedzi`). */
@@ -123,6 +141,8 @@ export function opisRozwiazania(z: ZadanieDane): string {
       return `Kolejność: ${z.dane.poprawna.map((i) => z.dane.elementy[i]).join(" → ")}`;
     case "pary":
       return `Pary: ${z.dane.lewe.map((l, i) => `${l} – ${z.dane.prawe[z.dane.poprawna[i]]}`).join(", ")}`;
+    case "ciekawostka":
+      return z.dane.tekst;
   }
 }
 
@@ -142,6 +162,8 @@ export function opisOdpowiedzi(z: ZadanieDane, o: DaneOdpowiedzi): string {
       return (o.kolejnosc ?? []).map((i) => z.dane.elementy[i] ?? "?").join(" → ");
     case "pary":
       return z.dane.lewe.map((l, i) => `${l} – ${z.dane.prawe[o.pary?.[i] ?? -1] ?? "?"}`).join(", ");
+    case "ciekawostka":
+      return "";
   }
 }
 

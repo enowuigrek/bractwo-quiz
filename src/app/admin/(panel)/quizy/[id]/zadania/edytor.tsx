@@ -23,6 +23,9 @@ type Props = {
 /** Wiersz edytora: `a` to odpowiedź / element / lewa strona pary, `b` prawa strona pary. */
 type Wiersz = { klucz: number; a: string; b: string };
 
+/** Najdłuższy tekst ciekawostki (mieści się na TV obok grafiki). */
+const LIMITY_CIEKAWOSTKI = 400;
+
 const OPISY: Record<TypZadania, string> = {
   wybor: "Odpowiedzi (kliknij literę poprawnej)",
   prawda_falsz: "Zdanie w polu „Pytanie” jest…",
@@ -30,6 +33,7 @@ const OPISY: Record<TypZadania, string> = {
   kolejnosc: "Elementy we właściwej kolejności (gracze zobaczą je pomieszane)",
   pary: "Pary (prawa strona zostanie pomieszana)",
   szacowanie: "Liczba do odgadnięcia",
+  ciekawostka: "Tekst ciekawostki (2–3 zdania pod tytułem, na TV obok grafiki)",
 };
 
 const MIN_WIERSZY: Record<TypZadania, number> = {
@@ -39,6 +43,7 @@ const MIN_WIERSZY: Record<TypZadania, number> = {
   kolejnosc: 3,
   pary: 2,
   szacowanie: 0,
+  ciekawostka: 0,
 };
 
 /** Pola szacowania jako tekst (przecinek albo kropka), zamiana na liczby na serwerze. */
@@ -55,6 +60,7 @@ function poczatek(zadanie?: Zadanie): { wiersze: string[][]; poprawna: number | 
     case "prawda_falsz":
       return { wiersze: [[""], [""], [""], [""]], poprawna: zadanie.dane.poprawna, zaznaczone: [] };
     case "szacowanie":
+    case "ciekawostka":
       return { wiersze: [[""], [""], [""], [""]], poprawna: null, zaznaczone: [] };
     case "wielokrotny":
       return { wiersze: zadanie.dane.odpowiedzi.map((o) => [o]), poprawna: null, zaznaczone: zadanie.dane.poprawna };
@@ -104,6 +110,7 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
       : { min: "", max: "", krok: "1", tolerancja: "", jednostka: "", poprawna: "" },
   );
   const [podpowiedzi, setPodpowiedzi] = useState<string[]>(() => zadanie?.dane.podpowiedzi ?? []);
+  const [tekst, setTekst] = useState(zadanie?.typ === "ciekawostka" ? zadanie.dane.tekst : "");
   const [odslaniaj, setOdslaniaj] = useState(zadanie?.dane.odslaniaj ?? false);
 
   const powtorzoneA = powtorzenia(wiersze.map((w) => w.a));
@@ -118,6 +125,8 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
         ? { poprawna }
         : typ === "szacowanie"
           ? liczba
+          : typ === "ciekawostka"
+            ? { tekst }
           : typ === "wielokrotny"
             ? { odpowiedzi: wiersze.map((w) => w.a), poprawna: [...zaznaczone].sort((x, y) => x - y) }
             : typ === "kolejnosc"
@@ -125,7 +134,7 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
               : { pary: wiersze.map((w) => [w.a, w.b]) };
   const dane = { ...daneTypu, podpowiedzi, odslaniaj };
   const zLiczbami = typ === "szacowanie";
-  const zWierszami = typ !== "prawda_falsz" && !zLiczbami;
+  const zWierszami = typ !== "prawda_falsz" && typ !== "ciekawostka" && !zLiczbami;
   // podgląd tolerancji: domyślnie ćwierć zakresu
   const zakres = Number(liczba.max.replace(",", ".")) - Number(liczba.min.replace(",", "."));
 
@@ -206,7 +215,7 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
       </fieldset>
 
       <div>
-        <label htmlFor="tresc">Pytanie</label>
+        <label htmlFor="tresc">{typ === "ciekawostka" ? "Tytuł ciekawostki" : "Pytanie"}</label>
         <textarea
           id="tresc"
           name="tresc"
@@ -218,6 +227,25 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
           autoFocus={!zadanie}
         />
       </div>
+
+      {typ === "ciekawostka" && (
+        <div>
+          <label htmlFor="tekst-ciekawostki">{OPISY[typ]}</label>
+          <textarea
+            id="tekst-ciekawostki"
+            className="pole"
+            value={tekst}
+            onChange={(e) => setTekst(e.target.value)}
+            required
+            maxLength={LIMITY_CIEKAWOSTKI}
+            rows={4}
+          />
+          <p className="podpowiedz">
+            Ciekawostka to plansza bez odpowiedzi i punktów: grafika (poniżej), tytuł i ten tekst. Prowadzący przechodzi
+            dalej z pilota. Nie liczy się do numeracji pytań.
+          </p>
+        </div>
+      )}
 
       {typ === "prawda_falsz" && (
         <fieldset>

@@ -26,6 +26,7 @@ const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
 const NAZWY: Record<FazaWidoczna, string> = {
   poczekalnia: "Poczekalnia",
+  wstep: "Wstęp",
   etap: "Plansza etapu",
   seria: "Seria trwa",
   pijany: "Pijany finał (nic nie liczy)",
@@ -170,9 +171,11 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         akcja: "nastepne" as const,
         napis: stan.nastepny_etap
           ? `Następny etap: ${stan.nastepny_etap.nazwa}`
-          : z
-            ? `Następne pytanie (${z.lp + 1}/${liczba})`
-            : "Start quizu",
+          : stan.nastepne_typ === "ciekawostka"
+            ? "Pokaż ciekawostkę"
+            : z
+              ? `Następne pytanie (${z.lp + 1}/${liczba})`
+              : "Start quizu",
       };
   const etap = stan.etap;
 
@@ -259,6 +262,20 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </>
         )}
 
+        {/* wstęp: TV pokazuje całą drogę, prowadzący opowiada i przechodzi do planszy 1. etapu */}
+        {faza === "wstep" && (
+          <>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+              {nastepne.napis}
+            </button>
+            <p className="pilot-zapowiedz" role="status">
+              <strong>Opowiedz graczom:</strong> przed nami {stan.plan_etapow.length} etapów, z każdym pytaniem
+              nalewa się piwo, a oni ścigają się do niego; po drodze odpadają najsłabsi, a o piwo walczy finałowa
+              trójka.
+            </p>
+          </>
+        )}
+
         {faza === "poczekalnia" && (
           <button
             className={`przycisk${stan.poczekalnia_otwarta ? " zloty" : ""}`}
@@ -312,7 +329,14 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
         {/* po pytaniu: wynik → odpowiedzi → ranking → następne; każdy krok można pominąć */}
         {/* po ostatnim pytaniu bez rankingu: od razu podium (odpowiedzi graczy można jeszcze pokazać) */}
+        {/* ciekawostka: plansza bez odpowiedzi, więc od razu dalej */}
+        {faza === "wynik" && z?.typ === "ciekawostka" && (
+          <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+            {nastepne.napis}
+          </button>
+        )}
         {faza === "wynik" &&
+          z?.typ !== "ciekawostka" &&
           (stan.ostatnie_zadanie ? (
             <>
               <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>

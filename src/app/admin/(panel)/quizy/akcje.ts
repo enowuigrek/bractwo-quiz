@@ -201,6 +201,14 @@ function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & 
     return { blad: "Nieprawidłowe dane pytania." };
   }
 
+  // ciekawostka: sam tekst pod tytułem (grafika jak w każdym pytaniu), bez odpowiedzi
+  if (typ === "ciekawostka") {
+    const opis = typeof surowe.tekst === "string" ? surowe.tekst.trim().replace(/\s+/g, " ") : "";
+    if (!opis) return { blad: "Wpisz tekst ciekawostki." };
+    if (opis.length > 400) return { blad: "Tekst ciekawostki może mieć najwyżej 400 znaków." };
+    return { tresc, typ, dane: { tekst: opis } };
+  }
+
   // czas na odpowiedź ustawia się przy uruchamianiu gry albo w etapie, nie w pytaniu
   if (typ === "prawda_falsz") {
     if (surowe.poprawna !== 0 && surowe.poprawna !== 1) return { blad: "Zaznacz, czy zdanie jest prawdą czy fałszem." };

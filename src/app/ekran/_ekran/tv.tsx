@@ -35,6 +35,7 @@ import { WyscigTv } from "./wyscig";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { PodiumTv, RankingTv } from "./ranking";
 import { LogoNaglowka } from "./logo";
+import { WstepTv } from "./wstep";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
 const SZER = 1920;
@@ -180,6 +181,8 @@ export function Tv({ kod, qr, host }: Props) {
                 browar: stan.browar,
               }}
             />
+          ) : stan.faza === "wstep" ? (
+            <WstepTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
           ) : stan.faza === "poczekalnia" ? (
             <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
           ) : stan.faza === "seria" ? (
@@ -368,6 +371,25 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         <p className="tv-duzy">Patrz na prowadzącego</p>
       </div>
     );
+  // ciekawostka: duża grafika i krótki tekst, bez zegara i odpowiedzi (pilot od razu w fazie `wynik`)
+  if (z.typ === "ciekawostka") {
+    return (
+      <div className="tv-ciekawostka">
+        <header className="tv-naglowek">
+          <Loga lokal={stan.lokal} browar={stan.browar} />
+          <LogoNaglowka />
+        </header>
+        <div className="tv-ciekawostka-tresc">
+          {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-ciekawostka-grafika" />}
+          <section>
+            <p className="tv-okazja">Ciekawostka</p>
+            <h1>{z.tresc}</h1>
+            {z.dane.tekst && <p className="tv-ciekawostka-tekst">{z.dane.tekst}</p>}
+          </section>
+        </div>
+      </div>
+    );
+  }
   const etap = stan.etap;
   const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
   const opisEtapu = etap ? ` · ${etap.nazwa}${etap.mnoznik !== 1 ? ` ${napisMnoznika(etap.mnoznik)}` : ""}` : "";

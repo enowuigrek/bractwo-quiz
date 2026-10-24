@@ -694,6 +694,12 @@ Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, pr
 - **Telefon:** nagłówek z logo Bractwa z lewej, „Quiz” na środku i logo lokalu z prawej.
 - Pytanie 18: „Doppel” bez nawiasu (migracja `20261024181638_pytanie_18_doppel`).
 
+### Ciekawostki i plansza wstępu (24.10) ✅
+
+- **Ciekawostka** (migracja `20261024181941_ciekawostka`): nowy typ zadania `ciekawostka` (tytuł w `tresc`, tekst w `dane.tekst`, grafika jak w pytaniu). Pilot przechodzi od razu do fazy `wynik` (bez odliczania, zegara i odpowiedzi), TV pokazuje dużą grafikę z tytułem i tekstem, telefon to samo mniejsze, pilot ma jeden przycisk dalej („Pokaż ciekawostkę” przed nią). Nie liczy się do `lp`, liczby pytań quizu i etapu ani do maksimum punktów wyścigu. W edytorze rodzaj „Ciekawostka” z polem tekstu (do 400 znaków). Nie wstawiać do etapu serii (finału).
+- **Ciekawostki w Piwnym quizie** (migracja `20261024182056_piwny_quiz_ciekawostki`): „Polski szampan” (grodziskie, przed pytaniem o grodziskie) i „Piwo zza klasztornych murów” (trapiści, na początku walki o finał), grafiki z OpenAI.
+- **Plansza wstępu** (migracja `20261024182239_faza_wstep`, nowa faza `wstep` w `sesje_faza_check`): w quizie z etapami start z poczekalni najpierw pokazuje „Wyścig po piwo”: etapy w rzędzie do szklanki, pod etapami, po których się odpada, ilu zostaje, i zdanie o nalewanej szklance; prowadzący opowiada (podpowiedź w pilocie) i przechodzi do planszy 1. etapu. Start ustala tu progi odpadania. Muzyka i tło jak w poczekalni; telefon „Zaraz zaczynamy! Patrz na telewizor”.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

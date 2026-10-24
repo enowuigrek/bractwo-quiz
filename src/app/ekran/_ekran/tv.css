@@ -349,6 +349,119 @@
   white-space: nowrap;
 }
 
+/* Wstęp (wstep.tsx): opowieść o całej drodze, etapy w rzędzie do szklanki */
+.tv-wstep {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tv-wstep-tytul {
+  margin: 4px 0 18px;
+  font-size: 120px;
+}
+
+.tv-wstep-opis {
+  margin: 0;
+  max-width: 1500px;
+  font-size: 40px;
+  line-height: 1.35;
+  color: var(--piana);
+}
+
+.tv-wstep-droga {
+  list-style: none;
+  margin: auto 0 40px;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.tv-wstep-droga li {
+  flex: 1;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.tv-wstep-nr {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 3px solid var(--zloto);
+  color: var(--zloto);
+  font-size: 40px;
+  font-weight: var(--w-black);
+}
+
+.tv-wstep-droga li.final .tv-wstep-nr {
+  background: var(--zloto);
+  color: var(--na-zlocie);
+  box-shadow: var(--glow-lg);
+}
+
+.tv-wstep-nazwa {
+  font-size: 30px;
+  font-weight: var(--w-black);
+}
+
+.tv-wstep-prog {
+  color: var(--czerwien);
+  font-size: 24px;
+  font-weight: var(--w-black);
+}
+
+.tv-wstep-meta {
+  flex: 0 0 160px !important;
+}
+
+.tv-wstep-meta img {
+  height: 230px;
+  width: auto;
+  margin-top: -90px;
+  filter: drop-shadow(0 0 30px rgba(227, 172, 63, 0.5));
+}
+
+/* Ciekawostka (tv.tsx): grafika z lewej, tytuł i krótki tekst z prawej */
+.tv-ciekawostka {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tv-ciekawostka-tresc {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 70px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.tv-ciekawostka-grafika {
+  width: 100%;
+  max-height: 760px;
+  object-fit: cover;
+  border-radius: var(--r-card);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.tv-ciekawostka h1 {
+  margin: 8px 0 24px;
+}
+
+.tv-ciekawostka-tekst {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.4;
+  color: var(--piana);
+}
+
 /* Przygotuj, pytanie i wynik */
 
 .tv-odliczanie {
