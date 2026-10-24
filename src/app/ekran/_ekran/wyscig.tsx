@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
+import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import { naTrasie, naTrasieFinalu } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
@@ -30,7 +31,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const odstep = wiersze.length > 8 ? 6 : 12;
   // odcięcie po etapie: kreska pod ostatnim, kto gra dalej (walka o finał: pod 3. miejscem, inaczej próg
   // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów
-  const odciecie = stan.etap?.final_po_etapie ? 3 : (stan.etap?.przechodzi ?? null);
+  const odciecie = odciecieEtapu(stan);
   const strefaFinalu = odciecie !== null && wiersze.length > odciecie;
   const tor = Math.min(
     92,
@@ -82,10 +83,22 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
               const przed = naTrasie(w.punkty - w.zdobyte, maks) * 100;
               const teraz = naTrasie(w.punkty, maks) * 100;
               const prowadzi = w.miejsce === 1 && w.punkty > 0;
+              // pod kreską (zagrożony) albo właśnie ją przeskoczył w którąś stronę
+              const kreska = wzgledemKreski(w, odciecie, wiersze.length);
               const wiersz = (
-                <div key={w.nick} className={`wyscig-wiersz${prowadzi ? " lider" : ""}`}>
+                <div key={w.nick} className={`wyscig-wiersz${prowadzi ? " lider" : ""}${kreska ? ` ${kreska}` : ""}`}>
                   <span className="wyscig-miejsce">{w.miejsce}.</span>
-                  <span className="wyscig-nick">{w.nick}</span>
+                  <span className="wyscig-nick">
+                    {w.nick}
+                    {(kreska === "awans" || kreska === "spadek") && (
+                      <span
+                        className={`wyscig-kreska ${kreska}`}
+                        style={{ animationDelay: `${START_S + RUCH_S * 0.7}s` }}
+                      >
+                        {kreska === "awans" ? "▲ nad kreską" : "▼ pod kreską"}
+                      </span>
+                    )}
+                  </span>
                   <div className="wyscig-lada">
                     {/* trasa krótsza o pół awatara z każdej strony: na mecie awatar dotyka linii, nie wychodzi za nią */}
                     <div className="wyscig-trasa">

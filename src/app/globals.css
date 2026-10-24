@@ -2655,3 +2655,22 @@ html:has(.kolumna) {
   padding-inline: 0;
   font-size: 1.2rem;
 }
+
+/* Telefon w rankingu etapu z odcięciem: przeskok przez kreskę (gracz.tsx, src/lib/gra/odpadanie.ts) */
+.kreska-zmiana {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border-radius: var(--r-card);
+  font-weight: var(--w-black);
+  text-align: center;
+}
+
+.kreska-zmiana.awans {
+  background: color-mix(in srgb, var(--chmiel) 22%, transparent);
+  color: var(--chmiel);
+}
+
+.kreska-zmiana.spadek {
+  background: color-mix(in srgb, var(--czerwien) 18%, transparent);
+  color: var(--czerwien);
+}

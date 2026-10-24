@@ -668,6 +668,8 @@ Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, pr
 - **TV:** plansza etapu z progiem mówi, ilu gra dalej i ilu odpada (walka o finał liczy już tylko grających); w wyścigu i tabeli kreska pod ostatnim, kto przechodzi („▲ 6 najlepszych gra dalej ▲”); odpadnięci znikają z wyścigu (pełna tabela i podium na końcu mają wszystkich).
 - **Telefon:** w rankingu etapu z progiem „Dalej gra N najlepszych. Do N. miejsca brakuje Ci X pkt”; po odcięciu „Odpadasz po N. etapie” z miejscem, do finału, a w finale kibicuje jak reszta.
 - Sprawdzone lokalnie (10 graczy): domyślny próg {3: 6}, zmiana w pilocie, kreska w wyścigu, odcięcie 4 ostatnich przy planszy 4. etapu, „3 odpada” na planszy walki o finał, ekran odpadniętego.
+- **Wyjaśnianie odpadania** (migracja `20261024172737_plan_etapow`: `stan_sesji.plan_etapow`): na TV pod kropkami etapów „✂ 6” / „✂ 3” przy etapach, po których się odpada, a plansza etapu bez odcięcia mówi „Po drodze odpada się: po 3. etapie zostaje 6, do finału wchodzi 3 najlepszych”; telefon na planszy etapu to samo. Liczby z `w_grze` (tylko grający).
+- **Zagrożeni i przeskok przez kreskę** (`src/lib/gra/odpadanie.ts`: `odciecieEtapu`, `wzgledemKreski`, `kolejneOdciecia`): w wyścigu i tabeli gracze pod kreską przygaszeni z czerwonym miejscem; kto przeskoczył kreskę po pytaniu, dostaje plakietkę „▲ nad kreską” (zielona) albo „▼ pod kreską” (czerwona); telefon: „▲ Wskakujesz nad kreskę!” / „▼ Spadasz pod kreskę…”. Sprawdzone lokalnie na scenariuszu (Iza z 10. na 1., Ewa pod kreskę).
 
 ## Zadania dla ciebie (dzień 0)
 

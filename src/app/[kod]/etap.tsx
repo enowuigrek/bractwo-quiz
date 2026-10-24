@@ -1,5 +1,6 @@
 import { Awatar } from "@/components/awatar";
 import { napisMnoznika } from "@/lib/etapy";
+import { kolejneOdciecia } from "@/lib/gra/odpadanie";
 import type { StanSesji } from "@/lib/gra/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { czyKibic } from "./rozgrywka";
@@ -37,11 +38,21 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
       {e.typy.includes("pary") && (
         <p className="etap-uwaga">Łączenie: stuknij element z jednej kolumny, a potem pasujący z drugiej.</p>
       )}
-      {e.final_po_etapie && (
+      {e.final_po_etapie ? (
         <p className="etap-uwaga">
           🏆 Po tym etapie <strong>3 najlepszych wchodzi do finału</strong>
-          {stan.liczba_graczy > 3 ? `, ${stan.liczba_graczy - 3} odpada i kibicuje` : ""}. Walcz o miejsce w trójce!
+          {stan.w_grze > 3 ? `, ${stan.w_grze - 3} odpada i kibicuje` : ""}. Walcz o miejsce w trójce!
         </p>
+      ) : e.przechodzi !== null && stan.w_grze > e.przechodzi ? (
+        <p className="etap-uwaga">
+          Po tym etapie gra dalej <strong>{e.przechodzi} najlepszych</strong>, {stan.w_grze - e.przechodzi} odpada i
+          kibicuje. Walcz o miejsce nad kreską!
+        </p>
+      ) : (
+        !e.finalowy &&
+        kolejneOdciecia(stan, e.nr + 1).length > 0 && (
+          <p className="etap-uwaga">Po drodze odpada się: {kolejneOdciecia(stan, e.nr + 1).join(", ")}.</p>
+        )
       )}
       {stan.finalisci && (
         <section className="etap-final">

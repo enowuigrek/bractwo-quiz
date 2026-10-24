@@ -4,6 +4,7 @@
 import { motion, MotionConfig } from "motion/react";
 import { Awatar } from "@/components/awatar";
 import { napisMnoznika } from "@/lib/etapy";
+import { kolejneOdciecia } from "@/lib/gra/odpadanie";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { LogoNaglowka } from "./logo";
@@ -16,6 +17,16 @@ import { LogoNaglowka } from "./logo";
 export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
   const e = stan.etap;
   if (!e) return null;
+  // kreski odpadania na drodze przez etapy: pod etapem, po którym się odpada, krótko ilu zostaje („✂ 6”);
+  // całe zdanie jest niżej, przy zasadach
+  const plan = stan.plan_etapow ?? [];
+  const nrFinalu = plan.find((p) => p.finalowy)?.nr ?? null;
+  const progPo = (nr: number) => {
+    const ile = nrFinalu !== null && nr === nrFinalu - 1 ? 3 : (plan.find((p) => p.nr === nr)?.przechodzi ?? null);
+    return ile === null ? null : `✂ ${ile}`;
+  };
+  // dalsze odcięcia (bez bieżącego etapu, o nim mówi osobny napis niżej)
+  const dalej = e.finalowy ? [] : kolejneOdciecia(stan, e.nr + 1);
   const wejscie = (i: number) => ({
     initial: { opacity: 0, y: 24 },
     animate: { opacity: 1, y: 0 },
@@ -32,6 +43,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             {Array.from({ length: e.liczba }, (_, i) => (
               <li key={i} className={i + 1 < e.nr ? "byl" : i + 1 === e.nr ? "teraz" : undefined}>
                 {i + 1}
+                {progPo(i + 1) && <span className="tv-etap-droga-prog">{progPo(i + 1)}</span>}
               </li>
             ))}
           </ol>
@@ -76,6 +88,12 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                   {stan.w_grze - e.przechodzi} odpada i kibicuje.
                 </motion.p>
               )
+            )}
+            {/* etap bez odcięcia, ale dalej się odpada: gracze wiedzą od początku, o co grają */}
+            {!e.final_po_etapie && e.przechodzi === null && dalej.length > 0 && (
+              <motion.p className="tv-etap-plan" {...wejscie(4)}>
+                Po drodze odpada się: {dalej.join(", ")}. Odpadnięci kibicują.
+              </motion.p>
             )}
             {stan.finalisci && (
               <motion.div className="tv-etap-final" {...wejscie(4)}>

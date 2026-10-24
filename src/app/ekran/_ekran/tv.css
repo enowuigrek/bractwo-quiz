@@ -1854,6 +1854,22 @@
   font-weight: var(--w-black);
 }
 
+.tv-etap-droga li {
+  position: relative;
+}
+
+/* pod etapem, po którym się odpada: ilu zostaje (etap.tsx) */
+.tv-etap-droga-prog {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  color: var(--czerwien);
+  font-size: 20px;
+  font-weight: var(--w-black);
+}
+
 .tv-etap-droga li.byl {
   border-color: var(--zloto);
   color: var(--zloto);
@@ -2742,8 +2758,79 @@
   max-width: 1150px;
 }
 
+/* etap bez odcięcia, ale dalej się odpada: spokojniej niż walka o finał */
+.tv-etap-plan {
+  margin: 28px 0 0;
+  max-width: 1150px;
+  color: var(--piana);
+  font-size: 36px;
+  font-weight: var(--w-semibold);
+}
+
 .tv-etap-walka strong {
   color: var(--zloto);
+}
+
+/* Odpadanie w wyścigu i tabeli (src/lib/gra/odpadanie.ts): pod kreską przygaszeni z czerwonym miejscem,
+   a kto ją właśnie przeskoczył, dostaje plakietkę: zieloną „▲ nad kreską” albo czerwoną „▼ pod kreską”. */
+.wyscig-wiersz.zagrozony,
+.wyscig-wiersz.spadek {
+  opacity: 0.72;
+}
+
+.wyscig-wiersz.zagrozony .wyscig-miejsce,
+.wyscig-wiersz.spadek .wyscig-miejsce,
+.tv-ranking-wiersz.zagrozony .tv-ranking-miejsce,
+.tv-ranking-wiersz.spadek .tv-ranking-miejsce {
+  color: var(--czerwien);
+}
+
+.wyscig-nick {
+  position: relative;
+}
+
+.wyscig-kreska {
+  display: inline-block;
+  margin-left: 14px;
+  padding: 2px 12px;
+  border-radius: var(--r-pill);
+  font-size: 0.6em;
+  font-weight: var(--w-black);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+  animation: plakietka-kreski 0.6s var(--ease-wjazd) both;
+}
+
+.wyscig-kreska.awans {
+  background: var(--chmiel);
+  color: var(--na-chmielu);
+  box-shadow: 0 0 22px 4px color-mix(in srgb, var(--chmiel) 55%, transparent);
+}
+
+.wyscig-kreska.spadek {
+  background: var(--czerwien-tlo);
+  color: var(--piana);
+}
+
+@keyframes plakietka-kreski {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tv-ranking-wiersz.awans {
+  box-shadow: inset 0 0 0 3px var(--chmiel);
 }
 
 .wyscig-strefa-finalu {

@@ -14,6 +14,7 @@ import {
   useNasluch,
   zZegarem,
 } from "@/lib/gra/nasluch";
+import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
@@ -428,7 +429,8 @@ function WGrze({
   }
 
   if (stan.faza === "ranking") {
-    const odciecie = stan.etap?.final_po_etapie ? 3 : (stan.etap?.przechodzi ?? null);
+    const odciecie = odciecieEtapu(stan);
+    const kreska = mojWiersz ? wzgledemKreski(mojWiersz, odciecie, stan.w_grze) : null;
     return (
       <>
         {/* awatar obok nicku: gracz od razu widzi, że to jego wynik */}
@@ -439,6 +441,9 @@ function WGrze({
         <h1>Ranking</h1>
         {moj && <Miejsce moj={moj} />}
         {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
+        {/* przeskok przez kreskę po tym pytaniu */}
+        {kreska === "awans" && <p className="kreska-zmiana awans">▲ Wskakujesz nad kreskę!</p>}
+        {kreska === "spadek" && <p className="kreska-zmiana spadek">▼ Spadasz pod kreskę. Odrób to w następnym pytaniu!</p>}
         {/* etap z odcięciem: walka o miejsce w trójce finału albo o miejsce, które gra dalej */}
         {mojWiersz && odciecie !== null && stan.w_grze > odciecie && (
           <p className="etap-uwaga">

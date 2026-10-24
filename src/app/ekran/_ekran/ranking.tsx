@@ -5,6 +5,7 @@ import { animate, AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { RESZTA_PODIUM_S, WJAZD_PODIUM_S } from "@/lib/gra/podium";
+import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { LogoNaglowka } from "./logo";
@@ -51,7 +52,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
   const reszta = ranking.length - wiersze.length;
   const z = stan.zadanie;
   // odcięcie po etapie (jak w wyścigu): kreska pod ostatnim, kto gra dalej
-  const odciecie = stan.etap?.final_po_etapie ? 3 : (stan.etap?.przechodzi ?? null);
+  const odciecie = odciecieEtapu(stan);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -74,6 +75,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
               {wiersze.map((w) => {
                 const miejsce = po ? w.miejsce : w.poprzednie_miejsce;
                 const zmiana = w.poprzednie_miejsce - w.miejsce;
+                const kreska = wzgledemKreski(w, odciecie, ranking.length);
                 return (
                   <motion.li
                     key={w.nick}
@@ -84,7 +86,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                     exit={{ opacity: 0, x: 60 }}
                     className={`tv-ranking-wiersz${po && w.miejsce === 1 ? " lider" : ""}${
                       po && odciecie !== null && ranking.length > odciecie && w.miejsce === odciecie ? " granica" : ""
-                    }`}
+                    }${po && kreska ? ` ${kreska}` : ""}`}
                   >
                     <span className="tv-ranking-miejsce">{miejsce}.</span>
                     <span className="tv-ranking-nick">
@@ -92,8 +94,16 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                       <span>{w.nick}</span>
                     </span>
                     <span className="tv-ranking-zmiana">
-                      {po && zmiana > 0 && <span className="w-gore">▲ {zmiana}</span>}
-                      {po && zmiana < 0 && <span className="w-dol">▼ {-zmiana}</span>}
+                      {po && kreska === "awans" ? (
+                        <span className="w-gore">▲ nad kreską</span>
+                      ) : po && kreska === "spadek" ? (
+                        <span className="w-dol">▼ pod kreską</span>
+                      ) : (
+                        <>
+                          {po && zmiana > 0 && <span className="w-gore">▲ {zmiana}</span>}
+                          {po && zmiana < 0 && <span className="w-dol">▼ {-zmiana}</span>}
+                        </>
+                      )}
                     </span>
                     <span className="tv-ranking-zdobyte">
                       {po && w.zdobyte > 0 && (
