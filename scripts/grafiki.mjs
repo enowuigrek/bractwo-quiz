@@ -150,7 +150,8 @@ const GRAFIKI = {
   // ikony etapów (etapy.ikona = /grafiki/etapy/…): wieczór w barze, na przezroczystym tle jak szklanka
   "etap-na-jedno": ikona(
     "na-jedno.webp",
-    "A single small classic beer mug with a handle, filled with golden lager and a white foam head.",
+    "A single American shaker pint glass (straight conical sides, no handle) filled with golden beer and a white " +
+      "foam head.",
   ),
   "etap-jednak-wiecej": ikona(
     "jednak-wiecej.webp",
@@ -220,8 +221,9 @@ const GRAFIKI = {
   ),
   "pyt-pinta": zdjecie(
     "pinta.webp",
-    "A full British nonic pint glass of amber ale with a creamy head, standing on a dark wooden bar counter of a " +
-      "traditional English pub, brass beer taps and warm lights blurred behind.",
+    "A full British nonic pint glass (smooth tall glass with the characteristic bulge a few centimetres below the rim, " +
+      "no facets, no handle) of amber ale with a creamy head, standing on a dark wooden bar counter of a traditional " +
+      "English pub, brass beer taps and warm lights blurred behind.",
   ),
   "pyt-mass": zdjecie(
     "mass.webp",
