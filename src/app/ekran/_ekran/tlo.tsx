@@ -22,6 +22,11 @@ export function TloTv() {
         autoPlay
         preload="auto"
       />
+      {/* tła nastrojów etapów (public/grafiki/tlo-*.webp, scripts/grafiki.mjs): widać tylko to z bieżącego
+          nastroju, przenikają się przy zmianie etapu (tv.css, [data-nastroj]) */}
+      {["poczekalnia", "noir1", "noir2", "neon", "walka", "podium"].map((n) => (
+        <span key={n} className={`tv-obraz tv-obraz-${n}`} />
+      ))}
       <span className="tv-blask tv-blask-1" />
       <span className="tv-blask tv-blask-2" />
       <span className="tv-blask tv-blask-3" />

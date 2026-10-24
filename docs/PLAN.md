@@ -676,7 +676,9 @@ Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, pr
 - **Nastroje TV** (`src/lib/gra/nastroj.ts`, `data-nastroj` na `.tv`, warstwy w `tlo.tsx`, style w `tv.css`): obraz idzie za muzyką. Poczekalnia ciepła jak dotąd; etapy 1–3 noir: ukośne cienie żaluzji w lewym górnym rogu, chłodniejsze smugi światła, w 2. ciemniej; etap 3: czerwony neon z prawej, czasem mrugnie; walka o finał: ciemnoczerwona winieta bijąca jak serce; podium: jaśniejsze złoto. **Finał (seria, pijany finał, werble) bez dodatków**, bo wideo wybuchu w trybie `screen` przepuszcza wszystko, co jasne pod spodem. Same warstwy z przezroczystością i przesunięciem, przejście 2 s (Samsung).
 - **Nagłówek poczekalni:** logo lokalu i logo Bractwa obok siebie, tej samej wysokości (130 px), rozdzielone złotą kreską; bez powtórzonej nazwy lokalu i małego logo po drugiej stronie. Lokal bez logo: jego nazwa. Kranoprzejęcie: × i logo browaru.
 - „Po drodze odpada się” pokazuje tylko odcięcia, które przy obecnej liczbie grających kogoś wyrzucą.
-- Tła z OpenAI (drugi poziom nastrojów) czekają na decyzję Łukasza po zobaczeniu samego CSS.
+- **Tła nastrojów z OpenAI** (`scripts/grafiki.mjs`, `public/grafiki/tlo-*.webp`, 1920×1080, 27–100 KB): poczekalnia (przytulny bar), noir1 (żaluzje, księżyc), noir2 (dym, deszcz), neon (czerwony neon za mokrą szybą), walka (ciemna scena w czerwieni), podium (złote światła, konfetti). Na TV 55% krycia, przenikanie 2,5 s; finał bez tła. Skrypt: `gpt-image-1` przestał działać (24.10: „model does not exist”), teraz `gpt-image-2` (zmienna `MODEL_OBRAZOW`), tła w średniej jakości; poprawiony zapis pliku (brakowało `await` przy `toBuffer`). **Uwaga:** `/api/nagroda` (przeróbka zdjęć nagród) dalej ma `gpt-image-1`, do sprawdzenia.
+- **Pętla muzyki bez nakładania:** ostatnie 1,2 s utwór cichnie, gra do końca pliku, 0,7 s ciszy i rusza od `petlaOd` (wcześniej 2,5 s przenikania, które na TV brzmiało jak dwa utwory naraz).
+- Pytanie 17 (polskie tradycje): grodziskie wróciło jako dobra odpowiedź (migracja `20261024174740_grodziskie_w_polskich_tradycjach`), zamiast koźlaka.
 
 ## Zadania dla ciebie (dzień 0)
 

@@ -13,9 +13,31 @@ if (!KLUCZ) {
   process.exit(1);
 }
 
+// gpt-image-1 przestał działać przy generowaniu (24.10: „model does not exist”), stąd gpt-image-2
+const MODEL = process.env.MODEL_OBRAZOW ?? "gpt-image-2";
+
 const STYL =
   "Photorealistic product render, studio lighting with warm golden rim light, rich amber and gold tones, " +
   "premium craft beer brand aesthetic, crisp detail, no text, no logos, no people.";
+
+// Tła nastrojów etapów (src/lib/gra/nastroj.ts): na TV mocno przygaszone, pod tekstem, więc środek kadru ma
+// zostać ciemny i pusty. Średnia jakość wystarcza (i jest kilka razy tańsza), bo i tak są przyciemnione.
+const STYL_TLA =
+  "Wide cinematic photograph, low-key lighting, very dark overall, shallow depth of field, soft focus, " +
+  "the center of the frame stays dark and uncluttered so text can be placed over it, " +
+  "no text, no letters, no signs with writing, no logos, no people.";
+
+/** Tło na całą scenę TV: przycięte do 16:9 i zmniejszone do 1920×1080. */
+const obrobkaTla = (img) => img.resize({ width: 1920, height: 1080, fit: "cover" }).webp({ quality: 70 });
+
+const tlo = (plik, opis) => ({
+  plik,
+  rozmiar: "1536x1024",
+  tlo: "opaque",
+  jakosc: "medium",
+  obrobka: obrobkaTla,
+  opis: `${opis} ${STYL_TLA}`,
+});
 
 const GRAFIKI = {
   // pełna szklanka; pusta to ta sama grafika przygaszona, piwo „nalewa się” od dołu przycięciem
@@ -44,6 +66,36 @@ const GRAFIKI = {
       "even lighting across the whole frame so it can tile horizontally, no objects on the counter. " +
       STYL,
   },
+  "tlo-poczekalnia": tlo(
+    "tlo-poczekalnia.webp",
+    "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +
+      "in the background, dark wooden bar, a few candles, deep shadows, inviting and calm atmosphere.",
+  ),
+  "tlo-noir1": tlo(
+    "tlo-noir1.webp",
+    "Film noir style empty bar interior at night, slanted light through venetian blinds casting striped shadows across " +
+      "the wall and a wooden bar counter, cool bluish moonlight, thin wisps of smoke, mostly dark.",
+  ),
+  "tlo-noir2": tlo(
+    "tlo-noir2.webp",
+    "Darker film noir bar corner at night, heavy shadows, a single dim lamp, venetian blind shadows on the wall, " +
+      "thick slowly drifting smoke, rain-streaked window, cold blue tones, mysterious and tense.",
+  ),
+  "tlo-neon": tlo(
+    "tlo-neon.webp",
+    "Rain-streaked bar window at night seen from inside, blurred red neon glow from a sign outside without any readable " +
+      "letters, wet reflections on the glass, dark interior with venetian blinds, noir mood, deep red and black.",
+  ),
+  "tlo-walka": tlo(
+    "tlo-walka.webp",
+    "Dramatic dark pub interior set up like a stage before a showdown, deep crimson light seeping in from the edges, " +
+      "haze in the air, narrow spotlights from above, intense tension, the middle almost black.",
+  ),
+  "tlo-podium": tlo(
+    "tlo-podium.webp",
+    "Celebration in a dark pub, warm golden light, sparkling bokeh, floating golden confetti and glowing light particles, " +
+      "beer glasses gleaming far in the blurred background, triumphant and festive.",
+  ),
 };
 
 /**
@@ -78,10 +130,10 @@ async function generuj(nazwa) {
     method: "POST",
     headers: { Authorization: `Bearer ${KLUCZ}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gpt-image-1",
+      model: MODEL,
       prompt: g.opis,
       size: g.rozmiar,
-      quality: "high",
+      quality: g.jakosc ?? "high",
       background: g.tlo,
       output_format: "png",
       n: 1,
@@ -92,7 +144,7 @@ async function generuj(nazwa) {
   const b64 = dane.data?.[0]?.b64_json;
   if (!b64) throw new Error(`${nazwa}: brak obrazu w odpowiedzi`);
   // obraz z API waży 2–3 MB, a na TV wystarczy mniejszy
-  await writeFile(`public/grafiki/${g.plik}`, (await g.obrobka(sharp(Buffer.from(b64, "base64")))).toBuffer());
+  await writeFile(`public/grafiki/${g.plik}`, await (await g.obrobka(sharp(Buffer.from(b64, "base64")))).toBuffer());
   console.log(`zapisano public/grafiki/${g.plik}`);
 }
 

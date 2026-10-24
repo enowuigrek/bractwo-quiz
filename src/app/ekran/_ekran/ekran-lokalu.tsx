@@ -65,7 +65,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
     return <Tv key={kod} kod={kod} qr={qr.svg} host={baza.replace(/^https?:\/\//, "")} />;
   }
   return (
-    <Scena>
+    <Scena nastroj={zapowiedz ? "poczekalnia" : undefined}>
       <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
       {/* zapowiedziana gra: muzyka poczekalni już teraz, a po otwarciu poczekalni gra dalej (muzyka.tsx) */}
       {zapowiedz?.muzyka && (

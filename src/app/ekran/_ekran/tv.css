@@ -1689,6 +1689,54 @@
   }
 }
 
+/* Tła nastrojów (wygenerowane, public/grafiki/tlo-*.webp): ciemne zdjęcia na całą scenę, mocno przygaszone,
+   ze spokojnym środkiem pod tekst. Finał bez tła (wideo wybuchu w trybie screen). */
+.tv-obraz {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 2.5s ease;
+}
+
+.tv-obraz-poczekalnia {
+  background-image: url("/grafiki/tlo-poczekalnia.webp");
+}
+
+.tv-obraz-noir1 {
+  background-image: url("/grafiki/tlo-noir1.webp");
+}
+
+.tv-obraz-noir2 {
+  background-image: url("/grafiki/tlo-noir2.webp");
+}
+
+.tv-obraz-neon {
+  background-image: url("/grafiki/tlo-neon.webp");
+}
+
+.tv-obraz-walka {
+  background-image: url("/grafiki/tlo-walka.webp");
+}
+
+.tv-obraz-podium {
+  background-image: url("/grafiki/tlo-podium.webp");
+}
+
+.tv[data-nastroj="poczekalnia"] .tv-obraz-poczekalnia,
+.tv[data-nastroj="etap1"] .tv-obraz-noir1,
+.tv[data-nastroj="etap2"] .tv-obraz-noir2,
+.tv[data-nastroj="etap3"] .tv-obraz-neon,
+.tv[data-nastroj="etap4"] .tv-obraz-walka,
+.tv[data-nastroj="podium"] .tv-obraz-podium {
+  opacity: 0.55;
+}
+
+.tv.zgaszona .tv-obraz {
+  display: none;
+}
+
 /* Nastroje etapów (src/lib/gra/nastroj.ts, `data-nastroj` na `.tv`): tło idzie za muzyką. Same warstwy
    z przezroczystością i przesunięciem (bez animowania filtrów i clip-path, Samsung), przejście 2 s. */
 .tv-zaluzje,

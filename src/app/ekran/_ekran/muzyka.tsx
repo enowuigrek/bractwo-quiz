@@ -25,8 +25,12 @@ type Utwor = keyof typeof UTWORY;
 
 const GLOSNOSC = 0.55;
 const PRZENIKANIE_MS = 1500;
-/** Pętla: tyle sekund przed końcem pliku rusza ten sam utwór na drugim odtwarzaczu i oba się przenikają. */
-const ZAKLADKA_S = 2.5;
+/**
+ * Pętla bez nakładania (na TV było słychać koniec i początek naraz): w ostatnich `WYCISZENIE_S` sekundach utwór
+ * cichnie, gra do końca pliku, chwila ciszy (`PRZERWA_PETLI_MS`) i ten sam utwór rusza od `petlaOd`.
+ */
+const WYCISZENIE_S = 1.2;
+const PRZERWA_PETLI_MS = 700;
 /**
  * Gesty, po których przeglądarka pozwala grać. Safari uznaje tylko kliknięcie i klawisz (nie `pointerdown`),
  * pilot TV wysyła klawisze.
@@ -253,12 +257,25 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     }
     if (!juzGra) zagraj(cel, 0);
 
-    // pętla: przed końcem pliku ten sam utwór od `petlaOd` na drugim odtwarzaczu
+    // pętla: tuż przed końcem pliku wyciszenie, po końcu chwila ciszy i ten sam utwór od `petlaOd`
+    const wyciszane = new WeakSet<HTMLAudioElement>();
     const petla = (e: Event) => {
       const a = e.currentTarget as HTMLAudioElement;
+      if (a !== w.aktywny || a.paused || UTWORY[cel].petlaOd === null || !a.duration || wyciszane.has(a)) return;
+      if (a.duration - a.currentTime <= WYCISZENIE_S) {
+        wyciszane.add(a);
+        plynnie(a, 0);
+      }
+    };
+    let przerwa = 0;
+    const koniecPliku = (e: Event) => {
+      const a = e.currentTarget as HTMLAudioElement;
       const od = UTWORY[cel].petlaOd;
-      if (a !== w.aktywny || a.paused || od === null || !a.duration) return;
-      if (a.duration - a.currentTime <= ZAKLADKA_S) zagraj(cel, od);
+      if (a !== w.aktywny || od === null) return;
+      przerwa = window.setTimeout(() => {
+        wyciszane.delete(a);
+        if (w.aktywny === a && w.grany === cel && !w.zatrzymana) zagraj(cel, od);
+      }, PRZERWA_PETLI_MS);
     };
     // gest: każdy odtwarzacz dostaje play() w czasie gestu (Safari odblokowuje je osobno): wolny cicho
     // i od razu staje, a stojący aktywny rusza na nowo
@@ -278,10 +295,17 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       // aktywny, który nie gra (stoi albo Safari po cichu go nie puścił): play() jeszcze raz, już w geście
       if (a && !a.error && !w.slychac && !w.zatrzymana) void wystartuj(a);
     };
-    for (const a of w.odtwarzacze) a.addEventListener("timeupdate", petla);
+    for (const a of w.odtwarzacze) {
+      a.addEventListener("timeupdate", petla);
+      a.addEventListener("ended", koniecPliku);
+    }
     for (const g of GESTY) window.addEventListener(g, gest);
     return () => {
-      for (const a of w.odtwarzacze) a.removeEventListener("timeupdate", petla);
+      window.clearTimeout(przerwa);
+      for (const a of w.odtwarzacze) {
+        a.removeEventListener("timeupdate", petla);
+        a.removeEventListener("ended", koniecPliku);
+      }
       for (const g of GESTY) window.removeEventListener(g, gest);
     };
   }, [cel]);
