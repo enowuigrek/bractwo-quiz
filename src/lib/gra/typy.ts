@@ -122,6 +122,8 @@ export type StanSesji = {
   liczba_graczy: number;
   /** Ilu graczy jeszcze gra (bez odpadniętych w etapach przed finałem). */
   w_grze: number;
+  /** Bieżące pytanie jest ostatnie w etapie: ranking po nim to koniec etapu (napis na TV, muzyka gaśnie). */
+  ostatnie_w_etapie: boolean;
   /** Etapy quizu z odpadaniem (ilu przechodzi po etapie): plan gry na planszy etapu. */
   plan_etapow: { nr: number; nazwa: string; finalowy: boolean; przechodzi: number | null }[];
   /** Ile osób odpowiedziało na bieżące zadanie. */

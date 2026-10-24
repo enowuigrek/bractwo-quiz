@@ -39,6 +39,21 @@ const tlo = (plik, opis) => ({
   opis: `${opis} ${STYL_TLA}`,
 });
 
+// Grafiki do pytań i ciekawostek (zadania.grafika_url = /grafiki/pytania/…): pokazywane na TV i telefonach
+// razem z pytaniem, więc wysoka jakość i zero napisów, które zdradzałyby odpowiedź.
+const STYL_ZDJECIA =
+  "Cinematic documentary photograph, natural light, rich detail, warm tones, " +
+  "no text, no letters, no labels, no logos, no people.";
+
+/** Grafika pytania albo ciekawostki: 1280 px szerokości, lekka dla telefonów. */
+const zdjecie = (plik, opis, styl = STYL) => ({
+  plik: `pytania/${plik}`,
+  rozmiar: "1536x1024",
+  tlo: "opaque",
+  obrobka: (img) => img.resize({ width: 1280 }).webp({ quality: 78 }),
+  opis: `${opis} ${styl}`,
+});
+
 const GRAFIKI = {
   // pełna szklanka; pusta to ta sama grafika przygaszona, piwo „nalewa się” od dołu przycięciem
   szklanka: {
@@ -66,6 +81,33 @@ const GRAFIKI = {
       "even lighting across the whole frame so it can tile horizontally, no objects on the counter. " +
       STYL,
   },
+  "pyt-chmiel": zdjecie(
+    "chmiel.webp",
+    "Extreme close-up of fresh green hop cones hanging on the bine, tiny dew drops, backlit by warm light, " +
+      "very dark background.",
+  ),
+  "pyt-kriek": zdjecie(
+    "kriek.webp",
+    "A tulip-shaped glass of Belgian kriek cherry beer, deep ruby red with a pink foam head, a few fresh cherries " +
+      "beside it on a dark wooden bar, warm side light, dark background.",
+  ),
+  "pyt-weizen": zdjecie(
+    "weizen.webp",
+    "A tall curved vase-shaped wheat beer glass (weizen glass) filled with cloudy golden hefeweizen and a big fluffy " +
+      "foam head, standing on a dark bar, warm light, dark background, the whole glass visible.",
+  ),
+  "ciek-grodzisk": zdjecie(
+    "grodzisk.webp",
+    "Historic red-brick brewery building in a small town in Greater Poland at dusk, 19th-century industrial " +
+      "architecture with a tall brick chimney, cobblestone street, warm light in the windows, gentle evening mist.",
+    STYL_ZDJECIA,
+  ),
+  "ciek-opactwo": zdjecie(
+    "opactwo.webp",
+    "A Belgian Trappist abbey at dusk, old stone walls and a bell tower, warm light glowing in the windows, " +
+      "quiet monastery courtyard with a few old wooden beer barrels by the wall.",
+    STYL_ZDJECIA,
+  ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
     "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +
@@ -148,7 +190,7 @@ async function generuj(nazwa) {
   console.log(`zapisano public/grafiki/${g.plik}`);
 }
 
-await mkdir("public/grafiki", { recursive: true });
+await mkdir("public/grafiki/pytania", { recursive: true });
 const wybrane = process.argv.slice(2);
 for (const nazwa of wybrane.length ? wybrane : Object.keys(GRAFIKI)) {
   if (!GRAFIKI[nazwa]) {

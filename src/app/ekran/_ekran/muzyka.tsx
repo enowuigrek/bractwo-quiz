@@ -27,10 +27,14 @@ const GLOSNOSC = 0.55;
 const PRZENIKANIE_MS = 1500;
 /**
  * Pętla bez nakładania (na TV było słychać koniec i początek naraz): w ostatnich `WYCISZENIE_S` sekundach utwór
- * cichnie, gra do końca pliku, chwila ciszy (`PRZERWA_PETLI_MS`) i ten sam utwór rusza od `petlaOd`.
+ * cichnie, gra do końca pliku, chwila ciszy (`PRZERWA_PETLI_MS`) i ten sam utwór wchodzi powoli od `petlaOd`
+ * (24.10: 0,7 s ciszy i 1,5 s wejścia to wciąż było za szybko).
  */
 const WYCISZENIE_S = 1.2;
-const PRZERWA_PETLI_MS = 700;
+const PRZERWA_PETLI_MS = 2000;
+const WEJSCIE_PO_PETLI_MS = 3500;
+/** Koniec etapu (ranking po ostatnim pytaniu etapu): muzyka powoli gaśnie przed planszą następnego etapu. */
+const WYCISZENIE_ETAPU_MS = 4000;
 /**
  * Gesty, po których przeglądarka pozwala grać. Safari uznaje tylko kliknięcie i klawisz (nie `pointerdown`),
  * pilot TV wysyła klawisze.
@@ -43,7 +47,7 @@ const GESTY = ["click", "keydown", "touchend"] as const;
 const PROSBA_PO_MS = 2000;
 
 /** Co z gry jest potrzebne muzyce (ekran lokalu przy zapowiedzi podaje samą poczekalnię). */
-type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza_do">;
+type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza_do" | "ostatnie_w_etapie">;
 
 /**
  * Wspólne dla całej strony: dwa odtwarzacze i to, co gra. Zostają, gdy komponent się wymienia (ekran lokalu
@@ -98,6 +102,8 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
     case "koniec":
       return "podium";
     default:
+      // ranking po ostatnim pytaniu etapu: cisza (powoli), następny etap wejdzie ze swoją muzyką od nowa
+      if (stan.faza === "ranking" && stan.ostatnie_w_etapie && !stan.etap?.finalowy) return null;
       // plansza etapu, pytania, wyniki i ranking: według etapu (na planszy to etap, który się zaczyna).
       // Narasta z etapu na etap: noir lekko, noir z napięciem, noir z lekkim napięciem w 3. i dalszych,
       // walka o finał (smyczki i trąbki) i finał. Quiz bez etapów: etap-1.
@@ -130,8 +136,11 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   const cel = stan.muzyka ? utworFazy(stan) : null;
   // werble: stary utwór staje od razu, bez przenikania (ekran gaśnie jak wyłączany telewizor)
   const twardo = useRef(false);
+  // koniec etapu: gaśnie powoli (WYCISZENIE_ETAPU_MS), a nie w zwykłe 1,5 s
+  const powoli = useRef(false);
   useEffect(() => {
     twardo.current = stan.faza === "werble";
+    powoli.current = stan.faza === "ranking";
   }, [stan.faza]);
 
   // dwa odtwarzacze na całą stronę; gest odblokowuje oba naraz (Safari pamięta zgodę per element)
@@ -192,12 +201,12 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   // zmiana utworu (albo wyłączenie): nowy rusza na wolnym odtwarzaczu, stary cichnie
   useEffect(() => {
     const w = strona();
-    const plynnie = (a: HTMLAudioElement, glosnosc: number, potem?: () => void) => {
+    const plynnie = (a: HTMLAudioElement, glosnosc: number, potem?: () => void, ms = PRZENIKANIE_MS) => {
       clearInterval(w.przenikania.get(a));
-      const krok = (glosnosc - a.volume) / (PRZENIKANIE_MS / 50);
+      const krok = (glosnosc - a.volume) / (ms / 50);
       // licznik kroków: iPhone nie pozwala stronie zmieniać głośności (`volume` zostaje 1), a bez niego
       // przenikanie nie skończyłoby się nigdy i stary utwór grałby razem z nowym
-      let kroki = PRZENIKANIE_MS / 50;
+      let kroki = ms / 50;
       const id = window.setInterval(() => {
         const nowa = a.volume + krok;
         if ((krok >= 0 && nowa >= glosnosc) || (krok < 0 && nowa <= glosnosc) || krok === 0 || --kroki <= 0) {
@@ -211,11 +220,11 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       w.przenikania.set(a, id);
     };
 
-    const wystartuj = (a: HTMLAudioElement) =>
+    const wystartuj = (a: HTMLAudioElement, wejscieMs = PRZENIKANIE_MS) =>
       a
         .play()
         .then(() => {
-          if (w.aktywny === a) plynnie(a, GLOSNOSC);
+          if (w.aktywny === a) plynnie(a, GLOSNOSC, undefined, wejscieMs);
         })
         .catch((e: Error) => {
           // brak pliku (NotSupportedError) to cisza; każda inna odmowa to od razu prośba o OK na pilocie
@@ -225,7 +234,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
           ustawCichoOd(0);
         });
 
-    const zagraj = (utwor: Utwor, od: number) => {
+    const zagraj = (utwor: Utwor, od: number, wejscieMs = PRZENIKANIE_MS) => {
       const stary = w.aktywny;
       const a = w.odtwarzacze.find((o) => o !== stary) ?? w.odtwarzacze[0];
       clearInterval(w.przenikania.get(a));
@@ -240,7 +249,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       w.slychac = false;
       ustawCichoOd((c) => c ?? Date.now());
       if (stary) plynnie(stary, 0, () => stary.pause());
-      void wystartuj(a);
+      void wystartuj(a, wejscieMs);
     };
 
     // ten sam utwór już gra (np. zapowiedź przeszła w poczekalnię): gra dalej, bez startu od nowa
@@ -252,7 +261,9 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       if (stary && twardo.current) {
         clearInterval(w.przenikania.get(stary));
         stary.pause();
-      } else if (stary) plynnie(stary, 0, () => stary.pause());
+      } else if (stary) {
+        plynnie(stary, 0, () => stary.pause(), powoli.current ? WYCISZENIE_ETAPU_MS : PRZENIKANIE_MS);
+      }
       return;
     }
     if (!juzGra) zagraj(cel, 0);
@@ -274,7 +285,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       if (a !== w.aktywny || od === null) return;
       przerwa = window.setTimeout(() => {
         wyciszane.delete(a);
-        if (w.aktywny === a && w.grany === cel && !w.zatrzymana) zagraj(cel, od);
+        if (w.aktywny === a && w.grany === cel && !w.zatrzymana) zagraj(cel, od, WEJSCIE_PO_PETLI_MS);
       }, PRZERWA_PETLI_MS);
     };
     // gest: każdy odtwarzacz dostaje play() w czasie gestu (Safari odblokowuje je osobno): wolny cicho

@@ -51,7 +51,9 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
       <h1>{etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
       {z && (
         <p className="tv-okazja">
-          {etap ? `${etap.nazwa} · ` : ""}po pytaniu {lp}
+          {etap && stan.ostatnie_w_etapie
+            ? `Koniec etapu ${etap.nr}: ${etap.nazwa}`
+            : `${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}
         </p>
       )}
       <LogoNaglowka />

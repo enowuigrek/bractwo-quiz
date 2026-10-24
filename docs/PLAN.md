@@ -686,6 +686,14 @@ Ustalone z Łukaszem: przy większej grupie gracze odpadają też wcześniej, pr
 - Pijany finał: telefony gasną i muzyka cichnie 7,5 s przed końcem (`GASNIECIE_S`), wybuch dalej 3 s przed końcem, więc 4,5 s ciszy zamiast 2,5 s; pilot daje 9 s (`WYLEWANIE_S`, migracja `20261024180529_pijany_dluzsza_cisza_i_seria_w_pijanym`).
 - Zwycięzca serii widać przy szklance, zanim zacznie się chaos: `stan_sesji` wydaje stan serii także w fazie `pijany` (wcześniej TV pokazywał miejsca bez ostatniego kroku zwycięzcy).
 
+### Grafiki w pytaniach, koniec etapu, logo lokalu na telefonie (24.10) ✅
+
+- **Pytania z grafiką** (migracja `20261024181426_piwny_quiz_grafiki_rozgrzewki`, pliki `public/grafiki/pytania/`, generowane `scripts/grafiki.mjs`): rozgrzewka 2 „To dzięki temu piwo jest gorzkie. Co to?” (chmiel, odsłaniana grafika), 4 „Jaki to styl?” (kriek), 6 „Jak nazywa się to szkło?” (weizenglas). Grafiki do ciekawostek już są (`grodzisk.webp`, `opactwo.webp`). `grafika_url` to ścieżka w `/public`, nie bucket.
+- **Koniec etapu** (migracja `20261024181531_ostatnie_w_etapie`: `stan_sesji.ostatnie_w_etapie`): na rankingu po ostatnim pytaniu etapu TV pisze „Koniec etapu 2: Kilka dobrych”, telefon „Koniec etapu 2”, a muzyka gaśnie przez 4 s, więc następny etap wchodzi ze swoją od nowa.
+- **Pętla muzyki:** 2 s ciszy i 3,5 s wejścia (było 0,7 s i 1,5 s, wciąż za szybko).
+- **Telefon:** nagłówek z logo Bractwa z lewej, „Quiz” na środku i logo lokalu z prawej.
+- Pytanie 18: „Doppel” bez nawiasu (migracja `20261024181638_pytanie_18_doppel`).
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

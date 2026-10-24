@@ -61,7 +61,9 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
           <h1>Ranking</h1>
           {z && (
             <p className="tv-okazja">
-              po pytaniu {z.lp}
+              {stan.etap && stan.ostatnie_w_etapie
+                ? `Koniec etapu ${stan.etap.nr}: ${stan.etap.nazwa}`
+                : `po pytaniu ${z.lp}`}
             </p>
           )}
           <LogoNaglowka />

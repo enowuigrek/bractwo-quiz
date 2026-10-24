@@ -70,7 +70,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
       {/* zapowiedziana gra: muzyka poczekalni już teraz, a po otwarciu poczekalni gra dalej (muzyka.tsx) */}
       {zapowiedz?.muzyka && (
         <MuzykaTv
-          stan={{ faza: "poczekalnia", muzyka: true, etap: null, faza_od: null, faza_do: null }}
+          stan={{ faza: "poczekalnia", muzyka: true, etap: null, faza_od: null, faza_do: null, ostatnie_w_etapie: false }}
           teraz={0}
         />
       )}

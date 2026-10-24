@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- logo lokalu z bucketu Supabase, logo Bractwa z /public */
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
-import { LogoQuiz } from "@/components/logo-quiz";
 import { Werble } from "@/components/werble";
 import {
   komunikatBledu,
@@ -159,7 +159,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!stan || sprawdzamToken) {
     return (
       <>
-        <Naglowek />
+        <Naglowek lokal={stan?.lokal} />
         <p className="pomocniczy">Łączę z grą…</p>
       </>
     );
@@ -168,7 +168,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!ja) {
     return (
       <>
-        <Naglowek />
+        <Naglowek lokal={stan?.lokal} />
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
@@ -211,7 +211,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   return (
     <>
-      <Naglowek />
+      <Naglowek lokal={stan?.lokal} />
       <WGrze
         stan={stan}
         ja={ja}
@@ -226,11 +226,16 @@ export function Gracz({ kod }: { kod: string }) {
   );
 }
 
-/** Sam znak Quizu: kod gry jest wewnętrzny (gracz wchodzi z QR), więc go nie pokazujemy. */
-function Naglowek() {
+/**
+ * Nagłówek telefonu: Bractwo z lewej, „Quiz” na środku, logo lokalu z prawej (jak na TV gospodarze obok siebie).
+ * Kod gry jest wewnętrzny (gracz wchodzi z QR), więc go nie pokazujemy.
+ */
+function Naglowek({ lokal }: { lokal?: { nazwa: string; logo_url: string | null } | null }) {
   return (
-    <header className="gra-naglowek">
-      <LogoQuiz wysokosc={40} />
+    <header className="gra-naglowek trzy">
+      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo gra-logo-bractwa" />
+      <span className="logo-quiz-napis gra-napis-quiz">Quiz</span>
+      {lokal?.logo_url ? <img src={lokal.logo_url} alt={lokal.nazwa} className="gra-logo-lokalu" /> : <span />}
     </header>
   );
 }
@@ -438,7 +443,7 @@ function WGrze({
           <Awatar nick={ja.nick} zdjecie={moj?.zdjecie ?? null} rozmiar={40} />
           {ja.nick}
         </p>
-        <h1>Ranking</h1>
+        <h1>{stan.etap && stan.ostatnie_w_etapie ? `Koniec etapu ${stan.etap.nr}` : "Ranking"}</h1>
         {moj && <Miejsce moj={moj} />}
         {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
         {/* przeskok przez kreskę po tym pytaniu */}
