@@ -2842,21 +2842,6 @@
   }
 }
 
-/* cała plansza faluje, coraz mocniej */
-.tv-pijany .drogi-finalu {
-  animation: falowanie-tv 5s ease-in-out infinite;
-}
-
-@keyframes falowanie-tv {
-  0%,
-  100% {
-    transform: skewX(calc(var(--poziom) * -5deg)) rotate(calc(var(--poziom) * -1.2deg));
-  }
-  50% {
-    transform: skewX(calc(var(--poziom) * 5deg)) rotate(calc(var(--poziom) * 1.2deg));
-  }
-}
-
 /* drogi po kolei spadają w dół ekranu, każda z innym przechyłem (--i, --obrot z drogi.tsx) */
 .drogi-finalu-svg.spadaja .drogi-finalu-pas {
   transform-box: fill-box;
@@ -2868,19 +2853,28 @@
     opacity 0.6s ease-in calc(2.4s + var(--i) * 0.6s);
 }
 
-.tv-pijany .drogi-finalu-szklanka {
-  transform-origin: 50% 90%;
-  filter: blur(calc(var(--poziom) * 1.5px));
-  animation: kolysanie-szklanki 2.4s ease-in-out infinite alternate;
+/* Szklanka stoi nieruchomo i ostro (bez falowania planszy): pod koniec podmienia ją wideo, którego
+   pierwsza klatka to ta sama szklanka w tym samym miejscu sceny (docs/wideo/pekniecie-start.png).
+   Gdy wideo gra, szklanka znika pod nim. */
+.tv-pijany.wylewa .drogi-finalu-szklanka {
+  visibility: hidden;
 }
 
-@keyframes kolysanie-szklanki {
-  from {
-    rotate: calc(var(--poziom) * -12deg - 2deg);
-  }
-  to {
-    rotate: calc(var(--poziom) * 12deg + 2deg);
-  }
+/* Wideo pękającej szklanki: cała scena 1920×1080 nad wszystkim, czarne tło klipu znika (screen) */
+.pijany-wideo {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  width: 1920px;
+  height: 1080px;
+  object-fit: cover;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.pijany-wideo.gra {
+  opacity: 1;
 }
 
 /* położenie ustawia pętla klatek (transform), tu tylko punkt odniesienia */
@@ -2958,8 +2952,6 @@
   .tv-seria.drzy .drogi-finalu-gracz .awatar,
   .tv-pijany,
   .tv-pijany .tv-ranking-gora,
-  .tv-pijany .drogi-finalu,
-  .tv-pijany .drogi-finalu-szklanka,
   .pijany-drzenie,
   .pijany-awatar,
   .pijany-duch {

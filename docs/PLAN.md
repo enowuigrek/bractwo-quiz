@@ -577,6 +577,15 @@ Uwagi Łukasza po grze na telefonie, wszystko wdrożone:
 - Sprawdzone skryptem: każdy plik w `src` jest gdzieś importowany, eksporty bez użycia poza plikiem to tylko typy i stałe używane wewnątrz, a pozostałe „nieużyte” klasy CSS są składane w kodzie (`efekt-${…}`, `utrudnienie-${…}`, `para-${…}`, `metal-${…}` itd.).
 - Zaktualizowane: `docs/DESIGN-SYSTEM.md` (pijany finał, okrzyki kibiców, utrudnienia bez zapowiedzi, liczby pytań, pilot, werble a Safari, karty wyboru z `--r-card`), ta sekcja „Stan”, `CLAUDE.md`, `docs/TEST.md`.
 
+### Wideo pękającej szklanki: przygotowanie (24.10) 🟡 w trakcie
+
+Pomysł Łukasza (plan w `docs/POMYSLY.md`). Zrobione: wszystko oprócz samego wideo.
+- **Szklanka w pijanym finale stoi nieruchomo i ostro:** bez kołysania i rozmycia, a cała plansza już nie faluje (falowanie przesuwało szklankę). Chaos robią nagłówek i awatary.
+- **Koniec dogrywki daje 7 s na wideo** (migracja `20261024062338_pijany_koniec_z_wideo`): `zakoncz_pijany` (gracz skończył pytania) i `pilot_akcja('werble')` nie dają od razu werbli, tylko ustawiają `faza_do = teraz + 7 s`; werble przychodzą przez `dokoncz_pytanie`. Gracz, który skończył, widzi werble od razu, reszta ma jeszcze te sekundy na pytania. Liczba 7 jest też w `WYLEWANIE_S` (`src/lib/pijany.ts`) i musi się zgadzać.
+- **TV** (`ekran/_ekran/pijany.tsx`): `<video src="/wideo/pekniecie.mp4">` portalem na całą scenę 1920×1080 (`.pijany-wideo`, `mix-blend-mode: screen`), zatrzymane na pierwszej klatce; rusza `WYLEWANIE_S` przed `faza_do`, a szklanka znika (`.tv-pijany.wylewa`) dopiero, gdy wideo naprawdę gra. Bez pliku nic się nie zmienia (sprawdzone: koniec z pilota po ok. 8 s daje werble, szklanka zostaje).
+- **Kadr startowy:** `docs/wideo/pekniecie-start.png` (1920×1080, czarne tło, szklanka dokładnie w miejscu z TV: x 1515–1765, y 396–863). Zrobiony ze zrzutu TV z Chrome bez okna (`--headless=new --window-size=1920,1080 --screenshot`), wycięta szklanka z blaskiem, tło wyczyszczone do czerni (PIL).
+- **Zostało:** wygenerować wideo w Figma Weave (np. Veo 3) z tego kadru, zapisać jako `public/wideo/pekniecie.mp4` (H.264, bez dźwięku; `avconvert` jest w systemie, ffmpeg nie), dopasować `WYLEWANIE_S` i 7 s w bazie do długości klipu (klip ≈ `WYLEWANIE_S` + 1 s), sprawdzić podmianę na TV. Weave wymaga połączenia konta Figma (https://app.weavy.ai/settings?section=profile), a każde uruchomienie modelu kosztuje i wymaga zgody Łukasza.
+
 ## Zadania dla ciebie (dzień 0)
 
 1. ✅ **Vercel:** zespół „Bractwo Piwne” (Hobby), połączony z prywatnym GitHubem.

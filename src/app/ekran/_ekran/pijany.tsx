@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import type { StanSesji } from "@/lib/gra/typy";
-import { zegarPijany } from "@/lib/pijany";
+import { WIDEO_WYLEWANIA, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
@@ -141,8 +142,39 @@ export function PijanyTv({
 
   const minelo = (teraz - od) / 1000;
 
+  // Koniec dogrywki: ostatnie sekundy to wideo pękającej szklanki (pierwsza klatka = ta szklanka w tym samym
+  // miejscu sceny). Wideo leży na całej scenie 1920×1080 (portal do `.scena`, bo tu wszystko się przesuwa),
+  // czeka zatrzymane na pierwszej klatce i rusza, gdy do `faza_do` zostaje `WYLEWANIE_S`. Szklankę chowamy
+  // dopiero, gdy wideo naprawdę gra: bez pliku albo bez zgody przeglądarki na odtwarzanie zostaje jak było.
+  const [scena, ustawScene] = useState<Element | null>(null);
+  const wideo = useRef<HTMLVideoElement>(null);
+  const [gra, ustawGra] = useState(false);
+  const czasWylewania = teraz >= od && do_ - teraz <= WYLEWANIE_S * 1000;
+  useEffect(() => {
+    if (czasWylewania) void wideo.current?.play().catch(() => undefined);
+  }, [czasWylewania, scena]);
+
   return (
-    <div className="tv-wyscig tv-seria tv-pijany" style={{ "--poziom": poziom } as React.CSSProperties}>
+    <div
+      className={`tv-wyscig tv-seria tv-pijany${gra ? " wylewa" : ""}`}
+      style={{ "--poziom": poziom } as React.CSSProperties}
+      ref={(el) => {
+        if (el && !scena) ustawScene(el.closest(".scena"));
+      }}
+    >
+      {scena &&
+        createPortal(
+          <video
+            ref={wideo}
+            className={`pijany-wideo${gra ? " gra" : ""}`}
+            src={WIDEO_WYLEWANIA}
+            muted
+            playsInline
+            preload="auto"
+            onPlaying={() => ustawGra(true)}
+          />,
+          scena,
+        )}
       {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
       <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000)} />
 

@@ -26,6 +26,15 @@ export type PijanePytanie = { nr: number; tresc: string; efekt: EfektPijany };
 export const LIMITY_PIJANE = { pytan: 20, tresc: 200 } as const;
 
 /**
+ * Wideo pękającej szklanki na koniec dogrywki (TV, `ekran/_ekran/pijany.tsx`): rusza `WYLEWANIE_S` sekund
+ * przed `faza_do`. Koniec od gracza (`zakoncz_pijany`) i od pilota (`werble`) ustawiają w bazie
+ * `faza_do = teraz + 7 s`, więc ta liczba musi się zgadzać z bazą. Klip trwa trochę dłużej niż
+ * `WYLEWANIE_S`, bo werble przychodzą ok. sekundy po `faza_do`.
+ */
+export const WYLEWANIE_S = 7;
+export const WIDEO_WYLEWANIA = "/wideo/pekniecie.mp4";
+
+/**
  * Sekundy na zegarze w pijanym finale (TV i telefon pokazują to samo, bo liczą z czasu serwera). Zegar
  * coraz bardziej wariuje: najpierw liczy normalnie w dół, potem leci w górę, potem co chwilę zmienia
  * kierunek, a pod koniec miga przypadkowymi liczbami i znika. `null`: w tej sekundzie zegara nie ma.
