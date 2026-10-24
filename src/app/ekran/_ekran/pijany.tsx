@@ -144,12 +144,14 @@ export function PijanyTv({
 
   // Koniec dogrywki: ostatnie sekundy to wideo pękającej szklanki (pierwsza klatka = ta szklanka w tym samym
   // miejscu sceny). Wideo leży na całej scenie 1920×1080 (portal do `.scena`, bo tu wszystko się przesuwa),
-  // czeka zatrzymane na pierwszej klatce i rusza, gdy do `faza_do` zostaje `WYLEWANIE_S`. Szklankę chowamy
+  // czeka zatrzymane na pierwszej klatce i rusza tak, żeby skończyć się z werblami (src/lib/pijany.ts). Szklankę chowamy
   // dopiero, gdy wideo naprawdę gra: bez pliku albo bez zgody przeglądarki na odtwarzanie zostaje jak było.
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
   const [gra, ustawGra] = useState(false);
-  const czasWylewania = teraz >= od && do_ - teraz <= WYLEWANIE_S * 1000;
+  const [dlugosc, ustawDlugosc] = useState<number | null>(null);
+  const przedKoncem = dlugosc ? Math.min(WYLEWANIE_S, Math.max(1, dlugosc - 1)) : WYLEWANIE_S;
+  const czasWylewania = teraz >= od && do_ - teraz <= przedKoncem * 1000;
   useEffect(() => {
     if (czasWylewania) void wideo.current?.play().catch(() => undefined);
   }, [czasWylewania, scena]);
@@ -171,6 +173,7 @@ export function PijanyTv({
             muted
             playsInline
             preload="auto"
+            onLoadedMetadata={(e) => ustawDlugosc(e.currentTarget.duration)}
             onPlaying={() => ustawGra(true)}
           />,
           scena,

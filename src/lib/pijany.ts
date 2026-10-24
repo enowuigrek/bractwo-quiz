@@ -26,10 +26,11 @@ export type PijanePytanie = { nr: number; tresc: string; efekt: EfektPijany };
 export const LIMITY_PIJANE = { pytan: 20, tresc: 200 } as const;
 
 /**
- * Wideo pękającej szklanki na koniec dogrywki (TV, `ekran/_ekran/pijany.tsx`): rusza `WYLEWANIE_S` sekund
- * przed `faza_do`. Koniec od gracza (`zakoncz_pijany`) i od pilota (`werble`) ustawiają w bazie
- * `faza_do = teraz + 7 s`, więc ta liczba musi się zgadzać z bazą. Klip trwa trochę dłużej niż
- * `WYLEWANIE_S`, bo werble przychodzą ok. sekundy po `faza_do`.
+ * Wideo pękającej szklanki na koniec dogrywki (TV, `ekran/_ekran/pijany.tsx`). Koniec od gracza
+ * (`zakoncz_pijany`) i od pilota (`werble`) ustawiają w bazie `faza_do = teraz + 7 s`: to najdłuższy klip,
+ * jaki się zmieści (`WYLEWANIE_S`, musi się zgadzać z bazą). TV startuje klip tak, żeby skończył się
+ * ok. sekundę po `faza_do`, kiedy przychodzą werble: długość klipu − 1 s przed końcem, najwyżej `WYLEWANIE_S`.
+ * Nowy klip wystarczy podmienić w `public/wideo/pekniecie.mp4` (do 8 s), bez zmian w kodzie.
  */
 export const WYLEWANIE_S = 7;
 export const WIDEO_WYLEWANIA = "/wideo/pekniecie.mp4";
