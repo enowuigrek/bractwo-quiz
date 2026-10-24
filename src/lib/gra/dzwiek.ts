@@ -29,3 +29,16 @@ export function useDzwiekOdblokowany(): boolean {
     () => false,
   );
 }
+
+// Wybuch szklanki w wideo pijanego finału (ekran/_ekran/pijany.tsx): muzyka TV urywa się w tej samej chwili
+// (ekran/_ekran/muzyka.tsx). Zwykłe zdarzenie okna, bo oba komponenty żyją obok siebie na jednej stronie.
+const WYBUCH = "bractwo-quiz:wybuch-szklanki";
+
+export function ogloszWybuch(): void {
+  window.dispatchEvent(new Event(WYBUCH));
+}
+
+export function naWybuch(f: () => void): () => void {
+  window.addEventListener(WYBUCH, f);
+  return () => window.removeEventListener(WYBUCH, f);
+}

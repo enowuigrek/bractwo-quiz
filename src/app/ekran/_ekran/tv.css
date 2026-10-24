@@ -2941,6 +2941,16 @@
   opacity: 1;
 }
 
+/* Gdy wideo gra, pod nim nie może być nic jasnego, bo czerń klipu przepuszcza (screen): drogi i ich pasy
+   (na Samsungu nie spadały i prześwitywały przez wybuch) i smugi tła znikają. Zostają nagłówek i awatary. */
+.tv-pijany.wylewa .drogi-finalu-svg {
+  visibility: hidden;
+}
+
+.tv:has(.tv-pijany.wylewa) .tv-tlo {
+  opacity: 0;
+}
+
 /* położenie ustawia pętla klatek (transform), tu tylko punkt odniesienia */
 .pijany-gracz {
   left: 0;

@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
-import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
+import { ogloszWybuch, useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import type { StanSesji } from "@/lib/gra/typy";
 import { WIDEO_WYLEWANIA, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
@@ -205,7 +205,10 @@ export function PijanyTv({
             onLoadedMetadata={(e) => ustawDlugosc(e.currentTarget.duration)}
             onPlaying={() => ustawGra(true)}
             onTimeUpdate={(e) => {
-              if (!wybuch && e.currentTarget.currentTime >= WYBUCH_S) ustawWybuch(true);
+              if (!wybuch && e.currentTarget.currentTime >= WYBUCH_S) {
+                ustawWybuch(true);
+                ogloszWybuch();
+              }
             }}
           />,
           scena,
