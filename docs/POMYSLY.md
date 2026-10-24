@@ -56,6 +56,7 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 - **Prawdziwy limit prób logowania** do panelu. W MVP jest tylko opóźnienie po złym haśle.
 - **Konta i uprawnienia:** osobne loginy (admin, kilku prowadzących, obsługa lokalu) zamiast dwóch haseł. Od 23.10 są role główny i obsługa (`src/lib/admin.ts`), a quizy i gry mają znacznik `tylko_glowny`: konta podmienią źródło roli i właściciela.
 - **Selfie bez lampy błyskowej:** własny podgląd z przedniej kamery (`getUserMedia`) zamiast systemowego aparatu, którego błysku strona nie ustawi.
+- **Wybór ikony etapu w panelu** (od 24.10 jest `etapy.ikona`, wpisywana migracją): lista gotowych ikon z `public/grafiki/etapy/` przy etapie w edytorze quizu.
 - **Kopiowanie quizu** jednym przyciskiem w panelu (np. żeby przerobić zeszłoroczny Dzień Porteru).
 - **Podgląd wybranej grafiki** przed zapisem i przycinanie logo do koła w panelu.
 - **Przeciąganie pytań** zamiast strzałek ↑ ↓ przy długich quizach.

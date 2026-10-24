@@ -2,41 +2,76 @@
 
 Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
-## Stan na 24.10 (po nocy z 23.10): od czego zacząć
+## Stan na 24.10 wieczór: od czego zacząć
 
-Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia decyzji jest niżej w „Ustaleniach z realizacji” (najnowsze na końcu: „Pijany finał”, „Kibicowanie w finale”, „Główny i obsługa…”, „Po teście pijanego finału”). Zasady pracy są w `CLAUDE.md`, wygląd w `docs/DESIGN-SYSTEM.md`, test w `docs/TEST.md`, pomysły w `docs/POMYSLY.md`.
-
-> **Uwaga dla wcześniejszych sesji:** etapy „Pijany finał” i „Kibicowanie w finale” są skończone i wdrożone, razem ze wszystkim, co Łukasz dorzucał w trakcie (ukryty tryb, numeracja 15/14, wariujący zegar, koniec po ostatnim pytaniu, dwa poziomy panelu, pobieranie grafiki). Niczego z nich nie trzeba dokańczać.
+Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia decyzji jest niżej w „Ustaleniach z realizacji” (najnowsze na końcu). Zasady pracy są w `CLAUDE.md`, wygląd w `docs/DESIGN-SYSTEM.md`, test w `docs/TEST.md`, pomysły w `docs/POMYSLY.md`.
 
 **Produkcja:** `https://quiz.bractwopiwne.pl` (Vercel, region `fra1`, wdrożenie z `main`), baza Supabase `bractwo-quiz` (Frankfurt). Commit, który działa, pokazuje `/api/wersja`.
 
 **Co jest:**
-- **Panel** (`/admin`): dwa hasła. Główne (`ADMIN_HASLO_GLOWNE`, tylko Łukasz) widzi wszystko, wspólne (`ADMIN_HASLO`, obsługa) nie widzi quizów i gier „tylko dla mnie” ani pijanego finału. Lokale z logo i adresem ekranu, quizy z etapami (szablony quizu „Klasyczny pub quiz” i „Bez etapów”), edytor pytań sześciu typów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas, nagrody ze zdjęciem, widoczność, pijany finał z polem „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź), pytania pijanego finału, historia gier, odbiór nagród, grafika podium.
-- **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`, scena 1920×1080): plansze lokalu, zapowiedź, poczekalnia z QR, plansza etapu z demo telefonu, pytanie z odliczaniem 3 s, wynik, odpowiedzi graczy, **wyścig po piwo**, finał trójki jako **wyścig** (12 kroków do szklanki, przewaga 0–3 za punkty z etapów, losowa pula 30 pytań, 180 s; drogi do szklanki, dymki okrzyków kibiców, licznik 📣), ukryty **pijany finał** (chaos pod nagłówkiem finału), **werble**, podium, tabela, koniec. Sam się przeładowuje po wdrożeniu (poza pytaniem, serią i pijanym finałem).
-- **Telefon** (`/<kod>`): nick i selfie, wszystkie typy odpowiedzi, „Pytanie 8” bez sumy, ranking ze szklanką, w finale koła ✓/✗ i utrudnienia bez zapowiedzi, kibic stuka hasła z awatarem finalisty, pijany finał udający dalszą serię (15/14…), medal, karta nagrody z pieczątką „Odebrana”, „Pobierz na pamiątkę” (od 24.10 bez „Udostępnij wynik”).
-- **Pilot** (`/pilot/<kod>?t=…`): włącznik muzyki na TV pod nagłówkiem, przyciski zawsze na górze, „Zakończ grę” na dole; w pijanym finale zwycięzca, podium, odliczanie i „Zakończ i pokaż werble”.
+- **Panel** (`/admin`): dwa hasła. Główne (`ADMIN_HASLO_GLOWNE`, tylko Łukasz) widzi wszystko, wspólne (`ADMIN_HASLO`, obsługa) nie widzi quizów i gier „tylko dla mnie” ani pijanego finału. Lokale z logo i adresem ekranu, quizy z etapami (szablony „Klasyczny pub quiz” i „Bez etapów”), edytor zadań siedmiu rodzajów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie, ciekawostka) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas, nagrody ze zdjęciem, widoczność, pijany finał z „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź), pytania pijanego finału, historia gier, odbiór nagród, grafika podium.
+- **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`, scena 1920×1080): plansze lokalu, zapowiedź, poczekalnia z QR, **plansza wstępu** (droga etapów do szklanki), plansza etapu z demo telefonu, pytanie z odliczaniem, ciekawostki, wynik, odpowiedzi graczy, **wyścig po piwo** po każdym pytaniu (do 12 graczy wszyscy na torach, przy większej grupie dziesiątka i pasek reszty), kreska odpadania, pasek „Koniec etapu”, finał trójki jako **wyścig** na 12 kroków z przewagą 0–3, ukryty **pijany finał** z wybuchem szklanki, **werble**, podium, tabela, koniec. Nastroje etapów (tła z OpenAI, żaluzje, neon) i **muzyka** z Suno na każdy etap. Sam się przeładowuje po wdrożeniu (poza pytaniem, serią i pijanym finałem).
+- **Telefon** (`/<kod>`): nick i selfie, wszystkie typy odpowiedzi, ranking z miejscem, kreską i szklanką, ekran „Odpadasz”, w finale koła ✓/✗ z utrudnieniami, kibic stuka hasła, pijany finał udający dalszą serię, medal, karta nagrody, „Pobierz grafikę na pamiątkę”.
+- **Pilot** (`/pilot/<kod>?t=…`): przyciski faz, progi odpadania przed startem, muzyka, w finale kroki finalistów, w pijanym finale odliczanie i „Zakończ i pokaż werble”.
 
-**Przebieg gry z etapami („Piwny quiz Bractwa”, dawniej „Piwo - quiz testowy”):** Rozgrzewka → Kilka dobrych → Strzał liczbowy → Połącz i ułóż (walka o finał: 3 najlepszych) → Finał (seria 14 pytań prawda/fałsz, 120 s, ×2, kończy się, gdy ktoś dobiegnie do piwa) → przy włączonym trybie pijany finał (stałe 60 s, nic nie liczy; na koniec telefony gasną, cisza i wybuch szklanki na TV) → werble → podium (odsłania prowadzący).
+**Quizy:**
+- **Piwny quiz Bractwa Piwnego** i **Muzyka ponadczasowa** (na próbę z Basią i Łukaszem) mają te same etapy jako wieczór w barze: **Na jedno** (jedna dobra) → **Jednak więcej** (kilka dobrych) → **Ile?** (szacowanie) → **Poskłada się jakoś** (kolejność i pary, walka o finał: do finału 3) → **Jeszcze zdążę** (finał: wyścig na 12 kroków, losowa pula 30 prawda/fałsz, 180 s) → przy włączonym trybie pijany finał (stałe 60 s) → werble → podium.
+- Odpadanie: do 8 graczy nikt, 9–15 po 3. etapie zostaje 6, od 16 po 2. etapie połowa (min. 8), po 3. szóstka. Pilot zmienia progi przed startem.
+- Ciekawostki stoją zawsze po pytaniu, którego dotyczą, nigdy na końcu etapu.
 
 **Najważniejsze pliki:**
-- Baza: `supabase/migrations/`. Funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `ranking`, `dokoncz_pytanie`, `pijane_pytania`, `zakoncz_pijany`, `kibicuj`, `wewn.zakoncz_serie`, `wewn.zamknij_serie_jesli_gotowe`. `stan_sesji` i `pilot_akcja` były ostatnio zmieniane podmianą fragmentów (`20261023182659_pijany_final.sql`, `20261023191228_okrzyki_kibicow.sql`), więc całą treść bierz z bazy (`select pg_get_functiondef(…)`).
-- TV: `src/app/ekran/_ekran/` (`tv.tsx` rozdziela fazy; `seria.tsx` z `NaglowekSerii`, `drogi.tsx` z `PlanszaDrog`, `pijany.tsx`, `okrzyki.tsx`, `wyscig.tsx`, `etap.tsx`, `demo.tsx`, `ranking.tsx`, `odpowiedzi.tsx`, `szacowanie.tsx`, `plansze.tsx`, `logo.tsx`, `tv.css`).
-- Telefon: `src/app/[kod]/` (`gracz.tsx` rozdziela fazy; `rozgrywka.tsx`, `odpowiadanie.tsx`, `seria.tsx` z utrudnieniami, `kibic.tsx`, `pijany.tsx`, `etap.tsx`, `fanfara.tsx`, `moj-wyscig.tsx`, `udostepnij.tsx`).
-- Pilot: `src/app/pilot/[kod]/pilot.tsx`. Panel: `src/app/admin/(panel)/` (pytania pijanego finału w `quizy/pijany-final/`).
-- Wspólne: `src/lib/admin.ts` (hasła, role, `widziWszystko`, `mozePijanyFinal`), `src/lib/admin-dostep.ts` (`wymagajQuizu`, `wymagajGry`, `widoczne`), `src/lib/gra/` (typy, `nasluch.ts` z `useNasluch`, `zZegarem`, `useKoniecPytania`; szklanka, wyścig, hasła kibiców), `src/lib/pijany.ts` (przeszkadzacze, `zegarPijany`), `src/lib/etapy.ts` (szablony), `src/lib/grafika-wyniku.ts` (grafiki do udostępniania), `src/lib/ekran-tv.ts` (wygaszacz, OLED, przeładowanie), `src/components/` (szklanka bez clip-path, werble, hasło kibica, awatar).
+- Baza: `supabase/migrations/`. Funkcje gry: `pilot_akcja`, `zapisz_odpowiedz`, `zapisz_odpowiedz_serii`, `stan_sesji`, `pilot_stan`, `ranking`, `dokoncz_pytanie`, `pijane_pytania`, `zakoncz_pijany`, `kibicuj`, `ustaw_progi`, `wewn.odetnij`, `wewn.progi_domyslne`, `wewn.ustaw_start_finalu`, `wewn.meta_finalu`, `wewn.zamknij_serie_jesli_gotowe`. Większość zmieniana podmianą fragmentów, więc całą treść bierz z bazy (`select pg_get_functiondef(…)`).
+- TV: `src/app/ekran/_ekran/` (`tv.tsx` rozdziela fazy; `wstep.tsx`, `etap.tsx`, `wyscig.tsx` z paskiem reszty, `ranking.tsx` z `KoniecEtapu`, `seria.tsx`, `drogi.tsx`, `pijany.tsx`, `muzyka.tsx`, `tlo.tsx`, `okrzyki.tsx`, `odpowiedzi.tsx`, `tv.css`).
+- Telefon: `src/app/[kod]/` (`gracz.tsx` rozdziela fazy; `rozgrywka.tsx`, `odpowiadanie.tsx`, `seria.tsx`, `kibic.tsx`, `pijany.tsx`, `etap.tsx`, `fanfara.tsx`, `moj-wyscig.tsx`, `udostepnij.tsx`).
+- Pilot: `src/app/pilot/[kod]/` (`pilot.tsx`, `progi.tsx`). Panel: `src/app/admin/(panel)/`.
+- Wspólne: `src/lib/gra/` (`typy.ts`, `nasluch.ts`, `final.ts` = `wewn.meta_finalu`, `wyscig.ts`, `odpadanie.ts`, `nastroj.ts`, `dzwiek.ts`), `src/lib/pijany.ts`, `src/lib/etapy.ts`, `src/lib/admin.ts`, `src/lib/admin-dostep.ts`. Grafiki z OpenAI: `scripts/grafiki.mjs` (model `gpt-image-2`).
 
-**Jak testować lokalnie:** szczegóły w `CLAUDE.md` („Testy lokalne”). W skrócie: `npm run build`, podgląd `start-test-hasla` (port 3100, hasła testowe obsługi i głównego w konfiguracji), gra testowa bez lokalu założona SQL-em, gracze i akcje pilota przez funkcje w SQL, na końcu usunięcie gry w panelu.
+**Jak testować lokalnie:** szczegóły w `CLAUDE.md` („Testy lokalne”).
 
 **Otwarte i niepewne:**
-- Test na żywo: spotkanie Kręgu w środę 28.10 (lista w `docs/TEST.md`).
-- Nie grane na kilku prawdziwych telefonach naraz: bonus z czasu bez limitu, kibicowanie przy wielu kibicach (TV pobiera stan po każdym okrzyku), pijany finał.
-- Samsung w lokalu: czy nie gaśnie (wideo czuwania 720p) i czy latające awatary pijanego finału idą płynnie.
-- Białe paski Safari przy werblach: poprawione na ślepo (błysk nie dotyka krawędzi), do sprawdzenia na iPhonie.
-- Muzyka na TV: są cztery utwory z Suno, brakuje `podium.mp3` (podium na razie gra w ciszy). Na Samsungu nie sprawdzona.
-- Lampy błyskowej przy selfie nie da się wyłączyć ze strony (systemowy aparat); pomysł na własny podgląd z kamery jest w `docs/POMYSLY.md`.
+- **Na 25.10: dźwięki i pijany finał** (plan niżej, w „Na 25.10”).
+- `/api/nagroda` (przeróbka zdjęcia nagrody w panelu) woła jeszcze `gpt-image-1`, który 24.10 przestał działać przy generowaniu. Pewnie nie działa; do sprawdzenia jednym zdjęciem i przejścia na `gpt-image-2`.
+- Pijany finał „Muzyki ponadczasowej” to prowizorka (`pijane_pytania_quizu`, opis w POMYSLY.md).
+- Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
+- Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
+- Gry testowe do usunięcia w panelu: JBXR, GDWX, QLLV, CFKE, QMRS, BTGX.
 
-**Następny krok:** test na żywo 28.10, potem poprawki po teście. Pomysły na dalej w `docs/POMYSLY.md` (np. konta zamiast dwóch haseł).
+**Następny krok:** dźwięki i pijany finał (25.10), potem test na żywo na spotkaniu Kręgu 28.10.
+
+## Na 25.10: dźwięki i pijany finał
+
+### Dźwięki (efekty na TV)
+
+Stan: jest tylko muzyka (`muzyka.tsx`, dwa stałe odtwarzacze) i dźwięk wybuchu w wideo pijanego finału. Werble i fanfara są dziś tylko obrazem. Odblokowanie dźwięku przez OK na pilocie TV już jest (`src/lib/gra/dzwiek.ts`, `odblokujDzwiek`).
+
+Propozycja techniczna:
+- Efekty tylko na TV (w barze telefony i tak nie słychać, a każdy telefon wymagałby osobnego odblokowania). Na telefonach najwyżej wibracja (Android).
+- Web Audio: jeden `AudioContext` wznawiany tym samym gestem co muzyka, krótkie pliki w `public/dzwieki/*.mp3` wczytane raz do buforów, `zagraj("nazwa")` w `src/lib/gra/dzwiek.ts`. Muzyka na czas efektu ściszana (np. do 40%) i z powrotem. Brakujący plik = cisza, jak przy muzyce.
+- Wyłącznik efektów w pilocie obok muzyki (osobny albo razem z nią, do ustalenia).
+- Zdarzenia z faz i czasów, które TV już zna (`stan.faza`, `faza_do`), bez nowych komunikatów z bazy.
+
+Lista do wybrania z Łukaszem (styl „bar”: kapsel, nalewanie, brzęk szkła, dzwonek):
+1. Dołączenie gracza w poczekalni (krótki „pop”/kapsel).
+2. Odliczanie 3-2-1 przed pytaniem i tykanie ostatnich 5 s.
+3. Koniec czasu (gong albo dzwonek barowy).
+4. Odsłonięcie dobrej odpowiedzi (ding).
+5. Ruch w wyścigu po pytaniu (nalewanie piwa do szklanki), wskoczenie nad kreskę.
+6. Koniec etapu (dzwonek „ostatnia kolejka”) i plansza nowego etapu.
+7. Finał: krok gracza, dobiegnięcie do szklanki.
+8. Werble przed podium i fanfara przy odsłonie miejsc.
+
+Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo proste tony z Web Audio do tykania), głośność względem muzyki, czy efekty grają też na ekranie lokalu między grami (raczej nie).
+
+### Pijany finał
+
+Stan: wspólna pula `pijane_pytania` (10 pytań, panel → Quizy → Pijany finał), każde z przeszkadzaczem i polami komentarzy po ✓ i ✗ (na razie puste). Kolejność to `nr` plus losowe przesunięcie do 4 miejsc na grę. Wstawki `{za_barem}` i `{lokal}`. Stałe 60 s według zegara serwera (`src/lib/pijany.ts`). Prowizorka 24.10: własne pytania „Muzyki ponadczasowej” w `pijane_pytania_quizu`.
+
+Do zaprojektowania razem:
+1. **Pytania i komentarze:** nowa lista z komentarzami po ✓ i ✗ (Łukasz chciał to ułożyć wspólnie). Komentarze krótkie, do 80 znaków.
+2. **Płynne wejście:** pierwsze 2–3 pytania brzmią jak dalszy ciąg prawdziwego finału (temat quizu), potem coraz dziwniej. Propozycja: pytania „wejścia” per quiz (z prowizorki zrobić porządną funkcję: w panelu przy quizie), a dalej wspólna pula absurdu. Wtedy losowanie kolejności tylko w części wspólnej.
+3. **Porządek po prowizorce:** `pijane_pytania_quizu` do panelu (lista przy quizie) albo zastąpienie powyższym.
+4. Pomysły z POMYSLY.md: „wyniki ankiety” z dogrywki na TV, kilka klipów wybuchu losowanych na grę.
 
 ## Ustalenia
 
@@ -726,6 +761,9 @@ Na test z Basią i Łukaszem, żeby nie odpowiadali o piwie (migracja `202610241
 - **Koniec etapu** na rankingu i wyścigu TV: duży złoty pasek „Koniec etapu N · nazwa” pod nagłówkiem (`KoniecEtapu` w `ranking.tsx`), wyścig zmniejsza tory o jego wysokość.
 - **Muzyka:** pliki `etap-2.mp3` i `etap-3.mp3` zamienione miejscami.
 - **Finał na telefonie:** zła odpowiedź tylko drży, bez czerwonej obwódki (na zielonym kole „Prawda” wyglądała źle).
+- **Nazwy etapów jako wieczór w barze** (migracja `20261024194544_nazwy_etapow_wieczor_w_barze`, pomysł Łukasza): Na jedno → Jednak więcej → Ile? → Poskłada się jakoś → Jeszcze zdążę, w obu quizach, z dopasowanymi opisami 1., 2. i 4. etapu. Na planszy wstępu każda nazwa w jednej linii.
+- **Ikony etapów** (migracja `20261024195230_ikony_etapow`, kolumna `etapy.ikona`, w `plan_etapow` i `etap_json`): kufel (Na jedno), deska degustacyjna (Jednak więcej), menzurka z piwem (Ile?), podstawka pocięta na puzzle (Poskłada się jakoś), kran z kieszonkowym zegarkiem (Jeszcze zdążę). Na planszy wstępu nad numerem etapu, na planszy etapu przed nazwą. Grafiki `public/grafiki/etapy/` ze `scripts/grafiki.mjs`: gpt-image-2 nie robi przezroczystego tła, więc przedmiot stoi na magencie, którą skrypt wycina (`bezMagenty`). Etap bez ikony wygląda jak dotąd; w panelu ikony jeszcze nie da się wybrać.
+- **Drobne w treści:** pytanie o jęczmień „Co to? Warzy się z tego większość piw.”, pinta ze zdjęciem szklanki, „pils” zamiast „pilzner” w 9 zadaniach, w ciekawostce o grodziskim tradycja z ok. 1301 roku i statut z 1601 roku (burmistrz próbował każdą beczkę; rok 1301 to data z tradycji, nie z dokumentu).
 - **Wyścig przy dużej grupie:** ranking po pytaniu to zawsze wyścig (wcześniej od 13 graczy była lista). Do 12 graczy każdy ma tor, powyżej tor ma pierwsza dziesiątka (`NA_TORACH_W_TLOKU`), a reszta stoi w pasku małych awatarów pod torami (do 26, dalsi jako „+N”), z przerywaną kreską odpadania, gdy wypada wśród nich. Sprawdzone przy 30 graczach (tor 56 px, z paskiem „Koniec etapu” też się mieści).
 
 ## Zadania dla ciebie (dzień 0)

@@ -45,6 +45,7 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
         <ol className="tv-wstep-droga">
           {plan.map((e, i) => (
             <motion.li key={e.nr} className={e.finalowy ? "final" : undefined} {...wejscie(3 + i)}>
+              {e.ikona ? <img src={e.ikona} alt="" className="tv-wstep-ikona" /> : null}
               <span className="tv-wstep-nr">{e.nr}</span>
               <span className="tv-wstep-nazwa">{e.nazwa}</span>
               {zostaje(e.nr) !== null && (

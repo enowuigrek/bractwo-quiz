@@ -54,6 +54,44 @@ const zdjecie = (plik, opis, styl = STYL) => ({
   opis: `${opis} ${styl}`,
 });
 
+/**
+ * Ikona etapu: jeden przedmiot przycięty do treści, 360 px. gpt-image-2 nie robi przezroczystego tła, więc
+ * przedmiot stoi na jednolitej magencie (w piwie jej nie ma), a skrypt zamienia ją na przezroczystość.
+ */
+const ikona = (plik, opis) => ({
+  plik: `etapy/${plik}`,
+  rozmiar: "1024x1024",
+  tlo: "opaque",
+  obrobka: async (img) =>
+    (await przytnijDoTresci(await bezMagenty(img)))
+      .resize({ width: 360, height: 360, fit: "inside" })
+      .webp({ quality: 85, alphaQuality: 90 }),
+  opis:
+    `${opis} Centered, the whole object visible with some margin, on a perfectly flat solid pure magenta ` +
+    "(#FF00FF) background with no shadows, no gradient and no reflections of the background. " +
+    STYL.replace("studio lighting with warm golden rim light", "even studio lighting"),
+});
+
+/** Magentowe tło na przezroczystość: im bliżej koloru #FF00FF, tym bardziej przezroczysty piksel. */
+async function bezMagenty(img) {
+  const { data, info } = await img.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    // magenta: dużo czerwieni i niebieskiego, mało zieleni
+    const magenta = Math.min(r, b) - g;
+    if (magenta > 120) data[i + 3] = 0;
+    else if (magenta > 60) {
+      data[i + 3] = Math.round(((120 - magenta) / 60) * 255);
+      // przebarwienie krawędzi: zabierz różowy nalot
+      data[i] = Math.min(r, g + 40);
+      data[i + 2] = Math.min(b, g + 40);
+    }
+  }
+  return sharp(data, { raw: info });
+}
+
 const GRAFIKI = {
   // pełna szklanka; pusta to ta sama grafika przygaszona, piwo „nalewa się” od dołu przycięciem
   szklanka: {
@@ -109,6 +147,31 @@ const GRAFIKI = {
     STYL_ZDJECIA,
   ),
   // quiz „Muzyka ponadczasowa”
+  // ikony etapów (etapy.ikona = /grafiki/etapy/…): wieczór w barze, na przezroczystym tle jak szklanka
+  "etap-na-jedno": ikona(
+    "na-jedno.webp",
+    "A single small classic beer mug with a handle, filled with golden lager and a white foam head.",
+  ),
+  "etap-jednak-wiecej": ikona(
+    "jednak-wiecej.webp",
+    "A wooden beer tasting flight paddle holding four small tasting glasses with different beers: pale golden, amber, " +
+      "ruby red and almost black stout.",
+  ),
+  "etap-ile": ikona(
+    "ile.webp",
+    "A tall laboratory glass measuring beaker with plain graduation lines but no numbers, filled two thirds with golden " +
+      "beer and a foam head.",
+  ),
+  "etap-poskladaj-sie": ikona(
+    "poskladaj-sie.webp",
+    "Four jigsaw puzzle pieces cut from a thick round cardboard beer coaster, three fitted together and the fourth " +
+      "floating just above its gap, warm amber and cream coloured cardboard without any print.",
+  ),
+  "etap-jeszcze-zdaze": ikona(
+    "jeszcze-zdaze.webp",
+    "A polished brass beer tap with a drop of golden beer falling from the spout, a vintage brass pocket watch with a " +
+      "plain dial without numbers hanging from the tap handle on its chain.",
+  ),
   "muz-saksofon": zdjecie(
     "saksofon.webp",
     "A golden alto saxophone lying on a dark velvet surface, dramatic warm side light, smoky jazz club atmosphere, " +
@@ -154,6 +217,11 @@ const GRAFIKI = {
     "jeczmien.webp",
     "Close-up of ripe golden two-row barley ears with long awns in a field at sunset, shallow depth of field.",
     STYL_ZDJECIA,
+  ),
+  "pyt-pinta": zdjecie(
+    "pinta.webp",
+    "A full British nonic pint glass of amber ale with a creamy head, standing on a dark wooden bar counter of a " +
+      "traditional English pub, brass beer taps and warm lights blurred behind.",
   ),
   "pyt-mass": zdjecie(
     "mass.webp",
@@ -243,6 +311,7 @@ async function generuj(nazwa) {
 }
 
 await mkdir("public/grafiki/pytania", { recursive: true });
+await mkdir("public/grafiki/etapy", { recursive: true });
 const wybrane = process.argv.slice(2);
 for (const nazwa of wybrane.length ? wybrane : Object.keys(GRAFIKI)) {
   if (!GRAFIKI[nazwa]) {

@@ -59,6 +59,8 @@ export type EtapWidoczny = {
   nr: number;
   liczba: number;
   nazwa: string;
+  /** Grafika przedmiotu przy nazwie etapu (/grafiki/etapy/…), null: bez ikony. */
+  ikona: string | null;
   opis: string | null;
   mnoznik: number;
   /** Czas na odpowiedź w etapie (z etapu albo gry), null: bez limitu. */
@@ -127,7 +129,7 @@ export type StanSesji = {
   /** Bieżące pytanie jest ostatnie w etapie: ranking po nim to koniec etapu (napis na TV, muzyka gaśnie). */
   ostatnie_w_etapie: boolean;
   /** Etapy quizu z odpadaniem (ilu przechodzi po etapie): plan gry na planszy etapu. */
-  plan_etapow: { nr: number; nazwa: string; finalowy: boolean; przechodzi: number | null }[];
+  plan_etapow: { nr: number; nazwa: string; ikona: string | null; finalowy: boolean; przechodzi: number | null }[];
   /** Ile osób odpowiedziało na bieżące zadanie. */
   liczba_odpowiedzi: number;
   /** Zegar serwera w chwili odpowiedzi. */

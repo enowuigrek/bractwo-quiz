@@ -415,6 +415,24 @@
   font-weight: var(--w-black);
 }
 
+/* ikona etapu (etapy.ikona) nad numerem na drodze wstępu */
+.tv-wstep-ikona {
+  height: 130px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.35));
+}
+
+/* ikona etapu przed nazwą na planszy etapu */
+.tv-etap-ikona {
+  height: 150px;
+  width: auto;
+  margin-right: 28px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.4));
+}
+
 .tv-wstep-prog {
   color: var(--czerwien);
   font-size: 24px;
