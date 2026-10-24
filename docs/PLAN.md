@@ -602,8 +602,8 @@ Po kolejnym teście Łukasza:
 
 ### Muzyka na TV (24.10) ✅ kod, utwory od Łukasza
 
-Pomysł Łukasza: wideo wybuchu ma dźwięk, więc przez cały quiz na TV może grać muzyka (z Suno). Decyzje: muzyka jest **opcjonalna**, włącza ją prowadzący w pilocie (domyślnie wyłączona), a gra bez dźwięku działa jak dotąd.
-- **Baza** (migracja `20261024080014_muzyka`): kolumna `sesje.muzyka` (domyślnie `false`), `stan_sesji` zwraca `muzyka`, `pilot_akcja('muzyka')` przełącza.
+Pomysł Łukasza: wideo wybuchu ma dźwięk, więc przez cały quiz na TV może grać muzyka (z Suno). Decyzje: muzyka jest **opcjonalna**: od 24.10 domyślnie włączona (migracja `20261024082653_muzyka_domyslnie`; bez głośników albo bez zgody przeglądarki po prostu nie gra), a prowadzący może ją wyłączyć w pilocie. Gra bez dźwięku działa jak dotąd.
+- **Baza** (migracja `20261024080014_muzyka`): kolumna `sesje.muzyka` (najpierw domyślnie `false`, potem `true`), `stan_sesji` zwraca `muzyka`, `pilot_akcja('muzyka')` przełącza.
 - **Pilot:** pod nagłówkiem „🔊 Muzyka na TV gra” / „🔇 Muzyka na TV wyłączona” z przyciskiem Włącz/Wyłącz.
 - **TV** (`ekran/_ekran/muzyka.tsx`, `MuzykaTv`): pięć utworów w `public/muzyka/`: `poczekalnia.mp3` (poczekalnia), `pytania.mp3` (zwykłe etapy), `przed-finalem.mp3` (etap walki o finał), `final.mp3` (finał serią i pijany finał), `podium.mp3` (podium, tabela, koniec; gra raz, reszta w pętli). Werble to cisza. Przy zmianie utworu 1,5 s przenikania. Brakujący plik po prostu nie gra, więc utwory można dodawać po kolei.
 - **Pijany finał:** muzyka finału rozciąga się jak taśma (`preservesPitch = false`, tempo spada do ok. 0,7 i faluje), coraz częściej się zacina (cofnięcie o 0,35 s), a od 5,8 s przed końcem zwalnia do zera i staje 4,2 s przed końcem, czyli tuż przed wideo. Wtedy wideo gra **z dźwiękiem wybuchu** (`pekniecie.mp4` ma teraz ścieżkę AAC), ale tylko gdy muzyka jest włączona i przeglądarka już pozwoliła grać (`src/lib/gra/dzwiek.ts`). Potem werble w ciszy.
