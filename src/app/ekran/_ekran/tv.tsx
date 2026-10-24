@@ -14,6 +14,7 @@ import {
 import { Awatar } from "@/components/awatar";
 import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
+import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import type { GraczNaLiscie, SeriaGracz, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
@@ -135,8 +136,15 @@ export function Tv({ kod, qr, host }: Props) {
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza), stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
 
-  // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację)
-  useNowaWersja(!stan || !["przygotuj", "pytanie", "seria", "pijany", "werble", "podium"].includes(stan.faza));
+  // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację);
+  // przy grającej muzyce dopiero po grze, bo po przeładowaniu przeglądarka znów czeka na OK na pilocie
+  const muzykaGra = useDzwiekOdblokowany() && !!stan?.muzyka;
+  useNowaWersja(
+    !stan ||
+      (muzykaGra
+        ? stan.faza === "koniec"
+        : !["przygotuj", "pytanie", "seria", "pijany", "werble", "podium"].includes(stan.faza)),
+  );
 
   // zapowiedziana gra: zamiast poczekalni z QR plansze z godziną i odliczaniem (jak na ekranie lokalu)
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
