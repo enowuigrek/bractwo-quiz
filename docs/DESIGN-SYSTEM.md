@@ -149,6 +149,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Muzyka na TV (Quiz).** Instrumentalna, w tle, głośność 0,55, przenikanie 1,5 s. Jedyny napis o dźwięku to prośba o zgodę na dole sceny (`.tv-muzyka-podpowiedz`), tylko w poczekalni: złota pigułka, znika, gdy muzyka zagra. W trakcie quizu żadnych napisów, najwyżej cisza. W pijanym finale muzyka psuje się razem z obrazem (zwalnia, faluje, ma dziury) i urywa się w chwili wybuchu szklanki, bez żadnego komunikatu. Werble zaczynają się od nagłej ciszy.
 
+**Finał jako wyścig (Quiz).** Na TV finaliści od startu stoją na drogach w różnych miejscach (przewaga 0–3 z 12 kroków), każdy krok to dobra odpowiedź; nigdzie nie ma liczby pytań. Pod koniec klipu wybuchu obraz zjeżdża w dół (1,1 s), jakby piana spłynęła.
+
 **Ocena w finale serią (Quiz).** Po odpowiedzi finalisty: błysk tła (radialny, `--chmiel` albo `--czerwien` 45%), wybrany przycisk pulsuje (dobrze, do 112%) albo trzęsie się na boki (źle, ±9 px). 0,4 s, od połowy serii (utrudnienia) coraz dłużej, do 1 s. Na TV awatar finalisty podskakuje z zieloną poświatą albo trzęsie się z czerwoną (0,9 s).
 
 **Okrzyki kibiców (Quiz).** Hasło z awatarem finalisty w miejscu kropek (`components/haslo-kibica.tsx`, hasła w `lib/gra/okrzyki.ts`): „Dawaj [awatar]!”, „[awatar], piwo czeka!”. Na telefonie kibica wybór finalisty (awatary) i przyciski z hasłami; na TV dymek nad drogą finalisty z nickiem kibica, unosi się i znika po 3,5 s, a pod nickiem finalisty licznik 📣, który podskakuje przy każdym okrzyku.

@@ -9,7 +9,7 @@ export const LIMITY_ETAPU = { nazwa: 60, opis: 240 } as const;
 export const MNOZNIKI = [1, 1.5, 2, 3] as const;
 
 /** Czasy etapu do wyboru; null = jak w ustawieniach gry. */
-export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45, 60, 90, 120];
+export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180];
 
 /** „×1,5” */
 export function napisMnoznika(m: number): string {
@@ -84,9 +84,10 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
   {
     klucz: "final",
     nazwa: "Finał",
-    opis: "Trzej najlepsi odpowiadają na serię pytań we własnym tempie. Na TV widać na żywo, kto jest bliżej piwa.",
+    opis:
+      "Trzej najlepsi ścigają się do piwa: każda dobra odpowiedź to krok, a lider ma kilka kroków przewagi. Kto pierwszy dobiegnie, wygrywa.",
     mnoznik: 2,
-    czas_s: 120,
+    czas_s: 180,
     finalowy: true,
     seria: true,
     typy: ["prawda_falsz"],

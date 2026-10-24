@@ -180,6 +180,8 @@ export type SeriaGracz = {
   zdjecie: string | null;
   odpowiedzi: number;
   dobre: number;
+  /** Finał jako wyścig: przewaga na starcie w krokach (0–3, src/lib/gra/final.ts). */
+  start?: number;
   /** Ile okrzyków dostał od kibiców. */
   doping?: number;
 };

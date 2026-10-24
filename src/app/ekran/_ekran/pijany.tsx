@@ -173,6 +173,8 @@ export function PijanyTv({
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
   const [gra, ustawGra] = useState(false);
+  // koniec klipu: piana zostaje na ostatniej klatce, więc zsuwamy obraz w dół, jakby spłynęła z ekranu
+  const [splywa, ustawSplywa] = useState(false);
   // wybuch (`WYBUCH_S` klipu) wypada `WYBUCH_PRZED_S` przed końcem fazy, po chwili ciszy od zgaszenia telefonów
   const przedKoncem = Math.min(WYLEWANIE_S, WYBUCH_PRZED_S + WYBUCH_S);
   const czasWylewania = teraz >= od && do_ - teraz <= przedKoncem * 1000;
@@ -197,7 +199,7 @@ export function PijanyTv({
         createPortal(
           <video
             ref={wideo}
-            className={`pijany-wideo${gra ? " gra" : ""}`}
+            className={`pijany-wideo${gra ? " gra" : ""}${splywa ? " splywa" : ""}`}
             src={WIDEO_WYLEWANIA}
             muted
             playsInline
@@ -208,6 +210,8 @@ export function PijanyTv({
                 ustawWybuch(true);
                 ogloszWybuch();
               }
+              const v = e.currentTarget;
+              if (!splywa && v.duration && v.duration - v.currentTime <= 0.7) ustawSplywa(true);
             }}
           />,
           scena,

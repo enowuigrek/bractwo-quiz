@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
+import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { ProgiPilota } from "./progi";
 
@@ -521,7 +522,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         <section className="karta" style={{ marginTop: 18 }}>
           <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
             <span>
-              {etap.nazwa} · seria {etap.liczba_pytan} pyt.
+              {etap.nazwa} · {etap.finalowy ? `wyścig do ${META_FINALU} kroków` : `seria ${etap.liczba_pytan} pyt.`}
             </span>
             <span className="gra-kod">
               {stan.faza_od && teraz < Date.parse(stan.faza_od)
@@ -532,11 +533,19 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </span>
           </p>
           <ol className="pilot-odpowiedzi">
-            {(stan.seria ?? []).map((g) => (
-              <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
-                {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
-              </li>
-            ))}
+            {(stan.seria ?? []).map((g) =>
+              // finał: kroki do szklanki (przewaga + dobre), zwykła seria: odpowiedzi z liczby pytań
+              etap.finalowy ? (
+                <li key={g.nick} className={krokiFinalu(g) >= META_FINALU ? "poprawna" : undefined}>
+                  {g.nick}: {Math.round(krokiFinalu(g) * 10) / 10}/{META_FINALU} kroków (przewaga {g.start ?? 0}),{" "}
+                  {g.odpowiedzi} odpowiedzi
+                </li>
+              ) : (
+                <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
+                  {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
+                </li>
+              ),
+            )}
           </ol>
           {stan.pijany_final && (
             <p className="pomocniczy" style={{ margin: "10px 0 0" }}>

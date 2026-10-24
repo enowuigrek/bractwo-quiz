@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MotionConfig } from "motion/react";
+import { naDrodzeFinalu } from "@/lib/gra/final";
 import type { SeriaGracz, StanSesji } from "@/lib/gra/typy";
 import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
@@ -10,7 +11,8 @@ import { OkrzykiNaDrogach } from "./okrzyki";
 
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
- * do pełnej szklanki. Każda dobra odpowiedź to krok (dobre / liczba pytań). Przed startem odliczanie
+ * do pełnej szklanki. Każda dobra odpowiedź to krok; w finale 12 kroków z przewagą 0–3 według punktów
+ * sprzed finału (src/lib/gra/final.ts), w zwykłej serii dobre / liczba pytań. Przed startem odliczanie
  * w nagłówku (drogi i gracze zostają widoczne), po nim w tym samym miejscu czas do końca serii.
  * Dane: `StanSesji.seria`, odświeżane po każdej odpowiedzi. W trybie „Pijany finał” pod koniec awatary drżą,
  * a po serii ten sam ekran z tym samym nagłówkiem przechodzi w chaos (pijany.tsx). Kibice spoza finału
@@ -23,7 +25,9 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const przedStartem = teraz < od;
-  const najlepszy = Math.max(0, ...gracze.map((g) => g.dobre));
+  // finał: wyścig na 12 kroków z przewagą (src/lib/gra/final.ts); zwykła seria: dobre / liczba pytań
+  const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g) : Math.min(1, g.dobre / n));
+  const najlepszy = Math.max(0, ...gracze.map(naDrodze));
 
   // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie
   // danych, w czasie renderu, jak zaleca React dla wartości wyprowadzonych z poprzednich propsów)
@@ -41,7 +45,7 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   // „Pijany finał”: od połowy drogi lidera (albo czasu serii) awatary zaczynają drżeć, coraz mocniej
   const postepCzasu = stan.faza_do ? (teraz - od) / Math.max(1, do_ - od) : 0;
   const drzenie =
-    stan.pijany_final && !przedStartem ? Math.min(1, Math.max(0, 2 * Math.max(najlepszy / n, postepCzasu) - 1)) : 0;
+    stan.pijany_final && !przedStartem ? Math.min(1, Math.max(0, 2 * Math.max(najlepszy, postepCzasu) - 1)) : 0;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -56,7 +60,7 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             <OkrzykiNaDrogach
               okrzyki={stan.okrzyki ?? []}
               gracze={gracze}
-              polozenie={gracze.map((g) => Math.min(1, g.dobre / n))}
+              polozenie={gracze.map(naDrodze)}
               teraz={teraz}
             />
           }
@@ -67,8 +71,8 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             nick: g.nick,
             zdjecie: g.zdjecie,
             przed: 0,
-            teraz: Math.min(1, g.dobre / n),
-            lider: g.dobre > 0 && g.dobre === najlepszy,
+            teraz: naDrodze(g),
+            lider: naDrodze(g) > 0 && naDrodze(g) === najlepszy,
             ocena: oceny[g.nick],
             // bez numeru pytania: widać tylko, kto jedzie szybciej, ciekawiej do samego końca
             podpis: (

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Werble } from "@/components/werble";
+import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import type { PytanieSerii, StanSesji, ZapisOdpowiedzi, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
@@ -18,30 +19,28 @@ import { Kibicowanie } from "./kibic";
 import { czyKibic, type Ja } from "./rozgrywka";
 
 /**
- * Utrudnienia w drugiej połowie finału: każde pytanie od połowy coś robi, za każdym razem co innego.
- * Efekt zależy tylko od miejsca pytania w serii (kolejność jest wszystkim wspólna), więc każdy finalista
- * dostaje przy tym samym pytaniu to samo. Same efekty to CSS (`.utrudnienie-*` w globals.css).
+ * Utrudnienia w drugiej połowie finału: od połowy drogi do szklanki (własne kroki z przewagą, src/lib/gra/final.ts)
+ * każde pytanie coś robi, za każdym razem co innego. Same efekty to CSS (`.utrudnienie-*` w globals.css).
  */
 const UTRUDNIENIA = ["drzenie", "zamiana", "mgla", "dryf", "zanikanie", "ucieczka", "kolysanie"] as const;
 /** Te działają na przyciskach prawda/fałsz; przy innym rodzaju pytania zamiast nich drży treść. */
 const NA_PRZYCISKACH: readonly string[] = ["zamiana", "ucieczka"];
 
-function utrudnienie(nr: number, liczba: number, typ: string): string | null {
-  const polowa = Math.ceil(liczba / 2);
-  if (nr < polowa) return null;
-  const efekt = UTRUDNIENIA[(nr - polowa) % UTRUDNIENIA.length];
+function utrudnienie(kroki: number, ktore: number, typ: string): string | null {
+  // od połowy drogi do szklanki (własne kroki z przewagą), co pytanie inny przeszkadzacz
+  if (kroki < META_FINALU / 2) return null;
+  const efekt = UTRUDNIENIA[ktore % UTRUDNIENIA.length];
   return typ !== "prawda_falsz" && NA_PRZYCISKACH.includes(efekt) ? "drzenie" : efekt;
 }
 
 /**
  * Ile trwa ocena po odpowiedzi w finale (błysk tła, puls albo drżenie przycisku); przyciski stoją wtedy
- * zablokowane. Krótko w pierwszej połowie, a od utrudnień coraz dłużej: 0,4 s → 1 s na ostatnim pytaniu.
- * Każdy finalista dostaje przy tym samym pytaniu to samo, więc wyścig zostaje uczciwy.
+ * zablokowane. Krótko w pierwszej połowie drogi, a od utrudnień coraz dłużej: 0,4 s → 1 s tuż przed szklanką.
  */
-function czasOceny(nr: number, liczba: number): number {
-  const polowa = Math.ceil(liczba / 2);
-  if (nr < polowa) return 400;
-  return Math.round(600 + (400 * (nr - polowa)) / Math.max(1, liczba - 1 - polowa));
+function czasOceny(kroki: number): number {
+  const polowa = META_FINALU / 2;
+  if (kroki < polowa) return 400;
+  return Math.round(Math.min(1000, 600 + (400 * (kroki - polowa)) / Math.max(1, META_FINALU - 1 - polowa)));
 }
 
 type Ocena = { id: string; dane: DaneOdpowiedzi; dobrze: boolean; ms: number };
@@ -109,6 +108,8 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   if (!pytania) return <p className="pomocniczy">Ładuję pytania…</p>;
   const teraz_ = pytania.find((p) => !odpowiedziane.includes(p.id));
   const ktore = odpowiedziane.length + 1;
+  // własne kroki w wyścigu (przewaga + dobre) z serii, którą widzi też TV
+  const mojeKroki = krokiFinalu(stan.seria?.find((g) => g.nick === ja.nick) ?? { dobre: 0, start: 0 });
 
   // koniec pytań albo czasu: bez „Gotowe!”, który mignąłby zwycięzcy i zdradził koniec. Zwykle od razu
   // ciemny ekran werbli; w pijanym finale sam pasek, z którego płynnie wychodzi „pytanie 15/14”
@@ -133,7 +134,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     const wynik = data as ZapisOdpowiedzi;
     if (wynik.przyjeta && e?.finalowy && wynik.poprawna !== undefined && pytania) {
       const id = teraz_.id;
-      const ms = czasOceny(pytania.indexOf(teraz_), pytania.length);
+      const ms = czasOceny(mojeKroki);
       ustawOcena({ id, dane, dobrze: wynik.poprawna, ms });
       setTimeout(() => {
         ustawOdpowiedziane((l) => [...l, id]);
@@ -156,7 +157,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     onWyslij: (d: DaneOdpowiedzi) => void odpowiedz(d),
   };
   // tylko w finale: od połowy pytań utrudnienia (numer pytania w serii, nie liczba odpowiedzi gracza)
-  const efekt = e?.finalowy ? utrudnienie(pytania.indexOf(teraz_), pytania.length, z.typ) : null;
+  const efekt = e?.finalowy ? utrudnienie(mojeKroki, ktore, z.typ) : null;
 
   return (
     <>
