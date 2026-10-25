@@ -2725,10 +2725,10 @@
   animation: odslona 0.5s var(--ease-wjazd) both;
 }
 
+/* wysokość kreski ustawia szacowanie.tsx (trochę ponad najwyższy stos kropek) */
 .tv-os-poprawna {
   position: absolute;
   bottom: 0;
-  top: -10px;
   width: 6px;
   margin-left: -3px;
   background: var(--zloto);
@@ -2765,7 +2765,8 @@
   margin: 10px 40px 0;
   padding: 0;
   display: flex;
-  gap: 40px;
+  flex-wrap: wrap;
+  gap: 10px 40px;
   font-size: 38px;
   font-weight: var(--w-black);
 }
@@ -2774,9 +2775,11 @@
   color: var(--zloto);
 }
 
+/* liczba z jednostką w jednej linii („8,5 %”), 25.10: „%” spadał do nowej linii */
 .tv-os-najblizej span {
   color: var(--szary);
   margin-left: 6px;
+  white-space: nowrap;
 }
 
 /* Finał (drogi.tsx): równe drewniane drogi z lewej zbiegają się pod szklanką po prawej */
@@ -3071,16 +3074,18 @@
   gap: 24px;
 }
 
+/* oś nie w połowie: nad nią 3 rzędy podpisów i plakietka poprawnej, pod nią 4 rzędy (szacowanie.tsx, RZEDY_POD) */
 .tv-os-odp-pole {
+  --os: 320px;
   position: relative;
-  height: 620px;
+  height: 704px;
 }
 
 .tv-os-odp-linia {
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: var(--os);
   height: 10px;
   margin-top: -5px;
   border-radius: 5px;
@@ -3134,7 +3139,7 @@
 /* gracz: awatar na osi, cienka kreska do podpisu w swoim rzędzie (--rzad: 0 najbliżej osi) */
 .tv-os-odp-gracz {
   position: absolute;
-  top: 50%;
+  top: var(--os);
   translate: -50% -50%;
   display: grid;
   place-items: center;
