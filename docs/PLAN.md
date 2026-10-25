@@ -29,6 +29,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 **Jak testować lokalnie:** szczegóły w `CLAUDE.md` („Testy lokalne”). Najszybciej: gra testowa SQL-em, w pilocie „Dodaj 4 boty” i automatyczne prowadzenie, TV w panelu przeglądarki 1920×1080.
 
 **Otwarte i niepewne:**
+- **OLED Samsunga nadal otwarty** (Łukasz, 25.10 wieczorem, domowy Tizen 9): w pijanym finale szklanka znika przed wybuchem, a wideo wybuchu nie widać; żeby ekran nie gasł, trzeba co jakiś czas klikać pilotem (OK już nie zatrzymuje muzyki). Na razie odłożone; wyniki badania wygaszacza w „Telewizor: wygaszacz, kursor…” niżej.
 - Wyniki gry w panelu liczą ciekawostki i całą pulę finału („Pytań w grze: 63”, „Dobrze 31/63”); trzeba liczyć tylko zadane pytania.
 - **Efekty dźwiękowe nikt jeszcze nie słyszał:** sprawdzone tylko, że grają we właściwych chwilach (licznik wywołań Web Audio). Głośność względem muzyki, brzmienie syntezy i Samsung w lokalu do odsłuchania; nagrania można podmienić plikami w `public/dzwieki/`.
 - Nowe pytania pijanego finału i komentarze ułożyłem sam (25.10): do przejrzenia przez Łukasza w panelu.
