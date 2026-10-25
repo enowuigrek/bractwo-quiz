@@ -163,6 +163,16 @@ Do zaprojektowania razem:
 - **Muzyka bez wyciszeń:** na końcu etapu urywa się razem z dzwonkiem (było 4 s wyciszania), a nowy utwór wchodzi od razu na pełną głośność (było 1,5 s podgłaśniania; utwory mają własne wstępy). Łagodne wejście zostało tylko przy powrocie pętli od środka utworu.
 - **Większe logotypy na planszach startowych ekranu lokalu:** zwykła 440/460 px (było 360/380), zapowiedź 400/420 px (było 260/280).
 
+### Telewizor: wygaszacz, kursor, stare przeglądarki, podgląd linku (25.10) ✅
+
+- **Badanie** (dwa przebiegi po kilku agentów, źródła: strony Samsunga, specyfikacja silnika WWW Samsunga, fora właścicieli): wygaszacz OLED Samsunga włącza się po 2 min bez pilota w każdej wbudowanej aplikacji i według Samsunga „nie da się go wyłączyć”. Strona go nie zatrzyma (Wake Lock nie istnieje w przeglądarce Tizen, wideo i muzyka nie pomagają; potwierdził test Łukasza na domowym OLED: czarny ekran z cieniami przy grającej grze). Wyłączyć go może tylko pakowana aplikacja Tizen (`webapis.appcommon.setScreenSaver`, tryb dewelopera i certyfikat; niepewne przy OLED) albo obraz z HDMI. Auto Power Off (4 h, UE) i Auto Power Saving da się wyłączyć w menu (lista w `docs/TEST.md`).
+- **Silnik przeglądarki Samsunga według roku:** 2025 Tizen 9 = Chromium 120, 2024 = 108, 2023 = 94, 2022 = 85, 2021 = 76, 2020 = 69, 2019 = 63. Next 16 celuje w Chrome 111+, więc tylko modele 2025+ pokażą ekran (u mamy Łukasza czarne tło). Obsługa starszych (browserslist w dół, polyfille) jest w POMYSLY.md.
+- **Kursor przeglądarki Samsunga** nie da się ukryć ze strony (`cursor: none`, pointer-events, Pointer Lock nie działają; tylko pakowane aplikacje mają przełącznik).
+- **Sprzątanie:** usunięte wideo czuwania (`public/wideo/czuwanie.mp4`, `useWideoCzuwania`); zostaje Wake Lock (działa na laptopie i przystawce z Chromium).
+- **Podgląd linku do ekranu** (Messenger itp.): `src/app/ekran/[adres]/opengraph-image.tsx` (1200×630: białe logo Bractwa, logo lokalu, „Quiz Bractwa Piwnego” i nazwa lokalu w Open Sans z Google Fonts) i tytuł „Ekran quizu · <lokal>” z opisem w `generateMetadata`. Messenger trzyma podgląd w pamięci, więc stary link może pokazywać stary podgląd.
+- **Szacowanie na TV:** plakietka poprawnej odpowiedzi 32 px niżej, w polu osi (przy dwuwierszowym pytaniu wchodziła na linię nagłówka).
+- **Szklanka wyścigu:** 48 bąbelków zamiast 26. **Nalewanie:** do 6 plików na zmianę (`nalewanie-2.mp3`…, brakujące pomijane).
+
 ## Ustalenia
 
 | Temat | Decyzja |

@@ -23,7 +23,17 @@ async function lokalPoAdresie(adres: string): Promise<Lokal | null> {
 export async function generateMetadata({ params }: PageProps<"/ekran/[adres]">): Promise<Metadata> {
   const { adres } = await params;
   const lokal = await lokalPoAdresie(adres);
-  return { title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()} · Bractwo Quiz` };
+  // podgląd linku (Messenger itp.): tytuł z lokalem i miniatura z opengraph-image.tsx
+  const tytul = lokal ? `Ekran quizu · ${lokal.nazwa}` : `Ekran gry ${adres.toUpperCase()}`;
+  const opis = lokal
+    ? "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze w lokalu: plansze, zapowiedź i gra pokażą się same."
+    : "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze: gra pokaże się sama.";
+  return {
+    title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()} · Bractwo Quiz`,
+    description: opis,
+    metadataBase: new URL(await adresAplikacji()),
+    openGraph: { title: tytul, description: opis, siteName: "Bractwo Quiz", locale: "pl_PL", type: "website" },
+  };
 }
 
 export default async function StronaEkranu({ params }: PageProps<"/ekran/[adres]">) {

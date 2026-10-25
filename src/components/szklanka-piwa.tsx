@@ -9,11 +9,12 @@ const BRZEG = brzegSzklanki();
  * Bąbelki w piwie: stałe położenia i tempo (bez losowania, żeby nie skakały przy odświeżeniu),
  * `x` w procentach szerokości szklanki, `r` średnica w px, `t` czas wznoszenia, `d` opóźnienie startu.
  */
-const BABELKI = Array.from({ length: 26 }, (_, i) => ({
-  x: 24 + ((i * 37) % 52),
+// 25.10 gęściej (Łukasz: na TV za mało): 48 zamiast 26, równiej rozłożone po szerokości i w czasie
+const BABELKI = Array.from({ length: 48 }, (_, i) => ({
+  x: 22 + ((i * 29) % 56),
   r: 3 + ((i * 5) % 4),
   t: 2.6 + ((i * 7) % 10) * 0.28,
-  d: -((i * 1.3) % 4.2),
+  d: -((i * 0.93) % 4.6),
   w: ((i % 3) - 1) * 6,
 }));
 

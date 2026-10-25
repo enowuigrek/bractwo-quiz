@@ -66,7 +66,7 @@ export function Scena({
   nastroj,
 }: {
   children: React.ReactNode;
-  /** Werble: czarny ekran bez smug tła (wideo czuwania gra dalej). */
+  /** Werble: czarny ekran bez smug tła. */
   zgaszona?: boolean;
   /** Nastrój tła według etapu (src/lib/gra/nastroj.ts); bez niego zwykłe ciepłe tło. */
   nastroj?: Nastroj;

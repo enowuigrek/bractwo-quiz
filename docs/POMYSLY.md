@@ -64,3 +64,6 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 - **Podgląd pytania tak, jak zobaczy je TV** prosto z edytora.
 - **Własne plansze na ekranie lokalu**, dodawane i zmieniane w panelu: grafiki, zapowiedzi wydarzeń (np. Dzień Porteru), ciekawostki piwne.
 - **„Dłuższy czas” dla wybranych pytań** (np. ×2 przy grafice albo długiej treści), jeśli jeden czas na całą grę okaże się za mało elastyczny.
+
+- **Starsze telewizory Samsunga (przed 2025)** (25.10): ich przeglądarki to Chromium 63–108, a Next 16 celuje w Chrome 111+, więc `/ekran` zostaje czarny. Do sprawdzenia: `browserslist` w `package.json` w dół (np. chrome 76), polyfille w `instrumentation-client.ts`, zamiana nowszych rzeczy w CSS (`translate`, `color-mix`, `inset`), test na takim TV. Na razie przystawka HDMI albo laptop.
+- **Aplikacja Tizen z wyłączonym wygaszaczem** (25.10): mała pakowana aplikacja otwierająca ekran lokalu i wołająca `webapis.appcommon.setScreenSaver(SCREEN_SAVER_OFF)`; instalacja w trybie dewelopera (Apps2Samsung, konto Samsung, certyfikat na DUID telewizora). Niepewne, czy przebije wygaszacz OLED.

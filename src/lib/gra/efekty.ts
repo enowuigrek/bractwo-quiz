@@ -40,8 +40,15 @@ export type Efekt =
 const TYLKO_PLIK: ReadonlySet<Efekt> = new Set(["nalewanie"]);
 /** Głośność efektów względem pełnej skali (muzyka gra na 0,55). */
 const GLOSNOSC = 0.6;
-/** Pliki efektu grane na zmianę (bez wpisu: jeden plik o nazwie efektu). */
-const WARIANTY: Partial<Record<Efekt, string[]>> = { krok: ["krok-1", "krok-2"], odpowiedzi: ["ding"] };
+/**
+ * Pliki efektu grane po kolei, za każdym razem następny (bez wpisu: jeden plik o nazwie efektu). Brakujące pliki
+ * są pomijane, więc nalewania można dokładać po jednym (`nalewanie-2.mp3`, `nalewanie-3.mp3`…).
+ */
+const WARIANTY: Partial<Record<Efekt, string[]>> = {
+  krok: ["krok-1", "krok-2"],
+  odpowiedzi: ["ding"],
+  nalewanie: ["nalewanie", "nalewanie-2", "nalewanie-3", "nalewanie-4", "nalewanie-5", "nalewanie-6"],
+};
 /** Tempo odtwarzania pliku (poniżej 1: niżej i wolniej, jak zniekształcone echo). */
 const TEMPO: Partial<Record<Efekt, number>> = { odpowiedzi: 0.78 };
 /** Głośność pojedynczych efektów (bez wpisu 1): częste i tła ciszej, żeby nie zagłuszały muzyki. */
@@ -100,6 +107,17 @@ function plik(nazwa: string): Promise<AudioBuffer | null> {
   return p;
 }
 
+/** Bufor do zagrania: jedyny plik efektu albo następny z wczytanych wariantów (`null`: żadnego pliku nie ma). */
+async function wybierzBufor(nazwa: Efekt): Promise<AudioBuffer | null> {
+  const warianty = WARIANTY[nazwa];
+  if (!warianty) return plik(nazwa);
+  const wczytane = (await Promise.all(warianty.map(plik))).filter((b): b is AudioBuffer => b !== null);
+  if (!wczytane.length) return null;
+  const n = ktoryWariant.get(nazwa) ?? 0;
+  ktoryWariant.set(nazwa, n + 1);
+  return wczytane[n % wczytane.length];
+}
+
 /** Wczytuje pliki z góry, żeby pierwszy efekt nie czekał na sieć. */
 export function wczytajEfekty(nazwy: readonly Efekt[]): void {
   if (!kontekst()) return;
@@ -128,11 +146,7 @@ export function zagraj(nazwa: Efekt): () => void {
     glos.gain.linearRampToValueAtTime(0, t + 0.15);
     window.setTimeout(() => glos.disconnect(), 400);
   };
-  // kilka plików: po kolei, za każdym razem następny
-  const warianty = WARIANTY[nazwa];
-  const n = ktoryWariant.get(nazwa) ?? 0;
-  ktoryWariant.set(nazwa, n + 1);
-  void plik(warianty ? warianty[n % warianty.length] : nazwa).then((bufor) => {
+  void wybierzBufor(nazwa).then((bufor) => {
     if (zatrzymany) return;
     if (bufor) {
       const zrodlo = c.createBufferSource();

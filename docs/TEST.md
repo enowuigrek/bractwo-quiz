@@ -10,6 +10,15 @@
 3. W panelu: uruchom grę (miasto → lokal → quiz, okazja, czas na odpowiedź, nagrody). Bonus za szybkość jest zawsze, drużyn już nie ma. Widoczność i „Pijany finał” są tylko po zalogowaniu hasłem głównym; gra głównego jest domyślnie „tylko dla mnie”, więc obsługa nie zobaczy jej w panelu (pilot i TV działają normalnie).
 4. Jeśli telewizor ma otwarty ekran od wczoraj, a w międzyczasie było wdrożenie: ekran sam się przeładuje w ciągu minuty (poza pytaniem, serią i pijanym finałem). Dla pewności odśwież go raz ręcznie.
 
+## Telewizor Samsung: ustawienia (raz, przed pierwszym quizem w lokalu)
+
+Badanie z 25.10 (strony Samsunga, fora właścicieli S90C/S95D/S90F):
+- Ustawienia → Wszystkie ustawienia → Ogólne i prywatność → Zasilanie i oszczędzanie energii: **Automatyczne wyłączanie: Wył.** (inaczej TV gaśnie po 4 h bez pilota, wymóg UE), **Automatyczne oszczędzanie energii: Wył.** (wyłącza sam ekran), Wyłącznik czasowy: Wył., oraz Optymalizacja jasności / Oszczędzanie energii / Motion Lighting: Wył. (ściemniają obraz). Polskie nazwy w modelach 2025 mogą się trochę różnić.
+- Ogólne i prywatność → Panel Care → Dostosuj jasność logo: Wył. (tylko OLED; ściemnia stałe elementy).
+- **OLED Samsunga (2023+): wygaszacz po 2 min bez pilota w każdej wbudowanej aplikacji, także w przeglądarce. Nie da się go wyłączyć w menu ani ze strony.** Właściciele piszą, że nie włącza się przy obrazie z HDMI, więc w lokalu z OLED-em ekran puszczamy z przystawki HDMI (Fire TV Stick z przeglądarką na pełnym ekranie i wygaszaczem „Nigdy”) albo z laptopa. Na zwykłym (nie OLED) Samsungu wystarczą ustawienia wyżej.
+- Kursora przeglądarki Samsunga strona nie ukryje (`cursor: none` nie działa); można go odsunąć pilotem w róg. Przy przystawce HDMI kursora nie ma.
+- Starsze Samsungi (przed 2025) mają przeglądarkę starszą niż Chrome 111, której wymaga aplikacja: ekran zostaje czarny. Wtedy też przystawka HDMI albo laptop.
+
 ## Na miejscu (30 min przed)
 
 1. Telewizor: przeglądarka na pełnym ekranie (F11), ekran lokalu z zakładek (`/ekran/<adres-lokalu>`, adres w panelu: ⚙ → lokal). Bez gry lecą plansze, a po uruchomieniu gry ekran sam przechodzi do poczekalni. Ekran sam prosi telewizor o niewygaszanie (Wake Lock i zapętlone, prawie czarne wideo na całym ekranie). Jeśli mimo to obraz gaśnie albo ciemnieje, to ustawienia telewizora. W lokalu stoi Samsung OLED (Tizen, przeglądarka Samsung Internet): Ustawienia → Wszystkie ustawienia → Ogólne i prywatność → Menedżer systemu → Czas autoochrony (wyłącz albo ustaw najdłuższy) oraz Ogólne i prywatność → Ochrona panelu OLED / Panel Care → Dostosuj jasność logo (wyłącz). Po otwarciu strony dotknij raz pilota TV. Nazwy pozycji różnią się trochę między rocznikami.
@@ -53,7 +62,7 @@ Do zanotowania po teście (dzień 7):
 - czy utrudnienia w finale nie są za mocne (albo za słabe),
 - czy na iPhonie przy werblach paski przeglądarki zostają czarne,
 - pijany finał: jak ludzie reagują, czy ktoś zauważył, że seria leci dalej, czy 60 s to nie za długo i czy latające awatary idą płynnie na Samsungu,
-- czy telewizor dalej się wygasza (wideo czuwania 720p z dźwiękiem, ustawienia Samsunga wyżej),
+- czy telewizor się wygasza albo ściemnia (ustawienia Samsunga wyżej; wygaszacza OLED Samsunga strona nie wyłączy, wtedy przystawka HDMI albo laptop),
 - muzyka: czy nie za głośna przy rozmowach i czy psucie w pijanym finale słychać na głośnikach TV,
 - czy coś na TV jest za małe z końca sali,
 - błędy i dziwne zachowania: kiedy, na jakim telefonie i w jakiej przeglądarce.

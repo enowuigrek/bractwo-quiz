@@ -8,7 +8,7 @@
   cursor: none;
 }
 
-/* werble: czarny ekran, wideo czuwania pod spodem gra dalej */
+/* werble: czarny ekran */
 .tv.zgaszona {
   background: #000;
 }
@@ -2188,7 +2188,7 @@
   filter: brightness(1.6);
 }
 
-/* ograniczony ruch: tło stoi, ale wideo czuwania (pod spodem) dalej gra */
+/* ograniczony ruch: tło stoi */
 @media (prefers-reduced-motion: reduce) {
   .tv-blask,
   .tv-smuga,
@@ -2196,15 +2196,6 @@
   .tv-winieta {
     animation: none;
   }
-}
-
-/* Prawie czarne wideo na całym ekranie (tlo.tsx): odtwarzanie trzyma telewizor bez wygaszacza */
-.tv-czuwanie {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 /* Wyścig po piwo (wyscig.tsx): tory na barowej ladzie, na mecie szklanka napełniana z każdym pytaniem */
@@ -3246,9 +3237,11 @@
   background: linear-gradient(90deg, transparent, var(--kamien3) 8%, var(--kamien3) 92%, transparent);
 }
 
+/* kreska poprawnej z plakietką na górze; plakietka mieści się w polu osi (wcześniej wystawała 23 px na linię
+   nagłówka przy dwuwierszowym pytaniu, 25.10) */
 .tv-os-odp-poprawna {
   position: absolute;
-  top: 9%;
+  top: calc(9% + 32px);
   bottom: 3%;
   width: 6px;
   margin-left: -3px;
