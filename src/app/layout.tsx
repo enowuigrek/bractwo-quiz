@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Open_Sans } from "next/font/google";
 import "../../docs/tokens.css";
 import "./globals.css";
+import { POLYFILLE } from "@/lib/polyfille";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -22,6 +23,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pl" className={openSans.variable}>
+      <head>
+        {/* starsze przeglądarki telewizorów (src/lib/polyfille.ts): przed całym kodem Next */}
+        <script dangerouslySetInnerHTML={{ __html: POLYFILLE }} />
+      </head>
       <body>{children}</body>
     </html>
   );

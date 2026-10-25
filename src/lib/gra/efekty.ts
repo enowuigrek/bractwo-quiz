@@ -47,7 +47,7 @@ const GLOSNOSC = 0.6;
 const WARIANTY: Partial<Record<Efekt, string[]>> = {
   krok: ["krok-1", "krok-2"],
   odpowiedzi: ["ding"],
-  nalewanie: ["nalewanie", "nalewanie-2", "nalewanie-3", "nalewanie-4", "nalewanie-5", "nalewanie-6"],
+  nalewanie: ["nalewanie", "nalewanie-2", "nalewanie-3", "nalewanie-4", "nalewanie-5"],
 };
 /** Tempo odtwarzania pliku (poniżej 1: niżej i wolniej, jak zniekształcone echo). */
 const TEMPO: Partial<Record<Efekt, number>> = { odpowiedzi: 0.78 };

@@ -24,12 +24,27 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
   const plansza = `${e?.id ?? ""}|${stan.finalisci?.length ?? 0}`;
   const [ciasno, ustawCiasno] = useState({ plansza, o: 0 });
   const stopien = ciasno.plansza === plansza ? ciasno.o : 0;
+  // pomiar od nowa, gdy treść urośnie po wejściu planszy: obrazki (logo lokalu, ikona etapu) i font wczytują się
+  // później, a pojedynczy pomiar na starcie przepuszczał wtedy listę finalistów pod ekran (25.10 u Łukasza)
+  const [urosla, ustawUrosla] = useState(0);
   useLayoutEffect(() => {
     const pole = tresc.current;
     const opis = pole?.querySelector(".tv-etap-opis");
     if (!pole || !opis || stopien >= 2) return;
-    if (opis.getBoundingClientRect().height > pole.clientHeight + 1) ustawCiasno({ plansza, o: stopien + 1 });
-  }, [plansza, stopien]);
+    if (opis.getBoundingClientRect().height > pole.clientHeight + 1) {
+      ustawCiasno({ plansza, o: stopien + 1 });
+      return;
+    }
+    if (typeof ResizeObserver === "undefined") return;
+    // tylko gdy opis naprawdę urósł od pomiaru (pierwsze zgłoszenie po podpięciu ma zwykle ten sam rozmiar;
+    // pomijanie go „na ślepo” gubiło wzrost, gdy pierwsza klatka przyszła dopiero po wczytaniu obrazków)
+    const wysokosc = opis.getBoundingClientRect().height;
+    const obserwator = new ResizeObserver(() => {
+      if (opis.getBoundingClientRect().height > wysokosc + 1) ustawUrosla((n) => n + 1);
+    });
+    obserwator.observe(opis);
+    return () => obserwator.disconnect();
+  }, [plansza, stopien, urosla]);
   if (!e) return null;
   // kreski odpadania na drodze przez etapy: pod etapem z progiem krótko, ilu zostaje („✂ 6”); trójki przed
   // finałem tu nie znaczymy, bo mówi o niej plansza walki o finał. Całe zdanie jest niżej, przy zasadach

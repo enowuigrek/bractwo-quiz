@@ -10,6 +10,8 @@ import type { Zapowiedz } from "@/lib/gra/zapowiedz";
 import { MuzykaTv } from "./muzyka";
 import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
+import { PlanszaProsta, ScenaProsta } from "../_prosty/prosty";
+import { useTrybProsty } from "@/lib/gra/prosty";
 
 type Props = {
   adres: string;
@@ -45,6 +47,8 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   useNasluchTematu(`lokal:${adres}`, pobierz, ["gra"]);
   // plansze bez gry można przeładować od razu; w trakcie gry pilnuje tego ekran gry (Tv)
   useNowaWersja(!kod);
+  // starsza przeglądarka telewizora: prosta plansza zamiast przewijanych plansz (src/lib/gra/prosty.ts)
+  const prosty = useTrybProsty();
 
   useEffect(() => {
     if (!kod) return;
@@ -65,9 +69,8 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   if (kod && qr?.kod === kod) {
     return <Tv key={kod} kod={kod} qr={qr.svg} host={baza.replace(/^https?:\/\//, "")} />;
   }
-  return (
-    <Scena nastroj={zapowiedz ? "poczekalnia" : undefined}>
-      <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+  const dzwieki = (
+    <>
       {/* zapowiedziana gra: muzyka poczekalni już teraz, a po otwarciu poczekalni gra dalej (muzyka.tsx) */}
       {zapowiedz?.muzyka && <ProbaEfektow />}
       {zapowiedz?.muzyka && (
@@ -83,6 +86,20 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
           teraz={0}
         />
       )}
+    </>
+  );
+  if (prosty) {
+    return (
+      <ScenaProsta>
+        <PlanszaProsta lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+        {dzwieki}
+      </ScenaProsta>
+    );
+  }
+  return (
+    <Scena nastroj={zapowiedz ? "poczekalnia" : undefined}>
+      <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+      {dzwieki}
     </Scena>
   );
 }

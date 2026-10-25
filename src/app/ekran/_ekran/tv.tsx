@@ -40,6 +40,8 @@ import { PodiumTv, RankingTv } from "./ranking";
 import { LogoNaglowka } from "./logo";
 import { NickiPoczekalni } from "./nicki";
 import { WstepTv } from "./wstep";
+import { ProstyTv, ScenaProsta } from "../_prosty/prosty";
+import { useTrybProsty } from "@/lib/gra/prosty";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
 const SZER = 1920;
@@ -156,6 +158,28 @@ export function Tv({ kod, qr, host }: Props) {
         ? stan.faza === "koniec"
         : !["przygotuj", "pytanie", "seria", "pijany", "werble", "podium"].includes(stan.faza)),
   );
+
+  // starsza przeglądarka telewizora: prosty ekran (te same dane, muzyka i efekty, bez animacji i nowego CSS)
+  const prosty = useTrybProsty();
+  if (prosty) {
+    return (
+      <ScenaProsta ciemna={stan?.faza === "werble"}>
+        <ProstyTv
+          stan={stan}
+          blad={blad}
+          gracze={gracze}
+          ranking={ranking}
+          odpowiedzi={odpowiedzi}
+          qr={qr}
+          host={host}
+          teraz={teraz}
+          przesuniecie={przesuniecie}
+        />
+        {stan && <MuzykaTv stan={stan} teraz={teraz} />}
+        {stan && <EfektyTv stan={stan} teraz={teraz} />}
+      </ScenaProsta>
+    );
+  }
 
   const wGrze = ranking.filter((w) => w.odpadl === null);
   // zapowiedziana gra: zamiast poczekalni z QR plansze z godziną i odliczaniem (jak na ekranie lokalu)

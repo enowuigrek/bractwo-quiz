@@ -174,6 +174,17 @@ Do zaprojektowania razem:
 - **Szacowanie na TV:** plakietka poprawnej odpowiedzi 32 px niżej, w polu osi (przy dwuwierszowym pytaniu wchodziła na linię nagłówka).
 - **Szklanka wyścigu:** 48 bąbelków zamiast 26. **Nalewanie:** do 6 plików na zmianę (`nalewanie-2.mp3`…, brakujące pomijane).
 
+### Prosty ekran TV dla starszych przeglądarek (25.10, wieczór)
+
+- **Po co:** starsze telewizory (Samsung przed 2025 = Chromium 69–108) pokazywały na `/ekran` czarny ekran. Przyczyny: Next 16 kompilował kod pod Chrome 111+, biblioteka `motion` woła `queueMicrotask` (Chrome 71+) od razu przy wczytaniu, a CSS pełnego ekranu używa rzeczy, których stare Chrome nie zna (`translate`/`scale` jako osobne właściwości ×62, `gap` we flexie ×175, `color-mix` ×15, `:has` ×9, `aspect-ratio`).
+- **Kompilacja pod Chrome 69:** `browserslist` w `package.json` (`chrome 69`, reszta jak domyślnie w Next 16). Sprawdzone narzędziem `es-check`: zbudowany kod przechodzi jako ES2019 (Chrome 69 ma wszystko z ES2019 poza funkcjami uzupełnianymi niżej).
+- **Polyfille** (`src/lib/polyfille.ts`, czyste ES5, wstawione na początku `<head>` w `app/layout.tsx`): `globalThis`, `queueMicrotask`, `.at()`, `Object.hasOwn`, `Object.fromEntries`, `String.replaceAll`, `String.matchAll`, `Promise.allSettled`. Każde tylko wtedy, gdy przeglądarka danej funkcji nie ma.
+- **Prosty ekran** (`src/app/ekran/_prosty/prosty.tsx` + `prosty.css`): te same dane, automat, muzyka i efekty co pełny ekran (`Tv` w `tv.tsx` tylko inaczej rysuje), każda faza jako statyczna plansza: zapowiedź i plansza lokalu, poczekalnia z QR i nickami, wstęp, etap, odliczanie, pytanie każdego rodzaju (pary w dwóch kolumnach do czasu wyniku), wynik z rozkładem głosów, ciekawostka, odpowiedzi graczy, ranking z kreską odcięcia, finał z paskami kroków, podium, tabela. CSS bez `gap` we flexie (marginesy), bez osobnych `translate`, bez `color-mix`, `:has`, `inset`, `aspect-ratio`, `min()/max()`. Pijany finał na prostym ekranie to dalej plansza finału (bez chaosu i wideo), więc na starym TV lepiej go nie włączać.
+- **Kiedy się włącza** (`src/lib/gra/prosty.ts`): sam, gdy przeglądarka nie zna `color-mix()` (Chrome przed 111, czyli każdy Samsung przed 2025), albo ręcznie `?prosty` w adresie (`/ekran/<lokal>?prosty`); `?pelny` wymusza pełny. `/tv/<kod>` przekazuje parametry dalej.
+- Sprawdzone w zwykłej przeglądarce z `?prosty` na grze z botami (wszystkie fazy powyżej); pełny ekran bez parametru bez zmian. **Nie sprawdzone na prawdziwym Chrome 69:** pobrany Chromium 69 jest na Intela i wymaga Rosetty (`softwareupdate --install-rosetta`), a najlepiej sprawdzić u mamy Łukasza.
+- **Plansza etapu zagęszcza się też po wczytaniu obrazków:** pomiar „czy się mieści” był raz, na starcie; gdy logo lokalu i ikona etapu wczytały się później, lista finalistów wyjeżdżała pod ekran (zgłoszenie Łukasza z TV). Teraz `ResizeObserver` powtarza pomiar, gdy opis urośnie (`etap.tsx`).
+- **Nalewanie:** 5 nagrań (`nalewanie.mp3`, `nalewanie-2…5.mp3`; nowe od Łukasza przycięte do 4 s z wyciszeniem, żeby nie wchodziły na odliczanie następnego pytania), grają po kolei.
+
 ## Ustalenia
 
 | Temat | Decyzja |
