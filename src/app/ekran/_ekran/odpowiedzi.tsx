@@ -152,7 +152,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             Dobrze <span>{dobre.length}</span>
           </p>
           {dobre.length === 0 ? (
-            <p className="tv-odpowiedzi-pusto">Nikt nie trafił.</p>
+            <p className="tv-odpowiedzi-pusto">Nikt nie odpowiedział dobrze.</p>
           ) : (
             <ol className="tv-odpowiedzi-lista" style={siatka(dobre.length, k)}>
               {dobre.map((o, i) => (
