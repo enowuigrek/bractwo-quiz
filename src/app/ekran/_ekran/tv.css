@@ -369,17 +369,19 @@
 }
 
 /* Automatyczne prowadzenie: ile osób kliknęło „Gotowy” na planszy (tv.tsx, GotowiTv) */
+/* lewy dolny róg: prawy zasłaniał podpis pod demo telefonu na planszy etapu */
 .tv-gotowi {
   position: absolute;
-  right: 40px;
-  bottom: 28px;
+  left: 40px;
+  bottom: 20px;
+  z-index: 30;
   margin: 0;
-  padding: 10px 26px;
+  padding: 6px 20px;
   border: 2px solid var(--kamien2);
   border-radius: var(--r-pill);
   background: rgba(0, 0, 0, 0.55);
   color: var(--szary);
-  font-size: 32px;
+  font-size: 26px;
   font-weight: var(--w-black);
   font-variant-numeric: tabular-nums;
 }
