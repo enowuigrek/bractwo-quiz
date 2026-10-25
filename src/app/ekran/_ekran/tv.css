@@ -369,11 +369,13 @@
 }
 
 /* Automatyczne prowadzenie: ile osób kliknęło „Gotowy” na planszy (tv.tsx, GotowiTv) */
-/* lewy dolny róg: prawy zasłaniał podpis pod demo telefonu na planszy etapu */
+/* górny środek: wolny pas nad treścią na wstępie, planszach etapów i ciekawostce (logo lokalu i numery
+   etapów stoją po bokach). Na dole zasłaniało raz podpis demo telefonu, raz przyciski etapu (25.10). */
 .tv-gotowi {
   position: absolute;
-  left: 40px;
-  bottom: 20px;
+  left: 50%;
+  top: 28px;
+  translate: -50% 0;
   z-index: 30;
   margin: 0;
   padding: 6px 20px;

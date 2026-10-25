@@ -106,6 +106,8 @@ Pigułki **wypełnione kolorem zależnym od rodzaju**, bez samych obramówek:
 - `.przycisk-cichy`: sam tekst, dla akcji pobocznych.
 Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole`, bo tekst bywa wielowierszowy.
 
+**Plakietki stanu na TV (np. „Gotowi x/y”):** na górze pośrodku sceny, nie w dolnych rogach (tam bywają podpisy demo i przyciski etapu).
+
 **Nazwa z ikoną (TV):** tekst zawsze od lewej, w jednej linii z resztą tekstu, ikona za nazwą po prawej (plansza etapu, od 25.10).
 
 **Akcje to przyciski, nie napisy do klikania** (Łukasz, 25.10). Przejście do innej strony też dostaje wygląd przycisku (`<Link className="przycisk">`, np. „Panel obsługi” w pilocie, po grze złoty, „Wpisz inny kod” na telefonie). Tekstowe linki zostają tylko tam, gdzie to nawigacja „← wstecz” w panelu albo podpis autora.
