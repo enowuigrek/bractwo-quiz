@@ -7,6 +7,11 @@ import type { StanSesji } from "@/lib/gra/typy";
 
 /** Tyle ostatnich sekund pytania tyka zegar. */
 const TYKANIE_S = 5;
+/**
+ * Dźwięki odliczania i zegara grają o tyle wcześniej niż zmiana cyfry na ekranie: telewizor odtwarza dźwięk
+ * z opóźnieniem bufora audio, więc bez wyprzedzenia cyfra była pierwsza (25.10, Łukasz: minimalnie, ale słychać).
+ */
+const WYPRZEDZENIE_MS = 150;
 const GESTY = ["click", "keydown", "touchend"] as const;
 const WSZYSTKIE: Efekt[] = [
   "pop",
@@ -32,8 +37,10 @@ type Migawka = {
   faza: string;
   zadanie: string | null;
   gracze: number;
-  /** Przed pytaniem: sekundy do startu (3, 2, 1), w pytaniu: sekundy do końca. */
+  /** Przed pytaniem: sekundy do startu (3, 2, 1), w pytaniu: sekundy do końca (z wyprzedzeniem dźwięku). */
   sekunda: number | null;
+  /** Pytanie już się zaczęło (z wyprzedzeniem dźwięku: chwilę przed odsłoną). */
+  start: boolean;
   czasMinal: boolean;
   seria: Map<string, { odpowiedzi: number; dobre: number }>;
 };
@@ -62,15 +69,16 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   const sekunda =
     faza === "przygotuj"
-      ? sekundaOdliczania(doStartu)
+      ? sekundaOdliczania(doStartu - WYPRZEDZENIE_MS)
       : faza === "pytanie" && !bezLimitu
-        ? Math.ceil(doKonca / 1000)
+        ? Math.ceil((doKonca - WYPRZEDZENIE_MS) / 1000)
         : null;
   const biezaca: Migawka = {
     faza,
     zadanie: stan.zadanie?.id ?? null,
     gracze: stan.liczba_graczy,
     sekunda,
+    start: faza === "pytanie" || (faza === "przygotuj" && doStartu <= WYPRZEDZENIE_MS),
     czasMinal,
     seria: new Map((stan.seria ?? []).map((g) => [g.nick, { odpowiedzi: g.odpowiedzi, dobre: g.dobre }])),
   };
@@ -93,7 +101,7 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     if (b.faza === "przygotuj" && b.sekunda !== p.sekunda && b.sekunda !== null && b.sekunda >= 1 && b.sekunda <= 3) {
       zagraj("odliczanie");
     }
-    if (b.faza === "pytanie" && p.faza === "przygotuj" && !nowaFaza) zagraj("start");
+    if (b.start && !p.start && p.faza === "przygotuj" && !nowaFaza) zagraj("start");
     if (
       b.faza === "pytanie" &&
       p.faza === "pytanie" &&
