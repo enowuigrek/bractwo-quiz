@@ -5,8 +5,11 @@ import type { AkcjaPilota, PilotStan } from "./typy";
 
 /** Plansza (wstęp, etap, ciekawostka): dalej, gdy wszyscy kliknęli „Gotowy” (nie wcześniej niż `min` s), albo po `max` s. */
 const PLANSZA = { wstep: [5, 40], etap: [6, 45], ciekawostka: [6, 40] } as const;
-/** Ile sekund trwa każdy krok po pytaniu. */
-const PO_PYTANIU = { wynik: 6, odpowiedzi: 6, ranking: 7, rankingKoniecEtapu: 10 } as const;
+/**
+ * Ile sekund trwa każdy krok po pytaniu (25.10 skrócone, Łukasz: za długo). Wyścig musi zmieścić jazdę i zamianę
+ * torów (ok. 3,5 s, `ekran/_ekran/wyscig.tsx`). Do tego dochodzi do 1,5 s, zanim TV zapyta o krok (/api/auto).
+ */
+const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 7 } as const;
 /** Pytanie bez limitu czasu: po tylu sekundach automat sam pokazuje wynik. */
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
