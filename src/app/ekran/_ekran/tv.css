@@ -2382,6 +2382,66 @@
   overflow-wrap: anywhere;
 }
 
+/* plansza ciaśniej, gdy opis z finalistami nie mieści się w wysokości (etap.tsx mierzy) */
+.tv .tv-etap.ciasno-1 .tv-etap-opis h1 {
+  font-size: 104px;
+}
+
+.tv-etap.ciasno-1 .tv-etap-ikona {
+  height: 120px;
+}
+
+.tv-etap.ciasno-1 .tv-etap-zasady {
+  margin-top: 18px;
+  font-size: 40px;
+}
+
+.tv-etap.ciasno-1 .tv-etap-cechy {
+  margin-top: 24px;
+}
+
+.tv-etap.ciasno-1 .tv-etap-cechy li {
+  font-size: 32px;
+}
+
+.tv-etap.ciasno-1 .tv-etap-final {
+  margin-top: 24px;
+}
+
+.tv .tv-etap.ciasno-2 .tv-etap-opis h1 {
+  font-size: 88px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-ikona {
+  height: 100px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-zasady {
+  margin-top: 14px;
+  font-size: 34px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-cechy {
+  margin-top: 18px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-cechy li {
+  font-size: 28px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-final {
+  margin-top: 18px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-final li {
+  font-size: 36px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-final .awatar {
+  width: 84px !important;
+  height: 84px !important;
+}
+
 .tv-etap-zasady {
   margin: 28px 0 0;
   font-size: 50px;
@@ -2711,7 +2771,7 @@
   bottom: 0;
   height: 12px;
   border-radius: 6px;
-  background: linear-gradient(90deg, var(--kamien2), var(--kamien3, #3a4652), var(--kamien2));
+  background: linear-gradient(90deg, var(--kamien2), var(--kamien3), var(--kamien2));
 }
 
 .tv-os-kropka {
@@ -3089,7 +3149,7 @@
   height: 10px;
   margin-top: -5px;
   border-radius: 5px;
-  background: linear-gradient(90deg, transparent, var(--kamien3, #34414e) 8%, var(--kamien3, #34414e) 92%, transparent);
+  background: linear-gradient(90deg, transparent, var(--kamien3) 8%, var(--kamien3) 92%, transparent);
 }
 
 .tv-os-odp-strona {

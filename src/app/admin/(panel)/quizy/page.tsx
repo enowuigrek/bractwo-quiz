@@ -3,7 +3,7 @@ import Link from "next/link";
 import { mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { widoczne } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { IkonaEdytuj, IkonaKosz } from "../_komponenty/ikony";
+import { IkonaEdytuj, IkonaKlodka, IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz } from "./akcje";
 import { liczbaPytan } from "./limity";
@@ -52,7 +52,11 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
                 </div>
                 <div className="lista-opis">
                   {/* obsługa takich nie widzi, więc znacznik ma sens tylko u głównego */}
-                  {widziWszystko(rola) && q.tylko_glowny && "🔒 tylko dla mnie · "}
+                  {widziWszystko(rola) && q.tylko_glowny && (
+                    <>
+                      <IkonaKlodka /> tylko dla mnie ·{" "}
+                    </>
+                  )}
                   {liczbaPytan(q.zadania[0]?.count ?? 0)}
                   {q.opis && ` · ${q.opis}`}
                 </div>

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { przygotujZdjecie } from "@/lib/zdjecie";
+import { IkonaAparat } from "@/components/ikony";
 
 type Props = {
   nick: string;
@@ -43,7 +44,15 @@ export function ZdjecieGracza({ nick, zdjecie, onWybrano, onUsun, rozmiar = 88 }
       <Awatar nick={nick || "?"} zdjecie={zdjecie} rozmiar={rozmiar} />
       <div className="zdjecie-gracza-akcje">
         <button type="button" className="przycisk-zdjecie" onClick={() => pole.current?.click()} disabled={trwa}>
-          {trwa ? "Chwila…" : zdjecie ? "Zmień zdjęcie" : "📷 Dodaj selfie"}
+          {trwa ? (
+            "Chwila…"
+          ) : zdjecie ? (
+            "Zmień zdjęcie"
+          ) : (
+            <>
+              <IkonaAparat /> Dodaj selfie
+            </>
+          )}
         </button>
         {zdjecie && onUsun && (
           <button

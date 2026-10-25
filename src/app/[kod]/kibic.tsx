@@ -8,6 +8,7 @@ import { HASLA, ODSTEP_OKRZYKOW_MS } from "@/lib/gra/okrzyki";
 import type { StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import type { Ja } from "./rozgrywka";
+import { IkonaMegafon } from "@/components/ikony";
 
 type Wynik = { przyjety: boolean; powod?: string; za_ms?: number; wyslane?: number };
 
@@ -30,7 +31,9 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   const naglowek = (
     <p className="etykieta gra-pasek">
       <span>{stan.etap?.nazwa ?? "Finał"} · kibicujesz</span>
-      {wyslane > 0 && <span className="gra-kod">📣 {wyslane}</span>}
+      {wyslane > 0 && <span className="gra-kod">
+          <IkonaMegafon /> {wyslane}
+        </span>}
     </p>
   );
 

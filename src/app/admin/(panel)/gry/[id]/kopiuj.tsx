@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IkonaGotowe, IkonaKopiuj } from "../../_komponenty/ikony";
+import { IkonaGotowe, IkonaKopiuj } from "@/components/ikony";
 
 /** Po ilu ms przytrzymania palcem link się kopiuje (zamiast otwierać). */
 const PRZYTRZYMANIE_MS = 450;

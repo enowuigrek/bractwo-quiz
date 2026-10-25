@@ -4,6 +4,7 @@ import { kolejneOdciecia } from "@/lib/gra/odpadanie";
 import type { StanSesji } from "@/lib/gra/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { czyKibic } from "./rozgrywka";
+import { IkonaPuchar } from "@/components/ikony";
 
 /** Telefon w fazie `etap`: nazwa i zasady etapu, mnożnik, a w finale trójki: grasz czy kibicujesz. */
 export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
@@ -42,7 +43,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
       )}
       {e.final_po_etapie ? (
         <p className="etap-uwaga">
-          🏆 Po tym etapie <strong>3 najlepszych wchodzi do finału</strong>
+          <IkonaPuchar /> Po tym etapie <strong>3 najlepszych wchodzi do finału</strong>
           {stan.w_grze > 3 ? `, ${stan.w_grze - 3} odpada i kibicuje` : ""}. Walcz o miejsce w trójce!
         </p>
       ) : e.przechodzi !== null && stan.w_grze > e.przechodzi ? (

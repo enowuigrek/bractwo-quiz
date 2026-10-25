@@ -22,7 +22,7 @@ import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } 
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
-import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "./ikony";
+import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
 

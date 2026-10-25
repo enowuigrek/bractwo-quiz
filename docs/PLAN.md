@@ -35,7 +35,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
 - Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
-- Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY, KSHD, TJPR, LTQA, FVRR, FRQE (i wcześniejsze, jeśli zostały).
+- Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY, KSHD, TJPR, LTQA, FVRR, FRQE, AUYD (i wcześniejsze, jeśli zostały).
 
 **Następny krok:** dźwięki i pijany finał (plan niżej, „Na 25.10”), potem test na żywo na spotkaniu Kręgu 28.10. Do testów samemu: boty i automatyczne prowadzenie z pilota (niżej).
 
@@ -72,7 +72,7 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 ### Poprawki 25.10 (po teście 24.10 wieczorem) ✅
 
 - **Wyścig:** przed finałem najwyżej 90% drogi do szklanki, i to przy komplecie punktów (`DROGA_PRZED_FINALEM` w `src/lib/gra/wyscig.ts`, wcześniej szklanka przy 75% maksimum; w teście 33 tys. z 41,5 tys. po 27 pytaniach stało już przy szklance).
-- **Telefon w rankingu:** „Na dobrej drodze” (zielone kółko z ptaszkiem, w walce o finał puchar) albo „Zagrożony odpadnięciem” (czerwony trójkąt), ikony SVG z `src/app/[kod]/ikony.tsx`, względem najbliższego odcięcia, także gdy to odcięcie jest dopiero za kilka etapów (`najblizszeOdciecie` w `src/lib/gra/odpadanie.ts`), z brakującymi punktami.
+- **Telefon w rankingu:** „Na dobrej drodze” (zielone kółko z ptaszkiem, w walce o finał puchar) albo „Zagrożony odpadnięciem” (czerwony trójkąt), ikony SVG z `src/components/ikony.tsx`, względem najbliższego odcięcia, także gdy to odcięcie jest dopiero za kilka etapów (`najblizszeOdciecie` w `src/lib/gra/odpadanie.ts`), z brakującymi punktami.
 - **Plansza wstępu:** więcej miejsca między opisem a ikonami (80 px), szklanka na mecie stoi na linii numerów etapów. **Plansza etapu:** długa nazwa zawija się obok ikony.
 - **Wideo wybuchu:** piana spływa i gaśnie 1,3 s przed końcem klipu (wcześniej zjeżdżała zamrożona ostatnia klatka).
 - **Finał „15/12 kroków”** z testu: pilot i TV miały jeszcze stary kod (wdrożenie kary było w trakcie gry), który liczył przewagę + dobre bez kary. Baza liczyła już z karą i dlatego seria trwała dalej.
@@ -85,10 +85,11 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 - **TV przy automacie:** na planszach z „Gotowy” w prawym dolnym rogu „Gotowi x/y” (`GotowiTv` w `tv.tsx`), zielone, gdy gotowi są wszyscy.
 - **Kreator:** zapowiedź startu domyślnie włączona (godzina od teraz).
 - **Poczekalnia TV:** nicki i awatary mniejsze wraz z liczbą graczy (`src/app/ekran/_ekran/nicki.tsx`, stopnie `.tv-nicki.st-0…4`), a jeśli lista i tak nie mieści się w polu, schodzi o stopień niżej. Sprawdzone: 12 graczy stopień 1, 30 graczy z długimi nickami stopień 4, oba w polu.
-- **Pilot:** włączniki muzyki i automatu z ikonami SVG (`src/app/pilot/[kod]/ikony.tsx`) zamiast emotek, przyciski równo po prawej (`.pilot-przelacznik`).
+- **Pilot:** włączniki muzyki i automatu z ikonami SVG (`src/components/ikony.tsx`) zamiast emotek, przyciski równo po prawej (`.pilot-przelacznik`).
 - **Ucięte ogonki liter na TV:** nagłówki przycinane do kilku linii (treść pytania, tytuł quizu w poczekalni, nagłówek odpowiedzi graczy) ucinały „g” i „ę” w ostatniej linii; mają zapas `padding-bottom: 0.2em` z ujemnym marginesem. Pytanie z chmielem: „To dzięki temu piwo ma goryczkę. Co to?”.
 - **Odpowiedzi graczy na TV:** wszystkie ramki (dobrze, częściowo, źle) mają tę samą liczbę kolumn liczoną od wszystkich graczy (wcześniej małe ramki zajmowały po kilka wierszy w jednej kolumnie i przy 13 graczach ostatnia wychodziła za ekran), a gdy i tak się nie mieści, ekran gęstnieje o stopień (`gesto`, `bardzo-gesto`, pomiar w `odpowiedzi.tsx`). Sprawdzone: 13 graczy bez zagęszczania, 30 graczy w najgęstszym, oba w ekranie.
 - **Szacowanie na TV:** w wyniku pytania złota kreska poprawnej tylko trochę ponad najwyższy stos kropek, więc plakietka z liczbą nie wchodzi na treść pytania, a w trójce najbliższych liczba z jednostką się nie łamie („8,5 %”). Na ekranie odpowiedzi graczy podpisy omijają plakietkę poprawnej, a pod osią jest czwarty rząd podpisów (oś wyżej, `--os` w `.tv-os-odp-pole`).
+- **Przegląd stylów 25.10:** emotki w interfejsie zamienione na ikony (puchar, megafon, aparat, kłódka, głośnik), wszystkie ikony w jednym pliku `src/components/ikony.tsx` (wcześniej trzy osobne), plansza etapu sama się zagęszcza, gdy opis z finalistami nie mieści się na ekranie (`.ciasno-1/2`, na planszy finału z karą lista finalistów wypadała pod ekran), bez zbędnych zapasowych kolorów przy `--kamien3`. Zasady (ikony, dopasowanie do ekranu, kolory statusów) w `DESIGN-SYSTEM.md`.
 - **Odpadanie na TV:** „zostaje 6” i „do finału 3” na planszy wstępu i etapu jasnym złotem zamiast czerwieni (to informacja, nie ostrzeżenie). Czerwone zostaje tylko „zagrożony” pod kreską w wyścigu i rankingu. Numer finału na drodze wstępu jest celowo pełny (złoty), bo to cel wyścigu.
 - **Zdjęcie nagrody bez przeróbki AI:** kreator wysyła samo zdjęcie (`/api/nagroda` tylko zapisuje w `grafiki/nagrody/<dzień>/`), wybór „po przeróbce / oryginał” zniknął. Aplikacja nie woła już OpenAI.
 

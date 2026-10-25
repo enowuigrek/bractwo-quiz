@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IkonaUstawienia } from "./ikony";
+import { IkonaUstawienia } from "@/components/ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
 const POZYCJE = [

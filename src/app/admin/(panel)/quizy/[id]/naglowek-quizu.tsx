@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useState } from "react";
 import type { Quiz, StanFormularza } from "@/lib/typy";
-import { IkonaEdytuj } from "../../_komponenty/ikony";
+import { IkonaEdytuj } from "@/components/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { zapiszQuiz } from "../akcje";
 import { LIMITY } from "../limity";

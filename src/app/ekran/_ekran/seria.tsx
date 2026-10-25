@@ -8,6 +8,7 @@ import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { LogoNaglowka } from "./logo";
 import { OkrzykiNaDrogach } from "./okrzyki";
+import { IkonaMegafon } from "@/components/ikony";
 
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
@@ -81,7 +82,7 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
                 {/* key: przy każdym nowym okrzyku licznik podskakuje */}
                 {!!g.doping && (
                   <span key={g.doping} className="drogi-finalu-doping">
-                    📣 {g.doping}
+                    <IkonaMegafon /> {g.doping}
                   </span>
                 )}
               </>

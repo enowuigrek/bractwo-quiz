@@ -13,7 +13,7 @@ import {
 import type { Etap, StanFormularza } from "@/lib/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { bezResetu } from "../../_komponenty/bez-resetu";
-import { IkonaEdytuj } from "../../_komponenty/ikony";
+import { IkonaEdytuj } from "@/components/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { dodajEtap, zapiszEtap } from "../akcje";
 

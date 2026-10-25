@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NAZWY_FAZ, type Faza } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
-import { IkonaKosz } from "../_komponenty/ikony";
+import { IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunGre } from "./akcje";
 

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { naWybuch, odblokujDzwiek } from "@/lib/gra/dzwiek";
 import { GASNIECIE_S } from "@/lib/pijany";
 import type { StanSesji } from "@/lib/gra/typy";
+import { IkonaGlosnik } from "@/components/ikony";
 
 /**
  * Utwory na TV (instrumentalne, z Suno), w `public/muzyka/`. Brakujący plik po prostu nie gra, więc można
@@ -374,7 +375,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   if (!cel || stan.faza !== "poczekalnia" || cichoOd === null || !prosba) return null;
   return (
     <p className="tv-muzyka-podpowiedz" role="status">
-      🔊 Naciśnij OK na pilocie telewizora, żeby włączyć muzykę
+      <IkonaGlosnik /> Naciśnij OK na pilocie telewizora, żeby włączyć muzykę
     </p>
   );
 }

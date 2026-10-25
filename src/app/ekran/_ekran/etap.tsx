@@ -2,12 +2,14 @@
 /* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
 import { motion, MotionConfig } from "motion/react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { napisMnoznika } from "@/lib/etapy";
 import { kolejneOdciecia } from "@/lib/gra/odpadanie";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { LogoNaglowka } from "./logo";
+import { IkonaPuchar } from "@/components/ikony";
 
 /**
  * Plansza etapu na TV (faza `etap`): który to etap, nazwa i zasady, mnożnik i czas, a obok telefon,
@@ -16,6 +18,18 @@ import { LogoNaglowka } from "./logo";
  */
 export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
   const e = stan.etap;
+  // gdy opis z finalistami nie mieści się w wysokości ekranu, plansza zmniejsza się o stopień (25.10: na planszy finału
+  // lista finalistów wypadała pod ekran); stopień liczony od nowa dla każdej planszy
+  const tresc = useRef<HTMLDivElement>(null);
+  const plansza = `${e?.id ?? ""}|${stan.finalisci?.length ?? 0}`;
+  const [ciasno, ustawCiasno] = useState({ plansza, o: 0 });
+  const stopien = ciasno.plansza === plansza ? ciasno.o : 0;
+  useLayoutEffect(() => {
+    const pole = tresc.current;
+    const opis = pole?.querySelector(".tv-etap-opis");
+    if (!pole || !opis || stopien >= 2) return;
+    if (opis.getBoundingClientRect().height > pole.clientHeight + 1) ustawCiasno({ plansza, o: stopien + 1 });
+  }, [plansza, stopien]);
   if (!e) return null;
   // kreski odpadania na drodze przez etapy: pod etapem z progiem krótko, ilu zostaje („✂ 6”); trójki przed
   // finałem tu nie znaczymy, bo mówi o niej plansza walki o finał. Całe zdanie jest niżej, przy zasadach
@@ -34,7 +48,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="tv-etap">
+      <div className={`tv-etap${stopien ? ` ciasno-${stopien}` : ""}`}>
         <header className="tv-naglowek">
           {loga}
           {/* droga przez etapy: kropka na każdy etap, ten złoty i większy */}
@@ -49,7 +63,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
           <LogoNaglowka />
         </header>
 
-        <div className="tv-etap-tresc">
+        <div ref={tresc} className="tv-etap-tresc">
           <section className="tv-etap-opis">
             <motion.p className="tv-okazja" {...wejscie(0)}>
               Etap {e.nr} z {e.liczba}
@@ -80,7 +94,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             {/* odpadanie: walka o finał (trójka) albo próg po etapie z `etap.przechodzi` (src/app/pilot/[kod]/progi.tsx) */}
             {e.final_po_etapie ? (
               <motion.p className="tv-etap-walka" {...wejscie(4)}>
-                🏆 Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału
+                <IkonaPuchar /> Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału
                 {stan.w_grze > 3 ? `, ${stan.w_grze - 3} odpada i kibicuje` : ""}.
               </motion.p>
             ) : (

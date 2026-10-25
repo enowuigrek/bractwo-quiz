@@ -2767,3 +2767,12 @@ html:has(.kolumna) {
 .pilot-przelacznik.wlaczony svg {
   color: var(--zloto);
 }
+
+/* Ikony liniowe (src/components/ikony.tsx): domyślnie wielkości tekstu, w linii z nim. `:where` bez wagi, więc
+   rozmiar z miejsca (np. `.pilot-przelacznik svg`, `.przycisk-maly.ikona svg`) zawsze wygrywa. */
+:where(.ikona-svg) {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.18em;
+  flex: none;
+}

@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { Werble } from "@/components/werble";
 import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
+import { IkonaMegafon } from "@/components/ikony";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 
@@ -86,7 +87,9 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
   const kibice = stan.finalisci?.find((f) => f.nick === nick)?.kibice ?? 0;
   const podziekowanie = (
     <>
-      {kibice > 0 && <p className="kibice-finalisty">📣 {kibicowalo(kibice)}!</p>}
+      {kibice > 0 && <p className="kibice-finalisty">
+          <IkonaMegafon /> {kibicowalo(kibice)}!
+        </p>}
       <p className="podziekowanie">
         Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
       </p>

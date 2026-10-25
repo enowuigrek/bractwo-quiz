@@ -23,7 +23,7 @@ import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { Gotowy } from "./gotowy";
-import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "./ikony";
+import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "@/components/ikony";
 import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
 import { SeriaGracza } from "./seria";

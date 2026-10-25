@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
 import { useRef, useState } from "react";
+import { IkonaAparat } from "@/components/ikony";
 
 /** Dłuższy bok wysyłanego zdjęcia (Vercel ma limit 4,5 MB na żądanie). */
 const BOK = 1024;
@@ -68,7 +69,7 @@ export function ZdjecieNagrody({ miejsce }: { miejsce: number }) {
 
       {stan.etap === "pusty" && (
         <button type="button" className="przycisk-maly" onClick={() => pole.current?.click()}>
-          📷 Zdjęcie nagrody
+          <IkonaAparat /> Zdjęcie nagrody
         </button>
       )}
 

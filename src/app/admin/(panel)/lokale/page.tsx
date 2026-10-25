@@ -4,7 +4,7 @@ import { wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
-import { IkonaEdytuj } from "../_komponenty/ikony";
+import { IkonaEdytuj } from "@/components/ikony";
 
 export const metadata: Metadata = { title: "Ustawienia: lokale · Bractwo Quiz" };
 

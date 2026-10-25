@@ -7,7 +7,7 @@ import { wymagajAdmina } from "@/lib/admin";
 import { wymagajGry } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
-import { IkonaKosz } from "../../_komponenty/ikony";
+import { IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { wynikiGry, zadaniaGry } from "../wyniki";

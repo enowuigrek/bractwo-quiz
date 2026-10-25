@@ -6,7 +6,7 @@ import { wymagajQuizu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
-import { IkonaKosz } from "../../_komponenty/ikony";
+import { IkonaKlodka, IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przesunEtap, przesunZadanie, ustawWidocznoscQuizu, usunEtap, usunZadanie, zmienPlanEtapu } from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
@@ -93,7 +93,13 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       {/* tylko główny decyduje, czy obsługa (wspólne hasło) widzi ten quiz */}
       {widziWszystko(rola) && (
         <form action={ustawWidocznoscQuizu.bind(null, quiz.id, !quiz.tylko_glowny)} className="pomocniczy">
-          {quiz.tylko_glowny ? "🔒 Tylko dla mnie: obsługa nie widzi tego quizu." : "Obsługa widzi ten quiz."}{" "}
+          {quiz.tylko_glowny ? (
+            <>
+              <IkonaKlodka /> Tylko dla mnie: obsługa nie widzi tego quizu.
+            </>
+          ) : (
+            "Obsługa widzi ten quiz."
+          )}{" "}
           <button type="submit" className="przycisk-maly">
             {quiz.tylko_glowny ? "Pokaż obsłudze" : "Ukryj przed obsługą"}
           </button>
