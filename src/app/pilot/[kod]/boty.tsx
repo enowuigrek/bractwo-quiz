@@ -29,7 +29,7 @@ export function useBoty(kod: string, token: string | null, stan: PilotStan | nul
   }, [aktywne, kod, token]);
 }
 
-/** Karta w poczekalni: dodaje boty (nicki „Bot Zenek”, „Bot Halina”…), żeby testując nie grać samemu. */
+/** Karta w poczekalni: dodaje boty (nicki „Zenek Bot”, „Halina Bot”…), żeby testując nie grać samemu. */
 export function BotyPilota({
   stan,
   kod,
@@ -67,7 +67,7 @@ export function BotyPilota({
       </button>
       <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
         Grają jak ludzie: raz dobrze, raz źle, z różnym czasem odpowiedzi. Odpowiadają w pierwszych sekundach pytania,
-        więc nie trzeba na nie czekać, ale tylko wtedy, gdy ten pilot jest otwarty.
+        więc nie trzeba na nie czekać, gdy otwarty jest ten pilot albo (przy automatycznym prowadzeniu) TV.
       </p>
       {blad && (
         <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>

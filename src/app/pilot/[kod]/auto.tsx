@@ -1,54 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { AkcjaPilota, PilotStan } from "@/lib/gra/typy";
+import { nastepnyKrok } from "@/lib/gra/auto";
+import type { PilotStan } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-
-/** Plansza (wstęp, etap, ciekawostka): dalej, gdy wszyscy kliknęli „Gotowy” (nie wcześniej niż `min` s), albo po `max` s. */
-const PLANSZA = { wstep: [5, 40], etap: [6, 45], ciekawostka: [6, 40] } as const;
-/** Ile sekund trwa każdy krok po pytaniu. */
-const PO_PYTANIU = { wynik: 6, odpowiedzi: 6, ranking: 7, rankingKoniecEtapu: 10 } as const;
-/** Pytanie bez limitu czasu: po tylu sekundach automat sam pokazuje wynik. */
-const BEZ_LIMITU_S = 45;
-const WERBLE_S = 7;
-const PODIUM_S = 30;
-
-/**
- * Co teraz kliknąłby prowadzący: krok pilota albo null (czekamy). Pytanie i seria kończą się same (zegar i baza),
- * a gra zatrzymuje się na pełnej tabeli (koniec prowadzący klika sam).
- */
-function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null {
-  const s = stan.faza_od ? (teraz - Date.parse(stan.faza_od)) / 1000 : 0;
-  const plansza = ([min, max]: readonly [number, number]) => s >= max || (stan.gotowi >= stan.w_grze && s >= min);
-  switch (stan.faza) {
-    case "wstep":
-      return plansza(PLANSZA.wstep) ? "nastepne" : null;
-    case "etap":
-      return plansza(PLANSZA.etap) ? "nastepne" : null;
-    case "wynik":
-      if (stan.zadanie?.typ === "ciekawostka") return plansza(PLANSZA.ciekawostka) ? "nastepne" : null;
-      return s >= PO_PYTANIU.wynik ? "odpowiedzi" : null;
-    case "odpowiedzi":
-      return s >= PO_PYTANIU.odpowiedzi ? "ranking" : null;
-    case "ranking":
-      if (s < (stan.ostatnie_w_etapie ? PO_PYTANIU.rankingKoniecEtapu : PO_PYTANIU.ranking)) return null;
-      return stan.ostatnie_zadanie ? "podium" : "nastepne";
-    // w bazie zostaje `przygotuj`, choć pytanie już trwa (odsłania je zegar), więc oba
-    case "przygotuj":
-    case "pytanie":
-      return !stan.faza_do && s >= BEZ_LIMITU_S ? "wynik" : null;
-    case "werble":
-      return s >= WERBLE_S ? "podium" : null;
-    case "podium":
-      return s >= PODIUM_S ? "tabela" : null;
-    default:
-      return null;
-  }
-}
 
 /**
  * Automatyczne prowadzenie (`sesje.auto`, przełącznik w pilocie): co sekundę sprawdza, co kliknąłby prowadzący,
- * i klika to raz na fazę. Działa, dopóki pilot jest otwarty; ręczne przyciski dalej działają.
+ * i klika to raz na fazę; ręczne przyciski dalej działają. To samo robi TV przez /api/auto (`useAutoZTv`), bo karta
+ * pilota w tle (Safari, zablokowany telefon) budzi się raz na minutę.
  */
 export function useAutoProwadzenie(
   kod: string,
@@ -73,12 +33,13 @@ export function useAutoProwadzenie(
       const klucz = `${s.faza}|${s.faza_od}|${s.zadanie?.nr ?? 0}`;
       if (!krok || zrobione.current === klucz) return;
       zrobione.current = klucz;
+      // `auto_krok` przechodzi tylko z fazy, którą tu widzimy: TV (/api/auto) mogło już kliknąć to samo
       void supabase()
-        .rpc("pilot_akcja", { p_kod: kod, p_host_token: token, p_akcja: krok })
+        .rpc("auto_krok", { p_kod: kod, p_host_token: token, p_faza_od: s.faza_od, p_akcja: krok })
         .then(({ data, error }) => {
           // np. prowadzący kliknął w tej samej chwili: spróbujemy przy następnym stanie
           if (error) zrobione.current = "";
-          else onZmiana(data as PilotStan);
+          else if (data) onZmiana(data as PilotStan);
         });
     }, 1000);
     return () => clearInterval(zegar);

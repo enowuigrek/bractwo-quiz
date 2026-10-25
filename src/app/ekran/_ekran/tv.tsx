@@ -25,6 +25,7 @@ import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { PijanyTv, type GraczPijany } from "./pijany";
+import { useAutoZTv } from "./auto";
 import { EfektyTv } from "./efekty";
 import { MuzykaTv } from "./muzyka";
 import { OsLiczbowa } from "./szacowanie";
@@ -143,6 +144,8 @@ export function Tv({ kod, qr, host }: Props) {
 
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza), stan?.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(kod, stan, teraz);
+  // automatyczne prowadzenie i boty także stąd: pilot w tle prawie stoi
+  useAutoZTv(kod, stan);
 
   // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację);
   // przy grającej muzyce dopiero po grze, bo po przeładowaniu przeglądarka znów czeka na OK na pilocie

@@ -455,7 +455,9 @@ function WGrze({
   if (stan.faza === "ranking") {
     const odciecie = odciecieEtapu(stan);
     const kreska = mojWiersz ? wzgledemKreski(mojWiersz, odciecie, stan.w_grze) : null;
-    const nastepne = najblizszeOdciecie(stan);
+    // rozgrzewka (1. etap) bez statusu, chyba że już po niej ktoś odpada: nikogo nie stresujemy na starcie
+    const dalsze = najblizszeOdciecie(stan);
+    const nastepne = stan.etap?.nr === 1 && dalsze?.poEtapie !== 1 ? null : dalsze;
     return (
       <>
         {/* awatar obok nicku: gracz od razu widzi, że to jego wynik */}

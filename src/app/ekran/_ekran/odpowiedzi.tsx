@@ -80,16 +80,20 @@ function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null })
 }
 
 function Wiersz({ o, i, nr, z }: PropsWiersza) {
+  // dobre odpowiedzi są wszystkie takie same (dobra jest już na ekranie wyniku): bez kolumny odpowiedzi
+  const bezOdpowiedzi = o.poprawna === true;
   return (
-    <motion.li className="tv-odpowiedzi-wiersz" {...wjazd(i)}>
+    <motion.li className={`tv-odpowiedzi-wiersz${bezOdpowiedzi ? " bez-odp" : ""}`} {...wjazd(i)}>
       <span className="tv-odpowiedzi-nr">{nr ? `${nr}.` : ""}</span>
       <span className="tv-odpowiedzi-nick">
         <Awatar nick={o.nick} zdjecie={o.zdjecie} rozmiar={38} />
         <span>{o.nick}</span>
       </span>
-      <span className="tv-odpowiedzi-odp">
-        <Odpowiedz o={o} z={z} />
-      </span>
+      {!bezOdpowiedzi && (
+        <span className="tv-odpowiedzi-odp">
+          <Odpowiedz o={o} z={z} />
+        </span>
+      )}
       <span className="tv-odpowiedzi-czas">{o.czas_ms !== null ? sekundy(o.czas_ms) : ""}</span>
     </motion.li>
   );
@@ -125,9 +129,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
         <div className="tv-odpowiedzi">
           <header className="tv-ranking-gora tv-odpowiedzi-gora">
             <h1>{z.tresc}</h1>
-            <p className="tv-okazja">
-              Pytanie {z.lp}
-            </p>
+            <p className="tv-okazja">Pytanie {z.lp}</p>
             <LogoNaglowka />
           </header>
           <OdpowiedziSzacowania z={z} odpowiedzi={odpowiedzi} />
@@ -141,11 +143,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
       <div ref={ekran} className={`tv-odpowiedzi${stopien >= 1 ? " gesto" : ""}${stopien >= 2 ? " bardzo-gesto" : ""}`}>
         <header className="tv-ranking-gora tv-odpowiedzi-gora">
           <h1>{z?.tresc ?? "Odpowiedzi"}</h1>
-          {z && (
-            <p className="tv-okazja">
-              Pytanie {z.lp}
-            </p>
-          )}
+          {z && <p className="tv-okazja">Pytanie {z.lp}</p>}
           <LogoNaglowka />
         </header>
 
