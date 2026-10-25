@@ -21,6 +21,8 @@ export type Efekt =
   | "ding"
   /** Plansza ciekawostki („a wiesz, że…”): osobny dźwięk niż dobra odpowiedź. */
   | "ciekawostka"
+  /** Plansza z odpowiedziami graczy (kto dobrze, kto źle): „ding” niżej i wolniej, jak echo odsłony. */
+  | "odpowiedzi"
   /** Ranking po pytaniu (wyścig): nalewanie piwa, tylko z pliku. */
   | "nalewanie"
   /** Wyścig: awatary jadą do szklanki (szum narastający), potem tory zamieniają się miejscami. */
@@ -39,7 +41,9 @@ const TYLKO_PLIK: ReadonlySet<Efekt> = new Set(["nalewanie"]);
 /** Głośność efektów względem pełnej skali (muzyka gra na 0,55). */
 const GLOSNOSC = 0.6;
 /** Pliki efektu grane na zmianę (bez wpisu: jeden plik o nazwie efektu). */
-const WARIANTY: Partial<Record<Efekt, string[]>> = { krok: ["krok-1", "krok-2"] };
+const WARIANTY: Partial<Record<Efekt, string[]>> = { krok: ["krok-1", "krok-2"], odpowiedzi: ["ding"] };
+/** Tempo odtwarzania pliku (poniżej 1: niżej i wolniej, jak zniekształcone echo). */
+const TEMPO: Partial<Record<Efekt, number>> = { odpowiedzi: 0.78 };
 /** Głośność pojedynczych efektów (bez wpisu 1): częste i tła ciszej, żeby nie zagłuszały muzyki. */
 const GLOSNOSC_EFEKTU: Partial<Record<Efekt, number>> = {
   tik: 0.5,
@@ -133,6 +137,7 @@ export function zagraj(nazwa: Efekt): () => void {
     if (bufor) {
       const zrodlo = c.createBufferSource();
       zrodlo.buffer = bufor;
+      zrodlo.playbackRate.value = TEMPO[nazwa] ?? 1;
       if (nazwa === "werble" && bufor.duration > WERBLE_PETLA_S[1]) {
         zrodlo.loop = true;
         [zrodlo.loopStart, zrodlo.loopEnd] = WERBLE_PETLA_S;
@@ -242,6 +247,11 @@ const SYNTEZA: Record<Exclude<Efekt, "nalewanie">, Synteza> = {
       ton(c, w, t + i * 0.28, { f, typ: "triangle", dl: 0.8, g: 0.38 });
       ton(c, w, t + i * 0.28, { f: f * 2, dl: 0.3, g: 0.08 });
     });
+  },
+  odpowiedzi: (c, w, t) => {
+    // jak „ding”, tylko niżej i dłużej
+    ton(c, w, t, { f: 612, typ: "triangle", dl: 0.45, g: 0.35 });
+    ton(c, w, t + 0.15, { f: 816, typ: "triangle", dl: 0.75, g: 0.35 });
   },
   ciekawostka: (c, w, t) => {
     // „aha!”: miękki błysk w górę, jak zapalająca się żarówka (cztery krótkie tony i lekki szum)

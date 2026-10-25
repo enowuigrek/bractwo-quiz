@@ -16,6 +16,7 @@ const WSZYSTKIE: Efekt[] = [
   "gong",
   "ding",
   "ciekawostka",
+  "odpowiedzi",
   "nalewanie",
   "jazda",
   "zamiana",
@@ -106,6 +107,7 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     if (b.czasMinal && !p.czasMinal && p.zadanie === b.zadanie) zagraj("gong");
     // ciekawostka to w bazie też „wynik”, ale ma swój dźwięk
     if (b.faza === "wynik" && p.faza !== "wynik") zagraj(stan.zadanie?.typ === "ciekawostka" ? "ciekawostka" : "ding");
+    if (b.faza === "odpowiedzi" && p.faza !== "odpowiedzi") zagraj("odpowiedzi");
 
     if (b.faza === "ranking" && p.faza !== "ranking") {
       // koniec etapu (nie finału): dzwonek „ostatnia kolejka”; zwykły ranking: nalewanie (jeśli jest plik)
