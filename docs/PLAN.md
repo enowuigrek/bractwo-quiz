@@ -145,6 +145,8 @@ Do zaprojektowania razem:
 - **Panel → Pijany finał:** dwie grupy kolorami (złota „Na początek”, szara „Potem”), przy pytaniu „↓ Potem” / „↑ Na początek” i usuń, w każdej grupie „+ pytanie” i „Wklej kilka naraz” (pytanie w linii, komentarze po kresce: `pytanie | po ✓ | po ✗`). Wejście quizu bez zmian (po kolei, ze strzałkami), bez wyboru przeszkadzacza.
 - **Ciekawostka ma swój dźwięk** (`ciekawostka`: miękki błysk w górę jak zapalona żarówka, synteza; plik `public/dzwieki/ciekawostka.mp3` go zastąpi). Wcześniej grał „ding” dobrej odpowiedzi.
 - **Dźwięk planszy odpowiedzi graczy** (`odpowiedzi`): ten sam plik co „ding”, odtworzony w tempie 0,78 (niżej i wolniej, jak echo odsłony; `TEMPO` i `WARIANTY` w `src/lib/gra/efekty.ts`).
+- **Szklanka w rankingu na telefonie niżej** (`.moj-wyscig`, 36 px odstępu od miejsca i statusu).
+- **Zdjęcie tripla do wymiany:** ma 960×1200 (pion 4:5), a grafiki pytań są 1280×853 (poziom 3:2). Łukasz generuje nowe w ChatGPT z promptu `pyt-tripel` w poziomie 3:2; po wgraniu przyciąć do 1280 px szerokości jak w `zdjecie()` w `scripts/grafiki.mjs`.
 - **„Ding” przytłumiony:** wysokie tony z pliku obcięte filtrem (ok. −3 dB powyżej 3 kHz względem całości).
 - **Automat szybciej po pytaniu:** wynik 4 s, odpowiedzi 4 s, wyścig 4,5 s, koniec etapu 7 s (było 6/6/7/10; `PO_PYTANIU` w `src/lib/gra/auto.ts`).
 - **Plansza etapu na TV:** nazwa od lewej (w linii z „Etap X z Y” i opisem), ikona etapu za nazwą po prawej. To jedyny ekran z ikoną obok nazwy (na wstępie ikony stoją nad numerami, telefon ich nie ma). W demo telefonu „Pils” zamiast „Pilzner”.

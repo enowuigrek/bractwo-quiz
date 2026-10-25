@@ -1982,6 +1982,8 @@ html:has(.kolumna) {
   display: grid;
   justify-items: center;
   gap: 10px;
+  /* niżej, z dala od miejsca i statusu nad nią (25.10) */
+  margin-top: 36px;
 }
 
 .moj-wyscig-szklanka {
