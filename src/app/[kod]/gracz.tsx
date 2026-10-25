@@ -151,9 +151,9 @@ export function Gracz({ kod }: { kod: string }) {
         <p className="pomocniczy">
           Nie znaleźliśmy gry o kodzie <strong className="gra-kod">{kod}</strong>. Sprawdź kod na telewizorze.
         </p>
-        <p>
-          <Link href="/">← Wpisz inny kod</Link>
-        </p>
+        <Link href="/" className="przycisk zloty">
+          Wpisz inny kod
+        </Link>
       </>
     );
   }

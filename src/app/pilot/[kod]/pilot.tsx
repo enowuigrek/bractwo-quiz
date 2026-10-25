@@ -707,12 +707,15 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           Zakończ grę
         </button>
       )}
-      <p style={{ marginTop: 32, textAlign: "center" }}>
-        {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło */}
-        <Link href="/admin/gry" className="pomocniczy">
-          ← Panel obsługi
-        </Link>
-      </p>
+      {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło.
+          Przycisk, nie napis do klikania; po grze złoty, bo to wtedy główna akcja */}
+      <Link
+        href="/admin/gry"
+        className={`przycisk${faza === "koniec" ? " zloty" : ""}`}
+        style={{ marginTop: 32 }}
+      >
+        Panel obsługi
+      </Link>
       {oknoPotwierdzenia}
     </>
   );

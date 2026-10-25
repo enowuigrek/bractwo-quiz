@@ -108,6 +108,9 @@ input.pole[type="time"] {
   border-radius: var(--r-btn);
   padding: 16px 24px;
   cursor: pointer;
+  /* także na linkach (<Link className="przycisk">): bez podkreślenia, tekst na środku */
+  text-align: center;
+  text-decoration: none;
   transition: background 0.35s var(--ease-std), filter 0.35s var(--ease-std);
 }
 

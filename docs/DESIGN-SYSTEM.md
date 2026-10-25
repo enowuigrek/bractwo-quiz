@@ -106,6 +106,8 @@ Pigułki **wypełnione kolorem zależnym od rodzaju**, bez samych obramówek:
 - `.przycisk-cichy`: sam tekst, dla akcji pobocznych.
 Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole`, bo tekst bywa wielowierszowy.
 
+**Akcje to przyciski, nie napisy do klikania** (Łukasz, 25.10). Przejście do innej strony też dostaje wygląd przycisku (`<Link className="przycisk">`, np. „Panel obsługi” w pilocie, po grze złoty, „Wpisz inny kod” na telefonie). Tekstowe linki zostają tylko tam, gdzie to nawigacja „← wstecz” w panelu albo podpis autora.
+
 **Pilot (Quiz).** Przyciski akcji zawsze od razu pod nagłówkiem, nad kartą pytania, odpowiedziami i listą graczy, żeby nie uciekały w dół, gdy lista rośnie. „Zakończ grę” (niebezpieczny) osobno na samym dole strony, z dala od zwykłych akcji.
 
 **Nagłówek telefonu (Quiz).** Sam znak Quizu, bez kodu gry (od 24.10): kod jest wewnętrzny, gracz wchodzi z QR. Kod zostaje tam, gdzie jest potrzebny: na TV pod QR („Bez skanowania”), w pilocie, w panelu i na karcie nagrody jako dowód dla obsługi.
