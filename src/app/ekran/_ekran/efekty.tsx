@@ -23,7 +23,6 @@ const WSZYSTKIE: Efekt[] = [
   "ciekawostka",
   "odpowiedzi",
   "nalewanie",
-  "jazda",
   "zamiana",
   "dzwonek",
   "krok",

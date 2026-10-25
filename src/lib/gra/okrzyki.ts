@@ -11,7 +11,7 @@ export const HASLA: readonly (readonly [string, string])[] = [
   ["Jeszcze trochę, ", "!"],
   ["", " po złoto!"],
   ["Nie zawiedź, ", "!"],
-  ["Gaz do dechy, ", "!"],
+  ["Jedziesz, ", "!"],
 ];
 
 /** Najwyżej jeden okrzyk na tyle ms na kibica (pilnuje `kibicuj` w bazie). */

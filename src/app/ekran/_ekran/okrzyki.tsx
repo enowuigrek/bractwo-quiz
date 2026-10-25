@@ -62,7 +62,7 @@ export function OkrzykiNaDrogach({
             }}
           >
             <div className="okrzyk-dymek">
-              <span className="okrzyk-kibic">{o.kibic}:</span>{" "}
+              <span className="okrzyk-kibic">{o.kibic}</span>{" "}
               <HasloKibica haslo={o.haslo} nick={g.nick} zdjecie={g.zdjecie} rozmiar={46} />
             </div>
           </div>

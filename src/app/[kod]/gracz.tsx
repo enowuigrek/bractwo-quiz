@@ -28,7 +28,8 @@ import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
 import { SeriaGracza } from "./seria";
 import { KoniecGracza } from "./fanfara";
-import { Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
+import { Kibicowanie } from "./kibic";
+import { czyKibic, Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { ZdjecieGracza } from "./zdjecie-gracza";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
@@ -426,6 +427,8 @@ function WGrze({
   }
 
   if (stan.faza === "pijany") {
+    // kibic nie gra dogrywki (25.10): dalej patrzy na finał na TV, ale okrzyków już nie wysyła (seria się skończyła)
+    if (czyKibic(stan, ja.nick)) return <Kibicowanie stan={stan} ja={ja} teraz={teraz} />;
     return <PijanyFinal stan={stan} teraz={teraz} />;
   }
 

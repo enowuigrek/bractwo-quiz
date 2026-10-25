@@ -36,15 +36,14 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const wiersze = wszyscy.length > MAX_W_WYSCIGU ? wszyscy.slice(0, NA_TORACH_W_TLOKU) : wszyscy;
   const reszta = wszyscy.slice(wiersze.length);
   const maks = stan.quiz?.max_przed_finalem ?? 0;
-  // dźwięki (src/lib/gra/efekty.ts): szum jazdy razem z awatarami, „fiuu” przy zamianie torów
-  // w finale każdy ma swoją drogę: tory się nie zamieniają, więc i bez dźwięku zamiany
+  // dźwięk (src/lib/gra/efekty.ts): tylko „fiuu” przy zamianie torów; szumu jazdy razem z awatarami nie ma od 25.10
+  // (Łukasz: nie brzmiał jak przesuwanie). W finale każdy ma swoją drogę: tory się nie zamieniają, więc i bez dźwięku
   const zamiana = lp > 1 && !stan.etap?.finalowy && wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce);
   const dzwieki = stan.muzyka;
   useEffect(() => {
-    if (!dzwieki) return;
-    const minutniki = [window.setTimeout(() => zagraj("jazda"), START_S * 1000)];
-    if (zamiana) minutniki.push(window.setTimeout(() => zagraj("zamiana"), ZAMIANA_OD_S * 1000));
-    return () => minutniki.forEach((m) => window.clearTimeout(m));
+    if (!dzwieki || !zamiana) return;
+    const minutnik = window.setTimeout(() => zagraj("zamiana"), ZAMIANA_OD_S * 1000);
+    return () => window.clearTimeout(minutnik);
   }, [dzwieki, zamiana]);
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   const odstep = wiersze.length > 8 ? 6 : 12;

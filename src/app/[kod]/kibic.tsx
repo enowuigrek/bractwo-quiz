@@ -37,12 +37,15 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     </p>
   );
 
-  if (teraz < od || teraz >= do_ || !f) {
+  // pijany finał (ukryta dogrywka finalistów): kibic widzi, że finał trwa, bez przycisków
+  if (stan.faza !== "seria" || teraz < od || teraz >= do_ || !f) {
     return (
       <>
         {naglowek}
         <p className="gra-kibic">
-          {teraz >= do_
+          {stan.faza !== "seria"
+            ? "Finał trwa! Patrz na telewizor."
+            : teraz >= do_
             ? "Koniec serii! Patrz na telewizor."
             : "Za chwilę start. Wtedy możesz kibicować!"}
         </p>
