@@ -148,12 +148,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                         {kreska === "awans" ? "▲ nad kreską" : "▼ pod kreską"}
                       </span>
                     )}
-                    {/* awans w rankingu (gdy nie przeskoczył kreski, bo wtedy mówi to plakietka kreski) */}
-                    {awans > 0 && kreska !== "awans" && (
-                      <span className="wyscig-kreska awans" style={{ animationDelay: `${ZAMIANA_OD_S + 0.3}s` }}>
-                        ▲ {awans}
-                      </span>
-                    )}
+                    {/* bez plakietki „▲ 1” przy awansie (25.10, Łukasz: zamianę torów i tak widać) */}
                   </span>
                   <div className="wyscig-lada">
                     {/* trasa krótsza o pół awatara z każdej strony: na mecie awatar dotyka linii, nie wychodzi za nią */}
