@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import type { WierszRankingu } from "@/lib/gra/typy";
-import { godzinaStartu, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
+import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Loga } from "./tv";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
@@ -60,7 +60,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
             {zapowiedz.planowany_start && doStartu !== null && (
               <p className="plansza-start">
                 <span>
-                  Start o <strong>{godzinaStartu(zapowiedz.planowany_start)}</strong>
+                  Start <strong>{kiedyStart(zapowiedz.planowany_start)}</strong>
                 </span>
                 <span className="plansza-odliczanie">{opisOdliczania(doStartu)}</span>
               </p>
@@ -122,7 +122,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
       {/* odliczanie do zapowiedzianego quizu na każdej planszy poza pierwszą (tam jest duże) */}
       {nr !== 0 && zapowiedz?.planowany_start && doStartu !== null && (
         <p className="plansze-zapowiedz">
-          Quiz o <strong>{godzinaStartu(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}
+          Quiz <strong>{kiedyStart(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}
         </p>
       )}
       {/* plansze 1 i 3 nie mają dużego logo Bractwa, więc dostają małe w rogu */}

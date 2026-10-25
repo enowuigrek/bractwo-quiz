@@ -2,6 +2,9 @@
 
 ## Przed eventem (dzień wcześniej)
 
+**Zapowiedź kilka dni wcześniej (sprawdzenie dźwięku w lokalu, od 25.10).** Uruchom grę z lokalem i zapowiedzią na dzień i godzinę eventu (kreator: data i godzina startu). Ekran lokalu pokazuje wtedy „Start w środę 28.10 o 19:00 · za 3 dni” i gra muzykę poczekalni. Panelu i pilota nie trzeba mieć otwartych: gra czeka w bazie, a poczekalnię otwiera prowadzący. Obsługa lokalu naciska raz OK na pilocie TV: rusza muzyka i raz gra krótki efekt („ding”), więc od razu wiadomo, że działa i muzyka, i efekty. Muzykę można wyłączyć w pilocie gry i włączyć w dniu eventu. Do eventu: żadnych gier testowych z tym lokalem (gra z otwartą poczekalnią w lokalu przejmuje ekran), testy bez lokalu. Po każdym wdrożeniu ekran sam się przeładuje i znów poprosi napisem o OK na pilocie TV (przeglądarka po przeładowaniu nie zagra bez gestu); tak samo po wyłączeniu i włączeniu telewizora.
+
+
 1. Na `/api/keepalive` (adres aplikacji + `/api/keepalive`) ma być `"ok": true` i `"realtime": "SUBSCRIBED"`. Jeśli jest ustawiony `CRON_SECRET`, bez nagłówka dostaniesz 401. Wtedy sprawdź w Vercelu: Project → Settings → Cron Jobs → Run.
 2. W panelu: quiz ma wszystkie pytania, poprawne odpowiedzi są zaznaczone, a grafiki się wczytują.
 3. W panelu: uruchom grę (miasto → lokal → quiz, okazja, czas na odpowiedź, nagrody). Bonus za szybkość jest zawsze, drużyn już nie ma. Widoczność i „Pijany finał” są tylko po zalogowaniu hasłem głównym; gra głównego jest domyślnie „tylko dla mnie”, więc obsługa nie zobaczy jej w panelu (pilot i TV działają normalnie).

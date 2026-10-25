@@ -18,7 +18,7 @@ import { najblizszeOdciecie, odciecieEtapu, wzgledemKreski } from "@/lib/gra/odp
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
-import { godzinaStartu } from "@/lib/gra/zapowiedz";
+import { kiedyStart } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
@@ -182,7 +182,7 @@ export function Gracz({ kod }: { kod: string }) {
             <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
             <p className="pomocniczy">
               Zapisy jeszcze nie ruszyły
-              {stan.planowany_start ? ` (start o ${godzinaStartu(stan.planowany_start)})` : ""}. Gdy na telewizorze
+              {stan.planowany_start ? ` (start ${kiedyStart(stan.planowany_start)})` : ""}. Gdy na telewizorze
               pojawi się kod QR, zeskanuj go albo odśwież tę stronę.
             </p>
           </>

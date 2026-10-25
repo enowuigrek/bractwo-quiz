@@ -17,7 +17,7 @@ import {
 } from "@/lib/gra/nasluch";
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
+import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
@@ -249,7 +249,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       {faza === "poczekalnia" && stan.planowany_start && doZapowiedzi !== null && (
         <p className="pilot-start">
           <span>
-            Start o <strong>{godzinaStartu(stan.planowany_start)}</strong> ·{" "}
+            Start <strong>{kiedyStart(stan.planowany_start)}</strong> ·{" "}
             <span className="gra-kod">{opisOdliczania(doZapowiedzi)}</span>
           </span>
           {!stan.poczekalnia_otwarta && (

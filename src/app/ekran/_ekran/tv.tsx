@@ -31,7 +31,7 @@ import { EfektyTv } from "./efekty";
 import { MuzykaTv } from "./muzyka";
 import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
-import { godzinaStartu, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
+import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { Plansze } from "./plansze";
 import { TloTv } from "./tlo";
 import { WyscigTv } from "./wyscig";
@@ -333,7 +333,7 @@ function Poczekalnia({
           <h1 className="tv-tytul-quizu">{stan.quiz?.tytul ?? "Quiz"}</h1>
           {stan.planowany_start && doStartu !== null && (
             <p className="tv-start">
-              Start o <strong>{godzinaStartu(stan.planowany_start)}</strong> · {opisOdliczania(doStartu)}
+              Start <strong>{kiedyStart(stan.planowany_start)}</strong> · {opisOdliczania(doStartu)}
             </p>
           )}
           {stan.grafika_url && <img src={stan.grafika_url} alt="" className="tv-grafika" />}

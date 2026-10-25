@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { przesuniecieZegara, useNasluchTematu } from "@/lib/gra/nasluch";
 import { useNowaWersja } from "@/lib/ekran-tv";
+import { wczytajEfekty, wznowEfekty, zagraj } from "@/lib/gra/efekty";
 import type { Zapowiedz } from "@/lib/gra/zapowiedz";
 import { MuzykaTv } from "./muzyka";
 import { Plansze, type OstatniQuiz } from "./plansze";
@@ -68,12 +69,43 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
     <Scena nastroj={zapowiedz ? "poczekalnia" : undefined}>
       <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
       {/* zapowiedziana gra: muzyka poczekalni już teraz, a po otwarciu poczekalni gra dalej (muzyka.tsx) */}
+      {zapowiedz?.muzyka && <ProbaEfektow />}
       {zapowiedz?.muzyka && (
         <MuzykaTv
-          stan={{ faza: "poczekalnia", muzyka: true, etap: null, faza_od: null, faza_do: null, ostatnie_w_etapie: false }}
+          stan={{
+            faza: "poczekalnia",
+            muzyka: true,
+            etap: null,
+            faza_od: null,
+            faza_do: null,
+            ostatnie_w_etapie: false,
+          }}
           teraz={0}
         />
       )}
     </Scena>
   );
+}
+
+/**
+ * Zapowiedź gry: po pierwszym OK na pilocie TV (albo kliknięciu) raz gra krótki efekt, żeby obsługa lokalu już przed
+ * quizem usłyszała obok muzyki także efekty (src/lib/gra/efekty.ts). Ten sam gest odblokowuje je na całą grę.
+ */
+function ProbaEfektow() {
+  useEffect(() => {
+    wczytajEfekty(["ding"]);
+    let zagrane = false;
+    const gest = () => {
+      wznowEfekty();
+      if (zagrane) return;
+      zagrane = true;
+      window.setTimeout(() => zagraj("ding"), 400);
+    };
+    const gesty = ["click", "keydown", "touchend"] as const;
+    for (const g of gesty) window.addEventListener(g, gest);
+    return () => {
+      for (const g of gesty) window.removeEventListener(g, gest);
+    };
+  }, []);
+  return null;
 }
