@@ -127,7 +127,7 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
  * na zmianę: zmiana utworu i powrót pętli to przenikanie z jednego na drugi, więc nie ma dziury na końcu pliku.
  * Stałe, bo Safari pozwala grać tylko elementom, które raz zagrały po geście; nowy element zostałby zablokowany.
  * W pijanym finale muzyka coraz bardziej się psuje: zwalnia i obniża się jak rozciągana taśma
- * (`preservesPitch = false`), faluje głośnością i ma krótkie dziury, a urywa się razem z gaśnięciem telefonów
+ * (`preservesPitch = false`) i faluje głośnością (bez dziur), a urywa się razem z gaśnięciem telefonów
  * (`GASNIECIE_S` przed końcem), żeby przed wybuchem szklanki była chwila ciszy; `naWybuch` to zapas na wypadek,
  * gdyby zegar TV się spóźniał. Bez przewijania (`currentTime`): telewizor po takim skoku potrafił ucichnąć.
  * Przeglądarka nie zagra bez gestu, więc gdy w poczekalni długo jest cicho, na dole jest prośba o OK na pilocie TV.
@@ -352,7 +352,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     [],
   );
 
-  // pijany finał: rozciągana taśma, falująca głośność i krótkie dziury, coraz mocniej (co tyknięcie zegara)
+  // pijany finał: rozciągana taśma i falująca głośność, coraz mocniej (co tyknięcie zegara)
   const pijany = stan.faza === "pijany" && cel === "final";
   useEffect(() => {
     const w = strona();
@@ -375,9 +375,8 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     // pierwsza połowa dogrywki gra czysto (jak dalsza seria), psucie rośnie dopiero od połowy
     const psucie = Math.max(0, (poziom - 0.5) / 0.5);
     a.playbackRate = Math.max(0.5, 1 - 0.3 * psucie + 0.05 * psucie * Math.sin(teraz / 700));
-    // dziura trwa jedno tyknięcie (250 ms), potem głośność wraca, falując
-    const dziura = Math.random() < 0.15 * psucie;
-    a.volume = dziura ? 0.03 : GLOSNOSC * (1 - 0.45 * psucie * (0.5 + 0.5 * Math.sin(teraz / 260)));
+    // głośność faluje, ale bez dziur (25.10, Łukasz: przerywanie brzmiało jak zepsuty sprzęt, a ma być pijany)
+    a.volume = GLOSNOSC * (1 - 0.3 * psucie * (0.5 + 0.5 * Math.sin(teraz / 900)));
   }, [pijany, teraz, stan.faza_od, stan.faza_do]);
 
   if (!cel || stan.faza !== "poczekalnia" || cichoOd === null || !prosba) return null;

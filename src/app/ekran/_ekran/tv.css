@@ -3571,40 +3571,8 @@
    bez clip-path (Samsung). */
 .tv-pijany {
   --poziom: 0;
-  animation:
-    czkawka-tv 0.8s ease-out both,
-    mrugniecie-tv 1.8s steps(1, end) 0.5s both;
-}
-
-/* na wejściu w tryb ekran kilka razy nierówno gaśnie, jak psujący się telewizor (bez zapowiedzi) */
-@keyframes mrugniecie-tv {
-  0% {
-    opacity: 1;
-  }
-  7% {
-    opacity: 0.1;
-  }
-  10% {
-    opacity: 1;
-  }
-  31% {
-    opacity: 0;
-  }
-  34% {
-    opacity: 0.85;
-  }
-  38% {
-    opacity: 0.15;
-  }
-  42% {
-    opacity: 1;
-  }
-  74% {
-    opacity: 0.35;
-  }
-  77% {
-    opacity: 1;
-  }
+  /* bez mrugania ekranu na wejściu (25.10, Łukasz: miganie to bardziej psucie niż pijaństwo) */
+  animation: czkawka-tv 0.8s ease-out both;
 }
 
 /* wejście w tryb: ekran podskakuje jak po czkawce */
