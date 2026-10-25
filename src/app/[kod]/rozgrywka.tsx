@@ -5,7 +5,7 @@ import { useState } from "react";
 import { sekundy } from "@/lib/czas";
 import { napisMnoznika } from "@/lib/etapy";
 import { rozmycie } from "@/lib/gra/dodatki";
-import { fazaTeraz, komunikatBledu } from "@/lib/gra/nasluch";
+import { fazaTeraz, komunikatBledu, sekundaOdliczania } from "@/lib/gra/nasluch";
 import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor, liczbaCzesci, ulamek, type DaneOdpowiedzi } from "@/lib/zadania";
@@ -122,7 +122,7 @@ export function Rozgrywka({
         <p className="nadtytul">{ja.nick}</p>
         {naglowek}
         <div className="odliczanie" aria-live="polite">
-          <span className="odliczanie-liczba">{Math.max(1, Math.ceil(doStartu / 1000))}</span>
+          <span className="odliczanie-liczba">{sekundaOdliczania(doStartu)}</span>
           <span>Przygotuj się!</span>
           {/* rodzaj pytania już w odliczaniu, żeby nikt nie był zaskoczony parami czy kolejnością;
               w quizie z etapami tłumaczy to plansza etapu */}

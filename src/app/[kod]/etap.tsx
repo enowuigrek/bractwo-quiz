@@ -26,13 +26,8 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
       {e.opis && <p className="etap-opis">{e.opis}</p>}
       <ul className="etap-cechy">
         {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
-        <li>
-          {e.czas_s
-            ? e.seria
-              ? `${e.czas_s} s na całą serię`
-              : `${e.czas_s} s na odpowiedź`
-            : "Kto pierwszy, ten lepszy"}
-        </li>
+        {/* bez limitu nic: że szybciej = więcej punktów, mówi opis etapu */}
+        {e.czas_s && <li>{e.seria ? `${e.czas_s} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>}
         {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
         {e.typy.map((t) => (
           <li key={t}>{NAZWY_TYPOW[t]}</li>

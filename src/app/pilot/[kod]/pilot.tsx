@@ -9,6 +9,7 @@ import {
   komunikatBledu,
   pamiec,
   przesuniecieZegara,
+  sekundaOdliczania,
   useCzasSerwera,
   useKoniecPytania,
   useNasluch,
@@ -625,7 +626,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 Pytanie {z.lp}/{liczba}
               </span>
               {faza === "przygotuj" && (
-                <span className="gra-kod">start za {Math.max(0, Math.ceil(doStartu / 1000))} s</span>
+                <span className="gra-kod">start za {sekundaOdliczania(doStartu)} s</span>
               )}
               {faza === "pytanie" && (
                 <span className="gra-kod">

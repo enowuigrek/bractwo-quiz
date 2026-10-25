@@ -3202,24 +3202,6 @@
   background: linear-gradient(90deg, transparent, var(--kamien3) 8%, var(--kamien3) 92%, transparent);
 }
 
-.tv-os-odp-strona {
-  position: absolute;
-  top: 0;
-  font-size: 24px;
-  font-weight: var(--w-black);
-  color: var(--szary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.tv-os-odp-strona.lewa {
-  left: 0;
-}
-
-.tv-os-odp-strona.prawa {
-  right: 0;
-}
-
 .tv-os-odp-poprawna {
   position: absolute;
   top: 9%;

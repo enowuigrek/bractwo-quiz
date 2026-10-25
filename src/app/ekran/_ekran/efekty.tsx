@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { wczytajEfekty, wznowEfekty, zagraj, type Efekt } from "@/lib/gra/efekty";
-import { fazaTeraz } from "@/lib/gra/nasluch";
+import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
 import type { StanSesji } from "@/lib/gra/typy";
 
 /** Tyle ostatnich sekund pytania tyka zegar. */
@@ -58,7 +58,7 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   const sekunda =
     faza === "przygotuj"
-      ? Math.ceil(doStartu / 1000)
+      ? sekundaOdliczania(doStartu)
       : faza === "pytanie" && !bezLimitu
         ? Math.ceil(doKonca / 1000)
         : null;

@@ -6,6 +6,7 @@ import {
   fazaTeraz,
   komunikatBledu,
   pobierzStan,
+  sekundaOdliczania,
   useCzasSerwera,
   useKoniecPytania,
   useNasluch,
@@ -418,7 +419,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
           Pytanie {z.lp}
           {opisEtapu}
         </p>
-        <p className="tv-odliczanie">{Math.max(1, Math.ceil(doStartu / 1000))}</p>
+        <p className="tv-odliczanie">{sekundaOdliczania(doStartu)}</p>
         <p className="tv-duzy">Przygotuj się!</p>
         {/* w quizie z etapami rodzaj pytania tłumaczy plansza etapu */}
         {!zEtapami && <p className="tv-odliczanie-typ">{PODPOWIEDZI_TYPOW[z.typ]}</p>}

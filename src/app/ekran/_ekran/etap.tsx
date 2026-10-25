@@ -80,13 +80,10 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             )}
             <motion.ul className="tv-etap-cechy" {...wejscie(3)}>
               {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
-              <li>
-                {e.seria
-                  ? `${e.czas_s ?? 60} s na całą serię`
-                  : e.czas_s
-                    ? `${e.czas_s} s na odpowiedź`
-                    : "Kto pierwszy, ten lepszy"}
-              </li>
+              {/* bez limitu nic: że szybciej = więcej punktów, mówi opis etapu */}
+              {(e.seria || e.czas_s) && (
+                <li>{e.seria ? `${e.czas_s ?? 60} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>
+              )}
               {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
               {/* w finale bez liczby pytań: seria prawda/fałsz leci szybko, a liczba tylko straszy */}
               {!e.finalowy && <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>}

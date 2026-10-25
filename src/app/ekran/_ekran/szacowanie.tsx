@@ -75,7 +75,7 @@ type Odpowiedz = { nick: string; zdjecie: string | null; liczba: number; punkty:
 
 /**
  * Odpowiedzi w szacowaniu (faza `odpowiedzi`): zamiast ramek „dobrze / źle” jedna oś przybliżona do odpowiedzi.
- * Na środku złota kreska z poprawną liczbą, gracze tam, gdzie strzelali (za mało z lewej, za dużo z prawej),
+ * Na środku złota kreska z poprawną liczbą, gracze tam, gdzie strzelali,
  * każdy z podpisem: nick, liczba i punkty. Podpisy układają się w rzędy nad i pod osią, żeby na siebie nie wchodziły.
  */
 export function OdpowiedziSzacowania({
@@ -134,8 +134,6 @@ export function OdpowiedziSzacowania({
     <div className="tv-os-odp">
       <div className="tv-os-odp-pole" style={{ width: SZEROKOSC_OSI }}>
         <div className="tv-os-odp-linia" />
-        <span className="tv-os-odp-strona lewa">← za mało</span>
-        <span className="tv-os-odp-strona prawa">za dużo →</span>
         <span className="tv-os-odp-poprawna" style={{ left: x(p) }}>
           <span>{liczbaZJednostka(p, jednostka)}</span>
         </span>

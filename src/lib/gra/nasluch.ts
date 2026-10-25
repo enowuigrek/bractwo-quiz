@@ -121,13 +121,29 @@ export function zZegarem(faza: FazaWidoczna | null | undefined): boolean {
   return faza === "przygotuj" || faza === "pytanie" || faza === "seria" || faza === "pijany";
 }
 
-/** Bieżący czas serwera, odświeżany co `coIleMs`, gdy `aktywny`. */
+/** Odliczanie przed pytaniem (`faza_od` = start + 3 s w `pilot_akcja`). */
+export const ODLICZANIE_S = 3;
+
+/** Liczba na odliczaniu: 3, 2, 1 (nigdy więcej, nawet gdy zegar jeszcze nie dogonił, patrz `useCzasSerwera`). */
+export function sekundaOdliczania(doStartu: number): number {
+  return Math.min(ODLICZANIE_S, Math.max(1, Math.ceil(doStartu / 1000)));
+}
+
+/**
+ * Bieżący czas serwera, odświeżany co `coIleMs`, gdy `aktywny`. Poza fazami z zegarem stoi, więc przy wejściu
+ * w odliczanie od razu się aktualizuje (pierwsza klatka i tak ma jeszcze stary czas: TV pokazywał wtedy „75”).
+ */
 export function useCzasSerwera(przesuniecie: number, aktywny: boolean, coIleMs = 250): number {
   const [teraz, ustawTeraz] = useState(() => Date.now() + przesuniecie);
   useEffect(() => {
     if (!aktywny) return;
-    const zegar = setInterval(() => ustawTeraz(Date.now() + przesuniecie), coIleMs);
-    return () => clearInterval(zegar);
+    const odswiez = () => ustawTeraz(Date.now() + przesuniecie);
+    const pierwszy = setTimeout(odswiez, 0);
+    const zegar = setInterval(odswiez, coIleMs);
+    return () => {
+      clearTimeout(pierwszy);
+      clearInterval(zegar);
+    };
   }, [przesuniecie, aktywny, coIleMs]);
   return teraz;
 }
