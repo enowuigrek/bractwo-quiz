@@ -19,7 +19,15 @@ export function krokiFinalu(g: PostepFinalisty): number {
   return Math.max(0, (g.start ?? 0) + 2 * g.dobre - g.odpowiedzi);
 }
 
-/** Położenie na drodze 0..1 (1 = przy szklance). */
+/**
+ * Ile drogi przechodzi się przed metą: krok przed szklanką to 85% drogi, a do szklanki awatar dobiega dopiero
+ * na mecie (25.10, Łukasz: z perspektywy widza nikt nie stoi przy piwie przed samym końcem).
+ */
+const DROGA_PRZED_META = 0.85;
+
+/** Położenie na drodze 0..1 (1 = przy szklance, tylko po dobiegnięciu do mety). */
 export function naDrodzeFinalu(g: PostepFinalisty): number {
-  return Math.min(1, krokiFinalu(g) / META_FINALU);
+  const kroki = krokiFinalu(g);
+  if (kroki >= META_FINALU) return 1;
+  return (DROGA_PRZED_META * Math.max(0, kroki)) / (META_FINALU - 1);
 }

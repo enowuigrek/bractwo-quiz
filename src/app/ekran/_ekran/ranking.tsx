@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
 import { animate, AnimatePresence, motion, MotionConfig } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { RESZTA_PODIUM_S, WJAZD_PODIUM_S } from "@/lib/gra/podium";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
@@ -171,7 +171,8 @@ export function PodiumTv({
   nagrody: Nagroda[] | null;
 }) {
   const top = ranking.slice(0, 3);
-  const dalej = ranking.slice(3, 10);
+  // dalsze miejsca: wszyscy (do 30), w jednej linii, która przesuwa się w bok, gdy się nie mieści (PasekDalej)
+  const dalej = ranking.slice(3);
   // Czasy liczymy od początku fazy w bazie, nie od chwili, gdy TV ją zauważyło
   // (telefony odsłaniają miejsca według tego samego zegara). Po przeładowaniu w trakcie podium nie ma powtórki.
   const [uplynelo] = useState(() => (start ? Math.max(0, (Date.now() - start) / 1000) : 0));
@@ -231,20 +232,49 @@ export function PodiumTv({
         })}
       </div>
       {dalej.length > 0 && (
-        <motion.ol
-          className="tv-podium-dalej"
+        <motion.div
           initial={odRazu ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: odRazu ? 0 : Math.max(0, RESZTA_PODIUM_S - uplynelo) }}
         >
-          {dalej.map((w) => (
-            <li key={w.nick}>
-              <span className="tv-zloto">{w.miejsce}.</span> {w.nick}{" "}
-              <span className="tv-podpowiedz">{w.punkty.toLocaleString("pl-PL")}</span>
-            </li>
-          ))}
-        </motion.ol>
+          <PasekDalej wiersze={dalej} />
+        </motion.div>
       )}
     </MotionConfig>
+  );
+}
+
+/** Prędkość przesuwania paska dalszych miejsc (px na sekundę): spokojnie, żeby dało się przeczytać nicki. */
+const PASEK_PX_S = 70;
+
+/**
+ * Dalsze miejsca pod podium w jednej linii (25.10, Łukasz: wcześniej tylko 4.–10. w dwóch rzędach). Gdy wszyscy się
+ * mieszczą, stoją na środku; gdy nie, linia przesuwa się w bok bez końca (druga kopia za pierwszą).
+ */
+function PasekDalej({ wiersze }: { wiersze: WierszRankingu[] }) {
+  const pole = useRef<HTMLDivElement>(null);
+  const lista = useRef<HTMLOListElement>(null);
+  const [szerokosc, ustawSzerokosc] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const w = lista.current?.scrollWidth ?? 0;
+    const miejsce = pole.current?.clientWidth ?? 0;
+    ustawSzerokosc(w > miejsce ? w : null);
+  }, [wiersze]);
+  const elementy = wiersze.map((w) => (
+    <li key={w.nick}>
+      <span className="tv-zloto">{w.miejsce}.</span> {w.nick}{" "}
+      <span className="tv-podpowiedz">{w.punkty.toLocaleString("pl-PL")}</span>
+    </li>
+  ));
+  return (
+    <div ref={pole} className={`tv-podium-dalej${szerokosc ? " przewija" : ""}`}>
+      <div
+        className="tv-podium-dalej-tor"
+        style={szerokosc ? { animationDuration: `${Math.round(szerokosc / PASEK_PX_S)}s` } : undefined}
+      >
+        <ol ref={lista}>{elementy}</ol>
+        {szerokosc && <ol aria-hidden>{elementy}</ol>}
+      </div>
+    </div>
   );
 }

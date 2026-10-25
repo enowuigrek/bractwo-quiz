@@ -1041,17 +1041,54 @@
   height: 170px;
 }
 
+/* dalsze miejsca pod podium: jedna linia, przesuwa się w bok, gdy się nie mieści (ranking.tsx, PasekDalej);
+   brzegi gasną maską, nie clip-path (Samsung) */
 .tv-podium-dalej {
-  list-style: none;
-  margin: 0;
   padding: 20px 0 0;
   border-top: 3px solid var(--zloto);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px 40px;
+  overflow: hidden;
   font-size: 30px;
   font-weight: var(--w-black);
+}
+
+.tv-podium-dalej-tor {
+  display: flex;
+  justify-content: center;
+}
+
+.tv-podium-dalej ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex: none;
+  gap: 40px;
+  white-space: nowrap;
+}
+
+.tv-podium-dalej.przewija {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.tv-podium-dalej.przewija .tv-podium-dalej-tor {
+  justify-content: flex-start;
+  width: max-content;
+  animation: podium-dalej-pasek linear infinite;
+}
+
+/* odstęp między kopiami jak między miejscami */
+.tv-podium-dalej.przewija ol {
+  padding-right: 40px;
+}
+
+@keyframes podium-dalej-pasek {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .tv-dziekujemy {
