@@ -275,13 +275,44 @@
   animation: wjazd-nicku 0.9s var(--ease-wjazd) both;
 }
 
-.tv-nicki.gesto {
+/* im więcej graczy, tym gęściej (nicki.tsx: stopień z liczby graczy, a gdy się nie mieszczą, jeszcze mniejszy) */
+.tv-nicki.st-1 {
+  gap: 12px;
+}
+
+.tv-nicki.st-1 li {
+  font-size: 28px;
+  padding: 6px 20px 6px 6px;
+}
+
+.tv-nicki.st-2 {
   gap: 10px;
 }
 
-.tv-nicki.gesto li {
-  font-size: 24px;
-  padding: 4px 16px;
+.tv-nicki.st-2 li {
+  font-size: 22px;
+  padding: 4px 14px 4px 4px;
+  gap: 8px;
+}
+
+.tv-nicki.st-3 {
+  gap: 8px;
+}
+
+.tv-nicki.st-3 li {
+  font-size: 18px;
+  padding: 3px 12px 3px 3px;
+  gap: 6px;
+}
+
+.tv-nicki.st-4 {
+  gap: 6px;
+}
+
+.tv-nicki.st-4 li {
+  font-size: 15px;
+  padding: 2px 10px 2px 2px;
+  gap: 5px;
 }
 
 /* Nowy gracz: wskakuje ze złotym blaskiem, który gaśnie */
@@ -441,8 +472,9 @@
   filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.4));
 }
 
+/* odpadanie po etapie: informacja, nie ostrzeżenie, więc jasne złoto, nie czerwień (25.10) */
 .tv-wstep-prog {
-  color: var(--czerwien);
+  color: var(--zloto-jasne);
   font-size: 24px;
   font-weight: var(--w-black);
 }
@@ -2238,7 +2270,7 @@
   left: 50%;
   translate: -50% 0;
   white-space: nowrap;
-  color: var(--czerwien);
+  color: var(--zloto-jasne);
   font-size: 20px;
   font-weight: var(--w-black);
 }

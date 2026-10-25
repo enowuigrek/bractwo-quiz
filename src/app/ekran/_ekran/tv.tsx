@@ -11,7 +11,6 @@ import {
   useNasluch,
   zZegarem,
 } from "@/lib/gra/nasluch";
-import { Awatar } from "@/components/awatar";
 import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
@@ -36,6 +35,7 @@ import { WyscigTv } from "./wyscig";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { PodiumTv, RankingTv } from "./ranking";
 import { LogoNaglowka } from "./logo";
+import { NickiPoczekalni } from "./nicki";
 import { WstepTv } from "./wstep";
 
 // Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
@@ -344,14 +344,7 @@ function Poczekalnia({
                 Czekamy na {druzyny ? "pierwsze drużyny" : "pierwszych graczy"}…
               </p>
             ) : (
-              <ul className={`tv-nicki${gracze.length > 30 ? " gesto" : ""}`}>
-                {gracze.map((g) => (
-                  <li key={g.nick}>
-                    <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={gracze.length > 30 ? 34 : 58} />
-                    {g.nick}
-                  </li>
-                ))}
-              </ul>
+              <NickiPoczekalni gracze={gracze} />
             )}
           </div>
         </section>

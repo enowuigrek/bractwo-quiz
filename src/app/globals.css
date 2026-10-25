@@ -2722,3 +2722,32 @@ html:has(.kolumna) {
 .gotowy .pomocniczy {
   margin: 0;
 }
+
+/* Pilot: wiersz z włącznikiem (muzyka, automatyczne prowadzenie): ikona, opis, przycisk równo po prawej */
+.pilot-przelacznik {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 6px;
+  color: var(--szary);
+}
+
+.pilot-przelacznik svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.pilot-przelacznik span {
+  flex: 1;
+  min-width: 0;
+}
+
+.pilot-przelacznik button {
+  flex: none;
+  min-width: 96px;
+}
+
+.pilot-przelacznik.wlaczony svg {
+  color: var(--zloto);
+}

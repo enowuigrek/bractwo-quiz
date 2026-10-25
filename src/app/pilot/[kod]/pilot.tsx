@@ -22,6 +22,7 @@ import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } 
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
+import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "./ikony";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
 
@@ -203,15 +204,17 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
       </p>
       {/* muzyka gra tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
-      <p className="pomocniczy" style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
-        {stan.muzyka ? "🔊 Muzyka na TV gra" : "🔇 Muzyka na TV wyłączona"}
+      <p className="pilot-przelacznik">
+        {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
+        <span>{stan.muzyka ? "Muzyka na TV gra" : "Muzyka na TV wyłączona"}</span>
         <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
           {stan.muzyka ? "Wyłącz" : "Włącz"}
         </button>
       </p>
       {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
-      <p className="pomocniczy" style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
-        {stan.auto ? "🤖 Gra prowadzi się sama" : "🤖 Prowadzenie automatyczne wyłączone"}
+      <p className={`pilot-przelacznik${stan.auto ? " wlaczony" : ""}`}>
+        <IkonaAutomat />
+        <span>{stan.auto ? "Gra prowadzi się sama" : "Prowadzenie automatyczne"}</span>
         <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => void przelaczAuto()}>
           {stan.auto ? "Wyłącz" : "Włącz"}
         </button>
