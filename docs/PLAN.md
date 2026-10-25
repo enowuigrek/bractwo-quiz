@@ -76,7 +76,7 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 - **Plansza wstępu:** więcej miejsca między opisem a ikonami (80 px), szklanka na mecie stoi na linii numerów etapów. **Plansza etapu:** długa nazwa zawija się obok ikony.
 - **Wideo wybuchu:** piana spływa i gaśnie 1,3 s przed końcem klipu (wcześniej zjeżdżała zamrożona ostatnia klatka).
 - **Finał „15/12 kroków”** z testu: pilot i TV miały jeszcze stary kod (wdrożenie kary było w trakcie gry), który liczył przewagę + dobre bez kary. Baza liczyła już z karą i dlatego seria trwała dalej.
-- **Czeka na środki w OpenAI** (25.10: „no credits remaining”): ikona „Jeszcze zdążę” jako klepsydra z piwem i zdjęcie tripla do pytania o moc. Prompty są w `scripts/grafiki.mjs`; po doładowaniu `node scripts/grafiki.mjs etap-jeszcze-zdaze pyt-tripel` i ustawić `grafika_url = '/grafiki/pytania/tripel.webp'` w pytaniu o tripla (cofnięte migracją `20261024224343`, bo pliku nie ma).
+- **Tripel ze zdjęciem:** grafika od Łukasza z ChatGPT (prompt `pyt-tripel` ze `scripts/grafiki.mjs`), przycięta do 4:5, `public/grafiki/pytania/tripel.webp`. **Czeka na środki w OpenAI** (25.10: „no credits remaining”): ikona „Jeszcze zdążę” jako klepsydra z piwem (`node scripts/grafiki.mjs etap-jeszcze-zdaze`).
 
 ### Pijany finał
 
