@@ -1959,7 +1959,7 @@ html:has(.kolumna) {
   font-weight: var(--w-semibold);
 }
 
-/* Zdjęcie nagrody na karcie zwycięzcy (bez tła, przerobione w panelu) */
+/* Zdjęcie nagrody na karcie zwycięzcy (zdjęcie z kreatora gry) */
 .karta-nagrody-zdjecie {
   display: block;
   width: 96px;

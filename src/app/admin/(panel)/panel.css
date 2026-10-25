@@ -1288,11 +1288,6 @@ a.przycisk {
   }
 }
 
-.zdjecie-nagrody-wybor {
-  display: flex;
-  gap: 10px;
-}
-
 .zdjecie-nagrody-opcja {
   display: grid;
   gap: 4px;

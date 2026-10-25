@@ -21,6 +21,7 @@ import { napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
+import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
@@ -108,6 +109,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza));
   const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
+  useBoty(kod, token, stan);
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
   if (!zamontowany) {
@@ -470,6 +472,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       </section>
 
       {faza === "poczekalnia" && <ProgiPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
+      {faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
 
       {faza === "poczekalnia" && (
         <section className="karta" style={{ marginTop: 18 }}>

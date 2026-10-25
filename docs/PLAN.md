@@ -12,7 +12,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Panel** (`/admin`): dwa hasła. Główne (`ADMIN_HASLO_GLOWNE`, tylko Łukasz) widzi wszystko, wspólne (`ADMIN_HASLO`, obsługa) nie widzi quizów i gier „tylko dla mnie” ani pijanego finału. Lokale z logo i adresem ekranu, quizy z etapami (szablony „Klasyczny pub quiz” i „Bez etapów”), edytor zadań siedmiu rodzajów (wybór, prawda/fałsz, wielokrotny, kolejność, pary, szacowanie, ciekawostka) z grafiką, podpowiedziami i odsłanianą grafiką, kreator gry (miasto → lokal → quiz, okazja, czas, nagrody ze zdjęciem, widoczność, pijany finał z „Kto dziś stoi za barem”, kranoprzejęcie, zapowiedź), pytania pijanego finału, historia gier, odbiór nagród, grafika podium.
 - **TV** (`/ekran/<adres-lokalu>` na stałe w lokalu albo `/tv/<kod>`, scena 1920×1080): plansze lokalu, zapowiedź, poczekalnia z QR, **plansza wstępu** (droga etapów do szklanki), plansza etapu z demo telefonu, pytanie z odliczaniem, ciekawostki, wynik, odpowiedzi graczy, **wyścig po piwo** po każdym pytaniu (do 12 graczy wszyscy na torach, przy większej grupie dziesiątka i pasek reszty), kreska odpadania, pasek „Koniec etapu”, finał trójki jako **wyścig** na 12 kroków z przewagą 0–3, ukryty **pijany finał** z wybuchem szklanki, **werble**, podium, tabela, koniec. Nastroje etapów (tła z OpenAI, żaluzje, neon) i **muzyka** z Suno na każdy etap. Sam się przeładowuje po wdrożeniu (poza pytaniem, serią i pijanym finałem).
 - **Telefon** (`/<kod>`): nick i selfie, wszystkie typy odpowiedzi, ranking z miejscem, kreską i szklanką, ekran „Odpadasz”, w finale koła ✓/✗ z utrudnieniami, kibic stuka hasła, pijany finał udający dalszą serię, medal, karta nagrody, „Pobierz grafikę na pamiątkę”.
-- **Pilot** (`/pilot/<kod>?t=…`): przyciski faz, progi odpadania przed startem, muzyka, w finale kroki finalistów, w pijanym finale odliczanie i „Zakończ i pokaż werble”.
+- **Pilot** (`/pilot/<kod>?t=…`): przyciski faz, progi odpadania i boty do testów przed startem, muzyka, w finale kroki finalistów, w pijanym finale odliczanie i „Zakończ i pokaż werble”.
 
 **Quizy:**
 - **Piwny quiz Bractwa Piwnego** i **Muzyka ponadczasowa** (na próbę z Basią i Łukaszem) mają te same etapy jako wieczór w barze: **Na jedno** (jedna dobra) → **Jednak więcej** (kilka dobrych) → **Ile?** (szacowanie) → **Jakoś się ułoży** (kolejność i pary, walka o finał: do finału 3) → **Jeszcze zdążę** (finał: wyścig na 12 kroków, losowa pula 30 prawda/fałsz, 180 s) → przy włączonym trybie pijany finał (stałe 60 s) → werble → podium.
@@ -30,14 +30,13 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 
 **Otwarte i niepewne:**
 - **Na 25.10: dźwięki i pijany finał** (plan niżej, w „Na 25.10”).
-- `/api/nagroda` (przeróbka zdjęcia nagrody w panelu) woła jeszcze `gpt-image-1`, który 24.10 przestał działać przy generowaniu. Pewnie nie działa; do sprawdzenia jednym zdjęciem i przejścia na `gpt-image-2`.
 - Pijany finał „Muzyki ponadczasowej” to prowizorka (`pijane_pytania_quizu`, opis w POMYSLY.md).
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
 - Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
-- Gry testowe do usunięcia w panelu: JLUL, QDSD (i wcześniejsze, jeśli zostały).
+- Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK (i wcześniejsze, jeśli zostały).
 
-**Następny krok:** dźwięki i pijany finał (25.10), potem test na żywo na spotkaniu Kręgu 28.10.
+**Następny krok:** dźwięki i pijany finał (plan niżej, „Na 25.10”), potem test na żywo na spotkaniu Kręgu 28.10. Do testów samemu: boty z pilota (niżej).
 
 ## Na 25.10: dźwięki i pijany finał
 
@@ -77,6 +76,11 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 - **Wideo wybuchu:** piana spływa i gaśnie 1,3 s przed końcem klipu (wcześniej zjeżdżała zamrożona ostatnia klatka).
 - **Finał „15/12 kroków”** z testu: pilot i TV miały jeszcze stary kod (wdrożenie kary było w trakcie gry), który liczył przewagę + dobre bez kary. Baza liczyła już z karą i dlatego seria trwała dalej.
 - **Tripel ze zdjęciem:** grafika od Łukasza z ChatGPT (prompt `pyt-tripel` ze `scripts/grafiki.mjs`), przycięta do 4:5, `public/grafiki/pytania/tripel.webp`. **Ikona „Jeszcze zdążę”:** klepsydra z piwem zamiast piasku (od Łukasza z ChatGPT, prompt `etap-jeszcze-zdaze` na magencie, wycięta jak pozostałe ikony). Konto API OpenAI nie ma środków (25.10), więc nowe grafiki na razie przez ChatGPT.
+
+### Boty do testów i zdjęcie nagrody bez AI (25.10) ✅
+
+- **Boty** (migracje `20261025065543_boty_do_testow`, `20261025065610_boty_wolniej`, `src/app/pilot/[kod]/boty.tsx`): w pilocie w poczekalni karta „Boty do testów” i „Dodaj 4 boty” (`dodaj_boty`, nicki „Bot Zenek”, „Bot Halina”…, `gracze.bot`). W pytaniu i w serii finału pilot co 1,5 s woła `boty_odpowiadaj`: za każdym razem część botów bez odpowiedzi odpowiada teraz (średnio po ok. 10 s w pytaniu i co ok. 4 s w serii), zwykłymi `zapisz_odpowiedz` / `zapisz_odpowiedz_serii`, więc punkty, bonus za czas, ranking, odpadanie i finał (z karą) liczą się jak u ludzi. Każdy bot ma stałą „wiedzę” 40–85% dobrych (`wewn.odpowiedz_bota`: dobra albo losowa odpowiedź każdego typu, szacowanie blisko albo daleko). Działa tylko przy otwartym pilocie. Pijanego finału ani kibicowania boty nie robią.
+- **Zdjęcie nagrody bez przeróbki AI:** kreator wysyła samo zdjęcie (`/api/nagroda` tylko zapisuje w `grafiki/nagrody/<dzień>/`), wybór „po przeróbce / oryginał” zniknął. Aplikacja nie woła już OpenAI.
 
 ### Pijany finał
 

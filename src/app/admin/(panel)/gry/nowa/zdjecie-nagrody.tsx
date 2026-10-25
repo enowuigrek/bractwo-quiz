@@ -3,7 +3,7 @@
 
 import { useRef, useState } from "react";
 
-/** Dłuższy bok zdjęcia wysyłanego do przeróbki (więcej nie poprawia wyniku, a Vercel ma limit 4,5 MB). */
+/** Dłuższy bok wysyłanego zdjęcia (Vercel ma limit 4,5 MB na żądanie). */
 const BOK = 1024;
 
 /** Zmniejsza zdjęcie z aparatu do JPEG o dłuższym boku `BOK`. */
@@ -20,39 +20,26 @@ async function zmniejsz(plik: File): Promise<Blob> {
   );
 }
 
-type Stan =
-  | { etap: "pusty" }
-  | { etap: "przerabiam"; podglad: string }
-  | { etap: "gotowe"; oryginal: string; przerobione: string | null; wybrane: string; blad?: string };
+type Stan = { etap: "pusty" } | { etap: "wysylam"; podglad: string } | { etap: "gotowe"; url: string };
 
 /**
- * Zdjęcie nagrody w kreatorze: zrób zdjęcie (albo wybierz plik), serwer przerabia je w stylu
- * Bractwa (`/api/nagroda`, ok. 20–40 s). Potem wybór: przeróbka albo oryginał, „Jeszcze raz”, „Usuń”.
- * Wybrany adres idzie w ukrytym polu `nagroda_zdjecie_<miejsce>`.
+ * Zdjęcie nagrody w kreatorze: zrób zdjęcie (albo wybierz plik), przeglądarka je zmniejsza, a serwer zapisuje
+ * w buckecie (`/api/nagroda`). Adres idzie w ukrytym polu `nagroda_zdjecie_<miejsce>`. Bez przeróbki przez AI
+ * (wyłączona 25.10).
  */
 export function ZdjecieNagrody({ miejsce }: { miejsce: number }) {
   const [stan, ustaw] = useState<Stan>({ etap: "pusty" });
-  const ostatni = useRef<Blob | null>(null);
   const pole = useRef<HTMLInputElement>(null);
 
-  async function przerob(zdjecie: Blob) {
-    ostatni.current = zdjecie;
-    ustaw({ etap: "przerabiam", podglad: URL.createObjectURL(zdjecie) });
+  async function wyslij(zdjecie: Blob) {
+    ustaw({ etap: "wysylam", podglad: URL.createObjectURL(zdjecie) });
     const dane = new FormData();
     dane.append("plik", zdjecie, "nagroda.jpg");
     try {
       const odp = await fetch("/api/nagroda", { method: "POST", body: dane });
-      const wynik = (await odp.json()) as { ok: boolean; blad?: string; oryginal?: string; przerobione?: string };
-      if (wynik.ok && wynik.oryginal && wynik.przerobione) {
-        ustaw({ etap: "gotowe", oryginal: wynik.oryginal, przerobione: wynik.przerobione, wybrane: wynik.przerobione });
-      } else if (wynik.oryginal) {
-        ustaw({
-          etap: "gotowe",
-          oryginal: wynik.oryginal,
-          przerobione: null,
-          wybrane: wynik.oryginal,
-          blad: wynik.blad,
-        });
+      const wynik = (await odp.json()) as { ok: boolean; blad?: string; url?: string };
+      if (wynik.ok && wynik.url) {
+        ustaw({ etap: "gotowe", url: wynik.url });
       } else {
         ustaw({ etap: "pusty" });
         alert(wynik.blad ?? "Nie udało się wysłać zdjęcia.");
@@ -65,7 +52,7 @@ export function ZdjecieNagrody({ miejsce }: { miejsce: number }) {
 
   return (
     <div className="zdjecie-nagrody">
-      <input type="hidden" name={`nagroda_zdjecie_${miejsce}`} value={stan.etap === "gotowe" ? stan.wybrane : ""} />
+      <input type="hidden" name={`nagroda_zdjecie_${miejsce}`} value={stan.etap === "gotowe" ? stan.url : ""} />
       <input
         ref={pole}
         type="file"
@@ -75,60 +62,29 @@ export function ZdjecieNagrody({ miejsce }: { miejsce: number }) {
         onChange={async (e) => {
           const plik = e.target.files?.[0];
           e.target.value = "";
-          if (plik) await przerob(await zmniejsz(plik).catch(() => plik));
+          if (plik) await wyslij(await zmniejsz(plik).catch(() => plik));
         }}
       />
 
       {stan.etap === "pusty" && (
         <button type="button" className="przycisk-maly" onClick={() => pole.current?.click()}>
-          📷 Zdjęcie nagrody (przeróbka AI)
+          📷 Zdjęcie nagrody
         </button>
       )}
 
-      {stan.etap === "przerabiam" && (
+      {stan.etap === "wysylam" && (
         <div className="zdjecie-nagrody-trwa" role="status">
           <img src={stan.podglad} alt="" />
-          <span>Przerabiam zdjęcie w stylu Bractwa, ok. 30 s…</span>
+          <span>Wysyłam zdjęcie…</span>
         </div>
       )}
 
       {stan.etap === "gotowe" && (
         <>
-          {stan.blad && <p className="blad">{stan.blad}</p>}
-          <div
-            className="zdjecie-nagrody-wybor"
-            role="radiogroup"
-            aria-label={`Zdjęcie nagrody za ${miejsce}. miejsce`}
-          >
-            {[
-              { url: stan.przerobione, napis: "Po przeróbce" },
-              { url: stan.oryginal, napis: "Oryginał" },
-            ].map(
-              (o) =>
-                o.url && (
-                  <button
-                    key={o.napis}
-                    type="button"
-                    role="radio"
-                    aria-checked={stan.wybrane === o.url}
-                    className={`zdjecie-nagrody-opcja${stan.wybrane === o.url ? " wybrana" : ""}`}
-                    onClick={() => ustaw({ ...stan, wybrane: o.url as string })}
-                  >
-                    <img src={o.url} alt="" />
-                    <span>{o.napis}</span>
-                  </button>
-                ),
-            )}
+          <div className="zdjecie-nagrody-opcja wybrana">
+            <img src={stan.url} alt={`Zdjęcie nagrody za ${miejsce}. miejsce`} />
           </div>
           <div className="zdjecie-nagrody-akcje">
-            <button
-              type="button"
-              className="przycisk-maly"
-              // w stanie „gotowe” ostatnie zdjęcie zawsze jest w pamięci
-              onClick={() => ostatni.current && void przerob(ostatni.current)}
-            >
-              Przerób jeszcze raz
-            </button>
             <button type="button" className="przycisk-maly" onClick={() => pole.current?.click()}>
               Inne zdjęcie
             </button>

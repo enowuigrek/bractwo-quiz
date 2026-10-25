@@ -152,6 +152,8 @@ export type PilotStan = StanSesji & {
   progi_wlasne: boolean;
   /** Etapy quizu (do edycji progów). */
   etapy: { nr: number; nazwa: string; finalowy: boolean }[];
+  /** Ile botów do testów jest w grze (`dodaj_boty`; pilot każe im odpowiadać, src/app/pilot/[kod]/boty.tsx). */
+  boty: number;
 };
 
 /** Wiersz `pilot_gracze`: token służy do QR, którym gracz wraca do gry na innym telefonie. */

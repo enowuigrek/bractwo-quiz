@@ -204,7 +204,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                 ))}
                 <p className="podpowiedz">
                   Nagroda pokaże się na podium na TV, a zwycięzca zobaczy ją na telefonie razem z instrukcją. Zdjęcie nagrody
-                  (przerobione w stylu Bractwa) stoi też przy szklance w wyścigu i na planszy finału.
+                  stoi też przy szklance w wyścigu i na planszy finału.
                 </p>
               </div>
             )}
