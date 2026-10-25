@@ -472,7 +472,7 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 
 - Każda scena TV (`Scena` w `tv.tsx`, hooki w `src/lib/ekran-tv.ts`) prosi przeglądarkę o Screen Wake Lock (ponawia po powrocie karty z tła).
 - Pierwsza wersja z niewidocznym wideo 2×2 px z płótna (`captureStream`) nie wystarczyła: telewizor i tak włączył wygaszacz. Teraz pod tłem gra na całym ekranie prawdziwy plik `public/wideo/czuwanie.mp4` (H.264, 128×72, 6 s, 3 KB, prawie czarny, nagrany w przeglądarce MediaRecorderem, bo nie ma ffmpeg), wyciszony i zapętlony, wznawiany co 20 s, gdyby stanął. Do sprawdzenia na telewizorze.
-- Przeciw wypaleniu OLED cała scena przesuwa się co 2 minuty o kilka pikseli (7 położeń, do 3 px), więc logo w rogu i kropki plansz nie stoją ciągle w jednym miejscu.
+- Przeciw wypaleniu OLED cała scena przesuwa się co 2 minuty o kilka pikseli (7 położeń, do 3 px), więc logo w rogu i kropki plansz nie stoją ciągle w jednym miejscu. (Usunięte 25.10 na prośbę Łukasza: ekrany i tak ciągle się zmieniają, więc wypalenie nie grozi.)
 - Sprawdzone w przeglądarce Chromium: wideo gra, Wake Lock dostępny. Na prawdziwym telewizorze LG do sprawdzenia, czy wygaszacz już się nie włącza (jeśli tak: wyłączyć go w ustawieniach TV, opis w TEST.md).
 
 ### Quiz o serialach, lokal „Dom” i porządki (23.10)

@@ -12,7 +12,7 @@ import {
   useNasluch,
   zZegarem,
 } from "@/lib/gra/nasluch";
-import { useBezWygaszacza, useNowaWersja, usePrzesuniecieOled } from "@/lib/ekran-tv";
+import { useBezWygaszacza, useNowaWersja } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import { naDrodzeFinalu } from "@/lib/gra/final";
@@ -57,7 +57,7 @@ function useSkala() {
 
 /**
  * Scena 1920×1080 przeskalowana do ekranu. Wspólna dla gry i plansz ekranu lokalu.
- * Trzyma telewizor bez wygaszacza i co 2 minuty przesuwa się o kilka pikseli (OLED).
+ * Trzyma telewizor bez wygaszacza.
  * Logo Bractwa jest w nagłówkach ekranów (logo.tsx), nie w rogu sceny, gdzie zasłaniało podpisy.
  */
 export function Scena({
@@ -73,7 +73,6 @@ export function Scena({
 }) {
   const skala = useSkala();
   useBezWygaszacza();
-  const [dx, dy] = usePrzesuniecieOled();
   return (
     <div className={`tv${zgaszona ? " zgaszona" : ""}`} data-nastroj={nastroj}>
       <TloTv />
@@ -81,8 +80,8 @@ export function Scena({
         className="scena"
         style={{
           transform: `scale(${skala})`,
-          left: `calc(50% - ${(SZER * skala) / 2 - dx * skala}px)`,
-          top: `calc(50% - ${(WYS * skala) / 2 - dy * skala}px)`,
+          left: `calc(50% - ${(SZER * skala) / 2}px)`,
+          top: `calc(50% - ${(WYS * skala) / 2}px)`,
         }}
       >
         {children}

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 
-// Telewizor w lokalu ma świecić cały wieczór: bez wygaszacza i bez wypalania OLED.
+// Telewizor w lokalu ma świecić cały wieczór: bez wygaszacza. Przesuwania sceny przeciw wypalaniu OLED nie ma od 25.10:
+// ekrany i tak ciągle się zmieniają (tła, animacje, kolejne plansze).
 
 /**
  * Prosi przeglądarkę, żeby nie wygaszała ekranu (Screen Wake Lock). Telewizorom to zwykle nie
@@ -61,31 +62,6 @@ export function useWideoCzuwania(): RefObject<HTMLVideoElement | null> {
     };
   }, []);
   return ref;
-}
-
-/** Kolejne położenia sceny w pikselach sceny (ok. 3 px w każdą stronę), zmieniane co 2 minuty. */
-const POLOZENIA: [number, number][] = [
-  [0, 0],
-  [3, 1],
-  [2, -2],
-  [-1, -3],
-  [-3, -1],
-  [-2, 2],
-  [1, 3],
-];
-const ZMIANA_POLOZENIA_MS = 120_000;
-
-/**
- * Lekkie przesuwanie całej sceny, żeby stałe elementy (logo w rogu, kropki plansz) nie stały
- * ciągle na tych samych pikselach OLED. Kilka pikseli co 2 minuty, niezauważalnie dla oka.
- */
-export function usePrzesuniecieOled(): [number, number] {
-  const [nr, ustawNr] = useState(0);
-  useEffect(() => {
-    const zegar = setInterval(() => ustawNr((n) => (n + 1) % POLOZENIA.length), ZMIANA_POLOZENIA_MS);
-    return () => clearInterval(zegar);
-  }, []);
-  return POLOZENIA[nr];
 }
 
 /** Wersja tego kodu (commit z builda na Vercelu); lokalnie pusta i wtedy niczego nie sprawdzamy. */
