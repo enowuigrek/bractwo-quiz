@@ -172,6 +172,9 @@ export function PijanyTv({
   // dopiero, gdy wideo naprawdę gra: bez pliku albo bez zgody przeglądarki na odtwarzanie zostaje jak było.
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
+  // `widac`: wideo już gra (pokazujemy je), `gra`: klip przewinął pierwsze klatki, więc chowamy naszą szklankę.
+  // Telewizor zgłasza „gra” chwilę przed pierwszą klatką, więc przy chowaniu od razu piwo na moment znikało (25.10)
+  const [widac, ustawWidac] = useState(false);
   const [gra, ustawGra] = useState(false);
   // koniec klipu: piana zostaje na ostatniej klatce, więc zsuwamy obraz w dół, jakby spłynęła z ekranu
   const [splywa, ustawSplywa] = useState(false);
@@ -199,13 +202,14 @@ export function PijanyTv({
         createPortal(
           <video
             ref={wideo}
-            className={`pijany-wideo${gra ? " gra" : ""}${splywa ? " splywa" : ""}`}
+            className={`pijany-wideo${widac ? " gra" : ""}${splywa ? " splywa" : ""}`}
             src={WIDEO_WYLEWANIA}
             muted
             playsInline
             preload="auto"
-            onPlaying={() => ustawGra(true)}
+            onPlaying={() => ustawWidac(true)}
             onTimeUpdate={(e) => {
+              if (!gra && e.currentTarget.currentTime >= 0.2) ustawGra(true);
               if (!wybuch && e.currentTarget.currentTime >= WYBUCH_S) {
                 ustawWybuch(true);
                 ogloszWybuch();
