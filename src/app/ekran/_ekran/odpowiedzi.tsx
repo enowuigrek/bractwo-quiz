@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, MotionConfig } from "motion/react";
-import type { CSSProperties } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
@@ -17,8 +17,11 @@ function kolumny(n: number): number {
   return n <= 5 ? 1 : n <= 12 ? 2 : 3;
 }
 
-function siatka(n: number): CSSProperties {
-  const k = kolumny(n);
+/**
+ * Siatka ramki z `n` graczami w `k` kolumnach. Kolumny liczy się od wszystkich odpowiedzi naraz, żeby małe ramki
+ * („Częściowo” 2, „Źle” 2) nie zajmowały po kilka wierszy w jednej kolumnie (25.10: przy 13 graczach nie mieściło się).
+ */
+function siatka(n: number, k = kolumny(n)): CSSProperties {
   return {
     gridTemplateColumns: `repeat(${k}, minmax(0, 1fr))`,
     gridTemplateRows: `repeat(${Math.ceil(n / k)}, auto)`,
@@ -103,7 +106,17 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
   const czesciowo = odpowiedzi.filter((o) => o.poprawna === false && (o.ocena ?? 0) > 0);
   // brak odpowiedzi też w czerwonej ramce, na końcu (baza zwraca ich po odpowiedziach)
   const zle = odpowiedzi.filter((o) => o.poprawna === null || (o.poprawna === false && !((o.ocena ?? 0) > 0)));
-  const gesto = odpowiedzi.length > 16;
+  // wspólna liczba kolumn dla wszystkich ramek i zagęszczenie: z liczby graczy, a gdy i tak się nie mieści, gęściej
+  const k = kolumny(odpowiedzi.length);
+  const ekran = useRef<HTMLDivElement>(null);
+  const [ciasno, ustawCiasno] = useState({ n: odpowiedzi.length, o: 0 });
+  const o = ciasno.n === odpowiedzi.length ? ciasno.o : 0;
+  const stopien = Math.min(2, (odpowiedzi.length > 16 ? 1 : 0) + o);
+  useLayoutEffect(() => {
+    const el = ekran.current;
+    if (!el || stopien >= 2) return;
+    if (el.scrollHeight > el.clientHeight + 1) ustawCiasno({ n: odpowiedzi.length, o: o + 1 });
+  }, [odpowiedzi.length, stopien, o]);
 
   // szacowanie: oś z graczami wokół poprawnej liczby zamiast ramek dobrze / częściowo / źle
   if (z?.typ === "szacowanie") {
@@ -125,7 +138,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`tv-odpowiedzi${gesto ? " gesto" : ""}`}>
+      <div ref={ekran} className={`tv-odpowiedzi${stopien >= 1 ? " gesto" : ""}${stopien >= 2 ? " bardzo-gesto" : ""}`}>
         <header className="tv-ranking-gora tv-odpowiedzi-gora">
           <h1>{z?.tresc ?? "Odpowiedzi"}</h1>
           {z && (
@@ -143,7 +156,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           {dobre.length === 0 ? (
             <p className="tv-odpowiedzi-pusto">Nikt nie trafił.</p>
           ) : (
-            <ol className="tv-odpowiedzi-lista" style={siatka(dobre.length)}>
+            <ol className="tv-odpowiedzi-lista" style={siatka(dobre.length, k)}>
               {dobre.map((o, i) => (
                 <Wiersz key={o.nick} o={o} i={i} nr={i + 1} z={z} />
               ))}
@@ -156,7 +169,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             <p className="tv-odpowiedzi-etykieta">
               Częściowo <span>{czesciowo.length}</span>
             </p>
-            <ul className="tv-odpowiedzi-lista" style={siatka(czesciowo.length)}>
+            <ul className="tv-odpowiedzi-lista" style={siatka(czesciowo.length, k)}>
               {czesciowo.map((o, i) => (
                 <Wiersz key={o.nick} o={o} i={dobre.length + i} z={z} />
               ))}
@@ -169,7 +182,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             <p className="tv-odpowiedzi-etykieta">
               Źle <span>{zle.length}</span>
             </p>
-            <ul className="tv-odpowiedzi-lista" style={siatka(zle.length)}>
+            <ul className="tv-odpowiedzi-lista" style={siatka(zle.length, k)}>
               {zle.map((o, i) => (
                 <Wiersz key={o.nick} o={o} i={dobre.length + czesciowo.length + i} z={z} />
               ))}
