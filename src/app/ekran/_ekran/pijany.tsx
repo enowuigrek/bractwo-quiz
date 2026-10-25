@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import { ogloszWybuch, useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import type { StanSesji } from "@/lib/gra/typy";
-import { WIDEO_WYLEWANIA, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { GASNIECIE_S, WIDEO_WYLEWANIA, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
@@ -181,14 +181,17 @@ export function PijanyTv({
   // wybuch (`WYBUCH_S` klipu) wypada `WYBUCH_PRZED_S` przed końcem fazy, po chwili ciszy od zgaszenia telefonów
   const przedKoncem = Math.min(WYLEWANIE_S, WYBUCH_PRZED_S + WYBUCH_S);
   const czasWylewania = teraz >= od && do_ - teraz <= przedKoncem * 1000;
+  // wideo wchodzi na scenę (i zaczyna się wczytywać) dopiero, gdy muzyka i tak się urywa (`GASNIECIE_S`): Samsung
+  // gra jeden element multimedialny naraz i wczytywane od początku dogrywki wideo uciszało muzykę (25.10)
+  const wideoNaScenie = teraz >= od && do_ - teraz <= Math.max(GASNIECIE_S, przedKoncem + 2) * 1000;
   // dźwięk wybuchu tylko przy włączonej muzyce i gdy przeglądarka już pozwoliła grać (muzyka.tsx)
   const dzwiek = useDzwiekOdblokowany() && stan.muzyka;
   useEffect(() => {
     if (wideo.current) wideo.current.muted = !dzwiek;
-  }, [dzwiek, scena]);
+  }, [dzwiek, scena, wideoNaScenie]);
   useEffect(() => {
     if (czasWylewania) void wideo.current?.play().catch(() => undefined);
-  }, [czasWylewania, scena]);
+  }, [czasWylewania, scena, wideoNaScenie]);
 
   return (
     <div
@@ -199,6 +202,7 @@ export function PijanyTv({
       }}
     >
       {scena &&
+        wideoNaScenie &&
         createPortal(
           <video
             ref={wideo}
