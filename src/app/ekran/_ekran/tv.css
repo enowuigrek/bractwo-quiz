@@ -220,6 +220,10 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* zapas na ogonki liter (g, ę, j): przy przycinaniu do linii `overflow: hidden` ucinał je w ostatniej linii (25.10),
+     a ujemny margines oddaje miejsce, więc układ się nie przesuwa */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
 }
 
 .tv-grafika {
@@ -605,6 +609,10 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* zapas na ogonki liter (g, ę, j): przy przycinaniu do linii `overflow: hidden` ucinał je w ostatniej linii (25.10),
+     a ujemny margines oddaje miejsce, więc układ się nie przesuwa */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
 }
 
 .tv-pytanie-srodek {
@@ -1050,6 +1058,10 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* zapas na ogonki liter (g, ę, j): przy przycinaniu do linii `overflow: hidden` ucinał je w ostatniej linii (25.10),
+     a ujemny margines oddaje miejsce, więc układ się nie przesuwa */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
 }
 
 .tv-odpowiedzi-gora .tv-okazja {
