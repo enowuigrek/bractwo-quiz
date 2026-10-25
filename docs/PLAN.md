@@ -35,7 +35,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
 - Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
-- Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS (i wcześniejsze, jeśli zostały).
+- Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY (i wcześniejsze, jeśli zostały).
 
 **Następny krok:** dźwięki i pijany finał (plan niżej, „Na 25.10”), potem test na żywo na spotkaniu Kręgu 28.10. Do testów samemu: boty i automatyczne prowadzenie z pilota (niżej).
 
@@ -72,7 +72,7 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 ### Poprawki 25.10 (po teście 24.10 wieczorem) ✅
 
 - **Wyścig:** przed finałem najwyżej 90% drogi do szklanki, i to przy komplecie punktów (`DROGA_PRZED_FINALEM` w `src/lib/gra/wyscig.ts`, wcześniej szklanka przy 75% maksimum; w teście 33 tys. z 41,5 tys. po 27 pytaniach stało już przy szklance).
-- **Telefon w rankingu:** „✅ Na dobrej drodze” albo „⚠️ Zagrożony odpadnięciem” względem najbliższego odcięcia, także gdy to odcięcie jest dopiero za kilka etapów (`najblizszeOdciecie` w `src/lib/gra/odpadanie.ts`), z brakującymi punktami.
+- **Telefon w rankingu:** „Na dobrej drodze” (zielone kółko z ptaszkiem, w walce o finał puchar) albo „Zagrożony odpadnięciem” (czerwony trójkąt), ikony SVG z `src/app/[kod]/ikony.tsx`, względem najbliższego odcięcia, także gdy to odcięcie jest dopiero za kilka etapów (`najblizszeOdciecie` w `src/lib/gra/odpadanie.ts`), z brakującymi punktami.
 - **Plansza wstępu:** więcej miejsca między opisem a ikonami (80 px), szklanka na mecie stoi na linii numerów etapów. **Plansza etapu:** długa nazwa zawija się obok ikony.
 - **Wideo wybuchu:** piana spływa i gaśnie 1,3 s przed końcem klipu (wcześniej zjeżdżała zamrożona ostatnia klatka).
 - **Finał „15/12 kroków”** z testu: pilot i TV miały jeszcze stary kod (wdrożenie kary było w trakcie gry), który liczył przewagę + dobre bez kary. Baza liczyła już z karą i dlatego seria trwała dalej.

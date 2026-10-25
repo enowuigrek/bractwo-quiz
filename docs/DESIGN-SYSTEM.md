@@ -224,3 +224,6 @@ Wspólne dla obu: Open Sans, białe logo na ciemnym tle i zawsze ciemny motyw.
 ## Słownik stopni (treść)
 
 Piwna Gołota (start) → Zaściankowy Piwosz (4) → Pan na Karczmie (12) → Szlachcic Słodowy (30) → Kasztelan Chmielny (50) → Podczaszy Koronny (75) → Kawaler Złotego Kufla (100).
+
+
+**Ikony zamiast emotek (25.10).** W interfejsie (pilot, telefon, panel) ikony liniowe SVG 24×24 w `currentColor`, kreska 2, zaokrąglone końce: `src/app/admin/(panel)/_komponenty/ikony.tsx`, `src/app/pilot/[kod]/ikony.tsx`, `src/app/[kod]/ikony.tsx`. Emotki tylko tam, gdzie są treścią (np. hasła kibiców).

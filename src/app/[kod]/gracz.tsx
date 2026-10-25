@@ -23,6 +23,7 @@ import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { Gotowy } from "./gotowy";
+import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "./ikony";
 import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
 import { SeriaGracza } from "./seria";
@@ -473,7 +474,7 @@ function WGrze({
           <p className={`etap-uwaga ${mojWiersz.miejsce <= nastepne.ile ? "na-drodze" : "zagrozony"}`}>
             {mojWiersz.miejsce <= nastepne.ile ? (
               <>
-                {nastepne.final ? "🏆 " : "✅ "}
+                {nastepne.final ? <IkonaPuchar /> : <IkonaDobrze />}
                 <strong>Na dobrej drodze:</strong>{" "}
                 {nastepne.final ? "jesteś w trójce, która wejdzie do finału" : `jesteś w najlepszej ${nastepne.ile}`}
                 {nastepne.poEtapie === stan.etap?.nr
@@ -482,7 +483,8 @@ function WGrze({
               </>
             ) : (
               <>
-                ⚠️ <strong>Zagrożony odpadnięciem:</strong>{" "}
+                <IkonaUwaga />
+                <strong>Zagrożony odpadnięciem:</strong>{" "}
                 {nastepne.final
                   ? `do finału wchodzi 3 najlepszych po ${nastepne.poEtapie}. etapie`
                   : `po ${nastepne.poEtapie}. etapie gra dalej ${nastepne.ile} najlepszych`}
