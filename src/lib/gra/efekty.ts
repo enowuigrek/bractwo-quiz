@@ -47,8 +47,11 @@ const GLOSNOSC_EFEKTU: Partial<Record<Efekt, number>> = {
   krok: 0.8,
   pudlo: 0.8,
 };
-/** Werble z pliku: po pierwszym przejściu pętla od tej sekundy (równy werbel, aż przyjdzie podium). */
-const WERBLE_PETLA_OD_S = 5;
+/**
+ * Werble z pliku grają w pętli, aż prowadzący pokaże podium: po narastaniu w kółko równy kawałek werbla
+ * (sekundy pliku, szew w cichych przerwach między uderzeniami, żeby rytm się nie potykał). Koniec pliku (uderzenie kończące i wybrzmienie, od ok. 6 s) nie gra nigdy.
+ */
+const WERBLE_PETLA_S = [5.15, 5.65] as const;
 /** Werble z syntezy: najdłużej tyle sekund, gdyby nikt ich nie zatrzymał. */
 const WERBLE_MAX_S = 20;
 
@@ -128,10 +131,9 @@ export function zagraj(nazwa: Efekt): () => void {
     if (bufor) {
       const zrodlo = c.createBufferSource();
       zrodlo.buffer = bufor;
-      if (nazwa === "werble" && bufor.duration > WERBLE_PETLA_OD_S + 0.5) {
+      if (nazwa === "werble" && bufor.duration > WERBLE_PETLA_S[1]) {
         zrodlo.loop = true;
-        zrodlo.loopStart = WERBLE_PETLA_OD_S;
-        zrodlo.loopEnd = bufor.duration;
+        [zrodlo.loopStart, zrodlo.loopEnd] = WERBLE_PETLA_S;
       }
       zrodlo.connect(glos);
       zrodlo.start();
