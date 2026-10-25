@@ -25,6 +25,7 @@ const UTWORY = {
 type Utwor = keyof typeof UTWORY;
 
 const GLOSNOSC = 0.55;
+/** Stary utwór cichnie przy zmianie tyle ms. Nowy wchodzi od razu na pełną głośność: utwory mają własne wstępy. */
 const PRZENIKANIE_MS = 1500;
 /**
  * Pętla bez nakładania (na TV było słychać koniec i początek naraz): w ostatnich `WYCISZENIE_S` sekundach utwór
@@ -34,8 +35,6 @@ const PRZENIKANIE_MS = 1500;
 const WYCISZENIE_S = 1.2;
 const PRZERWA_PETLI_MS = 2000;
 const WEJSCIE_PO_PETLI_MS = 3500;
-/** Koniec etapu (ranking po ostatnim pytaniu etapu): muzyka powoli gaśnie przed planszą następnego etapu. */
-const WYCISZENIE_ETAPU_MS = 4000;
 /**
  * Tyle muzyka czeka po zniknięciu komponentu, zanim ucichnie. Ekran lokalu przy otwarciu poczekalni wymienia
  * planszę zapowiedzi na ekran gry, który włącza muzykę dopiero po pobraniu stanu gry; przy 0,3 s zapasu utwór
@@ -110,7 +109,7 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
     case "koniec":
       return "podium";
     default:
-      // ranking po ostatnim pytaniu etapu: cisza (powoli), następny etap wejdzie ze swoją muzyką od nowa
+      // ranking po ostatnim pytaniu etapu: cisza (urywa się z dzwonkiem), następny etap wejdzie ze swoją muzyką od nowa
       if (stan.faza === "ranking" && stan.ostatnie_w_etapie && !stan.etap?.finalowy) return null;
       // plansza etapu, pytania, wyniki i ranking: według etapu (na planszy to etap, który się zaczyna).
       // Narasta z etapu na etap: noir lekko, noir z napięciem, noir z lekkim napięciem w 3. i dalszych,
@@ -142,13 +141,11 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   const [cichoOd, ustawCichoOd] = useState<number | null>(null);
   const [prosba, ustawProsbe] = useState(false);
   const cel = stan.muzyka ? utworFazy(stan) : null;
-  // werble: stary utwór staje od razu, bez przenikania (ekran gaśnie jak wyłączany telewizor)
+  // werble i koniec etapu: stary utwór urywa się od razu, bez wyciszania (werble: ekran gaśnie jak wyłączany
+  // telewizor; koniec etapu: razem z dzwonkiem „ostatnia kolejka”, efekty.tsx)
   const twardo = useRef(false);
-  // koniec etapu: gaśnie powoli (WYCISZENIE_ETAPU_MS), a nie w zwykłe 1,5 s
-  const powoli = useRef(false);
   useEffect(() => {
-    twardo.current = stan.faza === "werble";
-    powoli.current = stan.faza === "ranking";
+    twardo.current = stan.faza === "werble" || stan.faza === "ranking";
   }, [stan.faza]);
 
   // dwa odtwarzacze na całą stronę; gest odblokowuje oba naraz (Safari pamięta zgodę per element)
@@ -228,11 +225,14 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       w.przenikania.set(a, id);
     };
 
-    const wystartuj = (a: HTMLAudioElement, wejscieMs = PRZENIKANIE_MS) =>
+    // wejscieMs 0: od razu pełna głośność (nowy utwór ma własny wstęp); więcej tylko po powrocie pętli
+    const wystartuj = (a: HTMLAudioElement, wejscieMs = 0) =>
       a
         .play()
         .then(() => {
-          if (w.aktywny === a) plynnie(a, GLOSNOSC, undefined, wejscieMs);
+          if (w.aktywny !== a) return;
+          if (wejscieMs > 0) plynnie(a, GLOSNOSC, undefined, wejscieMs);
+          else a.volume = GLOSNOSC;
         })
         .catch((e: Error) => {
           // brak pliku (NotSupportedError) to cisza; każda inna odmowa to od razu prośba o OK na pilocie
@@ -242,7 +242,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
           ustawCichoOd(0);
         });
 
-    const zagraj = (utwor: Utwor, od: number, wejscieMs = PRZENIKANIE_MS) => {
+    const zagraj = (utwor: Utwor, od: number, wejscieMs = 0) => {
       const stary = w.aktywny;
       const a = w.odtwarzacze.find((o) => o !== stary) ?? w.odtwarzacze[0];
       clearInterval(w.przenikania.get(a));
@@ -270,7 +270,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
         clearInterval(w.przenikania.get(stary));
         stary.pause();
       } else if (stary) {
-        plynnie(stary, 0, () => stary.pause(), powoli.current ? WYCISZENIE_ETAPU_MS : PRZENIKANIE_MS);
+        plynnie(stary, 0, () => stary.pause());
       }
       return;
     }

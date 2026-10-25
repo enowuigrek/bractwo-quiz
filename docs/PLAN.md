@@ -33,7 +33,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Efekty dźwiękowe nikt jeszcze nie słyszał:** sprawdzone tylko, że grają we właściwych chwilach (licznik wywołań Web Audio). Głośność względem muzyki, brzmienie syntezy i Samsung w lokalu do odsłuchania; nagrania można podmienić plikami w `public/dzwieki/`.
 - Nowe pytania pijanego finału i komentarze ułożyłem sam (25.10): do przejrzenia przez Łukasza w panelu.
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, finał z karą, pijany finał. Finału i podium automatem z botami jeszcze nikt nie przeszedł do końca.
-- Samsung w lokalu: muzyka, przesuwany pasek podium i płynność latających awatarów niesprawdzone.
+- **Telewizor w Piwiarni niesprawdzony** (25.10): testowy Samsung z Tizen 9 to domowy OLED Łukasza (tam ekran, muzyka i brak wygaszacza działają), a starszy Samsung u mamy Łukasza pokazał na `/ekran` same czarne tło (przeglądarka starsza niż Chrome 111, którego wymaga Next 16). Przesuwany pasek podium i płynność latających awatarów na słabszym TV niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
 - Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY, KSHD, TJPR, LTQA, FVRR, FRQE, AUYD, UXQZ (i wcześniejsze, jeśli zostały).
 
@@ -146,12 +146,14 @@ Do zaprojektowania razem:
 - **Ciekawostka ma swój dźwięk** (`ciekawostka`: miękki błysk w górę jak zapalona żarówka, synteza; plik `public/dzwieki/ciekawostka.mp3` go zastąpi). Wcześniej grał „ding” dobrej odpowiedzi.
 - **Dźwięk planszy odpowiedzi graczy** (`odpowiedzi`): ten sam plik co „ding”, odtworzony w tempie 0,78 (niżej i wolniej, jak echo odsłony; `TEMPO` i `WARIANTY` w `src/lib/gra/efekty.ts`).
 - **Szklanka w rankingu na telefonie niżej** (`.moj-wyscig`, 36 px odstępu od miejsca i statusu).
-- **Zdjęcie tripla do wymiany:** ma 960×1200 (pion 4:5), a grafiki pytań są 1280×853 (poziom 3:2). Łukasz generuje nowe w ChatGPT z promptu `pyt-tripel` w poziomie 3:2; po wgraniu przyciąć do 1280 px szerokości jak w `zdjecie()` w `scripts/grafiki.mjs`.
+- **Nowe zdjęcie tripla** (od Łukasza z Gemini, w stylu promptu `pyt-tripel`): poziome 1280×853 jak pozostałe grafiki pytań, `public/grafiki/pytania/tripel.webp` (wcześniej pion 960×1200).
 - **„Ding” przytłumiony:** wysokie tony z pliku obcięte filtrem (ok. −3 dB powyżej 3 kHz względem całości).
 - **Automat szybciej po pytaniu:** wynik 4 s, odpowiedzi 4 s, wyścig 4,5 s, koniec etapu 7 s (było 6/6/7/10; `PO_PYTANIU` w `src/lib/gra/auto.ts`).
 - **Zapowiedź na kilka dni naprzód:** „Start w środę 28.10 o 19:00 · za 3 dni” (`kiedyStart`, `opisOdliczania` w `src/lib/gra/zapowiedz.ts`; wcześniej sama godzina, jakby dziś) na ekranie lokalu, TV gry, pilocie i telefonie. Na planszy zapowiedzi po pierwszym OK raz gra „ding” (`ProbaEfektow` w `ekran-lokalu.tsx`), żeby obsługa sprawdziła też efekty. Instrukcja w `docs/TEST.md`. Sprawdzone na lokalu testowym.
 - **Plansza etapu na TV:** nazwa od lewej (w linii z „Etap X z Y” i opisem), ikona etapu za nazwą po prawej. To jedyny ekran z ikoną obok nazwy (na wstępie ikony stoją nad numerami, telefon ich nie ma). W demo telefonu „Pils” zamiast „Pilzner”.
-- **Muzyka poczekalni nie zaczyna się od nowa** przy otwarciu poczekalni z ekranu zapowiedzi: wspólne odtwarzacze czekają 5 s (było 0,3 s), zanim uznają, że nikt nie przejął muzyki (`ZAPAS_WYMIANY_MS` w `muzyka.tsx`). Nie sprawdzone na żywo (nie przełączałem ekranu lokalu).
+- **Muzyka poczekalni nie zaczyna się od nowa** przy otwarciu poczekalni z ekranu zapowiedzi: wspólne odtwarzacze czekają 5 s (było 0,3 s), zanim uznają, że nikt nie przejął muzyki (`ZAPAS_WYMIANY_MS` w `muzyka.tsx`). Na produkcji Łukasz trafił na ciszę do odświeżenia. Sprawdzone lokalnie: po `otworz` ekran przeszedł w poczekalnię bez żadnego `pause`, `play` ani przewinięcia utworu.
+- **Muzyka bez wyciszeń:** na końcu etapu urywa się razem z dzwonkiem (było 4 s wyciszania), a nowy utwór wchodzi od razu na pełną głośność (było 1,5 s podgłaśniania; utwory mają własne wstępy). Łagodne wejście zostało tylko przy powrocie pętli od środka utworu.
+- **Większe logotypy na planszach startowych ekranu lokalu:** zwykła 440/460 px (było 360/380), zapowiedź 400/420 px (było 260/280).
 
 ## Ustalenia
 

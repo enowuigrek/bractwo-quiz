@@ -1404,19 +1404,20 @@
   gap: 100px;
 }
 
+/* plansza startowa ekranu lokalu: loga duże (25.10 powiększone, Łukasz) */
 .plansza-loga .tv-logo-bractwo-duze {
-  height: 360px;
+  height: 440px;
   width: auto;
 }
 
 .plansza-loga .tv-logo-lokalu {
-  width: 380px;
-  height: 380px;
+  width: 460px;
+  height: 460px;
 }
 
 .plansza-loga .tv-logo-browaru {
-  height: 380px;
-  max-width: 480px;
+  height: 460px;
+  max-width: 560px;
 }
 
 .plansza-loga .tv-loga {
@@ -1832,14 +1833,15 @@
   gap: 18px;
 }
 
+/* 25.10 większe (Łukasz): to ta plansza wisi w lokalu przed quizem */
 .plansza-zapowiedz .plansza-loga .tv-logo-bractwo-duze {
-  height: 260px;
+  height: 400px;
 }
 
 .plansza-zapowiedz .plansza-loga .tv-logo-lokalu,
 .plansza-zapowiedz .plansza-loga .tv-logo-browaru {
-  width: 280px;
-  height: 280px;
+  width: 420px;
+  height: 420px;
 }
 
 .plansza-zapowiedz .plansza-tytul {
