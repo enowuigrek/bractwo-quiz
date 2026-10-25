@@ -50,7 +50,7 @@ function Loga({ lokal }: { lokal: Lokal }) {
   return (
     <div className="pr-loga">
       {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="pr-logo-lokalu" />}
-      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="pr-logo-bractwa" />
+      <img src="/loga/bractwo-biale.svg" alt="Bractwo Piwne" className="pr-logo-bractwa" />
     </div>
   );
 }
@@ -476,7 +476,11 @@ function Seria({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     <div className="pr-pytanie">
       <Naglowek
         lewy="Finał: kto pierwszy do piwa"
-        prawy={!pijany && doKonca > 0 && doKonca < Infinity ? `${Math.ceil(doKonca / 1000)} s` : null}
+        prawy={
+          !pijany && doKonca > 0 && doKonca < Infinity ? (
+            <span className="pr-zegar">{Math.ceil(doKonca / 1000)} s</span>
+          ) : null
+        }
       />
       <ul className="pr-final">
         {gracze.map((g) => {

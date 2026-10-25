@@ -72,11 +72,11 @@
   object-fit: contain;
 }
 
-/* logo Bractwa jest czarne, na ciemnym tle odwrócone (jak w pełnym ekranie) */
+/* białe logo Bractwa z osobnego pliku: `filter: invert(1)` po minifikacji to `invert()`, którego Chrome 69 nie zna
+   (logo zostawało czarne, sprawdzone na Chromium 69 25.10) */
 .pr-logo-bractwa {
   height: 280px;
   width: auto;
-  filter: invert(1);
 }
 
 .pr-tytul {

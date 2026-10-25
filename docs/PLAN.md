@@ -185,6 +185,8 @@ Do zaprojektowania razem:
 - **Plansza etapu zagęszcza się też po wczytaniu obrazków:** pomiar „czy się mieści” był raz, na starcie; gdy logo lokalu i ikona etapu wczytały się później, lista finalistów wyjeżdżała pod ekran (zgłoszenie Łukasza z TV). Teraz `ResizeObserver` powtarza pomiar, gdy opis urośnie (`etap.tsx`).
 - **Nalewanie:** 5 nagrań (`nalewanie.mp3`, `nalewanie-2…5.mp3`; nowe od Łukasza przycięte do 4 s z wyciszeniem, żeby nie wchodziły na odliczanie następnego pytania), grają po kolei.
 
+- **Sprawdzone na prawdziwym Chromium 69** (25.10 wieczorem, macOS z Rosettą, bez okna, sterowany przez protokół DevTools): ekran lokalu, poczekalnia z QR i botami, wstęp, plansza etapu, pytanie (wybór, szacowanie z grafiką, pary), wynik, odpowiedzi, ranking, finał serią i podium. Bez wyjątków JS; 404 to tylko brakujące, opcjonalne pliki dźwięków. Poprawki po teście: logo Bractwa jako osobny biały plik `public/loga/bractwo-biale.svg` (minifikacja zmienia `filter: invert(1)` w `invert()`, którego Chrome 69 nie zna, i logo było czarne), zegar finału bez wielkiego „S”. Uruchomienie: `Chromium --headless --no-sandbox --remote-debugging-port=…` (bez `--no-sandbox` pada na nowym macOS, a `--screenshot` nie kończy się przez Realtime). Telewizora z Chrome 69 nadal nikt nie widział.
+
 ### Automat od godziny startu, szablony quizu (25.10, wieczór) ✅
 
 - **Automat w kreatorze gry:** „Prowadzenie automatyczne” w panelu (Uruchom quiz → Prowadzenie), zapisuje `sesje.auto` od razu przy zakładaniu gry. Na stronie gry w panelu widać „prowadzenie automatyczne”. Pilot dalej włącza i wyłącza automat w każdej chwili.
