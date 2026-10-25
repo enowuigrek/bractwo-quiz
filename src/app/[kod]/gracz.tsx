@@ -22,6 +22,7 @@ import { godzinaStartu } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
+import { Gotowy } from "./gotowy";
 import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
 import { SeriaGracza } from "./seria";
@@ -414,6 +415,7 @@ function WGrze({
         <p className="nadtytul">{ja.nick}</p>
         <h1>Zaraz zaczynamy!</h1>
         <p>Patrz na telewizor: prowadzący opowie, jak wygląda wyścig po piwo.</p>
+        <Gotowy stan={stan} token={ja.token} />
       </>
     );
   }
@@ -441,7 +443,12 @@ function WGrze({
   }
 
   if (stan.faza === "etap") {
-    return <EtapGracza stan={stan} nick={ja.nick} />;
+    return (
+      <>
+        <EtapGracza stan={stan} nick={ja.nick} />
+        <Gotowy stan={stan} token={ja.token} />
+      </>
+    );
   }
 
   if (stan.faza === "ranking") {

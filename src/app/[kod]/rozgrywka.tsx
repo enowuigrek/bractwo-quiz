@@ -17,6 +17,7 @@ import {
   OdpowiedzWielokrotna,
   Rozwiazanie,
 } from "./odpowiadanie";
+import { Gotowy } from "./gotowy";
 
 const POWODY: Record<Exclude<ZapisOdpowiedzi, { przyjeta: true }>["powod"], string> = {
   po_czasie: "Za późno, czas minął.",
@@ -81,7 +82,7 @@ export function Rozgrywka({
         <h2 className="gra-pytanie">{z.tresc}</h2>
         {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
         {z.dane.tekst && <p>{z.dane.tekst}</p>}
-        <p className="pomocniczy">Prowadzący zaraz pójdzie dalej.</p>
+        {stan.auto ? <Gotowy stan={stan} token={ja.token} /> : <p className="pomocniczy">Prowadzący zaraz pójdzie dalej.</p>}
       </>
     );
   }

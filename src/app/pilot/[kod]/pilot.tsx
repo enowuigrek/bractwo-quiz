@@ -21,6 +21,7 @@ import { napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
+import { useAutoProwadzenie } from "./auto";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
 
@@ -110,6 +111,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
   useBoty(kod, token, stan);
+  useAutoProwadzenie(kod, token, stan, przesuniecie, ustawStan);
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
   if (!zamontowany) {
@@ -160,6 +162,16 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     ustawPrzesuniecie(przesuniecieZegara(nowy.teraz, wyslano, odebrano));
   }
 
+  async function przelaczAuto() {
+    if (wysylam || !token || !stan) return;
+    ustawWysylam(true);
+    ustawBladAkcji(null);
+    const { data, error } = await supabase().rpc("ustaw_auto", { p_kod: kod, p_host_token: token, p_wlacz: !stan.auto });
+    ustawWysylam(false);
+    if (error) ustawBladAkcji(komunikatBledu(error));
+    else ustawStan(data as PilotStan);
+  }
+
   // `przygotuj` przechodzi w `pytanie` sam, gdy minie `faza_od`; nie czekamy na odpytanie bazy
   const { faza, doStartu, doKonca, bezLimitu } = fazaTeraz(stan, teraz);
   // w finale trójki odpowiadają tylko finaliści, wcześniej wszyscy, którzy nie odpadli
@@ -197,6 +209,18 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           {stan.muzyka ? "Wyłącz" : "Włącz"}
         </button>
       </p>
+      {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
+      <p className="pomocniczy" style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}>
+        {stan.auto ? "🤖 Gra prowadzi się sama" : "🤖 Prowadzenie automatyczne wyłączone"}
+        <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => void przelaczAuto()}>
+          {stan.auto ? "Wyłącz" : "Włącz"}
+        </button>
+      </p>
+      {stan.auto && (faza === "wstep" || faza === "etap" || (faza === "wynik" && stan.zadanie?.typ === "ciekawostka")) && (
+        <p className="pomocniczy" style={{ margin: "0 0 4px" }}>
+          Gotowi: <strong>{stan.gotowi}/{stan.w_grze}</strong>, dalej, gdy klikną wszyscy (albo po czasie).
+        </p>
+      )}
 
       {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy */}
       {bladAkcji && (

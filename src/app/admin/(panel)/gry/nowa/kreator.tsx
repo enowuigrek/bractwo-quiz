@@ -16,6 +16,13 @@ export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
 type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean };
 
 /** Uruchamianie gry krokami: miasto → lokal → quiz, potem szczegóły. */
+/** Godzina od teraz, zaokrąglona do 5 minut w górę: domyślny start zapowiedzi. */
+function zaGodzine(): Date {
+  const za = new Date(Date.now() + 60 * 60 * 1000);
+  za.setMinutes(Math.ceil(za.getMinutes() / 5) * 5, 0, 0);
+  return za;
+}
+
 /** Data (RRRR-MM-DD, pusta: dziś) i godzina (GG:MM) w czasie lokalnym jako ISO. */
 function isoStartu(data: string, godzina: string): string {
   const dzien = data || new Date().toLocaleDateString("sv-SE");
@@ -38,23 +45,15 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   const [ileNagrod, setIleNagrod] = useState(0);
   // pijany finał domyślnie włączony (tylko główny go widzi; obsługa nie wysyła tego pola)
   const [pijany, setPijany] = useState(true);
-  // zapowiedź: włączona pokazuje na ekranie lokalu godzinę i odliczanie, wyłączona od razu poczekalnię z QR.
-  // Data i godzina (czas lokalny przeglądarki) dopiero po włączeniu, domyślnie godzinę od teraz. Do serwera idzie ISO.
-  const [zapowiedz, setZapowiedz] = useState(false);
-  const [dataStartu, setDataStartu] = useState("");
-  const [godzinaStartu, setGodzinaStartu] = useState("");
+  // zapowiedź (domyślnie włączona): pokazuje na ekranie lokalu godzinę i odliczanie, wyłączona od razu poczekalnię
+  // z QR. Data i godzina w czasie lokalnym przeglądarki, domyślnie godzinę od teraz (pola są dopiero po wyborze
+  // quizu, więc serwer ich nie renderuje i godzina z przeglądarki nie gryzie się z HTML-em). Do serwera idzie ISO.
+  const [zapowiedz, setZapowiedz] = useState(true);
+  const [dataStartu, setDataStartu] = useState(() => zaGodzine().toLocaleDateString("sv-SE"));
+  const [godzinaStartu, setGodzinaStartu] = useState(() =>
+    zaGodzine().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }),
+  );
   const startIso = zapowiedz && godzinaStartu ? isoStartu(dataStartu, godzinaStartu) : "";
-
-  function przelaczZapowiedz(wlacz: boolean) {
-    setZapowiedz(wlacz);
-    if (wlacz && !godzinaStartu) {
-      // godzina od teraz, zaokrąglona do 5 minut w górę
-      const za = new Date(Date.now() + 60 * 60 * 1000);
-      za.setMinutes(Math.ceil(za.getMinutes() / 5) * 5, 0, 0);
-      setDataStartu(za.toLocaleDateString("sv-SE"));
-      setGodzinaStartu(za.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }));
-    }
-  }
 
   function wybierzMiasto(m: string) {
     setMiasto(m);
@@ -252,7 +251,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
           <fieldset>
             <legend>Zapowiedź</legend>
             <label className="przelacznik">
-              <input type="checkbox" checked={zapowiedz} onChange={(e) => przelaczZapowiedz(e.target.checked)} />{" "}
+              <input type="checkbox" checked={zapowiedz} onChange={(e) => setZapowiedz(e.target.checked)} />{" "}
               najpierw zapowiedź z godziną startu
             </label>
             {zapowiedz && (

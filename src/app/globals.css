@@ -2710,3 +2710,15 @@ html:has(.kolumna) {
   background: color-mix(in srgb, var(--czerwien) 18%, transparent);
   color: var(--czerwien);
 }
+
+/* Automatyczne prowadzenie: „Gotowy” na planszach (src/app/[kod]/gotowy.tsx) */
+.gotowy {
+  margin-top: var(--card-pad);
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.gotowy .pomocniczy {
+  margin: 0;
+}

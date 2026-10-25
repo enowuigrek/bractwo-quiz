@@ -102,6 +102,10 @@ export type StanSesji = {
   za_barem: string | null;
   /** Muzyka na TV włączona w pilocie (src/app/ekran/_ekran/muzyka.tsx). */
   muzyka: boolean;
+  /** Automatyczne prowadzenie (przełącznik w pilocie, src/app/pilot/[kod]/auto.tsx). */
+  auto: boolean;
+  /** Ilu grających kliknęło „Gotowy” na bieżącej planszy (boty zawsze gotowe). */
+  gotowi: number;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
   quiz: {
