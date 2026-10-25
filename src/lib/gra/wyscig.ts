@@ -17,16 +17,16 @@ export function rankingJakoWyscig(liczbaGraczy: number): boolean {
 }
 
 /**
- * Szklankę osiąga się przy tej części maksimum punktów przed finałem (1000 × mnożnik za pytanie). Do 25.10 było 0,75
- * i bardzo dobry gracz stał przy szklance już kilka pytań przed finałem (test: 33 tys. z 41,5 tys. po 27 pytaniach),
- * więc teraz przy szklance staje tylko komplet punktów.
+ * Przed finałem nikt nie dobiega do szklanki: komplet punktów (1000 × mnożnik za pytanie) to 90% drogi, żeby lider
+ * nie wyglądał na zwycięzcę przed finałem. Do 25.10 szklankę osiągało się przy 75% maksimum i bardzo dobry gracz stał
+ * przy niej kilka pytań przed finałem (test: 33 tys. z 41,5 tys. po 27 pytaniach).
  */
-const SKALA_MAKSIMUM = 1;
+const DROGA_PRZED_FINALEM = 0.9;
 
-/** Położenie na trasie 0..1 w zwykłych etapach: tylko z własnych punktów. */
+/** Położenie na trasie 0..1 w zwykłych etapach: tylko z własnych punktów, najwyżej 0,9. */
 export function naTrasie(punkty: number, maxPrzedFinalem: number): number {
   if (maxPrzedFinalem <= 0) return 0;
-  return Math.max(0, Math.min(1, punkty / (SKALA_MAKSIMUM * maxPrzedFinalem)));
+  return DROGA_PRZED_FINALEM * Math.max(0, Math.min(1, punkty / maxPrzedFinalem));
 }
 
 /** Gdzie jest lider, zanim padnie pierwsze pytanie (część trasy). */

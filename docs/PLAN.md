@@ -71,7 +71,7 @@ Do ustalenia: skąd pliki (darmowe CC0 z freesound.org, wygenerowane, albo prost
 
 ### Poprawki 25.10 (po teście 24.10 wieczorem) ✅
 
-- **Wyścig:** szklanka dopiero przy komplecie punktów przed finałem (`SKALA_MAKSIMUM` 0,75 → 1 w `src/lib/gra/wyscig.ts`; w teście 33 tys. z 41,5 tys. po 27 pytaniach stało już przy szklance).
+- **Wyścig:** przed finałem najwyżej 90% drogi do szklanki, i to przy komplecie punktów (`DROGA_PRZED_FINALEM` w `src/lib/gra/wyscig.ts`, wcześniej szklanka przy 75% maksimum; w teście 33 tys. z 41,5 tys. po 27 pytaniach stało już przy szklance).
 - **Telefon w rankingu:** „✅ Na dobrej drodze” albo „⚠️ Zagrożony odpadnięciem” względem najbliższego odcięcia, także gdy to odcięcie jest dopiero za kilka etapów (`najblizszeOdciecie` w `src/lib/gra/odpadanie.ts`), z brakującymi punktami.
 - **Plansza wstępu:** więcej miejsca między opisem a ikonami (80 px), szklanka na mecie stoi na linii numerów etapów. **Plansza etapu:** długa nazwa zawija się obok ikony.
 - **Wideo wybuchu:** piana spływa i gaśnie 1,3 s przed końcem klipu (wcześniej zjeżdżała zamrożona ostatnia klatka).
