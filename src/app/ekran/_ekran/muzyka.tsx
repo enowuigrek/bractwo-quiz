@@ -297,8 +297,10 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       }, PRZERWA_PETLI_MS);
     };
     // gest: każdy odtwarzacz dostaje play() w czasie gestu (Safari odblokowuje je osobno): wolny cicho
-    // i od razu staje, a stojący aktywny rusza na nowo
+    // i od razu staje, a stojący aktywny rusza na nowo. Tylko gdy muzyki nie słychać: Samsung gra jeden odtwarzacz
+    // naraz, więc play() wolnego zatrzymywał grającą muzykę (25.10: OK na pilocie, żeby OLED nie gasł, ją wyłączał)
     const gest = () => {
+      if (w.slychac) return;
       const a = w.aktywny;
       for (const o of w.odtwarzacze) {
         if (o === a || !o.paused) continue;
