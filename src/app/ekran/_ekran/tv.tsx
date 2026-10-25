@@ -217,8 +217,24 @@ export function Tv({ kod, qr, host }: Props) {
         </div>
       )}
       {stan && <MuzykaTv stan={stan} teraz={teraz} />}
+      {stan && !zapowiedz && <GotowiTv stan={stan} />}
       {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
     </Scena>
+  );
+}
+
+/**
+ * Automatyczne prowadzenie (`stan.auto`): na planszach, na których gracze klikają „Gotowy” (wstęp, etap,
+ * ciekawostka), w rogu ile osób już kliknęło. Gra rusza, gdy klikną wszyscy (src/app/pilot/[kod]/auto.tsx).
+ */
+function GotowiTv({ stan }: { stan: StanSesji }) {
+  const plansza =
+    stan.faza === "wstep" || stan.faza === "etap" || (stan.faza === "wynik" && stan.zadanie?.typ === "ciekawostka");
+  if (!stan.auto || !plansza) return null;
+  return (
+    <p className={`tv-gotowi${stan.gotowi >= stan.w_grze ? " wszyscy" : ""}`}>
+      Gotowi <strong>{stan.gotowi}</strong>/{stan.w_grze}
+    </p>
   );
 }
 

@@ -368,6 +368,34 @@
   color: var(--szary);
 }
 
+/* Automatyczne prowadzenie: ile osób kliknęło „Gotowy” na planszy (tv.tsx, GotowiTv) */
+.tv-gotowi {
+  position: absolute;
+  right: 40px;
+  bottom: 28px;
+  margin: 0;
+  padding: 10px 26px;
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-pill);
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--szary);
+  font-size: 32px;
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+}
+
+.tv-gotowi strong {
+  color: var(--zloto);
+}
+
+.tv-gotowi.wszyscy {
+  border-color: var(--chmiel);
+}
+
+.tv-gotowi.wszyscy strong {
+  color: var(--chmiel);
+}
+
 /* Muzyka (muzyka.tsx): przeglądarka nie zagra bez gestu, więc prośba o OK na pilocie TV */
 .tv-muzyka-podpowiedz {
   position: absolute;
