@@ -37,6 +37,12 @@ const WEJSCIE_PO_PETLI_MS = 3500;
 /** Koniec etapu (ranking po ostatnim pytaniu etapu): muzyka powoli gaśnie przed planszą następnego etapu. */
 const WYCISZENIE_ETAPU_MS = 4000;
 /**
+ * Tyle muzyka czeka po zniknięciu komponentu, zanim ucichnie. Ekran lokalu przy otwarciu poczekalni wymienia
+ * planszę zapowiedzi na ekran gry, który włącza muzykę dopiero po pobraniu stanu gry; przy 0,3 s zapasu utwór
+ * poczekalni czasem gasł i zaczynał się od nowa (25.10).
+ */
+const ZAPAS_WYMIANY_MS = 5000;
+/**
  * Gesty, po których przeglądarka pozwala grać. Safari uznaje tylko kliknięcie i klawisz (nie `pointerdown`),
  * pilot TV wysyła klawisze.
  */
@@ -196,7 +202,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
         w.odtwarzacze.forEach((a) => a.pause());
         w.aktywny = null;
         w.grany = null;
-      }, 300);
+      }, ZAPAS_WYMIANY_MS);
     };
   }, []);
 

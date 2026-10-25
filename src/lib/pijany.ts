@@ -1,6 +1,8 @@
 // Tryb „Pijany finał”: dogrywka po finale serią, która nic nie liczy. Pytania są w tabeli `pijane_pytania`
-// (edycja: panel → Quizy → Pijany finał), a każde ma swój przeszkadzacz i komentarze po ✓ i ✗. Do tego cały
-// ekran telefonu faluje coraz mocniej z upływem czasu. Wstawki w treści: {za_barem} (pole w kreatorze gry) i {lokal}.
+// (edycja: panel → Quizy → Pijany finał) w dwóch grupach: piwne lecą najpierw, potem reszta, w każdej losowo.
+// Każde ma komentarze po ✓ i ✗. Przeszkadzacze nie zależą od pytania: idą zawsze w tej samej, narastającej
+// kolejności według pozycji w dogrywce (`KOLEJNOSC_EFEKTOW`), a cały ekran telefonu faluje coraz mocniej z upływem
+// czasu. Wstawki w treści: {za_barem} (pole w kreatorze gry) i {lokal}.
 
 export const EFEKTY_PIJANE = {
   brak: "bez dodatkowego (tylko falowanie)",
@@ -16,20 +18,45 @@ export const EFEKTY_PIJANE = {
 
 export type EfektPijany = keyof typeof EFEKTY_PIJANE;
 
-export function czyEfektPijany(x: unknown): x is EfektPijany {
-  return typeof x === "string" && x in EFEKTY_PIJANE;
+/**
+ * Przeszkadzacz na kolejnych pozycjach dogrywki (od 0: pierwsze pytanie po finale), niezależnie od pytania, żeby
+ * zawsze narastało tak samo: na starcie spokojnie (wejście quizu), potem pojedyncze utrudnienia, na końcu chaos.
+ */
+export const KOLEJNOSC_EFEKTOW: readonly EfektPijany[] = [
+  "brak",
+  "brak",
+  "drzenie",
+  "brak",
+  "odwrocone_kolory",
+  "pion",
+  "drzenie",
+  "mgla",
+  "samoklik",
+  "ucieczka",
+  "odwrocone_kolory",
+  "obrot",
+  "mgla",
+  "ucieczka",
+  "pion",
+  "obrot",
+];
+
+/** Przeszkadzacz pytania na pozycji `i`; za listą już tylko chaos. */
+export function efektNaPozycji(i: number): EfektPijany {
+  return KOLEJNOSC_EFEKTOW[i] ?? "chaos";
 }
 
 /**
  * Pytanie pijanego finału, jak wydaje je baza (`pijane_pytania`), z podstawionymi wstawkami. Komentarze
  * przelatują przez ekran po odpowiedzi ✓ albo ✗ (bez własnego: czasem losowy z `KOMENTARZE_OGOLNE`).
+ * `piwne` ma tylko wspólna pula w panelu (grupa, która leci najpierw).
  */
 export type PijanePytanie = {
   nr: number;
   tresc: string;
-  efekt: EfektPijany;
   komentarz_prawda: string | null;
   komentarz_falsz: string | null;
+  piwne?: boolean;
 };
 
 /** `pytan`: wspólna pula, `wejscie`: pytania wejścia jednego quizu (lecą przed pulą). */

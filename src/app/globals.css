@@ -2496,11 +2496,48 @@ html:has(.kolumna) {
 /* Panel: pytania pijanego finału (treść i przeszkadzacz w jednym wierszu, na telefonie pod sobą) */
 .pijane-pytanie {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
 }
 
-/* komentarze po ✓ i ✗ pod treścią i efektem, na całą szerokość */
+.pijane-pytanie .pole {
+  width: 100%;
+}
+
+/* wspólna pula w dwóch grupach (pijany-final/formularz.tsx): złota leci najpierw, szara potem */
+.pijana-grupa {
+  margin-top: 24px;
+  padding-left: 16px;
+  border-left: 4px solid var(--kamien3);
+}
+
+.pijana-grupa.piwne {
+  border-left-color: var(--zloto);
+}
+
+.pijana-grupa h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pijana-grupa-kropka {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--kamien3);
+}
+
+.pijana-grupa.piwne .pijana-grupa-kropka {
+  background: var(--zloto);
+}
+
+.pijana-wklej textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+/* komentarze po ✓ i ✗ pod treścią, na całą szerokość */
 .pijane-komentarze {
   grid-column: 1 / -1;
   display: grid;

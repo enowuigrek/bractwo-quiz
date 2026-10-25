@@ -138,6 +138,15 @@ Do zaprojektowania razem:
 - **Szacowanie na TV:** bez napisów „← za mało” i „za dużo →” przy osi (oczywiste, a brzydkie). Na telefonie gracz dalej widzi, o ile się pomylił.
 - **Automat stał na rankingu do 2 minut:** pilot był w Safari w tle, a ukryta karta budzi minutniki raz na minutę (w logach kliknięcia automatu zawsze ok. :15–:22 każdej minuty). Teraz automat i boty prowadzi też TV, które jest zawsze na wierzchu: przy włączonym automacie co 1,5 s woła `/api/auto` (`useAutoZTv` w `ekran/_ekran/auto.ts`), a trasa kluczem serwisowym czyta `pilot_stan`, każe botom odpowiadać i klika krok z `nastepnyKrok` (`src/lib/gra/auto.ts`, wspólne z pilotem). Krok idzie przez `auto_krok(kod, host_token, faza_od, akcja)` (migracje `20261025081443_auto_krok`, `pilot_stan_dla_serwera`): przechodzi tylko z fazy, którą widział wołający, z blokadą wiersza, więc pilot i kilka ekranów naraz nie przeskoczą fazy. Pilot też klika przez `auto_krok`. Sprawdzone z samym TV (bez pilota) i 4 botami: wstęp → etap → pytania, wynik, odpowiedzi i ranking po ok. 7 s każdy.
 
+### Pijany finał w grupach, stałe utrudnienia, ciekawostka z dźwiękiem (25.10) ✅
+
+- **Dwie grupy pytań** (migracje `20261025092329_pijane_pytania_grupy`, `20261025092753_pijane_pytania_piec_piwnych`): `pijane_pytania.piwne`. W dogrywce najpierw wejście quizu (po kolei), potem **5 losowych złotych** (piwne, w każdej grze inne), potem wszystkie szare losowo; bez powtórek. Oznaczone piwne: 11 pytań o piwie, w tym nowe „Wszyscy lubią się napić Żubra, tylko tak gadają.” (✓ „No wiadomo.”, ✗ „Kogo chcesz oszukać?”). Pytania „na koniec” („Zaraz coś pęknie”, „To już ostatnie pytanie”) przez losowanie nie stoją już na końcu.
+- **Utrudnienia według pozycji, nie pytania:** `KOLEJNOSC_EFEKTOW` w `src/lib/pijany.ts` (brak, brak, drżenie, brak, kolory, pion, drżenie, mgła, samoklik, ucieczka, kolory, obrót, mgła, ucieczka, pion, obrót, dalej chaos). Kolumna `efekt` zostaje w bazie nieużywana, panel jej nie pokazuje.
+- **Panel → Pijany finał:** dwie grupy kolorami (złota „Na początek”, szara „Potem”), przy pytaniu „↓ Potem” / „↑ Na początek” i usuń, w każdej grupie „+ pytanie” i „Wklej kilka naraz” (pytanie w linii, komentarze po kresce: `pytanie | po ✓ | po ✗`). Wejście quizu bez zmian (po kolei, ze strzałkami), bez wyboru przeszkadzacza.
+- **Ciekawostka ma swój dźwięk** (`ciekawostka`: miękki błysk w górę jak zapalona żarówka, synteza; plik `public/dzwieki/ciekawostka.mp3` go zastąpi). Wcześniej grał „ding” dobrej odpowiedzi.
+- **„Ding” przytłumiony:** wysokie tony z pliku obcięte filtrem (ok. −3 dB powyżej 3 kHz względem całości).
+- **Muzyka poczekalni nie zaczyna się od nowa** przy otwarciu poczekalni z ekranu zapowiedzi: wspólne odtwarzacze czekają 5 s (było 0,3 s), zanim uznają, że nikt nie przejął muzyki (`ZAPAS_WYMIANY_MS` w `muzyka.tsx`). Nie sprawdzone na żywo (nie przełączałem ekranu lokalu).
+
 ## Ustalenia
 
 | Temat | Decyzja |

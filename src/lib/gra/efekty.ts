@@ -19,6 +19,8 @@ export type Efekt =
   | "gong"
   /** Odsłonięcie dobrej odpowiedzi. */
   | "ding"
+  /** Plansza ciekawostki („a wiesz, że…”): osobny dźwięk niż dobra odpowiedź. */
+  | "ciekawostka"
   /** Ranking po pytaniu (wyścig): nalewanie piwa, tylko z pliku. */
   | "nalewanie"
   /** Wyścig: awatary jadą do szklanki (szum narastający), potem tory zamieniają się miejscami. */
@@ -240,6 +242,11 @@ const SYNTEZA: Record<Exclude<Efekt, "nalewanie">, Synteza> = {
       ton(c, w, t + i * 0.28, { f, typ: "triangle", dl: 0.8, g: 0.38 });
       ton(c, w, t + i * 0.28, { f: f * 2, dl: 0.3, g: 0.08 });
     });
+  },
+  ciekawostka: (c, w, t) => {
+    // „aha!”: miękki błysk w górę, jak zapalająca się żarówka (cztery krótkie tony i lekki szum)
+    [659, 880, 1175, 1568].forEach((f, i) => ton(c, w, t + i * 0.07, { f, dl: 0.5 - i * 0.05, g: 0.22 }));
+    uderzenie(c, w, t + 0.2, { dl: 0.4, g: 0.06, typ: "highpass", f: 6000 });
   },
   jazda: (c, w, t) => {
     // szum przesuwania: filtr jedzie w górę razem z awatarami (ok. 2 s), cicho pod muzyką

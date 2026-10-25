@@ -19,7 +19,7 @@ export default async function WejsciePijanego({ params }: PageProps<"/admin/quiz
     db.from("quizy").select("id, tytul").eq("id", id).maybeSingle<{ id: string; tytul: string }>(),
     db
       .from("pijane_pytania_quizu")
-      .select("nr, tresc, efekt, komentarz_prawda, komentarz_falsz")
+      .select("nr, tresc, komentarz_prawda, komentarz_falsz")
       .eq("quiz_id", id)
       .order("nr")
       .returns<PijanePytanie[]>(),

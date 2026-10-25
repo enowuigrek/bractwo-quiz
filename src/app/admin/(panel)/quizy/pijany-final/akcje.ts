@@ -3,13 +3,14 @@
 import { refresh } from "next/cache";
 import { wymagajGlownego } from "@/lib/admin";
 import { wymagajQuizu } from "@/lib/admin-dostep";
-import { czyEfektPijany, LIMITY_PIJANE } from "@/lib/pijany";
+import { LIMITY_PIJANE } from "@/lib/pijany";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
 /**
- * Zapisuje całą listę pytań pijanego finału naraz (kolejność z formularza): wspólną pulę (`quizId` null) albo
- * wejście jednego quizu (`pijane_pytania_quizu`, może być puste).
+ * Zapisuje całą listę pytań pijanego finału naraz: wspólną pulę (`quizId` null; z grupą `piwne`, kolejność bez
+ * znaczenia, bo baza losuje w grupach) albo wejście jednego quizu (`pijane_pytania_quizu`, po kolei, może być puste).
+ * Przeszkadzacze nie są już przy pytaniach (idą według pozycji, src/lib/pijany.ts).
  */
 export async function zapiszPijanePytania(
   quizId: string | null,
@@ -31,26 +32,31 @@ export async function zapiszPijanePytania(
 
   const wiersze = [];
   for (const [i, p] of lista.entries()) {
-    const tresc = String((p as { tresc?: unknown })?.tresc ?? "")
-      .trim()
-      .replace(/\s+/g, " ");
-    const efekt = (p as { efekt?: unknown })?.efekt;
-    // komentarze po ✓ i ✗: puste = bez własnego (wtedy czasem ogólny)
-    const komentarz = (pole: "komentarz_prawda" | "komentarz_falsz") =>
-      String((p as Record<string, unknown>)?.[pole] ?? "")
+    const pole = (nazwa: string) =>
+      String((p as Record<string, unknown>)?.[nazwa] ?? "")
         .trim()
-        .replace(/\s+/g, " ") || null;
-    const komentarzPrawda = komentarz("komentarz_prawda");
-    const komentarzFalsz = komentarz("komentarz_falsz");
+        .replace(/\s+/g, " ");
+    const tresc = pole("tresc");
+    // komentarze po ✓ i ✗: puste = bez własnego (wtedy czasem ogólny)
+    const komentarzPrawda = pole("komentarz_prawda") || null;
+    const komentarzFalsz = pole("komentarz_falsz") || null;
     if (!tresc) return { blad: `Pytanie ${i + 1} jest puste.` };
     if (tresc.length > LIMITY_PIJANE.tresc) {
       return { blad: `Pytanie ${i + 1} może mieć najwyżej ${LIMITY_PIJANE.tresc} znaków.` };
     }
-    if (!czyEfektPijany(efekt)) return { blad: `Wybierz efekt w pytaniu ${i + 1}.` };
-    if ((komentarzPrawda?.length ?? 0) > LIMITY_PIJANE.komentarz || (komentarzFalsz?.length ?? 0) > LIMITY_PIJANE.komentarz) {
-      return { blad: `Komentarz w pytaniu ${i + 1} może mieć najwyżej ${LIMITY_PIJANE.komentarz} znaków.` };
+    if (
+      (komentarzPrawda?.length ?? 0) > LIMITY_PIJANE.komentarz ||
+      (komentarzFalsz?.length ?? 0) > LIMITY_PIJANE.komentarz
+    ) {
+      return { blad: `Komentarz w pytaniu „${tresc}” może mieć najwyżej ${LIMITY_PIJANE.komentarz} znaków.` };
     }
-    wiersze.push({ ...(quizId ? { quiz_id: quizId } : {}), nr: i + 1, tresc, efekt, komentarz_prawda: komentarzPrawda, komentarz_falsz: komentarzFalsz });
+    wiersze.push({
+      ...(quizId ? { quiz_id: quizId } : { piwne: (p as { piwne?: unknown })?.piwne === true }),
+      nr: i + 1,
+      tresc,
+      komentarz_prawda: komentarzPrawda,
+      komentarz_falsz: komentarzFalsz,
+    });
   }
 
   // cała lista od nowa: usunięcie starej i wpisanie nowej (pytania nie mają odpowiedzi ani historii)
