@@ -8,18 +8,17 @@ import { IkonaGlosnik } from "@/components/ikony";
 
 /**
  * Utwory na TV (instrumentalne, z Suno), w `public/muzyka/`. Brakujący plik po prostu nie gra, więc można
- * je dodawać po kolei. Podium gra raz, reszta w pętli. `petlaOd`: od której sekundy wraca pętla (za cichym
- * wstępem utworu, żeby przy powrocie nie było dołka).
+ * je dodawać po kolei. Podium gra raz, reszta w pętli (`petla`).
  */
 const UTWORY = {
-  poczekalnia: { plik: "/muzyka/poczekalnia.mp3", petlaOd: 2.5 },
-  etap1: { plik: "/muzyka/etap-1.mp3", petlaOd: 0 },
-  etap2: { plik: "/muzyka/etap-2.mp3", petlaOd: 4 },
-  etap3: { plik: "/muzyka/etap-3.mp3", petlaOd: 0 },
+  poczekalnia: { plik: "/muzyka/poczekalnia.mp3", petla: true },
+  etap1: { plik: "/muzyka/etap-1.mp3", petla: true },
+  etap2: { plik: "/muzyka/etap-2.mp3", petla: true },
+  etap3: { plik: "/muzyka/etap-3.mp3", petla: true },
   // walka o finał (etap przed finałem): smyczki i trąbki, napięcie przed finałem
-  etap4: { plik: "/muzyka/etap-4.mp3", petlaOd: 4 },
-  final: { plik: "/muzyka/final.mp3", petlaOd: 3.6 },
-  podium: { plik: "/muzyka/podium.mp3", petlaOd: null },
+  etap4: { plik: "/muzyka/etap-4.mp3", petla: true },
+  final: { plik: "/muzyka/final.mp3", petla: true },
+  podium: { plik: "/muzyka/podium.mp3", petla: false },
 } as const;
 
 type Utwor = keyof typeof UTWORY;
@@ -29,8 +28,10 @@ const GLOSNOSC = 0.55;
 const PRZENIKANIE_MS = 1500;
 /**
  * Pętla bez nakładania (na TV było słychać koniec i początek naraz): w ostatnich `WYCISZENIE_S` sekundach utwór
- * cichnie, gra do końca pliku, chwila ciszy (`PRZERWA_PETLI_MS`) i ten sam utwór wchodzi powoli od `petlaOd`
- * (24.10: 0,7 s ciszy i 1,5 s wejścia to wciąż było za szybko).
+ * cichnie, gra do końca pliku, chwila ciszy (`PRZERWA_PETLI_MS`) i ten sam utwór wchodzi powoli od początku
+ * (24.10: 0,7 s ciszy i 1,5 s wejścia to wciąż było za szybko). Od początku, bo plik wczytujemy na nowo zamiast
+ * przewijać: Samsung po skoku `currentTime` na wolnym odtwarzaczu potrafił już nie zagrać (25.10: pętla utworu
+ * finału wypadła w pijanym finale i muzyka ucichła do końca).
  */
 const WYCISZENIE_S = 1.2;
 const PRZERWA_PETLI_MS = 2000;
@@ -242,13 +243,13 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
           ustawCichoOd(0);
         });
 
-    const zagraj = (utwor: Utwor, od: number, wejscieMs = 0) => {
+    const zagraj = (utwor: Utwor, wejscieMs = 0) => {
       const stary = w.aktywny;
       const a = w.odtwarzacze.find((o) => o !== stary) ?? w.odtwarzacze[0];
       clearInterval(w.przenikania.get(a));
       const plik = UTWORY[utwor].plik;
-      if (!a.src.endsWith(plik)) a.src = plik;
-      a.currentTime = od;
+      // zawsze wczytanie od nowa (także tego samego pliku), nigdy przewijanie (patrz WYCISZENIE_S)
+      a.src = plik;
       a.volume = 0;
       a.playbackRate = stary?.playbackRate ?? 1;
       w.aktywny = a;
@@ -274,13 +275,13 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       }
       return;
     }
-    if (!juzGra) zagraj(cel, 0);
+    if (!juzGra) zagraj(cel);
 
-    // pętla: tuż przed końcem pliku wyciszenie, po końcu chwila ciszy i ten sam utwór od `petlaOd`
+    // pętla: tuż przed końcem pliku wyciszenie, po końcu chwila ciszy i ten sam utwór od początku
     const wyciszane = new WeakSet<HTMLAudioElement>();
     const petla = (e: Event) => {
       const a = e.currentTarget as HTMLAudioElement;
-      if (a !== w.aktywny || a.paused || UTWORY[cel].petlaOd === null || !a.duration || wyciszane.has(a)) return;
+      if (a !== w.aktywny || a.paused || !UTWORY[cel].petla || !a.duration || wyciszane.has(a)) return;
       if (a.duration - a.currentTime <= WYCISZENIE_S) {
         wyciszane.add(a);
         plynnie(a, 0);
@@ -289,11 +290,10 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     let przerwa = 0;
     const koniecPliku = (e: Event) => {
       const a = e.currentTarget as HTMLAudioElement;
-      const od = UTWORY[cel].petlaOd;
-      if (a !== w.aktywny || od === null) return;
+      if (a !== w.aktywny || !UTWORY[cel].petla) return;
       przerwa = window.setTimeout(() => {
         wyciszane.delete(a);
-        if (w.aktywny === a && w.grany === cel && !w.zatrzymana) zagraj(cel, od, WEJSCIE_PO_PETLI_MS);
+        if (w.aktywny === a && w.grany === cel && !w.zatrzymana) zagraj(cel, WEJSCIE_PO_PETLI_MS);
       }, PRZERWA_PETLI_MS);
     };
     // gest: każdy odtwarzacz dostaje play() w czasie gestu (Safari odblokowuje je osobno): wolny cicho

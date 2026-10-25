@@ -168,9 +168,10 @@ export function Tv({ kod, qr, host }: Props) {
           <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
         </div>
       ) : stan.faza === "werble" ? (
-        // po finale ekran gaśnie (bez łagodnego wejścia fazy), podium pokazuje prowadzący
-        // po pijanym finale TV jest już ciemny po wideo wybuchu: bez błysku, sam napis wchodzi na czerni
-        <Werble duzy blysk={!stan.pijany_final} />
+        // po finale ekran gaśnie (bez łagodnego wejścia fazy), podium pokazuje prowadzący; po pijanym finale TV jest
+        // już ciemny po wideo wybuchu, więc bez błysku. Bez napisu „Werble…” (25.10): werble słychać (efekty.tsx),
+        // napis zostaje na telefonach
+        <Werble duzy blysk={!stan.pijany_final} napis={false} />
       ) : (
         // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
         <div key={kluczEkranu(stan)} className="tv-ekran">

@@ -3652,11 +3652,30 @@
     opacity 0.6s ease-in calc(2.4s + var(--i) * 0.6s);
 }
 
-/* Szklanka stoi nieruchomo i ostro (bez falowania planszy): pod koniec podmienia ją wideo, którego
+/* Szklanka stoi nieruchomo i ostro (bez falowania planszy): pod koniec gra nad nią wideo, którego
    pierwsza klatka to ta sama szklanka w tym samym miejscu sceny (docs/wideo/pekniecie-start.png).
-   Gdy wideo gra, szklanka znika pod nim. */
-.tv-pijany.wylewa .drogi-finalu-szklanka {
-  visibility: hidden;
+   Szklanka pęka sama dopiero z wybuchem w klipie (WYBUCH_S), a nie gdy wideo rusza: Samsung zgłasza granie
+   wideo i gra jego dźwięk, ale obrazu nie było widać, więc piwo znikało bez wybuchu (25.10). */
+.tv-pijany.wybuch .drogi-finalu-szklanka {
+  animation: szklanka-peka 0.45s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+
+@keyframes szklanka-peka {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.12) rotate(-3deg);
+    opacity: 1;
+    filter: brightness(2.2);
+  }
+  100% {
+    transform: scale(1.6) rotate(6deg);
+    opacity: 0;
+    filter: brightness(3);
+  }
 }
 
 /* Wybuch w wideo (WYBUCH_S): interfejs się rozpada. Nagłówek wylatuje w górę, awatary odlatują od szklanki

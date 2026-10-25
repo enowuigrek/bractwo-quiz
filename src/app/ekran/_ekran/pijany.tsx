@@ -168,12 +168,12 @@ export function PijanyTv({
 
   // Koniec dogrywki: ostatnie sekundy to wideo pękającej szklanki (pierwsza klatka = ta szklanka w tym samym
   // miejscu sceny). Wideo leży na całej scenie 1920×1080 (portal do `.scena`, bo tu wszystko się przesuwa),
-  // czeka zatrzymane na pierwszej klatce i rusza tak, żeby skończyć się z werblami (src/lib/pijany.ts). Szklankę chowamy
-  // dopiero, gdy wideo naprawdę gra: bez pliku albo bez zgody przeglądarki na odtwarzanie zostaje jak było.
+  // czeka zatrzymane na pierwszej klatce i rusza tak, żeby skończyć się z werblami (src/lib/pijany.ts). Nasza szklanka
+  // pęka sama z wybuchem w klipie (tv.css): bez pliku albo bez zgody przeglądarki na odtwarzanie zostaje jak była.
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
-  // `widac`: wideo już gra (pokazujemy je), `gra`: klip przewinął pierwsze klatki, więc chowamy naszą szklankę.
-  // Telewizor zgłasza „gra” chwilę przed pierwszą klatką, więc przy chowaniu od razu piwo na moment znikało (25.10)
+  // `widac`: wideo już gra (pokazujemy je), `gra`: klip przewinął pierwsze klatki, więc chowamy drogi i tło pod nim
+  // (telewizor zgłasza „gra” chwilę przed pierwszą klatką)
   const [widac, ustawWidac] = useState(false);
   const [gra, ustawGra] = useState(false);
   // koniec klipu: piana zostaje na ostatniej klatce, więc zsuwamy obraz w dół, jakby spłynęła z ekranu

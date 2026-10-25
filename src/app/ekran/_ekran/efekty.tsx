@@ -29,7 +29,6 @@ const WSZYSTKIE: Efekt[] = [
   "krok",
   "pudlo",
   "werble",
-  "fanfara",
 ];
 
 /** Co z chwili poprzedniego renderu porównujemy z bieżącą. */
@@ -137,7 +136,7 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     }
 
     if (b.faza === "werble" && p.faza !== "werble") werble.current = zagraj("werble");
-    if (b.faza === "podium" && p.faza !== "podium") zagraj("fanfara");
+    // podium bez fanfary (25.10, Łukasz: głupio brzmiała): od razu gra muzyka podium (muzyka.tsx)
   });
 
   return null;
