@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { wczytajEfekty, wznowEfekty, zagraj, type Efekt } from "@/lib/gra/efekty";
+import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
 import type { StanSesji } from "@/lib/gra/typy";
 
@@ -63,6 +64,13 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       werble.current?.();
     };
   }, []);
+
+  // muzyka już gra, więc przeglądarka pozwala na dźwięk: efekty też, bez czekania na gest. Po przeładowaniu TV
+  // (nowa wersja) muzyka potrafiła ruszyć sama, a efekty milczały do najbliższego OK na pilocie (25.10)
+  const odblokowany = useDzwiekOdblokowany();
+  useEffect(() => {
+    if (odblokowany) wznowEfekty();
+  }, [odblokowany]);
 
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   const sekunda =
