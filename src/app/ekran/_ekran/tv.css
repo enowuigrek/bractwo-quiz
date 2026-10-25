@@ -1641,7 +1641,7 @@
   text-align: center;
   font-size: 36px;
   font-weight: var(--w-semibold);
-  color: var(--szary);
+  color: var(--piana);
 }
 
 .tv-koniec .tv-stopien-nr {
@@ -2231,6 +2231,44 @@
   align-items: center;
   gap: 20px;
   height: var(--tor);
+}
+
+/* numer miejsca przy zamianie torów: stary znika, nowy wchodzi (wyscig.tsx, --zamiana = start zamiany) */
+.wyscig-miejsce.zmiana {
+  display: grid;
+  justify-items: end;
+}
+
+.wyscig-miejsce.zmiana > span {
+  grid-area: 1 / 1;
+}
+
+.wyscig-miejsce.zmiana .stare {
+  animation: miejsce-znika 0.4s var(--zamiana) both;
+}
+
+.wyscig-miejsce.zmiana .nowe {
+  animation: miejsce-wchodzi 0.4s calc(var(--zamiana) + 0.4s) both;
+}
+
+@keyframes miejsce-znika {
+  to {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes miejsce-wchodzi {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+/* awans w rankingu: tor przejeżdża nad innymi przy zamianie miejsc (wyscig.tsx) */
+.wyscig-wiersz.awansuje {
+  position: relative;
+  z-index: 2;
 }
 
 .wyscig-miejsce {

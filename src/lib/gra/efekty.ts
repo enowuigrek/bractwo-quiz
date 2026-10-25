@@ -20,6 +20,9 @@ export type Efekt =
   | "ding"
   /** Ranking po pytaniu (wyścig): nalewanie piwa, tylko z pliku. */
   | "nalewanie"
+  /** Wyścig: awatary jadą do szklanki (szum narastający), potem tory zamieniają się miejscami. */
+  | "jazda"
+  | "zamiana"
   /** Koniec etapu: dzwonek „ostatnia kolejka”. */
   | "dzwonek"
   /** Finał: krok naprzód (dobra odpowiedź) i cofnięcie (zła). */
@@ -144,6 +147,14 @@ function ton(
   osc.stop(t + o.dl + 0.05);
 }
 
+/** Sekunda białego szumu (wspólna dla werbla, talerza i przesuwania). */
+function bufSzumu(c: AudioContext): AudioBuffer {
+  const b = c.createBuffer(1, c.sampleRate, c.sampleRate);
+  const d = b.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return b;
+}
+
 /** Krótki szum przez filtr (werbel, talerz, tyknięcie). */
 function uderzenie(
   c: AudioContext,
@@ -151,11 +162,7 @@ function uderzenie(
   t: number,
   o: { dl: number; g: number; typ: BiquadFilterType; f: number; q?: number },
 ) {
-  if (!szum) {
-    szum = c.createBuffer(1, c.sampleRate, c.sampleRate);
-    const d = szum.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  }
+  if (!szum) szum = bufSzumu(c);
   const z = c.createBufferSource();
   z.buffer = szum;
   const f = c.createBiquadFilter();
@@ -169,13 +176,6 @@ function uderzenie(
   z.connect(f).connect(g).connect(wyj);
   z.start(t, Math.random() * 0.5);
   z.stop(t + o.dl + 0.05);
-}
-
-/** Dzwonek: podstawa i niestrojone alikwoty jak w metalu. */
-function dzwon(c: AudioContext, wyj: AudioNode, t: number, f: number, dl: number, g: number) {
-  ton(c, wyj, t, { f, dl, g });
-  ton(c, wyj, t, { f: f * 2.76, dl: dl * 0.5, g: g * 0.35 });
-  ton(c, wyj, t, { f: f * 5.4, dl: dl * 0.25, g: g * 0.15 });
 }
 
 const SYNTEZA: Record<Exclude<Efekt, "nalewanie">, Synteza> = {
@@ -192,16 +192,48 @@ const SYNTEZA: Record<Exclude<Efekt, "nalewanie">, Synteza> = {
     ton(c, w, t, { f: 1700, dl: 0.04, g: 0.35 });
     uderzenie(c, w, t, { dl: 0.025, g: 0.2, typ: "highpass", f: 3000 });
   },
+  // 25.10: łagodniej niż pierwsze wersje (dzwonki za bardzo dzwoniły): krótkie wygaszenie, bez metalicznych alikwotów
   gong: (c, w, t) => {
-    ton(c, w, t, { f: 196, dl: 2.2, g: 0.55 });
-    ton(c, w, t, { f: 196 * 2.02, dl: 1.4, g: 0.2 });
-    ton(c, w, t, { f: 196 * 2.76, dl: 0.9, g: 0.15 });
-    uderzenie(c, w, t, { dl: 0.08, g: 0.2, typ: "lowpass", f: 800 });
+    // koniec czasu: miękkie, niskie „bum” w dół
+    ton(c, w, t, { f: 165, f2: 120, dl: 0.9, g: 0.6 });
+    ton(c, w, t, { f: 330, f2: 240, dl: 0.5, g: 0.15 });
   },
-  ding: (c, w, t) => dzwon(c, w, t, 1318, 1.4, 0.4),
+  ding: (c, w, t) => {
+    // dobra odpowiedź: dwa ciepłe tony w górę jak marimba
+    ton(c, w, t, { f: 784, typ: "triangle", dl: 0.35, g: 0.4 });
+    ton(c, w, t + 0.12, { f: 1046, typ: "triangle", dl: 0.6, g: 0.4 });
+  },
   dzwonek: (c, w, t) => {
-    // „ostatnia kolejka”: dzwonek barowy rozkołysany, kilka uderzeń, coraz ciszej
-    for (let i = 0; i < 8; i++) dzwon(c, w, t + i * 0.11, 1760, 0.6, 0.32 * (1 - i * 0.08));
+    // koniec etapu: trzy miękkie tony w dół (jak gong w barze, ale bez dzwonienia)
+    [880, 698, 523].forEach((f, i) => {
+      ton(c, w, t + i * 0.28, { f, typ: "triangle", dl: 0.8, g: 0.38 });
+      ton(c, w, t + i * 0.28, { f: f * 2, dl: 0.3, g: 0.08 });
+    });
+  },
+  jazda: (c, w, t) => {
+    // szum przesuwania: filtr jedzie w górę razem z awatarami (ok. 2 s), cicho pod muzyką
+    if (!szum) szum = bufSzumu(c);
+    const z = c.createBufferSource();
+    z.buffer = szum;
+    z.loop = true;
+    const f = c.createBiquadFilter();
+    f.type = "bandpass";
+    f.Q.value = 1.2;
+    f.frequency.setValueAtTime(300, t);
+    f.frequency.exponentialRampToValueAtTime(1600, t + 2);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.18, t + 0.5);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+    z.connect(f).connect(g).connect(w);
+    z.start(t);
+    z.stop(t + 2.3);
+  },
+  zamiana: (c, w, t) => {
+    // tory zamieniają się miejscami: krótki „fiuu” i dwa tony w górę
+    uderzenie(c, w, t, { dl: 0.35, g: 0.2, typ: "bandpass", f: 900, q: 0.8 });
+    ton(c, w, t + 0.05, { f: 520, f2: 700, typ: "triangle", dl: 0.18, g: 0.3 });
+    ton(c, w, t + 0.2, { f: 700, f2: 940, typ: "triangle", dl: 0.25, g: 0.3 });
   },
   krok: (c, w, t) => ton(c, w, t, { f: 520, f2: 820, typ: "triangle", dl: 0.14, g: 0.4 }),
   pudlo: (c, w, t) => ton(c, w, t, { f: 190, f2: 110, typ: "triangle", dl: 0.25, g: 0.5 }),

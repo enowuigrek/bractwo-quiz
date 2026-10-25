@@ -121,11 +121,6 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                     </li>
                   ))}
                 </ul>
-                <p className="tv-podpowiedz">
-                  {e.seria
-                    ? "Reszta kibicuje: na ekranie widać na żywo, kto jest bliżej piwa."
-                    : "Reszta kibicuje. Telefony pokażą pytania, ale odpowiadają tylko finaliści."}
-                </p>
                 {stan.nagrody?.[0] && (
                   <p className="tv-etap-nagroda">
                     {stan.nagrody[0].zdjecie && <img src={stan.nagrody[0].zdjecie} alt="" />}

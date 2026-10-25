@@ -16,6 +16,8 @@ const WSZYSTKIE: Efekt[] = [
   "gong",
   "ding",
   "nalewanie",
+  "jazda",
+  "zamiana",
   "dzwonek",
   "krok",
   "pudlo",
