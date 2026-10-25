@@ -2,7 +2,7 @@
 
 Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
-## Stan na 24.10 wieczór: od czego zacząć
+## Stan na 25.10 rano: od czego zacząć
 
 Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia decyzji jest niżej w „Ustaleniach z realizacji” (najnowsze na końcu). Zasady pracy są w `CLAUDE.md`, wygląd w `docs/DESIGN-SYSTEM.md`, test w `docs/TEST.md`, pomysły w `docs/POMYSLY.md`.
 
@@ -30,6 +30,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 
 **Otwarte i niepewne:**
 - **Na 25.10: dźwięki i pijany finał** (plan niżej, w „Na 25.10”).
+- Zgłoszone po teście 24.10 (opis w „Na 25.10” → „Zgłoszone wieczorem 24.10”): pijany finał powtarzał pytania w jednej grze (pula za mała) i chyba trwał ponad 60 s; wyniki gry w panelu liczą ciekawostki i całą pulę finału („Dobrze 31/63”); kreator z przełącznikiem zapowiedzi niesprawdzony w przeglądarce.
 - Pijany finał „Muzyki ponadczasowej” to prowizorka (`pijane_pytania_quizu`, opis w POMYSLY.md).
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, pijany finał.
 - Samsung w lokalu: muzyka i płynność latających awatarów niesprawdzone.
