@@ -1,8 +1,9 @@
 "use client";
 
-// Efekty dźwiękowe na TV (Web Audio, osobno od muzyki z `ekran/_ekran/muzyka.tsx`). Każdy efekt ma prostą
-// wersję syntezowaną, więc działa bez plików. Gdy w `public/dzwieki/<nazwa>.mp3` leży plik, gra plik zamiast
-// syntezy (np. nagranie kapsla albo dzwonka barowego); efekty `TYLKO_PLIK` bez pliku po prostu milczą.
+// Efekty dźwiękowe na TV (Web Audio, osobno od muzyki z `ekran/_ekran/muzyka.tsx`). Grają nagrania z
+// `public/dzwieki/<nazwa>.mp3` (od 25.10 od Łukasza, przycięte z ciszy i wyrównane do szczytu −3 dB), a gdy pliku
+// nie ma, prosta synteza; efekty `TYLKO_PLIK` bez pliku milczą. Efekt może mieć kilka plików, które idą na zmianę
+// (`WARIANTY`, np. kroki).
 // Przeglądarka TV pozwala grać dopiero po geście (OK na pilocie TV): `wznowEfekty()` woła ten sam gest co muzyka.
 
 export type Efekt =
@@ -35,13 +36,27 @@ export type Efekt =
 const TYLKO_PLIK: ReadonlySet<Efekt> = new Set(["nalewanie"]);
 /** Głośność efektów względem pełnej skali (muzyka gra na 0,55). */
 const GLOSNOSC = 0.6;
+/** Pliki efektu grane na zmianę (bez wpisu: jeden plik o nazwie efektu). */
+const WARIANTY: Partial<Record<Efekt, string[]>> = { krok: ["krok-1", "krok-2"] };
+/** Głośność pojedynczych efektów (bez wpisu 1): częste i tła ciszej, żeby nie zagłuszały muzyki. */
+const GLOSNOSC_EFEKTU: Partial<Record<Efekt, number>> = {
+  tik: 0.5,
+  odliczanie: 0.7,
+  jazda: 0.5,
+  nalewanie: 0.7,
+  krok: 0.8,
+  pudlo: 0.8,
+};
+/** Werble z pliku: po pierwszym przejściu pętla od tej sekundy (równy werbel, aż przyjdzie podium). */
+const WERBLE_PETLA_OD_S = 5;
 /** Werble z syntezy: najdłużej tyle sekund, gdyby nikt ich nie zatrzymał. */
 const WERBLE_MAX_S = 20;
 
 let ctx: AudioContext | null = null;
 let wyjscie: GainNode | null = null;
 let szum: AudioBuffer | null = null;
-const pliki = new Map<Efekt, Promise<AudioBuffer | null>>();
+const pliki = new Map<string, Promise<AudioBuffer | null>>();
+const ktoryWariant = new Map<Efekt, number>();
 
 function kontekst(): AudioContext | null {
   if (ctx) return ctx;
@@ -63,8 +78,8 @@ export function wznowEfekty(): void {
   if (c && c.state !== "running") void c.resume().catch(() => undefined);
 }
 
-/** Plik efektu, wczytany raz; `null`, gdy go nie ma (wtedy synteza). */
-function plik(nazwa: Efekt): Promise<AudioBuffer | null> {
+/** Plik, wczytany raz; `null`, gdy go nie ma (wtedy synteza). */
+function plik(nazwa: string): Promise<AudioBuffer | null> {
   let p = pliki.get(nazwa);
   if (!p) {
     p = fetch(`/dzwieki/${nazwa}.mp3`)
@@ -79,7 +94,7 @@ function plik(nazwa: Efekt): Promise<AudioBuffer | null> {
 /** Wczytuje pliki z góry, żeby pierwszy efekt nie czekał na sieć. */
 export function wczytajEfekty(nazwy: readonly Efekt[]): void {
   if (!kontekst()) return;
-  for (const n of nazwy) void plik(n);
+  for (const n of nazwy) for (const p of WARIANTY[n] ?? [n]) void plik(p);
 }
 
 /**
@@ -90,24 +105,38 @@ export function zagraj(nazwa: Efekt): () => void {
   const c = kontekst();
   if (!c || !wyjscie || c.state !== "running") return () => undefined;
   const glos = c.createGain();
+  glos.gain.value = GLOSNOSC_EFEKTU[nazwa] ?? 1;
   glos.connect(wyjscie);
   let zatrzymany = false;
+  let zatrzymajZrodlo: (() => void) | null = null;
   const zatrzymaj = () => {
     if (zatrzymany) return;
     zatrzymany = true;
+    zatrzymajZrodlo?.();
     const t = c.currentTime;
     glos.gain.cancelScheduledValues(t);
     glos.gain.setValueAtTime(glos.gain.value, t);
     glos.gain.linearRampToValueAtTime(0, t + 0.15);
     window.setTimeout(() => glos.disconnect(), 400);
   };
-  void plik(nazwa).then((bufor) => {
+  // kilka plików: po kolei, za każdym razem następny
+  const warianty = WARIANTY[nazwa];
+  const n = ktoryWariant.get(nazwa) ?? 0;
+  ktoryWariant.set(nazwa, n + 1);
+  void plik(warianty ? warianty[n % warianty.length] : nazwa).then((bufor) => {
     if (zatrzymany) return;
     if (bufor) {
       const zrodlo = c.createBufferSource();
       zrodlo.buffer = bufor;
+      if (nazwa === "werble" && bufor.duration > WERBLE_PETLA_OD_S + 0.5) {
+        zrodlo.loop = true;
+        zrodlo.loopStart = WERBLE_PETLA_OD_S;
+        zrodlo.loopEnd = bufor.duration;
+      }
       zrodlo.connect(glos);
       zrodlo.start();
+      // werble w pętli grałyby w nieskończoność: zatrzymanie wycisza głos i staje źródło
+      zatrzymajZrodlo = () => zrodlo.stop(c.currentTime + 0.2);
     } else if (!TYLKO_PLIK.has(nazwa)) {
       SYNTEZA[nazwa as Exclude<Efekt, "nalewanie">]?.(c, glos, c.currentTime + 0.01);
     }

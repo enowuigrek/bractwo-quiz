@@ -37,7 +37,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const reszta = wszyscy.slice(wiersze.length);
   const maks = stan.quiz?.max_przed_finalem ?? 0;
   // dźwięki (src/lib/gra/efekty.ts): szum jazdy razem z awatarami, „fiuu” przy zamianie torów
-  const zamiana = lp > 1 && wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce);
+  // w finale każdy ma swoją drogę: tory się nie zamieniają, więc i bez dźwięku zamiany
+  const zamiana = lp > 1 && !stan.etap?.finalowy && wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce);
   const dzwieki = stan.muzyka;
   useEffect(() => {
     if (!dzwieki) return;
