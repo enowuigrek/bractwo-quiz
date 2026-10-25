@@ -145,6 +145,7 @@ Do zaprojektowania razem:
 - **Panel → Pijany finał:** dwie grupy kolorami (złota „Na początek”, szara „Potem”), przy pytaniu „↓ Potem” / „↑ Na początek” i usuń, w każdej grupie „+ pytanie” i „Wklej kilka naraz” (pytanie w linii, komentarze po kresce: `pytanie | po ✓ | po ✗`). Wejście quizu bez zmian (po kolei, ze strzałkami), bez wyboru przeszkadzacza.
 - **Ciekawostka ma swój dźwięk** (`ciekawostka`: miękki błysk w górę jak zapalona żarówka, synteza; plik `public/dzwieki/ciekawostka.mp3` go zastąpi). Wcześniej grał „ding” dobrej odpowiedzi.
 - **„Ding” przytłumiony:** wysokie tony z pliku obcięte filtrem (ok. −3 dB powyżej 3 kHz względem całości).
+- **Plansza etapu na TV:** nazwa od lewej (w linii z „Etap X z Y” i opisem), ikona etapu za nazwą po prawej. To jedyny ekran z ikoną obok nazwy (na wstępie ikony stoją nad numerami, telefon ich nie ma). W demo telefonu „Pils” zamiast „Pilzner”.
 - **Muzyka poczekalni nie zaczyna się od nowa** przy otwarciu poczekalni z ekranu zapowiedzi: wspólne odtwarzacze czekają 5 s (było 0,3 s), zanim uznają, że nikt nie przejął muzyki (`ZAPAS_WYMIANY_MS` w `muzyka.tsx`). Nie sprawdzone na żywo (nie przełączałem ekranu lokalu).
 
 ## Ustalenia

@@ -140,7 +140,7 @@ function scena(typ: TypZadania, t: number): Scena {
       };
     }
     case "wielokrotny": {
-      const odp = ["Cascade", "Pilzner", "Citra", "Monachijski"];
+      const odp = ["Cascade", "Pils", "Citra", "Monachijski"];
       const zaznaczone = [poStuku(0.22), false, poStuku(0.42), false];
       return {
         tresc: "Które z nich to chmiele?",
