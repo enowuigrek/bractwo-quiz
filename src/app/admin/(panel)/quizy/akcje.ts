@@ -10,10 +10,10 @@ import type { StanFormularza } from "@/lib/typy";
 import {
   CZASY_ETAPU,
   LIMITY_ETAPU,
-  MAX_ETAPOW,
   MAX_PLAN_PYTAN,
   MNOZNIKI,
   SZABLONY_ETAPOW,
+  SZABLONY_QUIZU,
   typDomyslny,
 } from "@/lib/etapy";
 import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
@@ -33,22 +33,13 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
   if (!tytul) return { blad: "Podaj tytuł quizu." };
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
 
-  // etapy z szablonu quizu: [{ szablon, pytania }] po kolei
-  let surowe: unknown;
-  try {
-    surowe = JSON.parse(String(dane.get("etapy") ?? "[]"));
-  } catch {
-    return { blad: "Nieprawidłowe etapy." };
-  }
-  const lista = Array.isArray(surowe) ? surowe : [];
-  if (lista.length > MAX_ETAPOW) return { blad: `Quiz może mieć najwyżej ${MAX_ETAPOW} etapów.` };
+  // etapy na sztywno z szablonu quizu (src/lib/etapy.ts), kreator ich nie zmienia
+  const szablonQuizu = SZABLONY_QUIZU.find((s) => s.klucz === dane.get("szablon"));
+  if (!szablonQuizu) return { blad: "Wybierz szablon quizu." };
   const etapy = [];
-  for (const [i, e] of lista.entries()) {
-    const szablon = SZABLONY_ETAPOW.find((s) => s.klucz === (e as { szablon?: unknown })?.szablon);
-    const pytania = Number((e as { pytania?: unknown })?.pytania);
-    if (!szablon || !Number.isInteger(pytania) || pytania < 1 || pytania > MAX_PLAN_PYTAN) {
-      return { blad: "Nieprawidłowe etapy." };
-    }
+  for (const [i, e] of szablonQuizu.etapy.entries()) {
+    const szablon = SZABLONY_ETAPOW.find((s) => s.klucz === e.szablon);
+    if (!szablon) return { blad: "Nieprawidłowe etapy." };
     etapy.push({
       nr: i + 1,
       nazwa: szablon.nazwa,
@@ -57,7 +48,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       czas_s: szablon.czas_s,
       finalowy: szablon.finalowy,
       seria: szablon.seria,
-      plan_pytan: pytania,
+      plan_pytan: e.pytania,
       typ_domyslny: typDomyslny(szablon),
     });
   }

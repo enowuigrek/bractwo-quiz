@@ -107,12 +107,15 @@ export type SzablonQuizu = {
   etapy: { szablon: string; pytania: number }[];
 };
 
-/** Szablony nowego quizu: gotowy zestaw etapów z liczbą pytań, do zmiany przed utworzeniem i potem. */
+/**
+ * Szablony nowego quizu (25.10, Łukasz): klasyczny pub quiz to same pytania po kolei, a turniej ma stały zestaw
+ * etapów, którego kreator nie zmienia (liczbę pytań i etapy można poprawić potem na stronie quizu).
+ */
 export const SZABLONY_QUIZU: SzablonQuizu[] = [
   {
-    klucz: "klasyczny",
-    nazwa: "Klasyczny pub quiz",
-    opis: "Etapy od łatwych pytań do finału trójki.",
+    klucz: "turniej",
+    nazwa: "Turniej z finałem",
+    opis: "Stałe etapy od rozgrzewki do wyścigu trójki o piwo.",
     etapy: [
       { szablon: "rozgrzewka", pytania: 6 },
       { szablon: "kilka", pytania: 3 },
@@ -122,9 +125,9 @@ export const SZABLONY_QUIZU: SzablonQuizu[] = [
     ],
   },
   {
-    klucz: "bez",
-    nazwa: "Bez etapów",
-    opis: "Same pytania po kolei, jak dawniej.",
+    klucz: "klasyczny",
+    nazwa: "Klasyczny pub quiz",
+    opis: "Same pytania po kolei, bez etapów i finału.",
     etapy: [],
   },
 ];

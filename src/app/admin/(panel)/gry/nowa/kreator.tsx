@@ -6,6 +6,7 @@ import type { Lokal, StanFormularza } from "@/lib/typy";
 import { bezResetu } from "../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../_komponenty/grafika";
 import { KomunikatFormularza } from "../../_komponenty/stan";
+import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { LIMITY } from "../../quizy/limity";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
@@ -48,6 +49,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   // zapowiedź (domyślnie włączona): pokazuje na ekranie lokalu godzinę i odliczanie, wyłączona od razu poczekalnię
   // z QR. Data i godzina w czasie lokalnym przeglądarki, domyślnie godzinę od teraz (pola są dopiero po wyborze
   // quizu, więc serwer ich nie renderuje i godzina z przeglądarki nie gryzie się z HTML-em). Do serwera idzie ISO.
+  const [auto, setAuto] = useState(false);
   const [zapowiedz, setZapowiedz] = useState(true);
   const [dataStartu, setDataStartu] = useState(() => zaGodzine().toLocaleDateString("sv-SE"));
   const [godzinaStartu, setGodzinaStartu] = useState(() =>
@@ -283,8 +285,25 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <input type="hidden" name="start_tryb" value={zapowiedz ? "zapowiedz" : "teraz"} />
             <p className="podpowiedz">
               {zapowiedz
-                ? "Ekran lokalu pokaże godzinę i odliczanie, a QR pojawi się, gdy prowadzący otworzy poczekalnię na pilocie."
+                ? auto
+                  ? "Ekran lokalu pokaże godzinę i odliczanie, a o tej godzinie sam pokaże poczekalnię z kodem QR."
+                  : "Ekran lokalu pokaże godzinę i odliczanie, a QR pojawi się, gdy prowadzący otworzy poczekalnię na pilocie."
                 : "Bez zapowiedzi TV od razu pokazuje poczekalnię z kodem QR."}
+            </p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Prowadzenie</legend>
+            <label className="przelacznik">
+              <input type="checkbox" name="auto" checked={auto} onChange={(e) => setAuto(e.target.checked)} />{" "}
+              prowadzenie automatyczne
+            </label>
+            <p className="podpowiedz">
+              {!auto
+                ? "Każdy krok klika prowadzący na pilocie."
+                : zapowiedz
+                  ? `Gra prowadzi się sama: o godzinie startu otwiera poczekalnię, po ${NA_ZAPISY_MIN} minutach na dołączenie startuje quiz (jeśli ktoś dołączył) i dalej klika kolejne kroki. Na pilocie możesz w każdej chwili wyłączyć automat albo włączyć go z powrotem.`
+                  : "Gra prowadzi się sama od startu, który klikasz na pilocie. Na pilocie możesz w każdej chwili wyłączyć automat albo włączyć go z powrotem."}
             </p>
           </fieldset>
 

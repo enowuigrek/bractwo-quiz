@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 
 // Zapowiedź quizu: godzina startu i odliczanie (ekran lokalu, TV gry, pilot).
-// Start i tak klika prowadzący, więc po czasie odliczanie pokazuje tylko „Zaraz zaczynamy!”.
+// Start klika prowadzący (albo automat 5 minut po otwarciu poczekalni, src/lib/gra/auto.ts), więc po czasie
+// odliczanie pokazuje tylko „Zaraz zaczynamy!”.
 
 /** Zapowiedziana gra w lokalu (z `ekran_lokalu`). */
 export type Zapowiedz = {
@@ -13,6 +14,8 @@ export type Zapowiedz = {
   browar: { nazwa: string; logo_url: string | null } | null;
   /** Ekran lokalu (`ekran_lokalu`): muzyka poczekalni gra już przy zapowiedzi. */
   muzyka?: boolean;
+  /** Automatyczne prowadzenie: poczekalnia otworzy się sama o godzinie startu (ekran-lokalu.tsx). */
+  auto?: boolean;
 };
 
 /** Godzina startu do wyświetlenia, np. „20:00”. */

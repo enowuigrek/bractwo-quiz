@@ -23,6 +23,7 @@ import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } 
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
+import { NA_ZAPISY_MIN, startPoczekalni } from "@/lib/gra/auto";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
@@ -110,7 +111,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
 
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza));
-  const doZapowiedzi = useDoStartu(stan?.faza === "poczekalnia" ? (stan.planowany_start ?? null) : null, przesuniecie);
+  // automat: po otwarciu poczekalni odliczanie do startu automatu (src/lib/gra/auto.ts)
+  const startZapowiedzi = stan?.faza === "poczekalnia" ? startPoczekalni(stan) : null;
+  const doZapowiedzi = useDoStartu(startZapowiedzi, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
   useBoty(kod, token, stan);
   useAutoProwadzenie(kod, token, stan, przesuniecie, ustawStan);
@@ -246,15 +249,23 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         )}
 
       {/* zapowiedź: godzina i odliczanie jak na TV; start i tak klika prowadzący */}
-      {faza === "poczekalnia" && stan.planowany_start && doZapowiedzi !== null && (
+      {faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null && (
         <p className="pilot-start">
           <span>
-            Start <strong>{kiedyStart(stan.planowany_start)}</strong> ·{" "}
+            Start <strong>{kiedyStart(startZapowiedzi)}</strong> ·{" "}
             <span className="gra-kod">{opisOdliczania(doZapowiedzi)}</span>
           </span>
           {!stan.poczekalnia_otwarta && (
             <span className="pomocniczy">
-              Na ekranie lokalu jest zapowiedź z odliczaniem. Gracze dołączą po otwarciu poczekalni.
+              Na ekranie lokalu jest zapowiedź z odliczaniem.{" "}
+              {stan.auto
+                ? `Poczekalnia otworzy się sama o tej godzinie, a quiz ruszy ${NA_ZAPISY_MIN} minut później.`
+                : "Gracze dołączą po otwarciu poczekalni."}
+            </span>
+          )}
+          {stan.poczekalnia_otwarta && stan.auto && (
+            <span className="pomocniczy">
+              Automat wystartuje quiz o tej godzinie, jeśli ktoś dołączy. Możesz też kliknąć start wcześniej.
             </span>
           )}
         </p>

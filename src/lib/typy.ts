@@ -82,6 +82,8 @@ export type Sesja = {
   /** Zapowiedź: planowana godzina startu i czy poczekalnia (QR, dołączanie) jest już otwarta. */
   planowany_start: string | null;
   poczekalnia_otwarta: boolean;
+  /** Automatyczne prowadzenie (kreator albo pilot, src/lib/gra/auto.ts). */
+  auto: boolean;
   max_graczy: number;
   faza: Faza;
   zadanie_nr: number;

@@ -198,8 +198,8 @@ function FormularzEtapu({
   );
 }
 
-/** „+ Dodaj etap” pod listą pytań: rozwija formularz z szablonami. */
-export function NowyEtap({ quizId, pierwszy }: { quizId: string; pierwszy: boolean }) {
+/** „+ Dodaj etap” pod listą pytań quizu z etapami: rozwija formularz z szablonami. */
+export function NowyEtap({ quizId }: { quizId: string }) {
   const [otwarty, ustawOtwarty] = useState(false);
   if (!otwarty) {
     return (
@@ -208,17 +208,7 @@ export function NowyEtap({ quizId, pierwszy }: { quizId: string; pierwszy: boole
       </button>
     );
   }
-  return (
-    <>
-      {pierwszy && (
-        <p className="pomocniczy">
-          Pierwszy etap dostanie wszystkie obecne pytania. Potem dodaj kolejne etapy i przenieś do nich pytania
-          strzałkami.
-        </p>
-      )}
-      <FormularzEtapu quizId={quizId} onGotowe={() => ustawOtwarty(false)} onAnuluj={() => ustawOtwarty(false)} />
-    </>
-  );
+  return <FormularzEtapu quizId={quizId} onGotowe={() => ustawOtwarty(false)} onAnuluj={() => ustawOtwarty(false)} />;
 }
 
 /** Nagłówek etapu nad jego pytaniami: nazwa, mnożnik, czas, finał; ołówek otwiera edycję w miejscu. */

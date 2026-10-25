@@ -1,7 +1,7 @@
 "use client";
 
 import QRCode from "qrcode";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { przesuniecieZegara, useNasluchTematu } from "@/lib/gra/nasluch";
 import { useNowaWersja } from "@/lib/ekran-tv";
@@ -49,6 +49,28 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   useNowaWersja(!kod);
   // starsza przeglądarka telewizora: prosta plansza zamiast przewijanych plansz (src/lib/gra/prosty.ts)
   const prosty = useTrybProsty();
+
+  // zapowiedź z automatem: o godzinie startu ekran sam otwiera poczekalnię (baza sprawdza godzinę i automat),
+  // a zdarzenie `gra` z bazy przełącza go na grę z QR
+  const otwieraSama = !!zapowiedz?.auto && !!zapowiedz.planowany_start;
+  const startZapowiedzi = zapowiedz?.planowany_start ? Date.parse(zapowiedz.planowany_start) : 0;
+  // przesunięcie zegara zmienia się o milisekundy przy każdym odpytaniu: w zależnościach zerowałoby interwał
+  const przesuniecieRef = useRef(przesuniecie);
+  useEffect(() => {
+    przesuniecieRef.current = przesuniecie;
+  }, [przesuniecie]);
+  useEffect(() => {
+    if (!otwieraSama) return;
+    const zegar = setInterval(() => {
+      if (Date.now() + przesuniecieRef.current < startZapowiedzi) return;
+      void supabase()
+        .rpc("otworz_zaplanowane", { p_adres: adres })
+        .then(({ data }) => {
+          if (data) void pobierz();
+        });
+    }, 5000);
+    return () => clearInterval(zegar);
+  }, [otwieraSama, startZapowiedzi, adres, pobierz]);
 
   useEffect(() => {
     if (!kod) return;

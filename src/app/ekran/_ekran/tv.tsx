@@ -27,6 +27,7 @@ import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { PijanyTv, type GraczPijany } from "./pijany";
 import { useAutoZTv } from "./auto";
+import { startPoczekalni } from "@/lib/gra/auto";
 import { EfektyTv } from "./efekty";
 import { MuzykaTv } from "./muzyka";
 import { OsLiczbowa } from "./szacowanie";
@@ -313,7 +314,9 @@ function Poczekalnia({
   przesuniecie: number;
 }) {
   const druzyny = stan.tryb === "druzyny";
-  const doStartu = useDoStartu(stan.planowany_start, przesuniecie);
+  // automat: start 5 minut po otwarciu poczekalni (src/lib/gra/auto.ts)
+  const start = startPoczekalni(stan);
+  const doStartu = useDoStartu(start, przesuniecie);
   return (
     <div className="poczekalnia">
       {/* gospodarze obok siebie, równej wielkości: lokal (logo, a bez logo nazwa) | Bractwo (× browar przy
@@ -355,9 +358,9 @@ function Poczekalnia({
         <section className="tv-prawa">
           {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
           <h1 className="tv-tytul-quizu">{stan.quiz?.tytul ?? "Quiz"}</h1>
-          {stan.planowany_start && doStartu !== null && (
+          {start && doStartu !== null && (
             <p className="tv-start">
-              Start <strong>{kiedyStart(stan.planowany_start)}</strong> · {opisOdliczania(doStartu)}
+              Start <strong>{kiedyStart(start)}</strong> · {opisOdliczania(doStartu)}
             </p>
           )}
           {stan.grafika_url && <img src={stan.grafika_url} alt="" className="tv-grafika" />}

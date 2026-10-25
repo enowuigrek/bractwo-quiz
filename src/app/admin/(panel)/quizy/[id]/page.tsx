@@ -213,9 +213,12 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
             + Dodaj pytanie
           </Link>
         </p>
-        <div style={{ marginTop: 12 }}>
-          <NowyEtap quizId={quiz.id} pierwszy={etapy.length === 0} />
-        </div>
+        {/* klasyczny pub quiz (bez etapów) zostaje bez etapów, a turniej ma etapy z szablonu */}
+        {etapy.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            <NowyEtap quizId={quiz.id} />
+          </div>
+        )}
       </section>
 
       {/* obsługa nie wie o pijanym finale */}

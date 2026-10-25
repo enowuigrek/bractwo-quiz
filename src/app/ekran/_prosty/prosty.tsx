@@ -7,6 +7,7 @@ import { META_FINALU, krokiFinalu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
+import { startPoczekalni } from "@/lib/gra/auto";
 import { LITERY, PRAWDA_FALSZ, liczbaZJednostka } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -106,7 +107,7 @@ export function ProstyTv({ stan, blad, gracze, ranking, odpowiedzi, qr, host, te
   switch (stan.faza) {
     case "poczekalnia":
       return stan.poczekalnia_otwarta ? (
-        <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} />
+        <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
       ) : (
         <PlanszaProsta
           lokal={stan.lokal}
@@ -159,13 +160,17 @@ function Poczekalnia({
   gracze,
   qr,
   host,
+  przesuniecie,
 }: {
   stan: StanSesji;
   gracze: GraczNaLiscie[];
   qr: string;
   host: string;
+  przesuniecie: number;
 }) {
   const widoczni = gracze.slice(0, 40);
+  const start = startPoczekalni(stan);
+  const doStartu = useDoStartu(start, przesuniecie);
   return (
     <div className="pr-poczekalnia">
       <section className="pr-wejscie">
@@ -178,6 +183,11 @@ function Poczekalnia({
         <Loga lokal={stan.lokal} />
         {stan.okazja && <p className="pr-nadtytul">{stan.okazja}</p>}
         <h1 className="pr-tytul pr-tytul-maly">{stan.quiz?.tytul ?? "Quiz"}</h1>
+        {start && doStartu !== null && (
+          <p className="pr-start">
+            Start <strong>{kiedyStart(start)}</strong> · {opisOdliczania(doStartu)}
+          </p>
+        )}
         <p className="pr-nadtytul">
           Gracze {stan.liczba_graczy}/{stan.max_graczy}
         </p>

@@ -95,6 +95,8 @@ Zmienione 19.10 i jeszcze raz 22.10 na prośbę Łukasza: duże zaokrąglenia z 
 
 Karty do wyboru (np. szablony nowego quizu) to karty, więc `--r-card`, a nie pigułki: duże ramki z `999px` wyglądały jak zabawkowe kapsuły (poprawka 23.10).
 
+**Wybrana opcja to wypełnienie kolorem, nie poświata** (Łukasz, 25.10). Wybrana karta (szablon quizu) albo pigułka (czas na odpowiedź) dostaje złote wypełnienie jak złoty przycisk (gradient `--zloto-jasne` → `--zloto`), a cały tekst na niej `--na-zlocie`. Niewybrane zostają na `--kamien`/`--kamien2`. Sama złota obwódka z `--glow-md` za słabo odróżniała wybór.
+
 ## Przyciski (Bractwo Quiz)
 
 Pigułki **wypełnione kolorem zależnym od rodzaju**, bez samych obramówek:

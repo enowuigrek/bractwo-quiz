@@ -8,10 +8,11 @@ const CO_MS = 1500;
 
 /**
  * Automatyczne prowadzenie od strony TV (/api/auto): telewizor jest zawsze na wierzchu, a karta pilota w tle
- * budzi się raz na minutę. Tylko przy włączonym automacie i w trakcie gry (start i koniec klika prowadzący).
+ * budzi się raz na minutę. Tylko przy włączonym automacie; w poczekalni otwiera
+ * i startuje grę zapowiedzianą na godzinę (src/lib/gra/auto.ts), koniec klika prowadzący.
  */
 export function useAutoZTv(kod: string, stan: StanSesji | null) {
-  const aktywne = !!stan?.auto && !["poczekalnia", "tabela", "koniec"].includes(stan.faza);
+  const aktywne = !!stan?.auto && !["tabela", "koniec"].includes(stan.faza);
   useEffect(() => {
     if (!aktywne) return;
     const zegar = setInterval(() => {

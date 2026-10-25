@@ -1181,9 +1181,15 @@ a.przycisk {
   font-weight: var(--w-regular);
 }
 
-.szablon-quizu.wybrany {
+/* wybrana karta: wypełniona złotem jak wybrana opcja czasu (bez poświaty, która ledwo odróżniała wybór) */
+.formularz label.szablon-quizu.wybrany {
   border-color: var(--zloto);
-  box-shadow: var(--glow-md);
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+}
+
+.szablon-quizu.wybrany strong,
+.szablon-quizu.wybrany span {
+  color: var(--na-zlocie);
 }
 
 .szablon-quizu:has(input:focus-visible) {
@@ -1197,6 +1203,7 @@ a.przycisk {
 
 .etapy-szablonu-liczba {
   min-width: 2ch;
+  white-space: nowrap;
   text-align: center;
   font-weight: var(--w-black);
   color: var(--zloto);

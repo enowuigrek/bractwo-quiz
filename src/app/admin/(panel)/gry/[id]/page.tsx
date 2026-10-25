@@ -85,6 +85,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
                   })}`
                 : null,
               !gra.poczekalnia_otwarta && trwa ? "zapowiedź (poczekalnia zamknięta)" : null,
+              gra.auto ? "prowadzenie automatyczne" : null,
               gra.browar_nazwa ? `kranoprzejęcie: ${gra.browar_nazwa}` : null,
               gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
               gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,

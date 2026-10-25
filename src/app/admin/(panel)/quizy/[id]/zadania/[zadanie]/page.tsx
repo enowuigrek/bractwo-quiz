@@ -32,6 +32,18 @@ export default async function StronaZadania({
   if (!quiz || (!nowe && !zadanie)) notFound();
   const lista = etapy ?? [];
   const wybrany = lista.find((e) => e.id === etapZAdresu) ?? lista.at(-1) ?? null;
+  // quiz bez etapów (klasyczny): nowe pytanie ma rodzaj ostatniego pytania, dopóki prowadzący go nie zmieni
+  const { data: ostatnie } =
+    nowe && !wybrany
+      ? await db
+          .from("zadania")
+          .select("typ")
+          .eq("quiz_id", id)
+          .neq("typ", "ciekawostka")
+          .order("nr", { ascending: false })
+          .limit(1)
+          .maybeSingle<Pick<Zadanie, "typ">>()
+      : { data: null };
 
   return (
     <main>
@@ -45,7 +57,7 @@ export default async function StronaZadania({
           zadanie={zadanie ?? undefined}
           etapy={lista}
           domyslnyEtap={wybrany?.id ?? null}
-          domyslnyTyp={wybrany?.typ_domyslny ?? undefined}
+          domyslnyTyp={wybrany?.typ_domyslny ?? ostatnie?.typ ?? undefined}
         />
       </section>
     </main>

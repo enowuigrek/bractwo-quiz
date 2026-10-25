@@ -81,6 +81,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const startPole = String(dane.get("planowany_start") ?? "");
   const planowany_start = startPole && !Number.isNaN(Date.parse(startPole)) ? new Date(startPole).toISOString() : null;
   if (zapowiedz && !planowany_start) return { blad: "Do zapowiedzi ustaw godzinę startu." };
+  // automat (src/lib/gra/auto.ts): z godziną sam otwiera poczekalnię i 5 minut później startuje quiz;
+  // pilot może go wyłączyć i włączyć w trakcie gry
+  const auto = dane.get("auto") === "on";
 
   // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań
   const pijany_final = mozePijanyFinal(rola) && dane.get("pijany_final") === "on";
@@ -136,6 +139,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       browar_instagram: browar_nazwa ? browar_instagram : null,
       planowany_start,
       poczekalnia_otwarta: !zapowiedz,
+      auto,
       pijany_final,
       za_barem,
       tylko_glowny,

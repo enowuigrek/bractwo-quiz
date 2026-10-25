@@ -185,6 +185,16 @@ Do zaprojektowania razem:
 - **Plansza etapu zagęszcza się też po wczytaniu obrazków:** pomiar „czy się mieści” był raz, na starcie; gdy logo lokalu i ikona etapu wczytały się później, lista finalistów wyjeżdżała pod ekran (zgłoszenie Łukasza z TV). Teraz `ResizeObserver` powtarza pomiar, gdy opis urośnie (`etap.tsx`).
 - **Nalewanie:** 5 nagrań (`nalewanie.mp3`, `nalewanie-2…5.mp3`; nowe od Łukasza przycięte do 4 s z wyciszeniem, żeby nie wchodziły na odliczanie następnego pytania), grają po kolei.
 
+### Automat od godziny startu, szablony quizu (25.10, wieczór) ✅
+
+- **Automat w kreatorze gry:** „Prowadzenie automatyczne” w panelu (Uruchom quiz → Prowadzenie), zapisuje `sesje.auto` od razu przy zakładaniu gry. Na stronie gry w panelu widać „prowadzenie automatyczne”. Pilot dalej włącza i wyłącza automat w każdej chwili.
+- **Zapowiedź + automat:** o godzinie startu poczekalnia otwiera się sama (QR na TV), a po `NA_ZAPISY_MIN` = 5 minutach automat startuje quiz, jeśli dołączył choć jeden gracz (bez graczy czeka). Otwiera pierwszy, kto zapyta po czasie: ekran lokalu (`otworz_zaplanowane(adres)` co 5 s po godzinie startu, sam `ekran_lokalu` tylko czyta), TV gry albo pilot (`nastepnyKrok` → `otworz`, potem `nastepne`; TV woła `/api/auto` także w poczekalni) albo telefon gracza (`dolacz` przez `wewn.otworz_o_czasie`). Bez godziny start klika prowadzący, dalej prowadzi automat. Migracja `auto_otwarcie_poczekalni`.
+- **Godzina w poczekalni:** po otwarciu przez automat TV (pełny i prosty ekran) i pilot pokazują start automatu („Start o 19:05 · za 4:12”, `startPoczekalni` w `src/lib/gra/auto.ts`), zapowiedź przed otwarciem dalej godzinę z kreatora.
+- **Szablony nowego quizu:** „Turniej z finałem” (stałe etapy: rozgrzewka 6, kilka dobrych 3, strzał liczbowy 3, połącz i ułóż 3, finał 14; kreator ich nie zmienia, serwer bierze je z `SZABLONY_QUIZU` po kluczu) i „Klasyczny pub quiz” (bez etapów). Etapy turnieju można dalej poprawiać na stronie quizu.
+- **Quiz bez etapów:** strona quizu nie ma „+ Dodaj etap”, a nowe pytanie dostaje rodzaj ostatniego pytania (bez ciekawostek), dopóki prowadzący go nie zmieni.
+- **Wybór w panelu kolorem:** wybrany szablon quizu ma złote wypełnienie i ciemny tekst jak wybrany czas (zamiast złotej obwódki z poświatą); zasada w `docs/DESIGN-SYSTEM.md`.
+- **Sprawdzone lokalnie** (build, ekran `test-naglowka`): zapowiedź sama przeszła w poczekalnię z QR, bez graczy po czasie gra czekała, po dodaniu botów ruszyła (`wstep`); `dolacz` po godzinie wpuścił gracza do zamkniętej poczekalni. Kreatory obejrzane w panelu.
+
 ## Ustalenia
 
 | Temat | Decyzja |
