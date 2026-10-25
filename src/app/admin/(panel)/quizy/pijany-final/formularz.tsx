@@ -13,10 +13,11 @@ const nowyKlucz = () => ++licznik;
 
 /**
  * Lista pytań pijanego finału: treść, przeszkadzacz, komentarze po ✓ i ✗, kolejność; zapis całości jednym
- * przyciskiem.
+ * przyciskiem. Bez `quizId` wspólna pula, z `quizId` wejście tego quizu.
  */
-export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
-  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszPijanePytania, {});
+export function FormularzPijany({ pytania, quizId = null }: { pytania: PijanePytanie[]; quizId?: string | null }) {
+  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszPijanePytania.bind(null, quizId), {});
+  const limit = quizId ? LIMITY_PIJANE.wejscie : LIMITY_PIJANE.pytan;
   const [wiersze, ustawWiersze] = useState<Wiersz[]>(() =>
     pytania.map((p) => ({
       klucz: nowyKlucz(),
@@ -129,7 +130,7 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
         <button
           type="button"
           className="przycisk"
-          disabled={wiersze.length >= LIMITY_PIJANE.pytan}
+          disabled={wiersze.length >= limit}
           onClick={() =>
             ustawWiersze((l) => [
               ...l,

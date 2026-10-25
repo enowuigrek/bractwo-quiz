@@ -203,10 +203,10 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       <p className="pomocniczy" style={{ marginTop: 0 }}>
         {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
       </p>
-      {/* muzyka gra tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
+      {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
       <p className="pilot-przelacznik">
         {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
-        <span>{stan.muzyka ? "Muzyka na TV gra" : "Muzyka na TV wyłączona"}</span>
+        <span>{stan.muzyka ? "Muzyka i dźwięki na TV grają" : "Muzyka i dźwięki na TV wyłączone"}</span>
         <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
           {stan.muzyka ? "Wyłącz" : "Włącz"}
         </button>

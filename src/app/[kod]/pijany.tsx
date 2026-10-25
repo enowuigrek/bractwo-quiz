@@ -23,8 +23,8 @@ type Reakcja = { dobrze: boolean; wybrana: 0 | 1; komentarz: string | null; ms: 
 /**
  * Telefon w trybie „Pijany finał” (faza `pijany`): dogrywka po finale, która nic nie liczy. Tryb jest ukryty
  * przed graczami: telefon wygląda jak dalsza seria, a numeracja leci dalej (pytanie 15, 16…).
- * Każdy odpowiada we własnym tempie na pytania z `pijane_pytania` (cała pula, a gdy się skończy, od nowa);
- * odpowiedzi nigdzie nie idą. Po każdej odpowiedzi reakcja: błysk w losowym kolorze, drżenie albo puls
+ * Każdy odpowiada we własnym tempie na pytania z `pijane_pytania` (najpierw wejście quizu, potem wspólna pula,
+ * bez powtórek: po ostatnim zostaje sam pasek); odpowiedzi nigdzie nie idą. Po każdej odpowiedzi reakcja: błysk w losowym kolorze, drżenie albo puls
  * przycisku i czasem komentarz na środku ekranu („Serio?”), coraz dłużej (1 s → 3,5 s), więc nie da się tego
  * przeklikać. Cały ekran faluje coraz mocniej z upływem czasu (`--poziom` 0..1), a każde pytanie ma swój
  * przeszkadzacz (src/lib/pijany.ts). Koniec według zegara, wszystkim naraz: `GASNIECIE_S` przed końcem
@@ -51,9 +51,8 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
     };
   }, [stan.kod]);
 
-  const liczba = pytania?.length ?? 0;
-  // pula się skończyła: od nowa (w tym chaosie nikt nie zauważy)
-  const p = pytania && liczba > 0 ? pytania[nr % liczba] : null;
+  // bez powtórek: kto przejdzie całą pulę, czeka z samym paskiem jak po końcu prawdziwej serii
+  const p = pytania?.[nr] ?? null;
   const poziom = Math.min(1, Math.max(0, (teraz - od) / Math.max(1, do_ - od)));
 
   function odpowiedz(prawda: boolean) {
@@ -126,7 +125,7 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
       )}
       <div className={`pijany${p ? ` efekt-${p.efekt}` : ""}`} style={{ "--poziom": poziom } as React.CSSProperties}>
         {!p ? (
-          // chwila ładowania: sam pasek, bez napisu, który zdradzałby dogrywkę
+          // chwila ładowania albo koniec puli: sam pasek, bez napisu, który zdradzałby dogrywkę
           pasek
         ) : (
           <div key={nr}>

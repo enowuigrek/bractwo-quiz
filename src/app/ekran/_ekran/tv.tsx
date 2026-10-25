@@ -25,6 +25,7 @@ import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { PijanyTv, type GraczPijany } from "./pijany";
+import { EfektyTv } from "./efekty";
 import { MuzykaTv } from "./muzyka";
 import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
@@ -217,6 +218,7 @@ export function Tv({ kod, qr, host }: Props) {
         </div>
       )}
       {stan && <MuzykaTv stan={stan} teraz={teraz} />}
+      {stan && <EfektyTv stan={stan} teraz={teraz} />}
       {stan && !zapowiedz && <GotowiTv stan={stan} />}
       {stan && blad && <p className="tv-polaczenie">{blad}, ponawiam…</p>}
     </Scena>

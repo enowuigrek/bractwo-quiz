@@ -32,10 +32,24 @@ export type PijanePytanie = {
   komentarz_falsz: string | null;
 };
 
-export const LIMITY_PIJANE = { pytan: 40, tresc: 200, komentarz: 80 } as const;
+/** `pytan`: wspólna pula, `wejscie`: pytania wejścia jednego quizu (lecą przed pulą). */
+export const LIMITY_PIJANE = { pytan: 60, wejscie: 5, tresc: 200, komentarz: 80 } as const;
 
-/** Komentarze do pytań bez własnego (do uzupełnienia razem z nowymi pytaniami). */
-export const KOMENTARZE_OGOLNE = ["Serio?", "Na pewno?", "Hmm…", "Odważnie.", "Ta, jasne.", "Zapisuję…"] as const;
+/** Komentarze do pytań bez własnego komentarza po danej odpowiedzi (wszystkie z 25.10 mają własne). */
+export const KOMENTARZE_OGOLNE = [
+  "Serio?",
+  "Na pewno?",
+  "Hmm…",
+  "Odważnie.",
+  "Ta, jasne.",
+  "Zapisuję…",
+  "Barman widział.",
+  "Tak myślałem.",
+  "Sprawdzam…",
+  "Nie wierzę.",
+  "Dobrze ci idzie. Chyba.",
+  "Jeszcze raz?",
+] as const;
 
 /**
  * Ile trwa reakcja na odpowiedź w pijanym finale (przyciski stoją zablokowane): 1 s na starcie, 3,5 s

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { wymagajQuizu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
@@ -21,12 +21,14 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
   await wymagajQuizu(rola, id);
   const db = supabaseAdmin();
 
-  const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }] = await Promise.all([
-    db.from("quizy").select("id, tytul, opis, utworzono, tylko_glowny").eq("id", id).maybeSingle<Quiz>(),
-    db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
-    db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
-    db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
-  ]);
+  const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { count: wejscie }] =
+    await Promise.all([
+      db.from("quizy").select("id, tytul, opis, utworzono, tylko_glowny").eq("id", id).maybeSingle<Quiz>(),
+      db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
+      db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
+      db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
+      db.from("pijane_pytania_quizu").select("id", { count: "exact", head: true }).eq("quiz_id", id),
+    ]);
   if (!quiz) notFound();
   const lista = zadania ?? [];
   const etapy = etapyZBazy ?? [];
@@ -215,6 +217,21 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
           <NowyEtap quizId={quiz.id} pierwszy={etapy.length === 0} />
         </div>
       </section>
+
+      {/* obsługa nie wie o pijanym finale */}
+      {mozePijanyFinal(rola) && (
+        <section className="panel-sekcja">
+          <h2>Pijany finał: wejście</h2>
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            {wejscie
+              ? `Pytań wejścia: ${wejscie}. Dogrywka zaczyna się od nich (na temat quizu), potem wspólna pula.`
+              : "Bez wejścia: dogrywka zaczyna się od razu od wspólnej puli."}{" "}
+            <Link href={`/admin/quizy/${quiz.id}/pijany`} className="przycisk-maly">
+              Edytuj wejście
+            </Link>
+          </p>
+        </section>
+      )}
 
       <section className="panel-sekcja quiz-zapisz">
         <button type="submit" form={FORMULARZ_QUIZU} name="wroc" value="1" className="przycisk zloty">
