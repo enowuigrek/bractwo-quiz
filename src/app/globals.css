@@ -2921,3 +2921,101 @@ html:has(.kolumna) {
     margin-top: 0 !important;
   }
 }
+
+/* Kod QR, link do skopiowania i komunikat po skopiowaniu: panel (strona gry) i pilot (udostepnij.tsx) */
+.qr {
+  background: var(--piana);
+  border-radius: var(--r-pole);
+  padding: 12px;
+  width: min(260px, 100%);
+  line-height: 0;
+}
+
+.qr svg {
+  width: 100%;
+  height: auto;
+}
+
+/* Link w ramce: inny krój (stała szerokość), kliknięcie otwiera, ikona kopiuje */
+.link-kopiuj {
+  display: flex;
+  align-items: stretch;
+  background: var(--pole);
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  overflow: hidden;
+}
+
+.link-kopiuj a {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+  color: var(--piana);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.link-kopiuj a:hover {
+  color: var(--zloto);
+}
+
+.link-kopiuj-ikona {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  color: var(--szary);
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--kamien2);
+  cursor: pointer;
+}
+
+.link-kopiuj-ikona:hover {
+  color: var(--zloto);
+  background: var(--kamien);
+}
+
+.link-kopiuj-ikona svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Komunikat na dole ekranu (np. „Skopiowano link”) */
+.dymek {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 10;
+  margin: 0;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  background: var(--chmiel);
+  color: var(--na-chmielu);
+  font-weight: var(--w-black);
+  font-size: var(--fs-small);
+  white-space: nowrap;
+  animation: wjazd-dymka 0.3s var(--ease-wjazd) both;
+}
+
+.dymek.zly {
+  background: var(--czerwien-tlo);
+  color: var(--piana);
+  white-space: normal;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
+
+@keyframes wjazd-dymka {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+}

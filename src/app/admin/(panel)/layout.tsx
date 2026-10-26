@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { wymagajAdmina } from "@/lib/admin";
 import { wylogujAdmina } from "../akcje";
+import { MenuPanelu } from "./_komponenty/menu";
 import { Nawigacja } from "./_komponenty/nawigacja";
 import "./panel.css";
 
@@ -20,6 +21,8 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
             Wyloguj
           </button>
         </form>
+        {/* telefon: zamiast paska i „Wyloguj” samo menu obok logo */}
+        <MenuPanelu wyloguj={wylogujAdmina} />
       </header>
       {children}
     </div>

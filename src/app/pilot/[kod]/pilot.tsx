@@ -28,6 +28,7 @@ import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
+import { UdostepnijPilota } from "./udostepnij";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
@@ -760,6 +761,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </details>
           )}
 
+          {/* dołączanie, przekazanie pilota, ekran i strona gry w panelu: pod ręką, ale niżej */}
+          <UdostepnijPilota kod={kod} token={token} />
         </div>
       </div>
       {oknoPotwierdzenia}

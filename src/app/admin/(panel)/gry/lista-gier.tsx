@@ -11,11 +11,16 @@ export type GraNaLiscie = {
   okazja: string | null;
   faza: Faza;
   utworzono: string;
+  host_token: string;
   quizy: { tytul: string } | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
 };
 
-export const ZAPYTANIE_GIER = "id, kod, okazja, faza, utworzono, quizy(tytul), lokale(nazwa, miasto, logo_url)";
+export const ZAPYTANIE_GIER =
+  "id, kod, okazja, faza, utworzono, host_token, quizy(tytul), lokale(nazwa, miasto, logo_url)";
+
+/** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
+const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);
 
 const data = new Intl.DateTimeFormat("pl-PL", {
   day: "numeric",
@@ -34,7 +39,7 @@ export function ListaGier({ gry, pusta }: { gry: GraNaLiscie[]; pusta: string })
           <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
           <div className="lista-glowna">
             <div className="lista-tytul">
-              <Link href={`/admin/gry/${g.id}`}>
+              <Link href={adresGry(g)}>
                 {g.kod} · {g.quizy?.tytul ?? "quiz usunięty"}
               </Link>{" "}
               <span className={`znaczek${g.faza === "koniec" ? "" : " aktywny"}`}>{NAZWY_FAZ[g.faza]}</span>
@@ -46,8 +51,8 @@ export function ListaGier({ gry, pusta }: { gry: GraNaLiscie[]; pusta: string })
             </div>
           </div>
           <div className="lista-akcje">
-            <Link href={`/admin/gry/${g.id}`} className="przycisk-maly">
-              Otwórz
+            <Link href={adresGry(g)} className={`przycisk-maly${g.faza === "koniec" ? "" : " zloty"}`}>
+              {g.faza === "koniec" ? "Otwórz" : "Prowadź"}
             </Link>
             <PrzyciskPotwierdz
               akcja={usunGre.bind(null, g.id, false)}

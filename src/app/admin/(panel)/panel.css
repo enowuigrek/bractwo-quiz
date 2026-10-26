@@ -36,6 +36,90 @@ html:has(.panel) {
   grid-area: wyloguj;
 }
 
+/* Telefon (do 959 px): logo i przycisk menu (menu.tsx), bez paska zakładek i „Wyloguj” w nagłówku */
+.panel-menu {
+  grid-area: wyloguj;
+  position: relative;
+}
+
+@media (max-width: 959px) {
+  .panel-naglowek {
+    padding-bottom: 14px;
+  }
+
+  .panel-naglowek .panel-nawigacja,
+  .panel-naglowek .panel-wyloguj {
+    display: none;
+  }
+}
+
+@media (min-width: 960px) {
+  .panel-menu {
+    display: none;
+  }
+}
+
+.panel-menu-przycisk {
+  color: var(--piana);
+}
+
+.panel-menu-tlo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: default;
+}
+
+.panel-menu-lista {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 41;
+  width: min(300px, calc(100vw - 32px));
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-card);
+  background: var(--kamien);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+.panel-menu-lista .etykieta {
+  margin: 6px 0 0;
+}
+
+.panel-menu-lista .etykieta:first-child {
+  margin-top: 0;
+}
+
+.panel-menu-lista > a:not(.przycisk) {
+  padding: 10px 12px;
+  border-radius: var(--r-pole);
+  color: var(--piana);
+  font-weight: var(--w-semibold);
+  text-decoration: none;
+}
+
+.panel-menu-lista > a[aria-current="page"] {
+  color: var(--zloto);
+  background: rgba(227, 172, 63, 0.1);
+}
+
+.panel-menu-lista form {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--kamien2);
+}
+
+.panel-menu-lista form .przycisk,
+.panel-menu-lista > .przycisk {
+  width: 100%;
+}
+
 .panel-nawigacja {
   grid-area: nawigacja;
   display: flex;
@@ -562,103 +646,6 @@ a.przycisk {
   line-height: 1;
   color: var(--zloto);
   text-shadow: var(--glow-md);
-}
-
-.qr {
-  background: var(--piana);
-  border-radius: var(--r-pole);
-  padding: 12px;
-  width: min(260px, 100%);
-  line-height: 0;
-}
-
-.qr svg {
-  width: 100%;
-  height: auto;
-}
-
-/* Link w ramce: inny krój (stała szerokość), kliknięcie otwiera, ikona kopiuje */
-.link-kopiuj {
-  display: flex;
-  align-items: stretch;
-  background: var(--pole);
-  border: 1px solid var(--kamien2);
-  border-radius: var(--r-pole);
-  overflow: hidden;
-}
-
-.link-kopiuj a {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 12px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: var(--fs-xs);
-  line-height: 1.4;
-  color: var(--piana);
-  text-decoration: none;
-  overflow-wrap: anywhere;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.link-kopiuj a:hover {
-  color: var(--zloto);
-}
-
-.link-kopiuj-ikona {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 46px;
-  color: var(--szary);
-  background: transparent;
-  border: 0;
-  border-left: 1px solid var(--kamien2);
-  cursor: pointer;
-}
-
-.link-kopiuj-ikona:hover {
-  color: var(--zloto);
-  background: var(--kamien);
-}
-
-.link-kopiuj-ikona svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Komunikat na dole ekranu (np. „Skopiowano link”) */
-.dymek {
-  position: fixed;
-  left: 50%;
-  bottom: max(24px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  z-index: 10;
-  margin: 0;
-  padding: 10px 20px;
-  border-radius: var(--r-pill);
-  background: var(--chmiel);
-  color: var(--na-chmielu);
-  font-weight: var(--w-black);
-  font-size: var(--fs-small);
-  white-space: nowrap;
-  animation: wjazd-dymka 0.3s var(--ease-wjazd) both;
-}
-
-.dymek.zly {
-  background: var(--czerwien-tlo);
-  color: var(--piana);
-  white-space: normal;
-  width: max-content;
-  max-width: calc(100vw - 32px);
-}
-
-@keyframes wjazd-dymka {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 16px);
-  }
 }
 
 .znaczek {

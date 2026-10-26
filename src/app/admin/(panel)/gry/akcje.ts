@@ -161,13 +161,15 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       za_barem,
       tylko_glowny,
     })
-    .select("id")
-    .single();
+    .select("kod, host_token")
+    .single<{ kod: string; host_token: string }>();
   if (error) {
     await Promise.all([usunGrafike(grafika_url), usunGrafike(browar_logo_url)]);
     return { blad: `Nie udało się uruchomić gry: ${error.message}` };
   }
-  redirect(`/admin/gry/${data.id}`);
+  // od razu pilot (26.10, Łukasz: na stronie gry i tak zawsze klikał „Prowadź”); rzeczy ze strony gry są na dole
+  // pilota, a sama strona gry dalej jest w Rozgrywkach
+  redirect(`/pilot/${data.kod}?t=${data.host_token}`);
 }
 
 export async function zakonczGre(id: string): Promise<void> {

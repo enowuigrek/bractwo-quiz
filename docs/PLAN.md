@@ -40,7 +40,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 
 - **Lista drobnych zmian wizualnych od Łukasza (26.10), do zrobienia po kolei w kolejnej sesji:**
   1. ✅ Pilot: ramka „odpowiedziano” (stoi zawsze, opis niżej).
-  2. Pilot: „uruchomiona gra” i przekazywanie pilota oraz nagłówek w wersji na telefon (osobny krok).
+  2. ✅ Po uruchomieniu od razu pilot, przekazywanie pilota w pilocie, menu panelu na telefonie (opis niżej).
   3. Osobne panele dla lokali, a w pilocie osobne panele graczy i pytań (osobny krok).
   4. ✅ „Ile?”: oś na dole, gracze nad nią, poprawna odpowiedź pod nagłówkiem (opis niżej).
   5. ✅ Kreska odpadania z większym odstępem (opis niżej).
@@ -323,6 +323,13 @@ Do zaprojektowania razem:
 
 - **Odpowiedzi „Ile?” na TV** (`OdpowiedziSzacowania`): oś przy dole pola, wszyscy gracze w rzędach nad nią (wcześniej nad i pod osią), plakietka z poprawną liczbą przypięta do góry pola ze złotą kreską w dół do osi. Pole wypełnia miejsce między nagłówkiem a dolną linijką, więc plakietka nigdy nie wchodzi na nagłówek. Podpisy rozdawane od najbliższych poprawnej (trafiający w punkt stoją najniżej i zawsze mają podpis), każdy w najniższym wolnym rzędzie (5 rzędów); kto się nie zmieści, ma sam awatar. Sprawdzone z 8 botami.
 - **Kreska odpadania w wyścigu** (`.wyscig-strefa-finalu`): 56 px zamiast 22 (przerywana kreska 14 px pod torem, pod nią napis 24 px), tory zmniejszają się o tyle samo (`STREFA_PX`).
+
+### Od razu pilot, menu panelu na telefonie (26.10) ✅
+
+- **Po „Uruchom grę” od razu pilot** (`/pilot/<kod>?t=…`, `uruchomGre`), bez strony gry: Łukasz i tak zawsze klikał tam „Prowadź”. Na liście rozgrywek trwająca gra (tytuł i złoty przycisk „Prowadź”) też otwiera pilota, zakończona dalej stronę gry z wynikami.
+- **Dół pilota:** rozwijane „Dołączanie, przekazanie pilota, ekran” (`udostepnij.tsx`): QR i link dla gracza (z kodem do wpisania), QR i link do przekazania pilota (z ostrzeżeniem o tajnym kluczu), adres ekranu TV i „Strona gry w panelu” (usunięcie gry, szczegóły; `/admin/gry/<kod>` przekierowuje na stronę gry). Kod gry stoi w nagłówku pilota, gracze z usuwaniem jak dotąd w „Gracze”. Style QR, linku do kopiowania i dymka przeszły z `panel.css` do `globals.css`.
+- **Panel na telefonie** (do 959 px): w nagłówku samo logo i przycisk menu (`_komponenty/menu.tsx`); menu: Gra (Rozgrywki, „▶ Uruchom quiz”), Przygotowanie (Quizy, Lokale), Wyloguj. Na komputerze pasek jak dotąd.
+- Niesprawdzone kliknięciem: samo przekierowanie z kreatora (narzędzie nie przestawia list w kreatorze); lista rozgrywek → pilot, dół pilota i link do panelu sprawdzone.
 
 ## Ustalenia
 

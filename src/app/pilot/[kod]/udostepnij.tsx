@@ -1,0 +1,81 @@
+"use client";
+
+import QRCode from "qrcode";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { LinkDoSkopiowania } from "@/app/admin/(panel)/gry/[id]/kopiuj";
+
+const bezSubskrypcji = () => () => {};
+
+/** QR jako SVG z adresu, który sami złożyliśmy (bez danych od użytkownika). */
+function useQr(url: string | null): string | null {
+  const [qr, ustawQr] = useState<{ url: string; svg: string } | null>(null);
+  useEffect(() => {
+    if (!url) return;
+    let aktualny = true;
+    void QRCode.toString(url, { type: "svg", margin: 0, errorCorrectionLevel: "M" }).then((svg) => {
+      if (aktualny) ustawQr({ url, svg });
+    });
+    return () => {
+      aktualny = false;
+    };
+  }, [url]);
+  return qr && qr.url === url ? qr.svg : null;
+}
+
+/**
+ * Dół pilota (26.10, Łukasz: po uruchomieniu gry od razu pilot, bez strony gry w panelu, a jej potrzebne rzeczy
+ * niżej, na wszelki wypadek): QR dla kogoś, kto chce dołączyć, przekazanie pilota kodem QR, adres ekranu TV i strona
+ * gry w panelu (usuwanie gry, wyniki; wymaga logowania). Adresy z adresu bieżącej strony, bez domeny na sztywno.
+ */
+export function UdostepnijPilota({ kod, token }: { kod: string; token: string }) {
+  const adres = useSyncExternalStore(
+    bezSubskrypcji,
+    () => window.location.origin,
+    () => null,
+  );
+  const [otwarte, ustawOtwarte] = useState(false);
+  const gracz = adres ? `${adres}/${kod}` : null;
+  const pilot = adres ? `${adres}/pilot/${kod}?t=${token}` : null;
+  // QR licz dopiero po rozwinięciu
+  const qrGracza = useQr(otwarte ? gracz : null);
+  const qrPilota = useQr(otwarte ? pilot : null);
+
+  return (
+    <details
+      className="karta pilot-udostepnij"
+      style={{ marginTop: 18 }}
+      onToggle={(e) => ustawOtwarte(e.currentTarget.open)}
+    >
+      <summary className="etykieta">Dołączanie, przekazanie pilota, ekran</summary>
+      {gracz && pilot && adres && (
+        <>
+          <h3>Dla gracza</h3>
+          <p className="pomocniczy">
+            Skanuje kod albo wpisuje <strong>{kod}</strong> na stronie głównej.
+          </p>
+          {qrGracza && <div className="qr" dangerouslySetInnerHTML={{ __html: qrGracza }} />}
+          <LinkDoSkopiowania url={gracz} />
+
+          <h3>Przekaż pilota</h3>
+          <p className="pomocniczy">
+            Prowadzący skanuje ten kod i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
+          </p>
+          {qrPilota && <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />}
+          <LinkDoSkopiowania url={pilot} />
+
+          <h3>Ekran</h3>
+          <p className="pomocniczy">
+            Ekran lokalu przełącza się na grę sam. Inny telewizor: otwórz w jego przeglądarce.
+          </p>
+          <LinkDoSkopiowania url={`${adres}/ekran/${kod}`} />
+
+          <h3>Panel</h3>
+          <p className="pomocniczy">Usunięcie gry, szczegóły i wyniki (po zalogowaniu do panelu).</p>
+          <a href={`/admin/gry/${kod}`} className="przycisk">
+            Strona gry w panelu
+          </a>
+        </>
+      )}
+    </details>
+  );
+}

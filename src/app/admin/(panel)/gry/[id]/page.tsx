@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { poprawnyKod } from "@/lib/gra/kod";
 import QRCode from "qrcode";
 import { adresAplikacji } from "@/lib/adres";
 import { wymagajAdmina } from "@/lib/admin";
@@ -31,6 +32,18 @@ type GraZDanymi = Sesja & {
 export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   const rola = await wymagajAdmina();
   const { id } = await params;
+  // z pilota (udostepnij.tsx) przychodzi kod gry zamiast id: najnowsza gra z tym kodem
+  if (poprawnyKod(id)) {
+    const { data: zKodem } = await supabaseAdmin()
+      .from("sesje")
+      .select("id")
+      .eq("kod", id.toUpperCase())
+      .order("utworzono", { ascending: false })
+      .limit(1)
+      .maybeSingle<{ id: string }>();
+    if (!zKodem) notFound();
+    redirect(`/admin/gry/${zKodem.id}`);
+  }
   await wymagajGry(rola, id);
   const db = supabaseAdmin();
 
