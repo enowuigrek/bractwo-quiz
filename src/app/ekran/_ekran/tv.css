@@ -10,8 +10,8 @@
      odpowiedzi i rankingu odstawały od baru, a brązowe robiły całość za brązową). Telefon gracza ma te same
      (`.ekran-gracza` w globals.css), panel zostaje przy tokenach z tokens.css. */
   --kamien: #121212;
-  --kamien2: #4d4538;
-  --kamien3: #5f5547;
+  --kamien2: #3b352c;
+  --kamien3: #4d4538;
 }
 
 /* werble: czarny ekran */
@@ -1198,6 +1198,17 @@
   font-size: 32px;
   font-weight: var(--w-black);
   border-bottom: 1px solid var(--kamien2);
+}
+
+/* kreska między graczami w połowie odstępu (26.10: stała tuż pod wierszem, bliżej górnego gracza): zamiast odstępu
+   siatki po 4 px nad i pod treścią wiersza */
+.tv-odpowiedzi-lista {
+  row-gap: 0;
+}
+
+.tv-odpowiedzi-wiersz {
+  box-sizing: content-box;
+  padding: 4px 0;
 }
 
 /* pod ostatnim graczem bez kreski: niczego już nie oddziela (26.10) */

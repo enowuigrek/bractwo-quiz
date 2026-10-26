@@ -429,7 +429,7 @@
   min-width: 0;
   padding: 24px 32px;
   border-radius: 20px;
-  border: 4px solid #4d4538;
+  border: 4px solid #3b352c;
   background: #121212;
   overflow: hidden;
 }
@@ -465,7 +465,7 @@
   display: flex;
   justify-content: space-between;
   padding: 6px 0;
-  border-bottom: 1px solid #4d4538;
+  border-bottom: 1px solid #3b352c;
 }
 
 .pr-ramka li span {
@@ -489,7 +489,7 @@
   display: flex;
   align-items: center;
   padding: 10px 24px;
-  border-bottom: 2px solid #4d4538;
+  border-bottom: 2px solid #3b352c;
   font-size: 40px;
   font-weight: 700;
 }

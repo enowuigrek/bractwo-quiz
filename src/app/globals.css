@@ -1874,8 +1874,8 @@ html:has(.kolumna) {
    odstawały). Obrys wyblakły beż. Panel zostaje przy tokenach z tokens.css. */
 .ekran-gracza {
   --kamien: #121212;
-  --kamien2: #4d4538;
-  --kamien3: #5f5547;
+  --kamien2: #3b352c;
+  --kamien3: #4d4538;
   --pole: #0a0a0a;
 }
 
