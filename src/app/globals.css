@@ -1871,11 +1871,11 @@ html:has(.kolumna) {
 }
 
 /* Telefon gracza: powierzchnie prawie czarne z szarym obrysem, jak na TV (26.10: granatowe tła odpowiedzi i kafelków
-   odstawały). Panel zostaje przy tokenach z tokens.css. */
+   odstawały). Obrys wyblakły beż. Panel zostaje przy tokenach z tokens.css. */
 .ekran-gracza {
   --kamien: #121212;
-  --kamien2: #353535;
-  --kamien3: #4a4a4a;
+  --kamien2: #4d4538;
+  --kamien3: #5f5547;
   --pole: #0a0a0a;
 }
 

@@ -351,13 +351,7 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
       </div>
       {!wyslana && (
         <>
-          <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
-            {aktywny?.strona === "lewy"
-              ? `Teraz stuknij parę dla „${lewe[aktywny.i]}” po prawej.`
-              : aktywny?.strona === "prawy"
-                ? `Teraz stuknij parę dla „${prawe[aktywny.i]}” po lewej.`
-                : "Stuknij element z jednej kolumny, potem jego parę z drugiej."}
-          </p>
+          {/* bez podpowiedzi „stuknij parę dla…”: zmieniała wysokość i przesuwała „Zatwierdź” (26.10) */}
           <button
             className="przycisk zloty odp-zatwierdz"
             disabled={koniec || !komplet}

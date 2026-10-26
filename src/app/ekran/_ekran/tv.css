@@ -6,12 +6,12 @@
   overflow: hidden;
   background: var(--bg);
   cursor: none;
-  /* Powierzchnie na TV prawie czarne z jaśniejszym szarym obrysem (26.10, Łukasz: granatowe tła ramek pytań,
+  /* Powierzchnie na TV prawie czarne z wyblakłym beżowym obrysem (26.10, Łukasz: granatowe tła ramek pytań,
      odpowiedzi i rankingu odstawały od baru, a brązowe robiły całość za brązową). Telefon gracza ma te same
      (`.ekran-gracza` w globals.css), panel zostaje przy tokenach z tokens.css. */
   --kamien: #121212;
-  --kamien2: #353535;
-  --kamien3: #4a4a4a;
+  --kamien2: #4d4538;
+  --kamien3: #5f5547;
 }
 
 /* werble: czarny ekran */

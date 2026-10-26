@@ -189,7 +189,8 @@ export function Rozgrywka({
         {naglowek}
         {pasek}
         <Pytanie stan={stan} teraz={teraz} />
-        {z.typ !== "wybor" && !zEtapami && <p className="gra-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
+        {/* bez instrukcji pod pytaniem (26.10, Łukasz: zasady są na planszach między etapami, a tekst tylko
+            przeszkadzał i przesuwał przyciski) */}
         {z.typ === "prawda_falsz" ? (
           <OdpowiedzPrawdaFalsz
             key={z.id}
@@ -269,8 +270,6 @@ export function Rozgrywka({
             ) : (
               "Wszyscy odpowiedzieli. Za chwilę wynik…"
             )
-          ) : jedenWybor(z.typ) ? (
-            "Wybierz odpowiedź."
           ) : (
             ""
           )}
