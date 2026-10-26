@@ -10,8 +10,16 @@ const POZYCJE = [
   { href: "/admin/quizy", tekst: "Quizy" },
 ] as const;
 
-/** `ustawienia`: lista lokali u głównego, strona własnego lokalu w panelu lokalu. */
-export function Nawigacja({ ustawienia }: { ustawienia: string }) {
+/**
+ * `ustawienia`: lista lokali u głównego, strona własnego lokalu w panelu lokalu (wtedy zamiast zębatki logo lokalu).
+ */
+export function Nawigacja({
+  ustawienia,
+  lokal = null,
+}: {
+  ustawienia: string;
+  lokal?: { nazwa: string; logo_url: string | null } | null;
+}) {
   const sciezka = usePathname();
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");
   return (
@@ -37,10 +45,15 @@ export function Nawigacja({ ustawienia }: { ustawienia: string }) {
         href={ustawienia}
         className="przycisk-maly ikona nawigacja-ustawienia"
         aria-label="Ustawienia lokalu"
-        data-podpis="Ustawienia"
+        data-podpis={lokal ? "Mój lokal" : "Ustawienia"}
         aria-current={sciezka.startsWith("/admin/lokale") ? "page" : undefined}
       >
-        <IkonaUstawienia />
+        {lokal?.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- logo lokalu z bucketu Supabase
+          <img src={lokal.logo_url} alt="" className="nawigacja-logo-lokalu" />
+        ) : (
+          <IkonaUstawienia />
+        )}
       </Link>
     </nav>
   );

@@ -60,7 +60,10 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Pijany finał:** muzyka (Web Audio) ciszej (`PIJANA_CISZEJ` 0,7), poświata pod szklanką gaśnie z wybuchem (sam wybuch bez zmian), kroki pozorowanego wyścigu słychać jak w finale („krok” naprzód, „pudło” w tył).
 - **Grafika podium z panelu:** 1080×1920 jak grafika gracza, trójka na stopniach podium.
 - **Awatary jako kapsle** (`src/lib/kapsel.ts`, `awatar.tsx`): kapsel z ząbkami to SVG generowany w kolorze (tło elementu, bez masek i `clip-path`). Z selfie zdjęcie w środku, a kapsel w kolorze dobranym ze zdjęcia przy wysyłaniu (najbardziej nasycone piksele, rozjaśnione), zapisanym w adresie zdjęcia jako `#kapsel=rrggbb` (bez nowej kolumny; `usunGrafike` obcina fragment). Bez selfie cały kapsel w jasnym kolorze nicku z ciemną literą (nigdy ciemne tło). Na grafice na pamiątkę i grafice podium ten sam kapsel, rysowany ścieżką (`Path2D`), nie obrazkiem SVG. Obwódki `border` z innych reguł są wyłączone (`border: 0 !important` w `.awatar`).
-- **Telefon gracza:** te same ciepłe, prawie czarne powierzchnie co TV (`.ekran-gracza` nadpisuje `--kamien*` i `--pole`).
+- **Telefon gracza:** te same prawie czarne powierzchnie co TV (`.ekran-gracza` nadpisuje `--kamien*` i `--pole`). Brązowe (#17130f) robiły całość za brązową, więc od 26.10 wieczorem #121212 z obrysem #353535 (TV, telefon, prosty ekran).
+- **Ranking na dwóch stronach:** druga strona wjeżdża cała z dołu ekranu, bez zamiany torów (wcześniej przesunięte tory czekały widoczne pod listą).
+- **Podium:** bez górnej ścianki-trapezu na `clip-path` (Samsung jej nie rysował, a gdzie indziej wyglądała jak „niby 3D”), wszędzie płaskie jak na TV w wyścigu.
+- **Panel lokalu:** na górze menu „Mój lokal” z logo i nazwą (ekran lokalu, hasło, logo, Instagram), a na komputerze logo lokalu zamiast zębatki.
 - **Ikona na ekranie iPhone'a** (`src/app/apple-icon.png`): czarna z całym białym logo Bractwa (wcześniej czarne logo na białym, ucięte).
 - **OLED:** przeglądarka nie może sama „nacisnąć” OK na pilocie (zdarzenia z kodu nie są gestem użytkownika, a wygaszacz telewizora patrzy na pilota, nie na stronę). Zostają Wake Lock i wideo czuwania.
 - Na TV i telefonach w lokalu niesprawdzone; w przeglądarce sprawdzone: ranking 14 graczy na dwóch stronach, wycinek tabeli na telefonie, kapsle na telefonie i TV, nagłówki pytania.

@@ -112,15 +112,23 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         <KoniecEtapu stan={stan} />
 
         <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
-          {/* nowa strona: tory wjeżdżają od nowa (klucz) */}
-          <div key={strona} className="wyscig-tory" style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}>
+          {/* nowa strona: tory wjeżdżają od nowa (klucz); dalsza strona wjeżdża cała z dołu ekranu, bez zamiany
+              torów (26.10: przesunięte tory czekały widoczne pod listą) */}
+          <motion.div
+            key={strona}
+            className="wyscig-tory"
+            style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}
+            initial={strona > 0 ? { y: 900, opacity: 0 } : false}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          >
             {wiersze.map((w, i) => {
               const przed = naTrasie(w.punkty - w.zdobyte, maks) * 100;
               const teraz = naTrasie(w.punkty, maks) * 100;
               const prowadzi = w.miejsce === 1 && w.punkty > 0;
               // pod kreską (zagrożony) albo właśnie ją przeskoczył w którąś stronę
               const kreska = wzgledemKreski(w, odciecie, wszyscy.length);
-              const przesuniecie = pozycja(przedPytaniem.indexOf(w)) - pozycja(i);
+              const przesuniecie = strona > 0 ? 0 : pozycja(przedPytaniem.indexOf(w)) - pozycja(i);
               // o ile miejsc w górę (na pierwszym pytaniu wszyscy startują razem, więc bez awansów)
               const awans = lp > 1 ? Math.max(0, w.poprzednie_miejsce - w.miejsce) : 0;
               const wiersz = (
@@ -195,7 +203,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                 wiersz
               );
             })}
-          </div>
+          </motion.div>
 
           <Szklanka
             przed={nalanieSzklanki(stan.quiz, lp - 1)}

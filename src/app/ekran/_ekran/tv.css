@@ -6,11 +6,12 @@
   overflow: hidden;
   background: var(--bg);
   cursor: none;
-  /* Powierzchnie na TV prawie czarne, ciepłe, z jaśniejszym brązowym obrysem (26.10, Łukasz: granatowe tła ramek
-     pytań, odpowiedzi i rankingu odstawały od baru). Na telefonach i w panelu zostają tokeny z tokens.css. */
-  --kamien: #17130f;
-  --kamien2: #493a2a;
-  --kamien3: #5e4b36;
+  /* Powierzchnie na TV prawie czarne z jaśniejszym szarym obrysem (26.10, Łukasz: granatowe tła ramek pytań,
+     odpowiedzi i rankingu odstawały od baru, a brązowe robiły całość za brązową). Telefon gracza ma te same
+     (`.ekran-gracza` w globals.css), panel zostaje przy tokenach z tokens.css. */
+  --kamien: #121212;
+  --kamien2: #353535;
+  --kamien3: #4a4a4a;
 }
 
 /* werble: czarny ekran */
@@ -1709,7 +1710,7 @@
 
 .tv-koniec .tv-stopien .tv-stopien-blok {
   position: relative;
-  margin-top: 30px;
+  margin-top: 12px;
   border: 0;
   border-radius: 0;
   background:
@@ -1718,18 +1719,8 @@
   box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.8);
 }
 
-/* górna ścianka: trapez jaśniejszy od przodu */
-.tv-koniec .tv-stopien .tv-stopien-blok::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: 30px;
-  clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
-  background: linear-gradient(90deg, var(--metal-ciemny), var(--metal-jasny) 45%, var(--metal) 70%, var(--metal-ciemny));
-}
-
+/* Bez górnej ścianki-trapezu (26.10): szła przez `clip-path`, którego Samsung nie stosuje, więc na TV podium było
+   płaskie, a w innych przeglądarkach „niby 3D”. Wszędzie tak samo: przód z połyskiem i jasna krawędź. */
 /* krawędź między ścianką a przodem łapie światło */
 .tv-koniec .tv-stopien .tv-stopien-blok::after {
   content: "";

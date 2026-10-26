@@ -42,13 +42,14 @@ export function MenuPanelu({
   wyloguj,
   gra = null,
   ustawienia = "/admin/lokale",
-  lokal = false,
+  lokal = null,
 }: {
   wyloguj: () => Promise<void>;
   gra?: GraWMenu | null;
   /** Lista lokali u głównego, strona własnego lokalu w panelu lokalu. */
   ustawienia?: string;
-  lokal?: boolean;
+  /** Panel lokalu: jego logo i nazwa na górze menu, prowadzą do ustawień lokalu (ekran, hasło, logo). */
+  lokal?: { nazwa: string; logo_url: string | null } | null;
 }) {
   const sciezka = usePathname();
   const [otwarte, ustawOtwarte] = useState(false);
@@ -94,6 +95,23 @@ export function MenuPanelu({
       {/* zawsze w drzewie, żeby wysuwanie i przyciemnienie miały przejście w obie strony */}
       <div className="panel-menu-tlo" aria-hidden onClick={zamknij} />
       <nav id="panel-menu-szuflada" className="panel-menu-szuflada" aria-label="Panel" inert={!otwarte}>
+        {lokal && (
+          <section>
+            <p className="etykieta">Mój lokal</p>
+            <Link
+              href={ustawienia}
+              onClick={zamknij}
+              className="panel-menu-gra panel-menu-lokal"
+              aria-current={sciezka.startsWith("/admin/lokale") ? "page" : undefined}
+            >
+              {lokal.logo_url ? <img src={lokal.logo_url} alt="" /> : <span className="miniatura-pusta" aria-hidden />}
+              <span className="panel-menu-gra-opis">
+                <strong>{lokal.nazwa}</strong>
+                <span className="panel-menu-gra-lokal">ekran lokalu, hasło, logo, Instagram</span>
+              </span>
+            </Link>
+          </section>
+        )}
         <section>
           <p className="etykieta">Gra</p>
           {gra ? (
@@ -124,9 +142,7 @@ export function MenuPanelu({
         <section>
           <p className="etykieta">Przygotowanie</p>
           {pozycja("/admin/quizy", "Quizy", "pytania, etapy, kosz")}
-          {lokal
-            ? pozycja(ustawienia, "Mój lokal", "logo, hasło, ekran lokalu", sciezka.startsWith("/admin/lokale"))
-            : pozycja("/admin/lokale", "Lokale", "logo, hasła, ekrany lokali")}
+          {!lokal && pozycja("/admin/lokale", "Lokale", "logo, hasła, ekrany lokali")}
         </section>
         <form action={wyloguj} className="panel-menu-wyloguj">
           <button type="submit" className="przycisk">

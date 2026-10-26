@@ -1548,3 +1548,10 @@ button.tag:hover:not(.wybrany) {
 }
 
 /* Kreator gry bez zapasu pod formularzem (26.10: 45vh pustego miejsca na końcu wyglądało na błąd) */
+
+/* logo lokalu zamiast zębatki w pasku panelu lokalu (nawigacja.tsx) */
+.nawigacja-logo-lokalu {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}

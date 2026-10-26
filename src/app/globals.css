@@ -1870,13 +1870,13 @@ html:has(.kolumna) {
   line-height: 1.5;
 }
 
-/* Telefon gracza: powierzchnie ciepłe, prawie czarne, z brązowym obrysem, jak na TV (26.10: granatowe tła odpowiedzi
-   i kafelków odstawały). Panel zostaje przy tokenach z tokens.css. */
+/* Telefon gracza: powierzchnie prawie czarne z szarym obrysem, jak na TV (26.10: granatowe tła odpowiedzi i kafelków
+   odstawały). Panel zostaje przy tokenach z tokens.css. */
 .ekran-gracza {
-  --kamien: #17130f;
-  --kamien2: #493a2a;
-  --kamien3: #5e4b36;
-  --pole: #0d0a07;
+  --kamien: #121212;
+  --kamien2: #353535;
+  --kamien3: #4a4a4a;
+  --pole: #0a0a0a;
 }
 
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
@@ -3364,6 +3364,16 @@ html:has(.kolumna) {
   color: var(--piana);
   text-decoration: none;
   box-shadow: var(--glow-md);
+}
+
+/* panel lokalu: jego logo i nazwa na górze menu (menu.tsx), spokojniej niż trwająca gra */
+.panel-menu-lokal {
+  border-color: var(--kamien2);
+  box-shadow: none;
+}
+
+.panel-menu-lokal[aria-current="page"] {
+  border-color: var(--zloto);
 }
 
 .panel-menu-gra img,

@@ -64,14 +64,14 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
             ))}
           <LogoQuiz wysokosc={44} dopisek={lokal ? undefined : "panel"} />
         </Link>
-        <Nawigacja ustawienia={ustawienia} />
+        <Nawigacja ustawienia={ustawienia} lokal={lokal} />
         <form action={wylogujAdmina} className="panel-wyloguj">
           <button type="submit" className="przycisk-maly">
             Wyloguj
           </button>
         </form>
         {/* telefon: zamiast paska i „Wyloguj” samo menu obok logo */}
-        <MenuPanelu wyloguj={wylogujAdmina} gra={gra} ustawienia={ustawienia} lokal={!!lokalId} />
+        <MenuPanelu wyloguj={wylogujAdmina} gra={gra} ustawienia={ustawienia} lokal={lokal} />
       </header>
       {children}
     </div>
