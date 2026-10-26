@@ -29,7 +29,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 **Jak testować lokalnie:** szczegóły w `CLAUDE.md` („Testy lokalne”). Najszybciej: gra testowa SQL-em, w pilocie „Dodaj 4 boty” i automatyczne prowadzenie, TV w panelu przeglądarki 1920×1080.
 
 **Otwarte i niepewne:**
-- **OLED Samsunga nadal otwarty** (Łukasz, 25.10 wieczorem, domowy Tizen 9): w pijanym finale szklanka znika przed wybuchem, a wideo wybuchu nie widać; żeby ekran nie gasł, trzeba co jakiś czas klikać pilotem (OK już nie zatrzymuje muzyki). Na razie odłożone; wyniki badania wygaszacza w „Telewizor: wygaszacz, kursor…” niżej.
+- **OLED Samsunga:** wybuch szklanki i muzyka pijanego finału działają (26.10, sprawdził Łukasz: wybuch bez wideo, tory odlatują, muzyka kołysze się bez przerw). Zostaje wygaszacz: żeby ekran nie gasł, Łukasz co jakiś czas klika OK na pilocie TV (klik niczego nie zmienia na ekranie); wyniki badania w „Telewizor: wygaszacz, kursor…” niżej.
 - Wyniki gry w panelu liczą ciekawostki i całą pulę finału („Pytań w grze: 63”, „Dobrze 31/63”); trzeba liczyć tylko zadane pytania.
 - **Efekty dźwiękowe nikt jeszcze nie słyszał:** sprawdzone tylko, że grają we właściwych chwilach (licznik wywołań Web Audio). Głośność względem muzyki, brzmienie syntezy i Samsung w lokalu do odsłuchania; nagrania można podmienić plikami w `public/dzwieki/`.
 - Nowe pytania pijanego finału i komentarze ułożyłem sam (25.10): do przejrzenia przez Łukasza w panelu.
@@ -272,7 +272,7 @@ Do zaprojektowania razem:
 - **Subtelniej:** zamiast cofania, spadających dróg i latania awatarów: nagłówek się kołysze (jak było), plansza z drogami buja się (0,6° → 2,8°, okres 9 s), zawodnicy zjeżdżają po drogach w stronę przechyłu (do 6% drogi), awatar lekko się chwieje (bez drżenia i podwójnego widzenia).
 - **Nikt nie dojeżdża:** położenia zamrożone z chwili wejścia w pijany finał (ostatni krok serii, który przychodzi razem z przejściem, nie przesuwa już lidera do szklanki).
 - **Muzyka:** utwór finału na czas pijanego finału przechodzi z odtwarzacza na Web Audio (`src/lib/gra/muzyka-pijana.ts`, kontekst efektów): ten sam moment utworu, tempo kołysze się płynnie (oscylator 1/9 Hz na `playbackRate`, głębokość do 5%, średnio do 4% wolniej), bez dziur. Utwór dekoduje się już w finale serią. Gdy przejęcie się nie uda, gra zwykły odtwarzacz bez kołysania.
-- **Sprawdzone lokalnie:** z `?tv` bujanie, zamrożone położenia, wybuch bez wideo w zaplanowanej chwili i do werbli; bez `?tv` wideo jak dotąd. Muzyki na Samsungu nie dało się sprawdzić lokalnie.
+- **Sprawdzone lokalnie:** z `?tv` bujanie, zamrożone położenia, wybuch bez wideo w zaplanowanej chwili i do werbli; bez `?tv` wideo jak dotąd. **Na OLED Łukasza (26.10):** szklanka wybucha, tory odlatują, muzyka kołysze się bez przerw.
 
 ## Ustalenia
 
