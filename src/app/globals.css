@@ -1976,9 +1976,30 @@ html:has(.kolumna) {
 }
 
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
+/* okno wycinka: po pół wiersza sąsiadów nad i pod, wygaszone, gdy lista ciągnie się dalej */
+.moj-ranking-okno {
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.moj-ranking-okno.wyzej {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 44px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 44px);
+}
+
+.moj-ranking-okno.nizej {
+  -webkit-mask-image: linear-gradient(to top, transparent 0, #000 44px);
+  mask-image: linear-gradient(to top, transparent 0, #000 44px);
+}
+
+.moj-ranking-okno.wyzej.nizej {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 44px, #000 calc(100% - 44px), transparent 100%);
+}
+
 .moj-ranking {
   list-style: none;
-  margin: 16px 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 4px;
@@ -1989,7 +2010,9 @@ html:has(.kolumna) {
   grid-template-columns: 2.2em 28px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 12px;
   border-radius: var(--r-btn-sm);
   background: var(--kamien);
   font-weight: var(--w-bold);
