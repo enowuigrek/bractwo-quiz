@@ -1886,6 +1886,89 @@ html:has(.kolumna) {
   --pole: #0a0a0a;
 }
 
+/* Kto jak odpowiedział na telefonie (odpowiedzi-graczy.tsx): ramki jak na TV, w środku kapsle z nickami */
+.odpowiedzi-graczy {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.odpowiedzi-graczy-ramka {
+  padding: 10px 12px 12px;
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-card);
+  background: var(--kamien);
+}
+
+.odpowiedzi-graczy-ramka.dobrze {
+  border-color: var(--chmiel);
+}
+
+.odpowiedzi-graczy-ramka.czesciowo {
+  border-color: var(--zloto);
+}
+
+.odpowiedzi-graczy-ramka.zle {
+  border-color: var(--czerwien);
+}
+
+.odpowiedzi-graczy-etykieta {
+  margin: 0 0 8px;
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dobrze .odpowiedzi-graczy-etykieta {
+  color: var(--chmiel);
+}
+
+.czesciowo .odpowiedzi-graczy-etykieta {
+  color: var(--zloto);
+}
+
+.zle .odpowiedzi-graczy-etykieta {
+  color: var(--czerwien);
+}
+
+.odpowiedzi-graczy-etykieta span {
+  margin-left: 6px;
+  color: var(--piana);
+}
+
+.odpowiedzi-graczy-pusto {
+  margin: 0;
+  color: var(--szary);
+}
+
+.odpowiedzi-graczy ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.odpowiedzi-graczy li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  font-weight: var(--w-bold);
+}
+
+.odpowiedzi-graczy li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.odpowiedzi-graczy li.ja span {
+  color: var(--zloto);
+}
+
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
 .moj-ranking {
   list-style: none;

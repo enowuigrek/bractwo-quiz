@@ -17,6 +17,7 @@ import {
   Rozwiazanie,
 } from "./odpowiadanie";
 import { Gotowy } from "./gotowy";
+import { OdpowiedziGraczy } from "./odpowiedzi-graczy";
 
 const POWODY: Record<Exclude<ZapisOdpowiedzi, { przyjeta: true }>["powod"], string> = {
   po_czasie: "Za późno, czas minął.",
@@ -325,7 +326,11 @@ export function Rozgrywka({
         </p>
       )}
 
-      {/* po wyniku bez grafiki i ciaśniej, żeby ekran mieścił się bez przewijania */}
+      {/* gdy TV pokazuje, kto jak odpowiedział, telefon to samo zamiast rozwiązania (26.10) */}
+      {faza === "odpowiedzi" ? (
+        <OdpowiedziGraczy kod={stan.kod} zadanieId={z.id} nick={ja.nick} />
+      ) : (
+      // po wyniku bez grafiki i ciaśniej, żeby ekran mieścił się bez przewijania
       <div className="gra-wynik">
         <Pytanie stan={stan} bezGrafiki />
         {!jedenWybor(z.typ) ? (
@@ -347,6 +352,7 @@ export function Rozgrywka({
           </ol>
         )}
       </div>
+      )}
     </>
   );
 }
