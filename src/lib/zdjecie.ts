@@ -37,16 +37,28 @@ function wczytajObraz(plik: File): Promise<HTMLImageElement> {
 }
 
 /** Zapisuje zdjęcie gracza (token z localStorage). Zwraca adres zdjęcia. */
-export async function wyslijZdjecie(token: string, zdjecie: Blob): Promise<string> {
+export async function wyslijZdjecie(token: string, zdjecie: Blob, kolor?: string | null): Promise<string> {
   const dane = new FormData();
   dane.append("token", token);
   dane.append("plik", new File([zdjecie], "selfie.jpg", { type: "image/jpeg" }));
-  // kolor kapsla dobrany do zdjęcia (awatar.tsx), zapisany w adresie zdjęcia
-  dane.append("kapsel", await kolorZeZdjecia(zdjecie));
+  // kolor kapsla wybrany przez gracza, a bez wyboru dobrany do zdjęcia (zapisany w adresie zdjęcia, kapsel.ts)
+  dane.append("kapsel", kolor ?? (await kolorZeZdjecia(zdjecie)));
   const odp = await fetch("/api/zdjecie", { method: "POST", body: dane });
   const wynik = (await odp.json().catch(() => ({}))) as { zdjecie?: string; blad?: string };
   if (!odp.ok || !wynik.zdjecie) throw new Error(wynik.blad ?? "Nie udało się wysłać zdjęcia.");
   return wynik.zdjecie;
+}
+
+/** Zmienia kolor kapsla gracza (bez zmiany zdjęcia). */
+export async function ustawKolorKapsla(token: string, kolor: string): Promise<void> {
+  const dane = new FormData();
+  dane.append("token", token);
+  dane.append("kapsel", kolor);
+  const odp = await fetch("/api/zdjecie", { method: "POST", body: dane });
+  if (!odp.ok) {
+    const wynik = (await odp.json().catch(() => ({}))) as { blad?: string };
+    throw new Error(wynik.blad ?? "Nie udało się zmienić koloru kapsla.");
+  }
 }
 
 /** Usuwa zdjęcie: gracz swoje (token) albo prowadzący cudze (kod, klucz pilota, nick). */

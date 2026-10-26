@@ -17,7 +17,8 @@ import {
 import { najblizszeOdciecie, odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
+import { usunZdjecie, wyslijZdjecie, ustawKolorKapsla } from "@/lib/zdjecie";
+import { kolorZAdresu } from "@/lib/kapsel";
 import { kiedyStart } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { nalanieSzklanki, nazwaRodzaju, quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
@@ -268,6 +269,8 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
   const [blad, ustawBlad] = useState<string | null>(null);
   const [wysylam, ustawWysylam] = useState<false | "gracz" | "zdjecie">(false);
   const [zdjecie, ustawZdjecie] = useState<{ blob: Blob; podglad: string } | null>(null);
+  // kolor kapsla (null: nie wybrany; wtedy ze zdjęcia albo po nicku)
+  const [kolor, ustawKolor] = useState<string | null>(null);
   const druzyny = stan.tryb === "druzyny";
   const pelna = stan.liczba_graczy >= stan.max_graczy;
 
@@ -294,7 +297,9 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
         // zdjęcie po dołączeniu (potrzebny token); nieudane nie blokuje gry, można dodać je potem
         if (zdjecie) {
           ustawWysylam("zdjecie");
-          await wyslijZdjecie(d.token, zdjecie.blob).catch(() => undefined);
+          await wyslijZdjecie(d.token, zdjecie.blob, kolor).catch(() => undefined);
+        } else if (kolor) {
+          await ustawKolorKapsla(d.token, kolor).catch(() => undefined);
         }
         ustawWysylam(false);
         onDolaczono(d);
@@ -328,6 +333,8 @@ function Dolacz({ kod, stan, onDolaczono }: { kod: string; stan: StanSesji; onDo
         zdjecie={zdjecie?.podglad ?? null}
         onWybrano={(blob, podglad) => ustawZdjecie({ blob, podglad })}
         onUsun={() => ustawZdjecie(null)}
+        kolor={kolor}
+        onKolor={ustawKolor}
       />
       {blad && (
         <p className="blad" role="alert">
@@ -404,11 +411,16 @@ function WGrze({
           nick={ja.nick}
           zdjecie={gracze.find((g) => g.nick === ja.nick)?.zdjecie ?? null}
           onWybrano={async (blob) => {
-            await wyslijZdjecie(ja.token, blob);
+            // wybrany wcześniej kolor kapsla zostaje przy nowym zdjęciu
+            await wyslijZdjecie(ja.token, blob, kolorZAdresu(gracze.find((g) => g.nick === ja.nick)?.zdjecie));
             await odswiez();
           }}
           onUsun={async () => {
             await usunZdjecie({ token: ja.token });
+            await odswiez();
+          }}
+          onKolor={async (k) => {
+            await ustawKolorKapsla(ja.token, k);
             await odswiez();
           }}
         />

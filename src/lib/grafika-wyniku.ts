@@ -4,7 +4,7 @@
 // wynik gracza i podium gry dla lokalu (obie relacje 1080×1920).
 // Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru.
 
-import { BRZEG_KAPSLA, kolorNicku, kolorZAdresu, OBRYS_KAPSLA, przesun, ZLOTY_KAPSEL } from "./kapsel";
+import { adresZdjecia, BRZEG_KAPSLA, kolorNicku, kolorZAdresu, OBRYS_KAPSLA, przesun, ZLOTY_KAPSEL } from "./kapsel";
 
 export type LogoNaGrafice = { nazwa: string; logo_url: string | null } | null;
 
@@ -126,8 +126,8 @@ async function rysujAwatar(
   r: number,
 ) {
   const metal = (METALE[d.miejsce] ?? ["#3a4552", "#27313b", "#11161b"])[1];
-  const zdjecie = await moze(d.zdjecie);
-  const kolor = zdjecie ? (kolorZAdresu(d.zdjecie) ?? ZLOTY_KAPSEL) : kolorNicku(d.nick);
+  const zdjecie = await moze(adresZdjecia(d.zdjecie));
+  const kolor = kolorZAdresu(d.zdjecie) ?? (zdjecie ? ZLOTY_KAPSEL : kolorNicku(d.nick));
   // kapsel ścieżką, nie obrazkiem SVG (Safari potrafi wtedy zablokować zapis grafiki)
   ctx.save();
   ctx.translate(cx - r, cy - r);
@@ -159,11 +159,15 @@ async function rysujAwatar(
     ctx.drawImage(zdjecie, (zdjecie.width - bok) / 2, (zdjecie.height - bok) / 2, bok, bok, cx - wew, cy - wew, wew * 2, wew * 2);
     ctx.restore();
   } else {
-    ctx.fillStyle = "#1a1100";
-    ctx.font = `800 ${r * 0.92}px ${kroj()}`;
+    // wygrawerowana litera jak w aplikacji: jasna krawędź pod spodem, ciemna litera
+    const litera = d.nick.slice(0, 1).toUpperCase();
+    ctx.font = `800 ${r * 1.1}px ${kroj()}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(d.nick.slice(0, 1).toUpperCase(), cx, cy + r * 0.05);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+    ctx.fillText(litera, cx, cy + r * 0.05 + 3);
+    ctx.fillStyle = "rgba(26, 17, 0, 0.72)";
+    ctx.fillText(litera, cx, cy + r * 0.05);
   }
 
   // numer miejsca w kółku na dole kapsla

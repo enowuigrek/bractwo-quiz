@@ -1,38 +1,42 @@
 /* eslint-disable @next/next/no-img-element -- selfie z bucketu Supabase, małe i już przycięte */
 
-import { BRZEG_KAPSLA, kolorNicku, kolorZAdresu, tloKapsla, ZLOTY_KAPSEL } from "@/lib/kapsel";
+import { adresZdjecia, BRZEG_KAPSLA, kolorNicku, kolorZAdresu, tloKapsla, ZLOTY_KAPSEL } from "@/lib/kapsel";
 
 type Props = {
   nick: string;
+  /** `gracze.zdjecie_url`: adres selfie i/albo kolor kapsla (`#kapsel=rrggbb`, src/lib/kapsel.ts). */
   zdjecie?: string | null;
   /** Średnica w px. */
   rozmiar: number;
   className?: string;
+  /** Kolor kapsla zamiast zapisanego (podgląd przy dołączaniu). */
+  kolor?: string | null;
 };
 
 /**
  * Awatar jako kapsel (26.10, Łukasz): brzeg z ząbkami to wygenerowany SVG w tle (`src/lib/kapsel.ts`), bez
- * `clip-path` i masek, których starsze telewizory nie stosują. Z selfie: zdjęcie w środku, kapsel w kolorze
- * dobranym ze zdjęcia (`#kapsel=` w adresie, inaczej złoty). Bez selfie: cały kapsel w jasnym kolorze nicku
- * z ciemną literą.
+ * `clip-path` i masek, których starsze telewizory nie stosują. Kolor wybiera gracz (albo dobiera go telefon ze
+ * zdjęcia). Z selfie zdjęcie w środku kapsla, bez selfie wygrawerowana pierwsza litera nicku, a bez nicku pusty kapsel.
  */
-export function Awatar({ nick, zdjecie, rozmiar, className }: Props) {
+export function Awatar({ nick, zdjecie, rozmiar, className, kolor }: Props) {
   const klasa = `awatar${className ? ` ${className}` : ""}`;
-  if (zdjecie) {
+  const obraz = adresZdjecia(zdjecie);
+  const kolorKapsla = kolor ?? kolorZAdresu(zdjecie) ?? (obraz ? ZLOTY_KAPSEL : kolorNicku(nick));
+  if (obraz) {
     const styl = {
       width: rozmiar,
       height: rozmiar,
       padding: Math.max(2, Math.round(rozmiar * BRZEG_KAPSLA)),
-      backgroundImage: tloKapsla(kolorZAdresu(zdjecie) ?? ZLOTY_KAPSEL),
+      backgroundImage: tloKapsla(kolorKapsla),
     };
-    return <img src={zdjecie} alt="" className={klasa} style={styl} />;
+    return <img src={obraz} alt="" className={klasa} style={styl} />;
   }
-  const litera = Array.from(nick.trim())[0]?.toLocaleUpperCase("pl") ?? "?";
+  const litera = Array.from(nick.trim())[0]?.toLocaleUpperCase("pl") ?? "";
   const styl = {
     width: rozmiar,
     height: rozmiar,
-    fontSize: Math.round(rozmiar * 0.46),
-    backgroundImage: tloKapsla(kolorNicku(nick)),
+    fontSize: Math.round(rozmiar * 0.56),
+    backgroundImage: tloKapsla(kolorKapsla),
   };
   return (
     <span aria-hidden className={`${klasa} awatar-litera`} style={styl}>

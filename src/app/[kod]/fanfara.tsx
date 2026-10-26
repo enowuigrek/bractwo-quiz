@@ -13,6 +13,7 @@ import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
 import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaMegafon } from "@/components/ikony";
+import { adresZdjecia } from "@/lib/kapsel";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 
@@ -112,8 +113,8 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
     return (
       <>
         <div className={`fanfara fanfara-${miejsce}${nagroda ? " z-nagroda" : ""}`}>
-          <div className={`medal${zdjecie ? " ze-zdjeciem" : ""}`} aria-hidden>
-            {zdjecie ? <img src={zdjecie} alt="" /> : null}
+          <div className={`medal${adresZdjecia(zdjecie) ? " ze-zdjeciem" : ""}`} aria-hidden>
+            {adresZdjecia(zdjecie) ? <img src={adresZdjecia(zdjecie)!} alt="" /> : null}
             <span>{miejsce}</span>
           </div>
           <h1 className="fanfara-tytul">{TYTULY[miejsce]}</h1>

@@ -1,5 +1,5 @@
 import { usunGrafike } from "@/lib/grafiki";
-import { zKolorem } from "@/lib/kapsel";
+import { kolorZAdresu, zKolorem } from "@/lib/kapsel";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 
 // Selfie graczy. Przeglądarka nie ma klucza do magazynu, więc zapis i usuwanie idą przez serwer:
@@ -31,7 +31,17 @@ export async function POST(request: Request) {
   const dane = await request.formData().catch(() => null);
   const token = String(dane?.get("token") ?? "");
   const plik = dane?.get("plik");
-  if (!(plik instanceof File)) return blad("Brak zdjęcia.");
+  const kapsel = String(dane?.get("kapsel") ?? "") || null;
+  // sam kolor kapsla (bez nowego zdjęcia): zostaje obecne zdjęcie, zmienia się kolor
+  if (!(plik instanceof File)) {
+    if (!kapsel) return blad("Brak zdjęcia.");
+    const gracz = await graczPoTokenie(token);
+    if (!gracz) return blad("Nieznany gracz.", 403);
+    const zdjecie_url = zKolorem(gracz.zdjecie_url, kapsel);
+    const { error } = await supabaseAdmin().from("gracze").update({ zdjecie_url }).eq("id", gracz.id);
+    if (error) return blad("Nie udało się zmienić koloru kapsla.", 500);
+    return Response.json({ ok: true, zdjecie: zdjecie_url });
+  }
   if (!TYPY[plik.type]) return blad("Zdjęcie musi być w formacie JPEG albo WebP.");
   if (plik.size > MAX_B) return blad("Zdjęcie jest za duże.");
 
@@ -45,7 +55,7 @@ export async function POST(request: Request) {
   const { error: bladZapisu } = await storage.upload(sciezka, plik, { contentType: plik.type, cacheControl: "604800" });
   if (bladZapisu) return blad("Nie udało się zapisać zdjęcia.", 500);
   // kolor kapsla z telefonu w adresie (`#kapsel=rrggbb`, src/lib/kapsel.ts); zły kolor po prostu pomijamy
-  const url = zKolorem(storage.getPublicUrl(sciezka).data.publicUrl, String(dane?.get("kapsel") ?? "") || null);
+  const url = zKolorem(storage.getPublicUrl(sciezka).data.publicUrl, kapsel)!;
 
   const { error } = await supabaseAdmin().from("gracze").update({ zdjecie_url: url }).eq("id", gracz.id);
   if (error) {
@@ -88,7 +98,11 @@ export async function DELETE(request: Request) {
   }
   if (!gracz) return blad("Nie ma takiego gracza.", 404);
 
-  const { error } = await db.from("gracze").update({ zdjecie_url: null }).eq("id", gracz.id);
+  // kolor kapsla zostaje (`#kapsel=…` bez adresu zdjęcia)
+  const { error } = await db
+    .from("gracze")
+    .update({ zdjecie_url: zKolorem(null, kolorZAdresu(gracz.zdjecie_url)) })
+    .eq("id", gracz.id);
   if (error) return blad("Nie udało się usunąć zdjęcia.", 500);
   await usunGrafike(gracz.zdjecie_url);
   return Response.json({ ok: true });

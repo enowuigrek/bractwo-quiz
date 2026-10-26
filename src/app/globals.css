@@ -835,19 +835,6 @@ html:has(.kolumna) {
   }
 }
 
-.werble-tytul {
-  margin: 8px 0 0;
-  font-size: var(--fs-h1);
-  font-weight: var(--w-black);
-  color: var(--zloto);
-  text-shadow: var(--glow-md);
-}
-
-.werble-podpis {
-  margin: 0;
-  color: var(--szary);
-}
-
 .werble.duzy .werble-kropki {
   gap: 30px;
 }
@@ -855,14 +842,6 @@ html:has(.kolumna) {
 .werble.duzy .werble-kropki span {
   width: 38px;
   height: 38px;
-}
-
-.werble.duzy .werble-tytul {
-  font-size: 128px;
-}
-
-.werble.duzy .werble-podpis {
-  font-size: 40px;
 }
 
 /* przy ograniczonym ruchu bez migania: kropki stoją, błysk znika od razu */
@@ -1025,20 +1004,50 @@ html:has(.kolumna) {
   vertical-align: middle;
 }
 
-/* litera prosto na kapslu (kapsel w jasnym kolorze nicku, litera ciemna) */
+/* litera wygrawerowana w kapslu: ciemna, półprzezroczysta (przebija kolor kapsla), z jasną krawędzią pod spodem
+   i cieniem u góry, jak wytłoczona w blasze */
 .awatar-litera {
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: rgba(26, 17, 0, 0.72);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45),
+    0 -1px 0 rgba(0, 0, 0, 0.35);
 }
 
 /* Selfie przy nicku na telefonie */
 .zdjecie-gracza {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 14px;
   margin: 16px 0 4px;
 }
 
+/* kolor kapsla (zdjecie-gracza.tsx): osiem małych kapsli w jednym rzędzie pod podglądem */
+.wybor-kapsla {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.wybor-kapsla-kolor {
+  display: grid;
+  place-items: center;
+  padding: 3px;
+  border: 0;
+  border-radius: var(--r-round);
+  background: none;
+  cursor: pointer;
+}
+
+.wybor-kapsla-kolor.wybrany {
+  outline: 2px solid var(--piana);
+  outline-offset: 1px;
+}
+
 .zdjecie-gracza-akcje {
+  flex: 1;
+  min-width: 0;
   display: grid;
   justify-items: start;
   gap: 6px;

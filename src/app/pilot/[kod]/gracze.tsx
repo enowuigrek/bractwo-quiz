@@ -1,5 +1,6 @@
 "use client";
 
+import { adresZdjecia } from "@/lib/kapsel";
 import QRCode from "qrcode";
 import { useEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
@@ -105,7 +106,7 @@ export function GraczePilota({ kod, token, gracze, pytanie, koniec, odswiez }: P
       <ul className="pilot-gracze">
         {gracze.map((g) => (
           <li key={g.nick}>
-            {g.zdjecie && !koniec ? (
+            {adresZdjecia(g.zdjecie) && !koniec ? (
               // zdjęcie trafia na TV: prowadzący może je zdjąć, gdy się nie nadaje
               <button
                 type="button"

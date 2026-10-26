@@ -1,6 +1,8 @@
-// Kapsel koronowy jako SVG w dowolnym kolorze (awatary, 26.10). Kolor kapsla przy selfie dobiera telefon ze zdjęcia
-// i zapisuje go w adresie zdjęcia jako `#kapsel=rrggbb` (fragment nie trafia na serwer ani do magazynu, więc nie
-// trzeba nowej kolumny ani przekazywać koloru przez wszystkie stany gry). Bez koloru: złoty.
+// Kapsel koronowy jako SVG w dowolnym kolorze (awatary, 26.10). Kolor kapsla wybiera gracz przy dołączaniu (albo
+// telefon dobiera go ze zdjęcia) i zapisuje w `gracze.zdjecie_url` jako fragment `#kapsel=rrggbb`: za adresem selfie
+// albo sam (gracz bez zdjęcia). Fragment nie trafia do magazynu, a wszystkie stany gry i tak wydają `zdjecie`, więc
+// kolor dociera wszędzie bez nowej kolumny. Prawdziwy adres obrazka daje `adresZdjecia`. Bez koloru: przy zdjęciu
+// złoty, bez zdjęcia kolor po nicku.
 
 export const ZLOTY_KAPSEL = "e3ac3f";
 /** Grubość brzegu kapsla jako część średnicy: tyle zostaje na ząbki dookoła zdjęcia. */
@@ -8,6 +10,9 @@ export const BRZEG_KAPSLA = 0.12;
 
 // Kolory kapsli bez zdjęcia: jasne kolory z design systemu (litera jest ciemna, więc nic ciemnego), po nicku.
 const KOLORY = ["e3ac3f", "8fb63a", "c8711d", "f3d27a", "c9ced3", "e2735a", "7fb6e6", "5fc8c0"];
+
+/** Kolory kapsli do wyboru przy dołączaniu (jasne, bo litera na kapslu jest ciemna). */
+export const KOLORY_KAPSLI = ["e3ac3f", "c9ced3", "e2735a", "c8711d", "8fb63a", "5fc8c0", "7fb6e6", "b48ae6"] as const;
 
 /** Kolor kapsla gracza bez zdjęcia, zawsze ten sam dla nicku. */
 export function kolorNicku(nick: string): string {
@@ -69,10 +74,19 @@ export function kolorZAdresu(url: string | null | undefined): string | null {
   return m ? m[1].toLowerCase() : null;
 }
 
-/** Adres zdjęcia z kolorem kapsla (zastępuje poprzedni kolor). */
-export function zKolorem(url: string, hex: string | null): string {
-  const bez = url.split("#")[0];
-  return hex && /^[0-9a-f]{6}$/i.test(hex) ? `${bez}#kapsel=${hex.toLowerCase()}` : bez;
+/**
+ * Wartość `zdjecie_url` ze zdjęciem (może być puste: sam kolor) i kolorem kapsla (zastępuje poprzedni). Bez obu: null.
+ */
+export function zKolorem(url: string | null, hex: string | null): string | null {
+  const bez = url?.split("#")[0] ?? "";
+  if (hex && /^[0-9a-f]{6}$/i.test(hex)) return `${bez}#kapsel=${hex.toLowerCase()}`;
+  return bez || null;
+}
+
+/** Prawdziwy adres obrazka z `zdjecie_url` albo null (gracz bez zdjęcia, z samym kolorem kapsla). */
+export function adresZdjecia(url: string | null | undefined): string | null {
+  const bez = url?.split("#")[0];
+  return bez ? url! : null;
 }
 
 /**
