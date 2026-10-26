@@ -7,7 +7,7 @@ import { IkonaGotowe, IkonaKopiuj } from "@/components/ikony";
 const PRZYTRZYMANIE_MS = 450;
 
 /** Kopiuje tekst. Gdy Clipboard API jest niedostępne albo odmówi, próbuje starym sposobem przez zaznaczenie. */
-async function skopiuj(tekst: string): Promise<boolean> {
+export async function skopiuj(tekst: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(tekst);
     return true;

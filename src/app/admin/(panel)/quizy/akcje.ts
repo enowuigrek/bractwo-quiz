@@ -17,7 +17,8 @@ import {
   typDomyslny,
 } from "@/lib/etapy";
 import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
-import { LIMITY } from "./limity";
+import { czytajPytania } from "@/lib/import-pytan";
+import { LIMITY, liczbaPytan } from "./limity";
 
 function tekst(dane: FormData, pole: string): string {
   return String(dane.get(pole) ?? "").trim();
@@ -330,6 +331,51 @@ export async function zapiszZadanie(
   // „Zapisz i dodaj następne”: od razu kolejne pytanie w tym samym etapie
   if (dane.get("dalej")) redirect(`/admin/quizy/${quizId}/zadania/nowe${etapId ? `?etap=${etapId}` : ""}`);
   redirect(`/admin/quizy/${quizId}`);
+}
+
+/** Najwięcej pytań wklejonych naraz (cały quiz z AI to zwykle 20–40). */
+const MAX_WKLEJONYCH = 80;
+
+/**
+ * Wklejone pytania (klasyczny quiz, `src/lib/import-pytan.ts`): każde przechodzi tę samą walidację co formularz
+ * pytania i trafia na koniec quizu. Zapis wszystkich albo żadnego: przy jednym błędzie nic nie dodajemy.
+ */
+export async function wklejPytania(quizId: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
+  await wymagajQuizu(await wymagajAdmina(), quizId);
+  const db = supabaseAdmin();
+  const { count: etapow } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", quizId);
+  if (etapow) return { blad: "Wklejanie jest w klasycznym quizie (bez etapów)." };
+
+  const { pytania, bledy } = czytajPytania(String(dane.get("tekst") ?? ""));
+  if (bledy.length) return { blad: bledy.join(" ") };
+  if (!pytania.length) return { blad: "Wklej pytania w formacie z instrukcji pod polem." };
+  if (pytania.length > MAX_WKLEJONYCH) return { blad: `Naraz najwyżej ${MAX_WKLEJONYCH} pytań.` };
+
+  const wiersze = [];
+  for (const [i, p] of pytania.entries()) {
+    const pola = new FormData();
+    pola.set("tresc", p.tresc);
+    pola.set("typ", p.typ);
+    pola.set("dane", JSON.stringify(p.dane));
+    const odczyt = odczytajZadanie(pola);
+    if ("blad" in odczyt) return { blad: `Pytanie ${i + 1} („${p.tresc.slice(0, 40)}”): ${odczyt.blad}` };
+    wiersze.push(odczyt);
+  }
+
+  const { data: ostatnie } = await db
+    .from("zadania")
+    .select("nr")
+    .eq("quiz_id", quizId)
+    .order("nr", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const od = (ostatnie?.nr ?? 0) + 1;
+  const { error } = await db
+    .from("zadania")
+    .insert(wiersze.map((w, i) => ({ ...w, quiz_id: quizId, etap_id: null, nr: od + i })));
+  if (error) return { blad: `Nie udało się zapisać: ${error.message}` };
+  refresh();
+  return { ok: `Dodano ${liczbaPytan(wiersze.length)}. Przejrzyj je na liście i dodaj grafiki.` };
 }
 
 export async function usunZadanie(quizId: string, zadanieId: string): Promise<void> {

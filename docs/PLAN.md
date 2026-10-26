@@ -198,6 +198,14 @@ Do zaprojektowania razem:
 - **Wybór w panelu kolorem:** wybrany szablon quizu ma złote wypełnienie i ciemny tekst jak wybrany czas (zamiast złotej obwódki z poświatą); zasada w `docs/DESIGN-SYSTEM.md`.
 - **Sprawdzone lokalnie** (build, ekran `test-naglowka`): zapowiedź sama przeszła w poczekalnię z QR, bez graczy po czasie gra czekała, po dodaniu botów ruszyła (`wstep`); `dolacz` po godzinie wpuścił gracza do zamkniętej poczekalni. Kreatory obejrzane w panelu.
 
+### Wklejanie pytań do klasycznego quizu (26.10) ✅
+
+- **Po co:** klasyczne quizy hurtem z AI. Na stronie quizu bez etapów sekcja „Wklej pytania”: pole na tekst, podgląd na bieżąco (rodzaj i rozwiązanie każdego pytania, błędy z numerem pytania) i „Dodaj N pytań”. Pod polem prompt do skopiowania (`PROMPT_PYTAN`): dopisuje się temat, liczbę i rodzaje pytań, wkleja do dowolnego czatu z AI, a odpowiedź z powrotem w pole.
+- **Format** (`src/lib/import-pytan.ts`, opis na górze pliku): każde pytanie zaczyna się od `[jedna]`, `[kilka]`, `[prawda/fałsz]`, `[liczba]`, `[kolejność]`, `[pary]` albo `[ciekawostka]`; odpowiedzi `+`/`-`, `= prawda`, `= 1,5` z `zakres:` i `jednostka:`, elementy `>` we właściwej kolejności, pary `lewy = prawy`, do 4 linii `podpowiedź:`. Parser zdejmuje numerację, pogrubienia i blok kodu, które dokłada AI. Krok suwaka liczby wynika z miejsc po przecinku.
+- **Zapis** (`wklejPytania` w `quizy/akcje.ts`): wszystko albo nic, każde pytanie przez tę samą walidację co formularz (`odczytajZadanie`, mieszanie kolejności i par), na koniec quizu, najwyżej 80 naraz, tylko w quizie bez etapów. Grafiki dodaje się potem w edycji pytania.
+- **Prompt** zawiera zasady z CLAUDE.md (trudność rośnie, dobra odpowiedź na różnych miejscach, w „kilka” zmienna liczba dobrych, liczba nie na środku zakresu, ciekawostka po swoim pytaniu i nie na końcu, piwo bez koncernów, „pils”).
+- **Sprawdzone lokalnie:** parser na wszystkich rodzajach i na przykładzie z samego promptu; w panelu nowy klasyczny quiz, wklejone 7 pytań, zapis w bazie z pomieszaną kolejnością i parami; quiz testowy usunięty. Kopiowania promptu nie dało się sprawdzić w panelu podglądu (brak schowka), funkcja ta sama co przy „Kopiuj” linków gry.
+
 ## Ustalenia
 
 | Temat | Decyzja |

@@ -1327,3 +1327,29 @@ a.przycisk {
   flex-wrap: wrap;
   gap: 6px;
 }
+
+/* Wklejanie pytań do klasycznego quizu (quizy/[id]/wklej.tsx): tekst w krój o stałej szerokości, bo liczą się
+   znaki na początku linii (+, -, =, >) */
+.wklej-pole {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.wklej-podglad {
+  display: grid;
+  gap: 8px;
+}
+
+.wklej-prompt {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  margin-top: 24px;
+}
+
+.wklej-prompt .wklej-pole {
+  width: 100%;
+  color: var(--szary);
+}

@@ -10,6 +10,7 @@ import { IkonaKlodka, IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przesunEtap, przesunZadanie, ustawWidocznoscQuizu, usunEtap, usunZadanie, zmienPlanEtapu } from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
+import { WklejPytania } from "./wklej";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
 
@@ -220,6 +221,14 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
           </div>
         )}
       </section>
+
+      {/* klasyczny quiz: pytania hurtem z tekstu (np. z AI według promptu) */}
+      {etapy.length === 0 && (
+        <section className="panel-sekcja">
+          <h2>Wklej pytania</h2>
+          <WklejPytania quizId={quiz.id} />
+        </section>
+      )}
 
       {/* obsługa nie wie o pijanym finale; jest tylko po finale wyścigu po piwo (klasyczny pub quiz go nie ma) */}
       {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
