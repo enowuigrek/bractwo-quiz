@@ -1,5 +1,5 @@
 // Wklejanie pytań do klasycznego quizu (panel, strona quizu): tekst w prostym formacie, np. przygotowany przez AI
-// według `PROMPT_PYTAN`, zamieniony na pytania. Parser jest wspólny dla podglądu w przeglądarce i zapisu na serwerze;
+// według promptu z `promptPytan`, zamieniony na pytania. Parser jest wspólny dla podglądu w przeglądarce i zapisu na serwerze;
 // serwer i tak sprawdza każde pytanie tak samo jak formularz pytania (`odczytajTresc` w quizy/akcje.ts).
 //
 // Format: każde pytanie zaczyna się od rodzaju w nawiasach kwadratowych (puste linie między nimi dla wygody):
@@ -187,62 +187,100 @@ export function czytajPytania(tekst: string): WynikWklejenia {
   return { pytania, bledy };
 }
 
-/**
- * Prompt do skopiowania pod polem wklejania: prowadzący dopisuje temat i liczbę pytań, wkleja go do dowolnego
- * czatu z AI, a odpowiedź wkleja z powrotem. Zasady układania pytań jak w CLAUDE.md (trudność rośnie, dobra
- * odpowiedź pod różnymi literami, liczba nie na środku zakresu); bez ciekawostek.
- */
-export const PROMPT_PYTAN = `Przygotuj pytania do quizu w pubie (gracze odpowiadają na telefonach, pytania widać na telewizorze).
+/** Rodzaje pytań do wyboru w formularzu promptu, z zasadą i wzorem formatu dla AI. */
+export const RODZAJE_PROMPTU = {
+  jedna: {
+    nazwa: "Jedna odpowiedź",
+    zasada: "[jedna]: 4 odpowiedzi, dokładnie jedna dobra. Dobra odpowiedź stoi za każdym razem na innym miejscu.",
+    wzor: "[jedna] Treść pytania?\n- zła odpowiedź\n+ dobra odpowiedź\n- zła odpowiedź\n- zła odpowiedź",
+  },
+  kilka: {
+    nazwa: "Kilka dobrych",
+    zasada: "[kilka]: 4–6 odpowiedzi, dobrych od 1 do 4, w kolejnych pytaniach różna liczba dobrych.",
+    wzor: "[kilka] Treść pytania?\n+ dobra odpowiedź\n- zła odpowiedź\n+ dobra odpowiedź\n- zła odpowiedź",
+  },
+  prawda: {
+    nazwa: "Prawda / fałsz",
+    zasada: "[prawda/fałsz]: zdanie do oceny, mniej więcej po równo prawdziwych i fałszywych.",
+    wzor: "[prawda/fałsz] Zdanie do oceny.\n= prawda",
+  },
+  liczba: {
+    nazwa: "Liczba",
+    zasada:
+      "[liczba]: gracz ustawia liczbę suwakiem w podanym zakresie. Poprawna liczba nie leży na środku zakresu ani na jego krańcu. Jednostkę (np. l, km, %, zł) dopisz w linii „jednostka:”, a gdy jej nie ma, pomiń tę linię.",
+    wzor: "[liczba] Treść pytania?\n= 1,5\nzakres: 0,25 – 3\njednostka: l",
+  },
+  kolejnosc: {
+    nazwa: "Kolejność",
+    zasada: "[kolejność]: 3–6 elementów, wypisane we właściwej kolejności (automat sam je pomiesza).",
+    wzor: "[kolejność] Ułóż od najstarszego do najnowszego\n> pierwszy\n> drugi\n> trzeci",
+  },
+  pary: {
+    nazwa: "Pary",
+    zasada: "[pary]: 3–5 par, wypisane poprawnie (automat sam pomiesza prawą stronę).",
+    wzor: "[pary] Połącz … z …\nlewa strona = prawa strona\nlewa strona = prawa strona\nlewa strona = prawa strona",
+  },
+} as const;
+export type RodzajPromptu = keyof typeof RODZAJE_PROMPTU;
 
-Temat: [WPISZ TEMAT, np. filmy z lat 90.]
-Liczba pytań: [np. 30]
-Rodzaje pytań: [np. głównie [jedna], do tego kilka [kilka], [liczba] i [pary]]
-Dla kogo: [np. znajomi przy piwie, od łatwych do trudnych]
+export const POZIOMY_PROMPTU = {
+  latwy: { nazwa: "Łatwy", opis: "łatwe, dla każdego przy piwie, bez specjalistycznej wiedzy" },
+  mieszany: { nazwa: "Mieszany", opis: "od łatwych na początku do trudnych na końcu" },
+  trudny: { nazwa: "Trudny", opis: "dla znawców tematu, ale wciąż do zgadnięcia" },
+} as const;
+export type PoziomPromptu = keyof typeof POZIOMY_PROMPTU;
+
+export type UstawieniaPromptu = {
+  temat: string;
+  liczba: number;
+  rodzaje: RodzajPromptu[];
+  poziom: PoziomPromptu;
+  /** Dowolne dopiski prowadzącego, np. „bez pytań o Marvela”. */
+  uwagi: string;
+};
+
+/** Najwięcej pytań w jednym prompcie: tyle przyjmuje wklejanie naraz (`MAX_WKLEJONYCH` w quizy/akcje.ts). */
+export const MAX_PYTAN_PROMPTU = 80;
+
+const listaPolska = (l: string[]) => (l.length < 2 ? l.join("") : `${l.slice(0, -1).join(", ")} i ${l[l.length - 1]}`);
+
+/**
+ * Prompt dla AI z formularza pod polem wklejania (temat, liczba, rodzaje, poziom): prowadzący kopiuje gotowy tekst
+ * do dowolnego czatu, a odpowiedź wkleja z powrotem. W prompcie tylko wybrane rodzaje (zasady i wzory). Zasady
+ * układania jak w CLAUDE.md (trudność rośnie, dobra odpowiedź pod różnymi literami, liczba nie na środku zakresu);
+ * bez ciekawostek.
+ */
+export function promptPytan(u: UstawieniaPromptu): string {
+  const rodzaje = u.rodzaje.length ? u.rodzaje : (["jedna"] as RodzajPromptu[]);
+  const znaczniki = rodzaje.map((r) => RODZAJE_PROMPTU[r].wzor.slice(0, RODZAJE_PROMPTU[r].wzor.indexOf("]") + 1));
+  const opisRodzajow =
+    rodzaje.length === 1
+      ? `tylko ${znaczniki[0]}`
+      : rodzaje.includes("jedna")
+        ? `głównie [jedna], do tego ${listaPolska(znaczniki.filter((z) => z !== "[jedna]"))}`
+        : `${listaPolska(znaczniki)}, mniej więcej po równo`;
+  const temat = u.temat.trim() || "dowolny, lekki temat do pubu";
+  const uwagi = u.uwagi.trim();
+
+  return `Przygotuj pytania do quizu w pubie (gracze odpowiadają na telefonach, pytania widać na telewizorze).
+
+Temat: ${temat}
+Liczba pytań: ${u.liczba}
+Rodzaje pytań: ${opisRodzajow}
+Poziom: ${POZIOMY_PROMPTU[u.poziom].opis}${uwagi ? `\nDodatkowo: ${uwagi}` : ""}
 
 Zasady:
 - Fakty muszą być prawdziwe i sprawdzalne. Gdy nie masz pewności, pomiń pytanie.
 - Trudność rośnie od pierwszego do ostatniego pytania.
 - Po polsku, krótko i jasno: pytanie do 300 znaków, odpowiedź do 120 znaków.
-- [jedna]: 4 odpowiedzi, dokładnie jedna dobra. Dobra odpowiedź stoi za każdym razem na innym miejscu.
-- [kilka]: 4–6 odpowiedzi, dobrych od 1 do 4, w kolejnych pytaniach różna liczba dobrych.
-- [prawda/fałsz]: zdanie do oceny, mniej więcej po równo prawdziwych i fałszywych.
-- [liczba]: gracz ustawia liczbę suwakiem w podanym zakresie. Poprawna liczba nie leży na środku zakresu ani na jego krańcu. Jednostkę (np. l, km, %, zł) dopisz w linii „jednostka:”, a gdy jej nie ma, pomiń tę linię.
-- [kolejność]: 3–6 elementów, wypisane we właściwej kolejności (automat sam je pomiesza).
-- [pary]: 3–5 par, wypisane poprawnie (automat sam pomiesza prawą stronę).
+${rodzaje.map((r) => `- ${RODZAJE_PROMPTU[r].zasada}`).join("\n")}
 - Bez ciekawostek i komentarzy między pytaniami: same pytania.
 - W jednym pytaniu odpowiedzi się nie powtarzają. Bez odpowiedzi w rodzaju „wszystkie powyższe”.
 - Jeśli temat dotyczy piwa: pytaj o style, historię i browary rzemieślnicze, nie o piwa koncernów. Styl to „pils”, nie „pilzner”.
 
 Format: trzymaj się go dokładnie, bo tekst czyta automat. Każde pytanie zaczyna się od rodzaju w nawiasach kwadratowych. Zwróć same pytania w jednym bloku kodu, bez numeracji i bez komentarzy.
 
-[jedna] Treść pytania?
-- zła odpowiedź
-+ dobra odpowiedź
-- zła odpowiedź
-- zła odpowiedź
-
-[kilka] Treść pytania?
-+ dobra odpowiedź
-- zła odpowiedź
-+ dobra odpowiedź
-- zła odpowiedź
-
-[prawda/fałsz] Zdanie do oceny.
-= prawda
-
-[liczba] Treść pytania?
-= 1,5
-zakres: 0,25 – 3
-jednostka: l
-
-[kolejność] Ułóż od najstarszego do najnowszego
-> pierwszy
-> drugi
-> trzeci
-
-[pary] Połącz … z …
-lewa strona = prawa strona
-lewa strona = prawa strona
-lewa strona = prawa strona
+${rodzaje.map((r) => RODZAJE_PROMPTU[r].wzor).join("\n\n")}
 
 Do dowolnego pytania możesz dopisać do 4 linii „podpowiedź: …”: pokazują się graczom po kolei w trakcie pytania, od najogólniejszej.`;
+}

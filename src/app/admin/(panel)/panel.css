@@ -1342,15 +1342,27 @@ a.przycisk {
   gap: 8px;
 }
 
-.wklej-prompt {
+.wklej-pytania {
   display: grid;
-  gap: 10px;
-  justify-items: start;
-  margin-top: 24px;
+  gap: 28px;
 }
 
-.wklej-prompt .wklej-pole {
+.wklej-krok {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.wklej-podglad-promptu summary {
+  cursor: pointer;
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.wklej-podglad-promptu .wklej-pole {
   width: 100%;
+  margin-top: 8px;
   color: var(--szary);
 }
 

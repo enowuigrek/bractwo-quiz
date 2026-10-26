@@ -225,8 +225,8 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       {/* klasyczny quiz: pytania hurtem z tekstu (np. z AI według promptu) */}
       {etapy.length === 0 && (
         <section className="panel-sekcja">
-          <h2>Wklej pytania</h2>
-          <WklejPytania quizId={quiz.id} />
+          <h2>Pytania z AI</h2>
+          <WklejPytania quizId={quiz.id} temat={[quiz.tytul, ...quiz.tagi].join(", ")} />
         </section>
       )}
 
