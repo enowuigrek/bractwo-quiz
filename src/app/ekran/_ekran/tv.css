@@ -573,7 +573,7 @@
 .tv-zegar {
   margin: 0;
   min-width: 150px;
-  font-size: 96px;
+  font-size: 84px;
   font-weight: var(--w-black);
   line-height: 1;
   text-align: right;
