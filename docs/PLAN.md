@@ -190,7 +190,7 @@ Do zaprojektowania razem:
 ### Automat od godziny startu, szablony quizu (25.10, wieczór) ✅
 
 - **Automat w kreatorze gry:** „Prowadzenie automatyczne” w panelu (Uruchom quiz → Prowadzenie), zapisuje `sesje.auto` od razu przy zakładaniu gry. Na stronie gry w panelu widać „prowadzenie automatyczne”. Pilot dalej włącza i wyłącza automat w każdej chwili.
-- **Zapowiedź + automat:** o godzinie startu poczekalnia otwiera się sama (QR na TV), a po `NA_ZAPISY_MIN` = 5 minutach automat startuje quiz, jeśli dołączył choć jeden gracz (bez graczy czeka). Otwiera pierwszy, kto zapyta po czasie: ekran lokalu (`otworz_zaplanowane(adres)` co 5 s po godzinie startu, sam `ekran_lokalu` tylko czyta), TV gry albo pilot (`nastepnyKrok` → `otworz`, potem `nastepne`; TV woła `/api/auto` także w poczekalni) albo telefon gracza (`dolacz` przez `wewn.otworz_o_czasie`). Bez godziny start klika prowadzący, dalej prowadzi automat. Migracja `auto_otwarcie_poczekalni`.
+- **Zapowiedź + automat** (od 26.10 inaczej, patrz niżej: poczekalnia 5 min przed godziną, quiz o godzinie): o godzinie startu poczekalnia otwiera się sama (QR na TV), a po `NA_ZAPISY_MIN` = 5 minutach automat startuje quiz, jeśli dołączył choć jeden gracz (bez graczy czeka). Otwiera pierwszy, kto zapyta po czasie: ekran lokalu (`otworz_zaplanowane(adres)` co 5 s po godzinie startu, sam `ekran_lokalu` tylko czyta), TV gry albo pilot (`nastepnyKrok` → `otworz`, potem `nastepne`; TV woła `/api/auto` także w poczekalni) albo telefon gracza (`dolacz` przez `wewn.otworz_o_czasie`). Bez godziny start klika prowadzący, dalej prowadzi automat. Migracja `auto_otwarcie_poczekalni`.
 - **Godzina w poczekalni:** po otwarciu przez automat TV (pełny i prosty ekran) i pilot pokazują start automatu („Start o 19:05 · za 4:12”, `startPoczekalni` w `src/lib/gra/auto.ts`), zapowiedź przed otwarciem dalej godzinę z kreatora.
 - **Szablony nowego quizu (rodzaj quizu, 26.10):** w kreatorze najpierw rodzaj, pod nim tytuł i opis. „Wyścig po piwo” ma stałe konkurencje jak Piwny quiz Bractwa, z ich nazwami, opisami i ikonami: Na jedno 10, Jednak więcej 8, Ile? 5, Jakoś się ułoży 6, Jeszcze zdążę (finał trójki) 14. Kreator ich nie zmienia, serwer bierze je z `SZABLONY_QUIZU` po kluczu. „Klasyczny pub quiz” nie ma etapów ani finału. Etapy wyścigu można dalej poprawiać na stronie quizu; szablony etapów w formularzu etapu to te same konkurencje plus degustacja.
 - **Pijany finał tylko w wyścigu po piwo:** kreator gry pokazuje opcję tylko przy quizie z finałem serią (`QuizDoWyboru.wyscig`), serwer bez takiego finału jej nie włączy, a strona quizu bez finału nie ma sekcji „Pijany finał: wejście”.
@@ -216,6 +216,12 @@ Do zaprojektowania razem:
 - **Klasyczny w grze:** ranking to zwykła tabela, bez wyścigu i szklanki (TV i telefon, `rankingJakoWyscig(stan, n)`); bez grafiki „na pamiątkę” na telefonie; muzyka: poczekalnia jak dotąd, od pierwszego pytania do rankingów `public/muzyka/klasyczny.mp3` (spokojne tło, Łukasz wygeneruje; do tego czasu cisza), podium jak dotąd. Efekty dźwiękowe te same.
 - **Klasyczny bez ciekawostek:** prompt ich nie zamawia, wklejanie odrzuca `[ciekawostka]`, edytor pytania nie pokazuje tego rodzaju (stara ciekawostka da się edytować), serwer nie doda nowej.
 - **Sprawdzone lokalnie:** lista z zakładkami i filtrem tematów, nowy klasyczny quiz z tematami i wklejonymi pytaniami (ciekawostka odrzucona), kreator gry z wyborem rodzaju i tematu, gra klasyczna z botami: ranking na TV jako tabela. Gra i quiz testowe usunięte.
+
+### Automat startuje o godzinie z kreatora, klasyczny bez nalewania (26.10) ✅
+
+- **Godzina z kreatora to start quizu** (Łukasz, test klasycznego z botami: poczekalnia otworzyła się o godzinie, a quiz czekał jeszcze 5 minut, co wyglądało jak zawieszenie). Teraz poczekalnia z QR otwiera się `NA_ZAPISY_MIN` = 5 minut wcześniej (`otwarcieAutomatu`, w bazie `wewn.otworz_o_czasie`, migracja `poczekalnia_przed_startem`), a quiz rusza o tej godzinie, jeśli ktoś dołączył. TV, pilot i zapowiedź pokazują jedną godzinę: start quizu.
+- **Kreator gry:** wybór klasycznego od razu włącza prowadzenie automatyczne (wyścig domyślnie bez); przełącznik dalej działa.
+- **Klasyczny bez nalewania:** ranking w klasycznym nie gra dźwięku nalewania (nie ma szklanki), pozostałe efekty bez zmian.
 
 ## Ustalenia
 

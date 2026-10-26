@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { wczytajEfekty, wznowEfekty, zagraj, type Efekt } from "@/lib/gra/efekty";
 import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
+import { quizKlasyczny } from "@/lib/gra/wyscig";
 import type { StanSesji } from "@/lib/gra/typy";
 
 /** Tyle ostatnich sekund pytania tyka zegar. */
@@ -123,7 +124,8 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     if (b.faza === "wynik" && p.faza !== "wynik") zagraj(stan.zadanie?.typ === "ciekawostka" ? "ciekawostka" : "ding");
     if (b.faza === "odpowiedzi" && p.faza !== "odpowiedzi") zagraj("odpowiedzi");
 
-    if (b.faza === "ranking" && p.faza !== "ranking") {
+    // klasyczny pub quiz nie ma szklanki, więc ranking bez nalewania (26.10)
+    if (b.faza === "ranking" && p.faza !== "ranking" && !quizKlasyczny(stan)) {
       // koniec etapu (nie finału): dzwonek „ostatnia kolejka”; zwykły ranking: nalewanie (jeśli jest plik)
       zagraj(stan.ostatnie_w_etapie && !stan.etap?.finalowy ? "dzwonek" : "nalewanie");
     }

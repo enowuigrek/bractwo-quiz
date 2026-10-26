@@ -23,7 +23,7 @@ import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } 
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
-import { NA_ZAPISY_MIN, startPoczekalni } from "@/lib/gra/auto";
+import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
@@ -111,8 +111,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz"]);
 
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan?.faza));
-  // automat: po otwarciu poczekalni odliczanie do startu automatu (src/lib/gra/auto.ts)
-  const startZapowiedzi = stan?.faza === "poczekalnia" ? startPoczekalni(stan) : null;
+  const startZapowiedzi = stan?.faza === "poczekalnia" ? stan.planowany_start : null;
   const doZapowiedzi = useDoStartu(startZapowiedzi, przesuniecie);
   useKoniecPytania(kod, stan, teraz);
   useBoty(kod, token, stan);
@@ -259,7 +258,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             <span className="pomocniczy">
               Na ekranie lokalu jest zapowiedź z odliczaniem.{" "}
               {stan.auto
-                ? `Poczekalnia otworzy się sama o tej godzinie, a quiz ruszy ${NA_ZAPISY_MIN} minut później.`
+                ? `Poczekalnia otworzy się sama ${NA_ZAPISY_MIN} minut przed tą godziną, a quiz ruszy o czasie.`
                 : "Gracze dołączą po otwarciu poczekalni."}
             </span>
           )}

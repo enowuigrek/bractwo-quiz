@@ -14,29 +14,16 @@ const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
 const PODIUM_S = 30;
-/** Gra zapowiedziana na godzinę: poczekalnia otwiera się o tej godzinie, a quiz rusza tyle minut później. */
+/**
+ * Gra zapowiedziana na godzinę z automatem: godzina z kreatora to start quizu (26.10, Łukasz), a poczekalnia
+ * z QR otwiera się tyle minut wcześniej, żeby gracze zdążyli dołączyć. To samo w bazie: `wewn.otworz_o_czasie`.
+ */
 export const NA_ZAPISY_MIN = 5;
 
-/**
- * Kiedy automat sam wystartuje zapowiedzianą grę (ms): godzina z kreatora + czas na dołączenie. Null, gdy gra
- * nie ma godziny albo automatu (start klika prowadzący).
- */
-export function startAutomatu(stan: { auto: boolean; planowany_start: string | null }): number | null {
+/** Kiedy automat otworzy poczekalnię (ms): godzina startu minus czas na dołączenie. Null bez godziny albo automatu. */
+export function otwarcieAutomatu(stan: { auto: boolean; planowany_start: string | null }): number | null {
   if (!stan.auto || !stan.planowany_start) return null;
-  return Date.parse(stan.planowany_start) + NA_ZAPISY_MIN * 60_000;
-}
-
-/**
- * Godzina startu do pokazania w poczekalni (ISO): po otwarciu poczekalni przez automat start automatu (godzina
- * z kreatora + czas na zapisy), inaczej godzina z kreatora.
- */
-export function startPoczekalni(stan: {
-  auto: boolean;
-  planowany_start: string | null;
-  poczekalnia_otwarta: boolean;
-}): string | null {
-  const start = startAutomatu(stan);
-  return start !== null && stan.poczekalnia_otwarta ? new Date(start).toISOString() : stan.planowany_start;
+  return Date.parse(stan.planowany_start) - NA_ZAPISY_MIN * 60_000;
 }
 
 /**
@@ -48,11 +35,11 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
   const plansza = ([min, max]: readonly [number, number]) => s >= max || (stan.gotowi >= stan.w_grze && s >= min);
   switch (stan.faza) {
     case "poczekalnia": {
-      // zapowiedź na godzinę: o tej godzinie poczekalnia (QR na TV), po czasie na zapisy start, jeśli ktoś dołączył
-      const start = startAutomatu(stan);
-      if (start === null) return null;
-      if (!stan.poczekalnia_otwarta) return teraz >= Date.parse(stan.planowany_start!) ? "otworz" : null;
-      return teraz >= start && stan.w_grze > 0 ? "nastepne" : null;
+      // zapowiedź na godzinę: poczekalnia (QR na TV) chwilę przed, a o tej godzinie start, jeśli ktoś dołączył
+      const otwarcie = otwarcieAutomatu(stan);
+      if (otwarcie === null) return null;
+      if (!stan.poczekalnia_otwarta) return teraz >= otwarcie ? "otworz" : null;
+      return teraz >= Date.parse(stan.planowany_start!) && stan.w_grze > 0 ? "nastepne" : null;
     }
     case "wstep":
       return plansza(PLANSZA.wstep) ? "nastepne" : null;

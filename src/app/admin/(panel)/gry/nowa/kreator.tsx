@@ -75,6 +75,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   // zapowiedź (domyślnie włączona): pokazuje na ekranie lokalu godzinę i odliczanie, wyłączona od razu poczekalnię
   // z QR. Data i godzina w czasie lokalnym przeglądarki, domyślnie godzinę od teraz (pola są dopiero po wyborze
   // quizu, więc serwer ich nie renderuje i godzina z przeglądarki nie gryzie się z HTML-em). Do serwera idzie ISO.
+  // automat domyślnie przy klasycznym (przełącza wybór rodzaju niżej), przy wyścigu prowadzi człowiek
   const [auto, setAuto] = useState(false);
   const [zapowiedz, setZapowiedz] = useState(true);
   const [dataStartu, setDataStartu] = useState(() => zaGodzine().toLocaleDateString("sv-SE"));
@@ -147,6 +148,8 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                     setRodzaj(r);
                     setTemat(null);
                     setQuiz("");
+                    // klasyczny zwykle leci sam: godzina startu i automat, prowadzący tylko zagląda
+                    setAuto(r === "klasyczny");
                   }}
                 />
                 <strong>{NAZWY_RODZAJOW[r]}</strong>
@@ -362,7 +365,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <p className="podpowiedz">
               {zapowiedz
                 ? auto
-                  ? "Ekran lokalu pokaże godzinę i odliczanie, a o tej godzinie sam pokaże poczekalnię z kodem QR."
+                  ? `Ekran lokalu pokaże godzinę i odliczanie, ${NA_ZAPISY_MIN} minut przed nią sam pokaże poczekalnię z kodem QR, a o tej godzinie ruszy quiz.`
                   : "Ekran lokalu pokaże godzinę i odliczanie, a QR pojawi się, gdy prowadzący otworzy poczekalnię na pilocie."
                 : "Bez zapowiedzi TV od razu pokazuje poczekalnię z kodem QR."}
             </p>
@@ -378,7 +381,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
               {!auto
                 ? "Każdy krok klika prowadzący na pilocie."
                 : zapowiedz
-                  ? `Gra prowadzi się sama: o godzinie startu otwiera poczekalnię, po ${NA_ZAPISY_MIN} minutach na dołączenie startuje quiz (jeśli ktoś dołączył) i dalej klika kolejne kroki. Na pilocie możesz w każdej chwili wyłączyć automat albo włączyć go z powrotem.`
+                  ? `Gra prowadzi się sama: ${NA_ZAPISY_MIN} minut przed godziną startu otwiera poczekalnię, o tej godzinie startuje quiz (jeśli ktoś dołączył) i dalej klika kolejne kroki. Na pilocie możesz w każdej chwili wyłączyć automat albo włączyć go z powrotem.`
                   : "Gra prowadzi się sama od startu, który klikasz na pilocie. Na pilocie możesz w każdej chwili wyłączyć automat albo włączyć go z powrotem."}
             </p>
           </fieldset>

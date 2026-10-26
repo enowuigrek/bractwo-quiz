@@ -7,7 +7,6 @@ import { META_FINALU, krokiFinalu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
-import { startPoczekalni } from "@/lib/gra/auto";
 import { LITERY, PRAWDA_FALSZ, liczbaZJednostka } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -169,7 +168,7 @@ function Poczekalnia({
   przesuniecie: number;
 }) {
   const widoczni = gracze.slice(0, 40);
-  const start = startPoczekalni(stan);
+  const start = stan.planowany_start;
   const doStartu = useDoStartu(start, przesuniecie);
   return (
     <div className="pr-poczekalnia">

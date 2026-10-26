@@ -27,7 +27,6 @@ import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { PijanyTv, type GraczPijany } from "./pijany";
 import { useAutoZTv } from "./auto";
-import { startPoczekalni } from "@/lib/gra/auto";
 import { EfektyTv } from "./efekty";
 import { MuzykaTv } from "./muzyka";
 import { OsLiczbowa } from "./szacowanie";
@@ -314,8 +313,7 @@ function Poczekalnia({
   przesuniecie: number;
 }) {
   const druzyny = stan.tryb === "druzyny";
-  // automat: start 5 minut po otwarciu poczekalni (src/lib/gra/auto.ts)
-  const start = startPoczekalni(stan);
+  const start = stan.planowany_start;
   const doStartu = useDoStartu(start, przesuniecie);
   return (
     <div className="poczekalnia">
