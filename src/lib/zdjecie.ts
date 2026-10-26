@@ -1,5 +1,7 @@
 "use client";
 
+import { kolorZeZdjecia } from "./kapsel";
+
 /** Bok kwadratowego selfie w px. Na TV największe kółko ma 200 px, więcej nie trzeba. */
 const BOK = 256;
 
@@ -39,6 +41,8 @@ export async function wyslijZdjecie(token: string, zdjecie: Blob): Promise<strin
   const dane = new FormData();
   dane.append("token", token);
   dane.append("plik", new File([zdjecie], "selfie.jpg", { type: "image/jpeg" }));
+  // kolor kapsla dobrany do zdjęcia (awatar.tsx), zapisany w adresie zdjęcia
+  dane.append("kapsel", await kolorZeZdjecia(zdjecie));
   const odp = await fetch("/api/zdjecie", { method: "POST", body: dane });
   const wynik = (await odp.json().catch(() => ({}))) as { zdjecie?: string; blad?: string };
   if (!odp.ok || !wynik.zdjecie) throw new Error(wynik.blad ?? "Nie udało się wysłać zdjęcia.");

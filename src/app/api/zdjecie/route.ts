@@ -1,4 +1,5 @@
 import { usunGrafike } from "@/lib/grafiki";
+import { zKolorem } from "@/lib/kapsel";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 
 // Selfie graczy. Przeglądarka nie ma klucza do magazynu, więc zapis i usuwanie idą przez serwer:
@@ -43,7 +44,8 @@ export async function POST(request: Request) {
   const storage = supabaseAdmin().storage.from(BUCKET);
   const { error: bladZapisu } = await storage.upload(sciezka, plik, { contentType: plik.type, cacheControl: "604800" });
   if (bladZapisu) return blad("Nie udało się zapisać zdjęcia.", 500);
-  const url = storage.getPublicUrl(sciezka).data.publicUrl;
+  // kolor kapsla z telefonu w adresie (`#kapsel=rrggbb`, src/lib/kapsel.ts); zły kolor po prostu pomijamy
+  const url = zKolorem(storage.getPublicUrl(sciezka).data.publicUrl, String(dane?.get("kapsel") ?? "") || null);
 
   const { error } = await supabaseAdmin().from("gracze").update({ zdjecie_url: url }).eq("id", gracz.id);
   if (error) {

@@ -1005,8 +1005,8 @@ html:has(.kolumna) {
 }
 
 /* Awatar gracza: selfie w kółku albo pierwsza litera nicku */
-/* Awatar jako kapsel (awatar.tsx): ząbkowany złoty brzeg w tle, zdjęcie albo litera w środku (dopełnienie ustawia
-   komponent). Brzeg kapsla zastępuje obwódki: `border` z innych reguł (TV) nie rysuje się wokół ząbków. */
+/* Awatar jako kapsel (awatar.tsx): ząbkowany kapsel w tle (obraz ustawia komponent), zdjęcie w środku (dopełnienie
+   też z komponentu) albo litera na całym kapslu. Brzeg kapsla zastępuje obwódki: `border` z innych reguł (TV) nie rysuje się wokół ząbków. */
 .awatar {
   flex: none;
   box-sizing: border-box;
@@ -1014,7 +1014,10 @@ html:has(.kolumna) {
   place-items: center;
   border-radius: var(--r-round);
   object-fit: cover;
-  background: url("/grafiki/kapsel.svg") center / 100% 100% no-repeat;
+  background-color: transparent;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   border: 0 !important;
   color: var(--na-zlocie);
   font-weight: var(--w-black);
@@ -1022,11 +1025,9 @@ html:has(.kolumna) {
   vertical-align: middle;
 }
 
-/* litera na kolorowym kółku w środku kapsla */
+/* litera prosto na kapslu (kapsel w jasnym kolorze nicku, litera ciemna) */
 .awatar-litera {
-  background:
-    radial-gradient(circle closest-side, var(--tlo) 97%, transparent 100%) content-box,
-    url("/grafiki/kapsel.svg") center / 100% 100% no-repeat border-box;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 /* Selfie przy nicku na telefonie */
@@ -1867,6 +1868,15 @@ html:has(.kolumna) {
 .haslo-kibica {
   display: inline;
   line-height: 1.5;
+}
+
+/* Telefon gracza: powierzchnie ciepłe, prawie czarne, z brązowym obrysem, jak na TV (26.10: granatowe tła odpowiedzi
+   i kafelków odstawały). Panel zostaje przy tokenach z tokens.css. */
+.ekran-gracza {
+  --kamien: #17130f;
+  --kamien2: #493a2a;
+  --kamien3: #5e4b36;
+  --pole: #0d0a07;
 }
 
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */

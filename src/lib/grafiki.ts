@@ -41,6 +41,8 @@ export async function usunGrafike(url: string | null | undefined): Promise<void>
   const znacznik = `/storage/v1/object/public/${BUCKET}/`;
   const i = url?.indexOf(znacznik) ?? -1;
   if (!url || i < 0) return;
+  // adres selfie może mieć na końcu kolor kapsla (`#kapsel=…`, src/lib/kapsel.ts)
+  url = url.split("#")[0];
   // błąd sprzątania nie powinien blokować zapisu, najwyżej zostanie osierocony plik
   await supabaseAdmin().storage.from(BUCKET).remove([decodeURIComponent(url.slice(i + znacznik.length))]);
 }

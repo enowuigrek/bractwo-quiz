@@ -15,7 +15,8 @@ export default async function StronaGracza({ params }: PageProps<"/[kod]">) {
   if (kod !== kod.toUpperCase()) redirect(`/${kod.toUpperCase()}`);
 
   return (
-    <main className="kolumna">
+    // `ekran-gracza`: ciepłe, prawie czarne powierzchnie jak na TV (globals.css)
+    <main className="kolumna ekran-gracza">
       <Gracz kod={kod} />
     </main>
   );
