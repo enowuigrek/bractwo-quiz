@@ -110,6 +110,13 @@ span.panel-logo-lokalu {
   gap: var(--section-gap);
 }
 
+/* kolumna kart w układzie dwóch kolumn (strona lokalu): karty jedna pod drugą, niezależnie od drugiej kolumny */
+.stos-kart {
+  display: grid;
+  gap: var(--section-gap);
+  min-width: 0;
+}
+
 @media (min-width: 960px) {
   .panel {
     max-width: 1120px;

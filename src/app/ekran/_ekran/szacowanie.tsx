@@ -54,7 +54,6 @@ export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean })
       </div>
       <div className="tv-os-zakres">
         <span>{liczbaZJednostka(min, z.dane.jednostka)}</span>
-        {!wynik && <span className="tv-podpowiedz">Ustaw liczbę suwakiem na telefonie</span>}
         <span>{liczbaZJednostka(max, z.dane.jednostka)}</span>
       </div>
       {wynik && !!z.najblizej?.length && (

@@ -1382,6 +1382,12 @@ html:has(.kolumna) {
   margin: 18px 0 4px;
 }
 
+/* kod QR na całą szerokość linku pod nim i z odstępem od niego (26.10: stał krzywo i przyklejony) */
+.pilot-udostepnij .qr {
+  width: 100%;
+  margin: 10px 0 12px;
+}
+
 /* kod gry przy tytule pilota */
 /* lokal gry na samej górze pilota (pilot.tsx): logo i nazwa, wyraźnie, żeby nie pomylić gier */
 .pilot-lokal {
