@@ -247,6 +247,19 @@ const GRAFIKI = {
     "A one-litre dimpled thick glass Bavarian beer mug with a big handle (Masskrug), full of golden lager with a thick " +
       "white foam head, standing on a wooden table, blurred warm lights of a festival tent behind.",
   ),
+  // etap „Ile?” (26.10): grafika do każdego pytania; bez dat, napisów i wskazówek epoki, które zdradzałyby rok
+  "pyt-pils": zdjecie(
+    "pils.webp",
+    "A tall tapered glass of crystal-clear brilliant golden pale lager with a dense snow-white foam head, fine bubbles " +
+      "rising, standing on a dark wooden table of a traditional Czech pub with vaulted ceiling, warm lights blurred behind.",
+  ),
+  "pyt-weihenstephan": zdjecie(
+    "weihenstephan.webp",
+    "An old Bavarian monastery brewery on a green hill above a small town, white walls and red tile roofs, an onion-domed " +
+      "church tower, hop gardens on the slopes, a stone cellar entrance in the hillside with stacked wooden barrels, " +
+      "soft morning light.",
+    STYL_ZDJECIA,
+  ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
     "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +
