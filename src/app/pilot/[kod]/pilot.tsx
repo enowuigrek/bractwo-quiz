@@ -304,29 +304,38 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
               {kod}
             </span>
           </div>
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
-          </p>
-          {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki).
-              Klasyczny pub quiz na razie nie ma muzyki, więc bez przełącznika (26.10) */}
-          {!klasyczny && (
-            <p className={`pilot-przelacznik${stan.muzyka ? " wlaczony" : ""}`}>
-              {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
-              {/* stałe napisy: zmienny tekst zmieniał wysokość i przesuwał przyciski niżej; stan widać po przycisku */}
-              <span>Muzyka i dźwięki na TV</span>
-              <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
-                {stan.muzyka ? "Wyłącz" : "Włącz"}
+          {/* lokal i faza, a obok przełączniki samymi ikonami (26.10: bez podpisów, mieszczą się w jednym wierszu);
+              włączony świeci na złoto, nazwa w podpowiedzi i dla czytnika ekranu. Muzyka i efekty grają tylko na TV,
+              klasyczny pub quiz na razie nie ma muzyki. Automat klika kolejne kroki sam (auto.tsx) */}
+          <div className="pilot-pasek">
+            <p className="pomocniczy">{[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}</p>
+            <div className="pilot-przelaczniki">
+              {!klasyczny && (
+                <button
+                  type="button"
+                  className={`pilot-ikona${stan.muzyka ? " wlaczony" : ""}`}
+                  aria-pressed={stan.muzyka}
+                  aria-label="Muzyka i dźwięki na TV"
+                  title={stan.muzyka ? "Muzyka i dźwięki na TV: grają" : "Muzyka i dźwięki na TV: wyłączone"}
+                  disabled={wysylam}
+                  onClick={() => akcja("muzyka")}
+                >
+                  {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
+                </button>
+              )}
+              <button
+                type="button"
+                className={`pilot-ikona${stan.auto ? " wlaczony" : ""}`}
+                aria-pressed={stan.auto}
+                aria-label="Prowadzenie automatyczne"
+                title={stan.auto ? "Prowadzenie automatyczne: włączone" : "Prowadzenie automatyczne: wyłączone"}
+                disabled={wysylam}
+                onClick={() => void przelaczAuto()}
+              >
+                <IkonaAutomat />
               </button>
-            </p>
-          )}
-          {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
-          <p className={`pilot-przelacznik${stan.auto ? " wlaczony" : ""}`}>
-            <IkonaAutomat />
-            <span>Prowadzenie automatyczne</span>
-            <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => void przelaczAuto()}>
-              {stan.auto ? "Wyłącz" : "Włącz"}
-            </button>
-          </p>
+            </div>
+          </div>
 
           {licznik}
 

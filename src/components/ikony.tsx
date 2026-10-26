@@ -1,6 +1,6 @@
 // Ikony liniowe 24×24 całej aplikacji (panel, pilot, telefon, TV), kolor z `currentColor`. Od 25.10 ikony zamiast
 // emotek w interfejsie (docs/DESIGN-SYSTEM.md). Wielkość: domyślnie 1,1 em jak tekst (`.ikona-svg` w globals.css), gdzie indziej z CSS
-// miejsca (np. `.pilot-przelacznik svg`, `.etap-uwaga svg`).
+// miejsca (np. `.pilot-ikona svg`, `.etap-uwaga svg`).
 
 const wspolne = {
   viewBox: "0 0 24 24",

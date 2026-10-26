@@ -2846,36 +2846,61 @@ html:has(.kolumna) {
 }
 
 /* Pilot: wiersz z włącznikiem (muzyka, automatyczne prowadzenie): ikona, opis, przycisk równo po prawej */
-.pilot-przelacznik {
+/* Pilot: lokal i faza, a po prawej przełączniki samymi ikonami (muzyka, automat; pilot.tsx, 26.10) */
+.pilot-pasek {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 0 0 6px;
-  color: var(--szary);
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 0;
 }
 
-.pilot-przelacznik svg {
-  flex: none;
-  width: 22px;
-  height: 22px;
-}
-
-.pilot-przelacznik span {
-  flex: 1;
+.pilot-pasek .pomocniczy {
   min-width: 0;
+  margin: 0;
 }
 
-.pilot-przelacznik button {
+.pilot-przelaczniki {
   flex: none;
-  min-width: 96px;
+  display: flex;
+  gap: 10px;
 }
 
-.pilot-przelacznik.wlaczony svg {
+.pilot-ikona {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--kamien2);
+  background: var(--kamien);
+  color: var(--szary);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.pilot-ikona svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pilot-ikona.wlaczony {
+  border-color: var(--zloto);
+  background: rgba(227, 172, 63, 0.14);
   color: var(--zloto);
 }
 
+.pilot-ikona:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* Ikony liniowe (src/components/ikony.tsx): domyślnie wielkości tekstu, w linii z nim. `:where` bez wagi, więc
-   rozmiar z miejsca (np. `.pilot-przelacznik svg`, `.przycisk-maly.ikona svg`) zawsze wygrywa. */
+   rozmiar z miejsca (np. `.pilot-ikona svg`, `.przycisk-maly.ikona svg`) zawsze wygrywa. */
 :where(.ikona-svg) {
   width: 1.1em;
   height: 1.1em;

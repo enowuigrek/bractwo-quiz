@@ -2,9 +2,9 @@
 
 Pomysły na później są w [POMYSLY.md](POMYSLY.md), a design system w [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
-## Stan na 25.10 w południe: od czego zacząć
+## Stan na 26.10 po południu: od czego zacząć
 
-Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia decyzji jest niżej (najnowsze: „Pijany finał: wejście, pula i komentarze (25.10)”, „Efekty dźwiękowe na TV (25.10)”, „Boty, automatyczne prowadzenie…”). Zasady pracy są w `CLAUDE.md`, wygląd w `docs/DESIGN-SYSTEM.md` (ikony, dopasowanie do ekranu TV, kolory statusów), test w `docs/TEST.md`, pomysły w `docs/POMYSLY.md`.
+Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia decyzji jest niżej, najnowsze na końcu sekcji „Na 25.10” (od „Uczciwsze punkty, szybsze nalewanie…” do „Kreator na kafelkach, pilot uporządkowany…” z 26.10). Zasady pracy są w `CLAUDE.md`, wygląd w `docs/DESIGN-SYSTEM.md` (ikony, dopasowanie do ekranu TV, kolory statusów), test w `docs/TEST.md`, pomysły w `docs/POMYSLY.md`.
 
 **Produkcja:** `https://quiz.bractwopiwne.pl` (Vercel, region `fra1`, wdrożenie z `main`), baza Supabase `bractwo-quiz` (Frankfurt). Commit, który działa, pokazuje `/api/wersja`.
 
@@ -36,16 +36,19 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Nie grane na wielu prawdziwych telefonach naraz: odpadanie, wyścig z paskiem reszty przy 13+ graczach, finał z karą, pijany finał. Finału i podium automatem z botami jeszcze nikt nie przeszedł do końca.
 - **Telewizor w Piwiarni niesprawdzony** (25.10): testowy Samsung z Tizen 9 to domowy OLED Łukasza (tam ekran, muzyka i brak wygaszacza działają), a starszy Samsung u mamy Łukasza pokazał na `/ekran` same czarne tło (przeglądarka starsza niż Chrome 111, którego wymaga Next 16). Przesuwany pasek podium i płynność latających awatarów na słabszym TV niesprawdzone.
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
-- Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY, KSHD, TJPR, LTQA, FVRR, FRQE, AUYD, UXQZ (i wcześniejsze, jeśli zostały).
+- Stare gry testowe z 25.10 (JLUL, QDSD…) mogą jeszcze wisieć w historii rozgrywek: do usunięcia w panelu. Gry testowe z 26.10 są usunięte, lokal „Test nagłówka” też.
 
 - **Lista drobnych zmian wizualnych od Łukasza (26.10), do zrobienia po kolei w kolejnej sesji:**
   1. ✅ Pilot: ramka „odpowiedziano” (stoi zawsze, opis niżej).
   2. ✅ Po uruchomieniu od razu pilot, przekazywanie pilota w pilocie, menu panelu na telefonie (opis niżej).
-  3. Osobne panele dla lokali, a w pilocie osobne panele graczy i pytań (osobny krok).
+  3. **Do zrobienia (następny krok):** osobne panele dla lokali, a w pilocie osobne panele graczy i pytań. Łukasz opisał to krótko; przed pracą dopytaj o szczegóły. Punkt wyjścia: lokale są dziś w panelu pod „Lokale” (menu → Przygotowanie, `src/app/admin/(panel)/lokale/`), a w pilocie gracze i pytanie to zwijane karty pod przyciskami (`pilot-gracze-karta`, `pilot-pytanie-karta`, `udostepnij.tsx` w `src/app/pilot/[kod]/`). Prawdopodobnie chodzi o osobne widoki (zakładki albo strony) zamiast jednej długiej strony; zasada z pilota zostaje: przyciski sterowania i ramka stanu nie mogą zmieniać pozycji.
   4. ✅ „Ile?”: oś na dole, gracze nad nią, poprawna odpowiedź pod nagłówkiem (opis niżej).
   5. ✅ Kreska odpadania z większym odstępem (opis niżej).
 
-**Następny krok:** lista drobnych zmian wizualnych wyżej, potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
+- **Dziś (26.10) zmienione, na produkcji, ale niesprawdzone na prawdziwym TV/telefonach w lokalu:** wybuch szklanki na TV z klatek klipu (zamiast konfetti; na komputerze dalej wideo), równoległe drogi finału blisko siebie, scena TV na cały ekran (nagłówek od góry, stopka od dołu), podium i tabela na zmianę na końcu gry, ekran lokalu wraca do logo po „Zakończ grę”, nowy pilot (ramka stanu, ikony muzyki i automatu, menu), kreator na kafelkach. Łukasz testuje na OLED i iPhonie na bieżąco.
+- Muzyka klasycznego pub quizu wyłączona (POMYSLY.md), a „Ile?” ma mnożnik ×2.
+
+**Następny krok:** punkt 3 z listy wyżej (osobne panele), potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
 
 ## Na 25.10: dźwięki i pijany finał
 
@@ -478,6 +481,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
   - Skakanie ekranu na telefonie przy wyborze: kafelki, przyciski czasu i szablony mają `position: relative` (ukryte pole wyboru leżało gdzie indziej i telefon do niego przewijał), a kreator ma zapas 45vh pod spodem, żeby skracająca się treść nie podjeżdżała widoku. Sprawdzone: wybór lokalu, rodzaju i quizu po przewinięciu nie rusza ekranu.
   - Pilot: ramka stanu ma dwa wiersze: licznik, a pod nim postęp („Pytanie 4/10”, w wyścigu „Etap 2/5 · 14/59”, przed startem liczba pytań) i po prawej rodzaj następnego pytania jako kolorowa pastylka (`.rodzaj-pytania` w `globals.css`: jedna odpowiedź złota, kilka niebieska, prawda/fałsz zielona, szacowanie fioletowa, kolejność czerwona, pary turkusowa, ciekawostka szara) albo krótko czas („Zostało 12 s”, „Start za 3 s”). Gracze w poczekalni zwijani (domyślnie rozwinięci), bez tekstu o QR, ✕ i zdjęciach.
   - Plansza „Zaczynamy!”: „Gra 1 osoba”, „Grają 2–4 osoby”, „Gra 5 osób” (`grajaOsoby` w `start.tsx`).
+  - Pilot: przełączniki muzyki i automatu jako okrągłe przyciski z samą ikoną (`.pilot-ikona`, złote = włączone, nazwa w `title` i `aria-label`) w jednym wierszu z lokalem i fazą; w wyścigu oba mieszczą się obok siebie.
 ### Dzień 1
 
 - **Next.js 16.4** (Turbopack). `cacheComponents` wyłączone: panel i tak jest dynamiczny, a gra działa po stronie klienta na Realtime. Middleware nazywa się teraz `proxy` (`src/proxy.ts`).
