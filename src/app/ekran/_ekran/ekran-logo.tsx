@@ -13,7 +13,8 @@ type Props = {
 
 /**
  * Ekran lokalu (26.10, Łukasz): jeden ekran zamiast zmieniających się plansz. Duże logo lokalu na środku, które
- * powoli unosi się nad ciepłym blaskiem (tło z tym samym logo daje tlo.tsx). Zapowiedziany klasyczny pub quiz
+ * powoli unosi się nad ciepłym blaskiem, a w tle tylko dryfujące plamy światła (przygaszone logo lokalu w tle
+ * jest dopiero w trakcie klasycznego quizu, tlo.tsx). Zapowiedziany klasyczny pub quiz
  * dokłada tytuł, godzinę i odliczanie. Zapowiedziany wyścig po piwo ma dalej plansze (plansze.tsx).
  */
 export function EkranLogo({ lokal, zapowiedz = null, przesuniecie = 0 }: Props) {

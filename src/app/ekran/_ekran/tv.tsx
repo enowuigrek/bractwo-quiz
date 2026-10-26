@@ -174,11 +174,14 @@ export function Tv({ kod, qr, host }: Props) {
 
   // starsza przeglądarka telewizora: prosty ekran (te same dane, muzyka i efekty, bez animacji i nowego CSS)
   const prosty = useTrybProsty();
+  // zapowiedź klasycznego (poczekalnia jeszcze zamknięta): duże logo na środku (ekran-logo.tsx), więc w tle
+  // bez drugiego, przygaszonego logo; to pojawia się dopiero w trakcie quizu
+  const zamknieta = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
   if (prosty) {
     return (
       <ScenaProsta
         ciemna={stan?.faza === "werble"}
-        lokalTla={stan && quizKlasyczny(stan) ? (stan.lokal ?? null) : undefined}
+        lokalTla={stan && quizKlasyczny(stan) ? (zamknieta ? null : (stan.lokal ?? null)) : undefined}
       >
         <ProstyTv
           stan={stan}
@@ -205,7 +208,7 @@ export function Tv({ kod, qr, host }: Props) {
     <Scena
       zgaszona={stan?.faza === "werble"}
       nastroj={stan ? nastrojFazy(stan) : undefined}
-      lokalTla={stan && quizKlasyczny(stan) ? (stan.lokal ?? null) : undefined}
+      lokalTla={stan && quizKlasyczny(stan) ? (zamknieta ? null : (stan.lokal ?? null)) : undefined}
     >
       {!stan ? (
         <div className="tv-srodek">

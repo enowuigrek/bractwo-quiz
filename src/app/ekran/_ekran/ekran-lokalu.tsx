@@ -117,7 +117,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   const wyscig = !!zapowiedz && !zapowiedz.klasyczny;
   if (prosty) {
     return (
-      <ScenaProsta lokalTla={wyscig ? undefined : lokal}>
+      <ScenaProsta>
         {wyscig ? (
           <PlanszaProsta lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
         ) : (
@@ -136,7 +136,8 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
     );
   }
   return (
-    <Scena lokalTla={lokal}>
+    // w tle same ciepłe plamy światła: logo stoi duże na środku, a przygaszone logo w tle dopiero w trakcie quizu
+    <Scena lokalTla={null}>
       <EkranLogo lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
       {dzwieki}
     </Scena>
