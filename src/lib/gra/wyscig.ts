@@ -8,12 +8,17 @@ export const MAX_W_WYSCIGU = 12;
 /** Ilu graczy ma tor, gdy wszyscy się nie mieszczą (reszta w pasku małych awatarów). */
 export const NA_TORACH_W_TLOKU = 10;
 
+/** Klasyczny pub quiz: quiz bez etapów (bez finału, szklanki i wyścigu, src/lib/tagi.ts). */
+export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }): boolean {
+  return (stan.quiz?.liczba_etapow ?? 0) === 0;
+}
+
 /**
- * Ranking po pytaniu na TV (i szklanka na telefonie): zawsze wyścig po piwo, także w quizie bez etapów i przy
- * dużej grupie (od 24.10; wcześniej powyżej 12 graczy była tabela). Prowadzący tego nie wybiera.
+ * Ranking po pytaniu na TV (i szklanka na telefonie): wyścig po piwo przy każdej liczbie graczy (od 24.10;
+ * wcześniej powyżej 12 graczy była tabela). Klasyczny pub quiz ma zwykłą tabelę, bez szklanki (26.10).
  */
-export function rankingJakoWyscig(liczbaGraczy: number): boolean {
-  return liczbaGraczy > 0;
+export function rankingJakoWyscig(stan: { quiz: { liczba_etapow: number } | null }, liczbaGraczy: number): boolean {
+  return liczbaGraczy > 0 && !quizKlasyczny(stan);
 }
 
 /**

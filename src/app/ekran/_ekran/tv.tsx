@@ -234,7 +234,7 @@ export function Tv({ kod, qr, host }: Props) {
           ) : stan.faza === "ranking" ? (
             // wyścig po piwo, gdy gracze mieszczą się na torach; inaczej tabela. Bez odpadniętych w etapach
             // (pełna tabela i podium na końcu mają wszystkich)
-            rankingJakoWyscig(wGrze.length) ? (
+            rankingJakoWyscig(stan, wGrze.length) ? (
               <WyscigTv stan={stan} ranking={wGrze} />
             ) : (
               <RankingTv stan={stan} ranking={wGrze} />

@@ -10,7 +10,7 @@ import { LIMITY } from "../limity";
 /** Id formularza; przycisk „Zapisz quiz” na dole strony wysyła go z `wroc=1`. */
 export const FORMULARZ_QUIZU = "quiz-naglowek";
 
-/** Tytuł i opis quizu w nagłówku. Ołówek otwiera edycję w miejscu. */
+/** Tytuł, opis i tematy quizu w nagłówku. Ołówek otwiera edycję w miejscu. */
 export function NaglowekQuizu({ quiz }: { quiz: Quiz }) {
   const [edycja, ustawEdycje] = useState(false);
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(async (poprzedni, dane) => {
@@ -41,6 +41,17 @@ export function NaglowekQuizu({ quiz }: { quiz: Quiz }) {
             <label htmlFor="opis">Opis (tylko dla obsługi)</label>
             <textarea id="opis" name="opis" className="pole" defaultValue={quiz.opis ?? ""} maxLength={LIMITY.opis} rows={2} />
           </div>
+          <div>
+            <label htmlFor="tagi">Tematy (po przecinku, do filtrowania)</label>
+            <input
+              id="tagi"
+              name="tagi"
+              className="pole"
+              defaultValue={quiz.tagi.join(", ")}
+              placeholder="np. filmy, lata 90."
+              maxLength={200}
+            />
+          </div>
           <KomunikatFormularza stan={stan} />
           <div className="quiz-naglowek-przyciski">
             <button type="submit" className="przycisk-maly zloty" disabled={trwa}>
@@ -55,19 +66,29 @@ export function NaglowekQuizu({ quiz }: { quiz: Quiz }) {
         <>
           <input type="hidden" name="tytul" value={quiz.tytul} />
           <input type="hidden" name="opis" value={quiz.opis ?? ""} />
+          <input type="hidden" name="tagi" value={quiz.tagi.join(", ")} />
           <div className="quiz-naglowek-tytul">
             <h1>{quiz.tytul}</h1>
             <button
               type="button"
               className="przycisk-maly ikona"
               onClick={() => ustawEdycje(true)}
-              aria-label="Edytuj tytuł i opis"
+              aria-label="Edytuj tytuł, opis i tematy"
               data-podpis="Edytuj"
             >
               <IkonaEdytuj />
             </button>
           </div>
           {quiz.opis && <p className="pomocniczy quiz-naglowek-opis">{quiz.opis}</p>}
+          {quiz.tagi.length > 0 && (
+            <p className="tagi">
+              {quiz.tagi.map((t) => (
+                <span key={t} className="tag">
+                  {t}
+                </span>
+              ))}
+            </p>
+          )}
           {stan.blad && <KomunikatFormularza stan={stan} />}
         </>
       )}

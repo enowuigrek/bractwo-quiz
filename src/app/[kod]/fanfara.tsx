@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { Werble } from "@/components/werble";
 import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
+import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaMegafon } from "@/components/ikony";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
@@ -64,8 +65,9 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
     if (miejsce === 1) return deszczKonfetti(4000);
   }, [odslonieto, faza, miejsce]);
 
-  // grafika z wynikiem do relacji: dla każdego gracza z miejscem, po odsłonięciu
-  const udostepnienie = moj?.miejsce ? (
+  // grafika z wynikiem do relacji: dla każdego gracza z miejscem, po odsłonięciu; klasyczny pub quiz to za małe
+  // wydarzenie na pamiątkę (26.10)
+  const udostepnienie = moj?.miejsce && !quizKlasyczny(stan) ? (
     <UdostepnijWynik
       wynik={{
         tytul: stan.quiz?.tytul ?? "Quiz",

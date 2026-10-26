@@ -499,8 +499,8 @@ function WGrze({
             )}
           </p>
         )}
-        {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV */}
-        {mojWiersz && rankingJakoWyscig(stan.w_grze) && (
+        {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV (w klasycznym nie ma) */}
+        {mojWiersz && rankingJakoWyscig(stan, stan.w_grze) && (
           <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />
         )}
       </>

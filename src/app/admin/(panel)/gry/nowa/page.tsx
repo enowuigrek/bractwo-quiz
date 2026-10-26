@@ -15,11 +15,17 @@ export default async function NowaGra() {
     db.from("lokale").select("id, nazwa, miasto, logo_url").order("nazwa").returns<Lokal[]>(),
     db
       .from("quizy")
-      .select("id, tytul, zadania(count), etapy(finalowy, seria)")
+      .select("id, tytul, tagi, zadania(count), etapy(finalowy, seria)")
       .in("tylko_glowny", widoczne(rola))
       .order("utworzono", { ascending: false })
       .returns<
-        { id: string; tytul: string; zadania: { count: number }[]; etapy: { finalowy: boolean; seria: boolean }[] }[]
+        {
+          id: string;
+          tytul: string;
+          tagi: string[];
+          zadania: { count: number }[];
+          etapy: { finalowy: boolean; seria: boolean }[];
+        }[]
       >(),
   ]);
 
@@ -37,7 +43,9 @@ export default async function NowaGra() {
             id: q.id,
             tytul: q.tytul,
             pytania: q.zadania[0]?.count ?? 0,
-            wyscig: q.etapy.some((e) => e.finalowy && e.seria),
+            tagi: q.tagi,
+            rodzaj: q.etapy.length ? "wyscig" : "klasyczny",
+            pijany: q.etapy.some((e) => e.finalowy && e.seria),
           }))}
         />
       </section>

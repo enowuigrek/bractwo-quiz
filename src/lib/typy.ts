@@ -18,6 +18,8 @@ export type Quiz = {
   utworzono: string;
   /** Widzi go tylko główny (src/lib/admin.ts), obsługa nie. */
   tylko_glowny: boolean;
+  /** Tematyczne oznaczenia do filtrowania (src/lib/tagi.ts). */
+  tagi: string[];
 };
 
 import type { TypZadania, ZadanieDane } from "./zadania";

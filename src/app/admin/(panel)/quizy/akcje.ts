@@ -18,6 +18,7 @@ import {
 } from "@/lib/etapy";
 import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
 import { czytajPytania } from "@/lib/import-pytan";
+import { czytajTagi } from "@/lib/tagi";
 import { LIMITY, liczbaPytan } from "./limity";
 
 function tekst(dane: FormData, pole: string): string {
@@ -59,7 +60,12 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
   const { data, error } = await db
     .from("quizy")
     // główny decyduje, czy quiz widzi obsługa; quiz założony przez obsługę widzą wszyscy
-    .insert({ tytul, opis: tekst(dane, "opis") || null, tylko_glowny: widziWszystko(rola) && !!dane.get("tylko_glowny") })
+    .insert({
+      tytul,
+      opis: tekst(dane, "opis") || null,
+      tagi: czytajTagi(tekst(dane, "tagi")),
+      tylko_glowny: widziWszystko(rola) && !!dane.get("tylko_glowny"),
+    })
     .select("id")
     .single();
   if (error) return { blad: `Nie udało się utworzyć quizu: ${error.message}` };
@@ -78,13 +84,17 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
   if (opis.length > LIMITY.opis) return { blad: `Opis może mieć najwyżej ${LIMITY.opis} znaków.` };
 
-  const { error } = await supabaseAdmin()
+  const db = supabaseAdmin();
+  const { error } = await db
     .from("quizy")
-    .update({ tytul, opis: opis || null })
+    .update({ tytul, opis: opis || null, tagi: czytajTagi(tekst(dane, "tagi")) })
     .eq("id", id);
   if (error) return { blad: `Nie udało się zapisać: ${error.message}` };
-  // „Zapisz quiz” na dole edycji: zapis i powrót do listy
-  if (dane.get("wroc")) redirect("/admin/quizy");
+  // „Zapisz quiz” na dole edycji: zapis i powrót do listy, na zakładkę rodzaju tego quizu
+  if (dane.get("wroc")) {
+    const { count: etapow } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", id);
+    redirect(etapow ? "/admin/quizy" : "/admin/quizy?rodzaj=klasyczny");
+  }
   refresh();
   return { ok: "Zapisano." };
 }
@@ -102,14 +112,17 @@ export async function usunQuiz(id: string): Promise<void> {
   await wymagajQuizu(await wymagajAdmina(), id);
   const db = supabaseAdmin();
 
+  // powrót na zakładkę rodzaju tego quizu (klasyczny = bez etapów)
+  const { count: etapow } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", id);
+  const lista = etapow ? "/admin/quizy?" : "/admin/quizy?rodzaj=klasyczny&";
   const { count } = await db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id);
-  if (count) redirect("/admin/quizy?blad=gry");
+  if (count) redirect(`${lista}blad=gry`);
 
   const { data: zadania } = await db.from("zadania").select("grafika_url").eq("quiz_id", id);
   const { error } = await db.from("quizy").delete().eq("id", id);
-  if (error) redirect("/admin/quizy?blad=usuwanie");
+  if (error) redirect(`${lista}blad=usuwanie`);
   await Promise.all((zadania ?? []).map((z) => usunGrafike(z.grafika_url)));
-  redirect("/admin/quizy");
+  redirect(lista.slice(0, -1));
 }
 
 // ---------------------------------------------------------------------------
@@ -273,6 +286,12 @@ export async function zapiszZadanie(
 
   const odczyt = odczytajZadanie(dane);
   if ("blad" in odczyt) return odczyt;
+
+  // klasyczny quiz (bez etapów) nie ma nowych ciekawostek
+  if (odczyt.typ === "ciekawostka" && !zadanieId) {
+    const { count } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", quizId);
+    if (!count) return { blad: "W klasycznym quizie nie ma ciekawostek." };
+  }
 
   // etap z listy etapów tego quizu (pusty: quiz bez etapów)
   const etapId = tekst(dane, "etap_id") || null;

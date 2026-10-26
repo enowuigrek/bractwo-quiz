@@ -9,7 +9,7 @@
 //   [liczba] Treść?         = 1,5 / zakres: 0,25 – 3 / jednostka: l
 //   [kolejność] Treść       > element… we właściwej kolejności (3–6)
 //   [pary] Treść            lewy = prawy (2–6)
-//   [ciekawostka] Tytuł     dalej tekst ciekawostki
+// Ciekawostek w klasycznym quizie nie robimy (26.10): to szybki quiz z promptu, plansze z ciekawostkami są w wyścigu.
 // Do każdego pytania można dopisać linie „podpowiedź: …” (najwyżej 4).
 
 import type { TypZadania } from "./zadania";
@@ -43,7 +43,6 @@ const RODZAJE: Record<string, TypZadania> = {
   kolejność: "kolejnosc",
   kolejnosc: "kolejnosc",
   pary: "pary",
-  ciekawostka: "ciekawostka",
 };
 
 /** Liczba z polskim albo angielskim zapisem: „1,5”, „1 516”, „1.5”. */
@@ -70,6 +69,7 @@ function czytajBlok(linie: string[], nr: number): WklejonePytanie | string {
   const naglowek = linie[0].match(/^\[([^\]]+)\]\s*(.*)$/);
   if (!naglowek) return `Pytanie ${nr}: zacznij od rodzaju w nawiasach, np. „[jedna] Treść pytania?”.`;
   const typ = RODZAJE[naglowek[1].trim().toLocaleLowerCase("pl").replace(/\s+/g, " ")];
+  if (/^ciekawostk/i.test(naglowek[1].trim())) return `Pytanie ${nr}: ciekawostek w klasycznym quizie nie robimy, usuń ją.`;
   if (!typ) return `Pytanie ${nr}: nieznany rodzaj „[${naglowek[1]}]”.`;
   const tresc = naglowek[2].trim();
   if (!tresc) return `Pytanie ${nr}: brak treści po „[${naglowek[1]}]”.`;
@@ -83,12 +83,6 @@ function czytajBlok(linie: string[], nr: number): WklejonePytanie | string {
   }
   const dodatki = podpowiedzi.length ? { podpowiedzi } : {};
   const blad = (opis: string) => `Pytanie ${nr} („${tresc.slice(0, 40)}${tresc.length > 40 ? "…" : ""}”): ${opis}`;
-
-  if (typ === "ciekawostka") {
-    const tekst = reszta.join(" ").replace(/\s+/g, " ").trim();
-    if (!tekst) return blad("dopisz tekst ciekawostki pod tytułem.");
-    return { tresc, typ, dane: { tekst }, opis: tekst };
-  }
 
   if (typ === "wybor" || typ === "wielokrotny") {
     const odpowiedzi: string[] = [];
@@ -196,13 +190,13 @@ export function czytajPytania(tekst: string): WynikWklejenia {
 /**
  * Prompt do skopiowania pod polem wklejania: prowadzący dopisuje temat i liczbę pytań, wkleja go do dowolnego
  * czatu z AI, a odpowiedź wkleja z powrotem. Zasady układania pytań jak w CLAUDE.md (trudność rośnie, dobra
- * odpowiedź pod różnymi literami, liczba nie na środku zakresu, ciekawostka po swoim pytaniu i nie na końcu).
+ * odpowiedź pod różnymi literami, liczba nie na środku zakresu); bez ciekawostek.
  */
 export const PROMPT_PYTAN = `Przygotuj pytania do quizu w pubie (gracze odpowiadają na telefonach, pytania widać na telewizorze).
 
 Temat: [WPISZ TEMAT, np. filmy z lat 90.]
 Liczba pytań: [np. 30]
-Rodzaje pytań: [np. głównie [jedna], do tego kilka [kilka], [liczba], [pary] i 2–3 ciekawostki]
+Rodzaje pytań: [np. głównie [jedna], do tego kilka [kilka], [liczba] i [pary]]
 Dla kogo: [np. znajomi przy piwie, od łatwych do trudnych]
 
 Zasady:
@@ -215,7 +209,7 @@ Zasady:
 - [liczba]: gracz ustawia liczbę suwakiem w podanym zakresie. Poprawna liczba nie leży na środku zakresu ani na jego krańcu. Jednostkę (np. l, km, %, zł) dopisz w linii „jednostka:”, a gdy jej nie ma, pomiń tę linię.
 - [kolejność]: 3–6 elementów, wypisane we właściwej kolejności (automat sam je pomiesza).
 - [pary]: 3–5 par, wypisane poprawnie (automat sam pomiesza prawą stronę).
-- [ciekawostka]: krótki tytuł i 1–2 zdania (do 400 znaków), stoi zaraz po pytaniu, którego dotyczy, i nigdy na końcu.
+- Bez ciekawostek i komentarzy między pytaniami: same pytania.
 - W jednym pytaniu odpowiedzi się nie powtarzają. Bez odpowiedzi w rodzaju „wszystkie powyższe”.
 - Jeśli temat dotyczy piwa: pytaj o style, historię i browary rzemieślnicze, nie o piwa koncernów. Styl to „pils”, nie „pilzner”.
 
@@ -251,7 +245,4 @@ lewa strona = prawa strona
 lewa strona = prawa strona
 lewa strona = prawa strona
 
-[ciekawostka] Krótki tytuł
-Jedno albo dwa zdania ciekawostki.
-
-Do dowolnego pytania (poza ciekawostką) możesz dopisać do 4 linii „podpowiedź: …”: pokazują się graczom po kolei w trakcie pytania, od najogólniejszej.`;
+Do dowolnego pytania możesz dopisać do 4 linii „podpowiedź: …”: pokazują się graczom po kolei w trakcie pytania, od najogólniejszej.`;

@@ -8,6 +8,7 @@ import { PoleGrafiki } from "../../_komponenty/grafika";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { LIMITY } from "../../quizy/limity";
+import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 
@@ -15,14 +16,25 @@ export type QuizDoWyboru = {
   id: string;
   tytul: string;
   pytania: number;
-  /** Wyścig po piwo: finał serią, po którym może być pijany finał (klasyczny pub quiz go nie ma). */
-  wyscig: boolean;
+  tagi: string[];
+  /** Klasyczny pub quiz (bez etapów) ma mniej opcji: bez pijanego finału, kranoprzejęcia i grafiki. */
+  rodzaj: RodzajQuizu;
+  /** Finał serią, po którym może być pijany finał. */
+  pijany: boolean;
 };
 
 /** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) widzi „Pijany finał” i widoczność gry. */
 type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean };
 
-/** Uruchamianie gry krokami: miasto → lokal → quiz, potem szczegóły. */
+/** „1 quiz”, „3 quizy”, „5 quizów”. */
+function liczbaQuizow(n: number): string {
+  if (n === 1) return "1 quiz";
+  const r10 = n % 10;
+  const r100 = n % 100;
+  return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "quizy" : "quizów"}`;
+}
+
+/** Uruchamianie gry krokami: miasto → lokal → quiz (rodzaj, temat, quiz), potem szczegóły. */
 /** Godzina od teraz, zaokrąglona do 5 minut w górę: domyślny start zapowiedzi. */
 function zaGodzine(): Date {
   const za = new Date(Date.now() + 60 * 60 * 1000);
@@ -46,7 +58,15 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   const [miasto, setMiasto] = useState(miasta.length === 1 ? miasta[0] : "");
   const lokaleWMiescie = lokale.filter((p) => p.miasto === miasto);
   const [lokal, setLokal] = useState(lokaleWMiescie.length === 1 ? lokaleWMiescie[0].id : "");
+  // quiz w trzech krokach: rodzaj, temat (opcjonalnie), quiz z listy już przefiltrowanej
+  const [rodzaj, setRodzaj] = useState<RodzajQuizu>("wyscig");
+  const [temat, setTemat] = useState<string | null>(null);
   const [quiz, setQuiz] = useState("");
+  const wRodzaju = quizy.filter((q) => q.rodzaj === rodzaj);
+  const tematy = wszystkieTagi(wRodzaju);
+  const doWyboru = temat ? wRodzaju.filter((q) => q.tagi.includes(temat)) : wRodzaju;
+  const wybrany = quizy.find((q) => q.id === quiz);
+  const klasyczny = wybrany?.rodzaj === "klasyczny";
   const [czas, setCzas] = useState<string>(LIMITY.domyslnyCzas === null ? "bez" : String(LIMITY.domyslnyCzas));
   const bezLimitu = czas === "bez";
   const [ileNagrod, setIleNagrod] = useState(0);
@@ -112,22 +132,69 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
       )}
 
       {lokal && (
-        <div>
-          <label htmlFor="quiz_id" className="krok">
+        <fieldset>
+          <legend className="krok">
             <span className="krok-nr">3</span> Quiz
-          </label>
-          <select id="quiz_id" name="quiz_id" className="pole" value={quiz} onChange={(e) => setQuiz(e.target.value)} required>
+          </legend>
+          <div className="szablony-quizu">
+            {(["wyscig", "klasyczny"] as const).map((r) => (
+              <label key={r} className={`szablon-quizu${rodzaj === r ? " wybrany" : ""}`}>
+                <input
+                  type="radio"
+                  name="rodzaj_quizu"
+                  checked={rodzaj === r}
+                  onChange={() => {
+                    setRodzaj(r);
+                    setTemat(null);
+                    setQuiz("");
+                  }}
+                />
+                <strong>{NAZWY_RODZAJOW[r]}</strong>
+                <span>{liczbaQuizow(quizy.filter((q) => q.rodzaj === r).length)}</span>
+              </label>
+            ))}
+          </div>
+          {tematy.length > 0 && (
+            <p className="tagi" style={{ marginTop: 12 }}>
+              <button type="button" className={`tag${temat ? "" : " wybrany"}`} onClick={() => setTemat(null)}>
+                wszystkie
+              </button>
+              {tematy.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`tag${temat === t ? " wybrany" : ""}`}
+                  onClick={() => {
+                    setTemat(t);
+                    if (wybrany && !wybrany.tagi.includes(t)) setQuiz("");
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </p>
+          )}
+          <select
+            id="quiz_id"
+            name="quiz_id"
+            className="pole"
+            style={{ marginTop: 12 }}
+            value={quiz}
+            onChange={(e) => setQuiz(e.target.value)}
+            aria-label="Quiz"
+            required
+          >
             <option value="" disabled>
               Wybierz quiz…
             </option>
-            {quizy.map((q) => (
+            {doWyboru.map((q) => (
               <option key={q.id} value={q.id} disabled={q.pytania === 0}>
                 {q.tytul} ({q.pytania === 0 ? "brak pytań" : `pytań: ${q.pytania}`})
               </option>
             ))}
           </select>
-          {quizy.length === 0 && <p className="podpowiedz">Najpierw dodaj quiz w zakładce „Quizy”.</p>}
-        </div>
+          {doWyboru.length === 0 && <p className="podpowiedz">Nie ma jeszcze takiego quizu. Dodaj go w zakładce „Quizy”.</p>}
+        </fieldset>
       )}
 
       {quiz && (
@@ -229,7 +296,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
               </fieldset>
 
               {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału) */}
-              {quizy.find((q) => q.id === quiz)?.wyscig && (
+              {wybrany?.pijany && (
                 <fieldset>
                   <legend>Pijany finał</legend>
                   <label className="przelacznik">
@@ -333,37 +400,42 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             </div>
           </div>
 
-          <fieldset>
-            <legend>Kranoprzejęcie (opcjonalnie)</legend>
-            <input
-              name="browar_nazwa"
-              className="pole"
-              placeholder="Nazwa browaru"
-              aria-label="Nazwa gościnnego browaru"
-              maxLength={80}
-            />
-            <input
-              name="browar_instagram"
-              className="pole"
-              style={{ marginTop: 10 }}
-              placeholder="Instagram, np. @browar"
-              aria-label="Instagram browaru"
-              maxLength={60}
-            />
-            <div style={{ marginTop: 10 }}>
-              <PoleGrafiki
-                nazwa="browar_logo"
-                etykieta="Logo browaru"
-                podpowiedz="Pokaże się na TV obok logo lokalu. Najlepiej z przezroczystym tłem, do 5 MB."
-              />
-            </div>
-          </fieldset>
+          {/* klasyczny pub quiz to mniejsze wydarzenie: bez kranoprzejęcia i grafiki na poczekalnię */}
+          {!klasyczny && (
+            <>
+              <fieldset>
+                <legend>Kranoprzejęcie (opcjonalnie)</legend>
+                <input
+                  name="browar_nazwa"
+                  className="pole"
+                  placeholder="Nazwa browaru"
+                  aria-label="Nazwa gościnnego browaru"
+                  maxLength={80}
+                />
+                <input
+                  name="browar_instagram"
+                  className="pole"
+                  style={{ marginTop: 10 }}
+                  placeholder="Instagram, np. @browar"
+                  aria-label="Instagram browaru"
+                  maxLength={60}
+                />
+                <div style={{ marginTop: 10 }}>
+                  <PoleGrafiki
+                    nazwa="browar_logo"
+                    etykieta="Logo browaru"
+                    podpowiedz="Pokaże się na TV obok logo lokalu. Najlepiej z przezroczystym tłem, do 5 MB."
+                  />
+                </div>
+              </fieldset>
 
-          <PoleGrafiki
-            nazwa="grafika"
-            etykieta="Grafika na poczekalnię (opcjonalnie)"
-            podpowiedz="Np. plakat wydarzenia. Pokazuje się na TV pod tytułem. PNG, JPG, WebP albo SVG, do 5 MB."
-          />
+              <PoleGrafiki
+                nazwa="grafika"
+                etykieta="Grafika na poczekalnię (opcjonalnie)"
+                podpowiedz="Np. plakat wydarzenia. Pokazuje się na TV pod tytułem. PNG, JPG, WebP albo SVG, do 5 MB."
+              />
+            </>
+          )}
 
           <KomunikatFormularza stan={stan} />
           <div className="kreator-przyciski">

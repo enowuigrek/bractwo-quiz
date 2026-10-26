@@ -24,7 +24,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
 
   const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { count: wejscie }] =
     await Promise.all([
-      db.from("quizy").select("id, tytul, opis, utworzono, tylko_glowny").eq("id", id).maybeSingle<Quiz>(),
+      db.from("quizy").select("id, tytul, opis, utworzono, tylko_glowny, tagi").eq("id", id).maybeSingle<Quiz>(),
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),

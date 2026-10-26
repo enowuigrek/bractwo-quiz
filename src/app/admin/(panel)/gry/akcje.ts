@@ -68,7 +68,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     });
   }
 
-  const [{ data: lokal }, { count: pytania }, { data: quiz }, { count: finalySerii }] = await Promise.all([
+  const [{ data: lokal }, { count: pytania }, { data: quiz }, { count: finalySerii }, { count: etapow }] =
+    await Promise.all([
     db.from("lokale").select("id").eq("id", lokal_id).maybeSingle(),
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
     db.from("quizy").select("tylko_glowny").eq("id", quiz_id).maybeSingle<{ tylko_glowny: boolean }>(),
@@ -78,7 +79,10 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       .eq("quiz_id", quiz_id)
       .eq("finalowy", true)
       .eq("seria", true),
+    db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
   ]);
+  // klasyczny pub quiz (bez etapów): bez kranoprzejęcia i grafiki na poczekalnię (kreator ich nie pokazuje)
+  const klasyczny = !etapow;
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
 
@@ -104,17 +108,18 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     : null;
 
   // gościnny browar (kranoprzejęcie): nazwa wymagana, gdy jest logo
-  const browar_nazwa =
-    String(dane.get("browar_nazwa") ?? "")
+  const browar_nazwa = klasyczny
+    ? null
+    : String(dane.get("browar_nazwa") ?? "")
       .trim()
       .replace(/\s+/g, " ") || null;
-  const browarLogo = plikZFormularza(dane, "browar_logo");
+  const browarLogo = klasyczny ? null : plikZFormularza(dane, "browar_logo");
   if (browarLogo && !browar_nazwa) return { blad: "Podaj nazwę browaru do logo." };
   if (browar_nazwa && browar_nazwa.length > 80) return { blad: "Nazwa browaru może mieć najwyżej 80 znaków." };
   const browar_instagram = kontoInstagram(dane.get("browar_instagram"));
   if (browar_instagram === false) return { blad: "Instagram browaru: sama nazwa konta, np. @browar." };
 
-  const grafika = plikZFormularza(dane, "grafika");
+  const grafika = klasyczny ? null : plikZFormularza(dane, "grafika");
   for (const plik of [grafika, browarLogo]) {
     const blad = plik && bladGrafiki(plik);
     if (blad) return { blad };

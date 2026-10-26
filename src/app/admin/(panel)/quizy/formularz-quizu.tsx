@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { SZABLONY_ETAPOW, SZABLONY_QUIZU, napisMnoznika } from "@/lib/etapy";
+import type { RodzajQuizu } from "@/lib/tagi";
 import type { StanFormularza } from "@/lib/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { bezResetu } from "../_komponenty/bez-resetu";
@@ -13,9 +14,10 @@ import { LIMITY, liczbaPytan } from "./limity";
  * Nowy quiz: najpierw szablon, potem tytuł i opis. „Wyścig po piwo” ma stały zestaw konkurencji (kreator ich nie
  * zmienia), klasyczny pub quiz to same pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
  */
-export function FormularzQuizu({ glowny }: { glowny: boolean }) {
+export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: RodzajQuizu }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(utworzQuiz, {});
-  const [szablon, ustawSzablon] = useState(SZABLONY_QUIZU[0].klucz);
+  // rodzaj z zakładki listy quizów (klucze szablonów to rodzaje)
+  const [szablon, ustawSzablon] = useState<string>(rodzaj);
   const etapy = SZABLONY_QUIZU.find((s) => s.klucz === szablon)?.etapy ?? [];
   const razem = etapy.reduce((s, e) => s + e.pytania, 0);
 
@@ -82,6 +84,10 @@ export function FormularzQuizu({ glowny }: { glowny: boolean }) {
       <div>
         <label htmlFor="opis">Opis (tylko dla obsługi)</label>
         <textarea id="opis" name="opis" className="pole" maxLength={LIMITY.opis} rows={2} />
+      </div>
+      <div>
+        <label htmlFor="tagi">Tematy (po przecinku, do filtrowania)</label>
+        <input id="tagi" name="tagi" className="pole" placeholder="np. filmy, lata 90." maxLength={200} />
       </div>
       {/* tylko główny: jego nowe quizy są domyślnie ukryte przed obsługą (zmiana później na stronie quizu) */}
       {glowny && (

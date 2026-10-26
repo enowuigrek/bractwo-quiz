@@ -1353,3 +1353,56 @@ a.przycisk {
   width: 100%;
   color: var(--szary);
 }
+
+/* Rodzaje quizów (zakładka Quizy) i tematy: wybrane wypełnione złotem, jak każdy wybór w panelu */
+.quizy-rodzaje {
+  margin-bottom: 14px;
+}
+
+.quizy-rodzaje a,
+.tagi a {
+  text-decoration: none;
+}
+
+.tagi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+}
+
+.quizy-tagi {
+  margin-bottom: 16px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--r-btn-sm);
+  background: var(--kamien2);
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+}
+
+a.tag:hover {
+  background: var(--kamien3);
+  color: var(--piana);
+}
+
+.tag.wybrany,
+a.tag.wybrany:hover {
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  color: var(--na-zlocie);
+}
+
+button.tag {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button.tag:hover:not(.wybrany) {
+  background: var(--kamien3);
+  color: var(--piana);
+}

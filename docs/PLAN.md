@@ -206,6 +206,16 @@ Do zaprojektowania razem:
 - **Prompt** zawiera zasady z CLAUDE.md (trudność rośnie, dobra odpowiedź na różnych miejscach, w „kilka” zmienna liczba dobrych, liczba nie na środku zakresu, ciekawostka po swoim pytaniu i nie na końcu, piwo bez koncernów, „pils”).
 - **Sprawdzone lokalnie:** parser na wszystkich rodzajach i na przykładzie z samego promptu; w panelu nowy klasyczny quiz, wklejone 7 pytań, zapis w bazie z pomieszaną kolejnością i parami; quiz testowy usunięty. Kopiowania promptu nie dało się sprawdzić w panelu podglądu (brak schowka), funkcja ta sama co przy „Kopiuj” linków gry.
 
+### Dwa rodzaje quizów i tematy (26.10) ✅
+
+- **Rodzaj z etapów:** quiz z etapami to „Wyścig po piwo”, bez etapów to „Klasyczny pub quiz” (`quizKlasyczny` w `src/lib/gra/wyscig.ts`, `RodzajQuizu` w `src/lib/tagi.ts`). Bez osobnej kolumny: TV i tak rozpoznawał quiz bez etapów.
+- **Tematy:** kolumna `quizy.tagi` (migracja `tagi_quizow`), wpisywane po przecinku przy tworzeniu i w edycji nagłówka quizu (`czytajTagi`: małe litery, bez powtórzeń, do 6).
+- **Zakładka Quizy:** przełącznik „Wyścig po piwo / Klasyczny pub quiz” (`?rodzaj=klasyczny`), pod nim filtr tematów (`?tag=`), przycisk nowego quizu danego rodzaju. „Pijany finał: pytania” tylko w zakładce wyścigu. Zapis i usunięcie quizu wracają na zakładkę jego rodzaju.
+- **Kreator gry, krok 3:** karty rodzaju z liczbą quizów, tematy jako przyciski, lista quizów już przefiltrowana. Klasyczny bez pijanego finału, kranoprzejęcia i grafiki na poczekalnię (serwer też ich nie zapisze).
+- **Klasyczny w grze:** ranking to zwykła tabela, bez wyścigu i szklanki (TV i telefon, `rankingJakoWyscig(stan, n)`); bez grafiki „na pamiątkę” na telefonie; muzyka: poczekalnia jak dotąd, od pierwszego pytania do rankingów `public/muzyka/klasyczny.mp3` (spokojne tło, Łukasz wygeneruje; do tego czasu cisza), podium jak dotąd. Efekty dźwiękowe te same.
+- **Klasyczny bez ciekawostek:** prompt ich nie zamawia, wklejanie odrzuca `[ciekawostka]`, edytor pytania nie pokazuje tego rodzaju (stara ciekawostka da się edytować), serwer nie doda nowej.
+- **Sprawdzone lokalnie:** lista z zakładkami i filtrem tematów, nowy klasyczny quiz z tematami i wklejonymi pytaniami (ciekawostka odrzucona), kreator gry z wyborem rodzaju i tematu, gra klasyczna z botami: ranking na TV jako tabela. Gra i quiz testowe usunięte.
+
 ## Ustalenia
 
 | Temat | Decyzja |

@@ -205,7 +205,8 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
       <fieldset>
         <legend>Rodzaj pytania</legend>
         <div className="wybor-czasu">
-          {TYPY_ZADAN.map((t) => (
+          {/* klasyczny quiz (bez etapów) nie ma ciekawostek; istniejącą starą da się dalej edytować */}
+          {TYPY_ZADAN.filter((t) => t !== "ciekawostka" || etapy.length > 0 || zadanie?.typ === "ciekawostka").map((t) => (
             <label key={t} className={`wybor-czasu-opcja${typ === t ? " wybrana" : ""}`}>
               <input type="radio" name="typ_wybor" value={t} checked={typ === t} onChange={() => zmienTyp(t)} />
               {NAZWY_TYPOW[t]}

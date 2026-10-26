@@ -19,6 +19,8 @@ const UTWORY = {
   etap4: { plik: "/muzyka/etap-4.mp3", petla: true },
   final: { plik: "/muzyka/final.mp3", petla: true },
   podium: { plik: "/muzyka/podium.mp3", petla: false },
+  // klasyczny pub quiz (bez etapów): spokojne tło bez emocji przez całe pytania i rankingi (26.10)
+  klasyczny: { plik: "/muzyka/klasyczny.mp3", petla: true },
 } as const;
 
 type Utwor = keyof typeof UTWORY;
@@ -54,7 +56,10 @@ const GESTY = ["click", "keydown", "touchend"] as const;
 const PROSBA_PO_MS = 2000;
 
 /** Co z gry jest potrzebne muzyce (ekran lokalu przy zapowiedzi podaje samą poczekalnię). */
-type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza_do" | "ostatnie_w_etapie">;
+type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza_do" | "ostatnie_w_etapie"> & {
+  /** Klasyczny pub quiz (bez etapów) ma własne tło; ekran lokalu przy zapowiedzi go nie zna (gra poczekalnia). */
+  quiz?: StanSesji["quiz"];
+};
 
 /**
  * Wspólne dla całej strony: dwa odtwarzacze i to, co gra. Zostają, gdy komponent się wymienia (ekran lokalu
@@ -110,11 +115,13 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
     case "koniec":
       return "podium";
     default:
+      // klasyczny pub quiz: jedno spokojne tło od pierwszego pytania do ostatniego rankingu
+      if (stan.quiz && stan.quiz.liczba_etapow === 0) return "klasyczny";
       // ranking po ostatnim pytaniu etapu: cisza (urywa się z dzwonkiem), następny etap wejdzie ze swoją muzyką od nowa
       if (stan.faza === "ranking" && stan.ostatnie_w_etapie && !stan.etap?.finalowy) return null;
       // plansza etapu, pytania, wyniki i ranking: według etapu (na planszy to etap, który się zaczyna).
       // Narasta z etapu na etap: noir lekko, noir z napięciem, noir z lekkim napięciem w 3. i dalszych,
-      // walka o finał (smyczki i trąbki) i finał. Quiz bez etapów: etap-1.
+      // walka o finał (smyczki i trąbki) i finał.
       if (stan.etap?.finalowy) return "final";
       if (stan.etap?.final_po_etapie) return "etap4";
       if ((stan.etap?.nr ?? 1) >= 3) return "etap3";
