@@ -2020,7 +2020,9 @@ html:has(.kolumna) {
 
 .moj-ranking li.ja {
   background: color-mix(in srgb, var(--zloto) 18%, var(--kamien));
+  /* obwódka do środka: okno wycinka ucina wszystko poza nim (overflow: hidden) */
   outline: 2px solid var(--zloto);
+  outline-offset: -2px;
 }
 
 .moj-ranking-miejsce {
