@@ -474,24 +474,31 @@
   font-weight: var(--w-black);
 }
 
-.tv-wstep-droga li.final .tv-wstep-nr {
-  background: var(--zloto);
-  color: var(--na-zlocie);
-  box-shadow: var(--glow-lg);
-}
+/* numer finału jak pozostałe (26.10: wypełniony złotem wyglądał na zaznaczony); finał wyróżnia szklanka na mecie */
 
 .tv-wstep-nazwa {
   font-size: 30px;
   font-weight: var(--w-black);
 }
 
-/* ikona etapu (etapy.ikona) nad numerem na drodze wstępu */
+/* ikona etapu (etapy.ikona) nad numerem na drodze wstępu: liniowa, złota (ikony-etapow.tsx) */
 .tv-wstep-ikona {
   height: 130px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.35));
+}
+
+.ikona-etapu {
+  display: inline-block;
+  aspect-ratio: 1;
+  color: var(--zloto);
+}
+
+.ikona-etapu svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* plansza etapu: ikona przed blokiem „Etap X z Y” + nazwa (etap.tsx, 26.10) */
@@ -505,7 +512,6 @@
   flex: none;
   height: 120px;
   width: auto;
-  filter: drop-shadow(0 0 20px rgba(227, 172, 63, 0.35));
 }
 
 /* odpadanie po etapie: informacja, nie ostrzeżenie, więc jasne złoto, nie czerwień (25.10) */

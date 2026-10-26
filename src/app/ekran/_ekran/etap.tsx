@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
+import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
@@ -79,7 +80,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
           <section className="tv-etap-opis">
             {/* ikona przed nazwą etapu, razem z „Etap X z Y” (26.10, Łukasz: tytuł z dużą ikoną obok był za ciężki) */}
             <motion.div className="tv-etap-glowa" {...wejscie(0)}>
-              {e.ikona && <img src={e.ikona} alt="" className="tv-etap-ikona" />}
+              {e.ikona && <IkonaEtapu ikona={e.ikona} className="tv-etap-ikona" />}
               <div>
                 <p className="tv-okazja">
                   Etap {e.nr} z {e.liczba}
