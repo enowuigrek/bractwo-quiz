@@ -19,15 +19,16 @@ const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
 /**
- * Gra zapowiedziana na godzinę z automatem: godzina z kreatora to start quizu (26.10, Łukasz), a poczekalnia
- * z QR otwiera się tyle minut wcześniej, żeby gracze zdążyli dołączyć. To samo w bazie: `wewn.otworz_o_czasie`.
+ * Gra zapowiedziana na godzinę z automatem: o godzinie z kreatora otwiera się poczekalnia z QR (27.10, Łukasz; 26.10
+ * była to godzina startu quizu, a poczekalnia wcześniej), a quiz startuje sam tyle minut później, żeby gracze zdążyli
+ * dołączyć. Otwarcie o tej godzinie pilnuje też baza: `wewn.otworz_o_czasie`.
  */
 export const NA_ZAPISY_MIN = 5;
 
-/** Kiedy automat otworzy poczekalnię (ms): godzina startu minus czas na dołączenie. Null bez godziny albo automatu. */
+/** Kiedy automat otworzy poczekalnię (ms): godzina z kreatora. Null bez godziny albo automatu. */
 export function otwarcieAutomatu(stan: { auto: boolean; planowany_start: string | null }): number | null {
   if (!stan.auto || !stan.planowany_start) return null;
-  return Date.parse(stan.planowany_start) - NA_ZAPISY_MIN * 60_000;
+  return Date.parse(stan.planowany_start);
 }
 
 /**
@@ -39,11 +40,11 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
   const plansza = (min: number) => stan.gotowi >= stan.gotowi_z && s >= min;
   switch (stan.faza) {
     case "poczekalnia": {
-      // zapowiedź na godzinę: poczekalnia (QR na TV) chwilę przed, a o tej godzinie start, jeśli ktoś dołączył
+      // zapowiedź na godzinę: o tej godzinie poczekalnia (QR na TV), `NA_ZAPISY_MIN` później start, gdy ktoś dołączył
       const otwarcie = otwarcieAutomatu(stan);
       if (otwarcie === null) return null;
       if (!stan.poczekalnia_otwarta) return teraz >= otwarcie ? "otworz" : null;
-      return teraz >= Date.parse(stan.planowany_start!) && stan.w_grze > 0 ? "nastepne" : null;
+      return teraz >= otwarcie + NA_ZAPISY_MIN * 60_000 && stan.w_grze > 0 ? "nastepne" : null;
     }
     case "wstep":
       // plansza startowa klasycznego quizu kończy się sama po odliczaniu (`dokoncz_pytanie`)
