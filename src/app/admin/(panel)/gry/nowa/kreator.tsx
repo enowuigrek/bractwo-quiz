@@ -10,7 +10,7 @@ import { LIMITY, liczbaPytan } from "../../quizy/limity";
 import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
-import { IkonaMiasto, IkonaPubQuiz, IkonaWyscig } from "@/components/ikony";
+import { IkonaMiasto, IkonaPodium1, IkonaPodium3, IkonaPubQuiz, IkonaWyscig } from "@/components/ikony";
 
 export type QuizDoWyboru = {
   id: string;
@@ -124,9 +124,10 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
           <legend className="krok">
             <span className="krok-nr">2</span> Lokal
           </legend>
-          <div className="kafelki">
+          {/* równe kafelki; z logo bez podpisu (logo wystarcza), bez logo sama nazwa */}
+          <div className="kafelki kafelki-lokali">
             {lokaleWMiescie.map((p) => (
-              <label key={p.id} className="kafelek">
+              <label key={p.id} className="kafelek" title={p.nazwa}>
                 <input
                   type="radio"
                   name="lokal_id"
@@ -135,8 +136,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                   onChange={() => setLokal(p.id)}
                   required
                 />
-                {p.logo_url ? <img src={p.logo_url} alt="" /> : <span className="miniatura-pusta" />}
-                {p.nazwa}
+                {p.logo_url ? <img src={p.logo_url} alt={p.nazwa} /> : <strong>{p.nazwa}</strong>}
               </label>
             ))}
           </div>
@@ -178,7 +178,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <span className="krok-nr">4</span> Quiz
           </legend>
           {tematy.length > 0 && (
-            <p className="tagi" style={{ marginTop: 0 }}>
+            <p className="tagi" style={{ margin: "0 0 14px" }}>
               <button type="button" className={`tag${temat ? "" : " wybrany"}`} onClick={() => setTemat(null)}>
                 wszystkie
               </button>
@@ -264,19 +264,20 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <input type="hidden" name="nagrody" value={ileNagrod} />
             {ileNagrod > 0 && (
               <>
-                <div className="wybor-rowny" style={{ marginTop: 12 }}>
+                <div className="kafelki kafelki-dwa" style={{ marginTop: 12 }}>
                   {[
-                    { ile: 1, napis: "1. miejsce" },
-                    { ile: 3, napis: "pierwsza trójka" },
+                    { ile: 1, napis: "1. miejsce", ikona: <IkonaPodium1 /> },
+                    { ile: 3, napis: "pierwsza trójka", ikona: <IkonaPodium3 /> },
                   ].map((o) => (
                     <button
                       key={o.ile}
                       type="button"
-                      className={`wybor-czasu-opcja${ileNagrod === o.ile ? " wybrana" : ""}`}
+                      className={`kafelek${ileNagrod === o.ile ? " wybrany" : ""}`}
                       aria-pressed={ileNagrod === o.ile}
                       onClick={() => setIleNagrod(o.ile)}
                     >
-                      {o.napis}
+                      <span className="kafelek-ikona duza">{o.ikona}</span>
+                      <span className="kafelek-opis">{o.napis}</span>
                     </button>
                   ))}
                 </div>

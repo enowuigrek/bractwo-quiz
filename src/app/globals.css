@@ -2889,6 +2889,8 @@ html:has(.kolumna) {
    wierszu, druga zawsze stoi), żeby przyciski pod ramką nie skakały (26.10) */
 .pilot-licznik {
   display: grid;
+  /* kolumna nie szersza od ramki: długi wiersz skraca się, zamiast wypychać liczbę za krawędź */
+  grid-template-columns: minmax(0, 1fr);
   gap: 4px;
   box-sizing: border-box;
   margin: 18px 0 0;
@@ -2907,9 +2909,22 @@ html:has(.kolumna) {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 40px;
   margin: 0;
+  line-height: 1.25;
   white-space: nowrap;
+}
+
+/* wiersz postępu: etap i pytanie, po prawej rodzaj następnego pytania w kolorze */
+.pilot-licznik > p.pilot-licznik-postep {
+  min-height: 28px;
+  font-weight: var(--w-semibold);
+  font-size: var(--fs-small);
+}
+
+.pilot-licznik > p.pilot-licznik-postep > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pilot-licznik > p > span {
@@ -2917,21 +2932,14 @@ html:has(.kolumna) {
   text-overflow: ellipsis;
 }
 
-.pilot-licznik > p.pilot-licznik-info {
-  display: block;
-  min-height: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.pilot-licznik-info {
+  flex: none;
   color: var(--szary);
   font-weight: var(--w-regular);
-  font-size: var(--fs-small);
-}
-
-.pilot-licznik.komplet > p.pilot-licznik-info {
-  color: inherit;
 }
 
 .pilot-licznik strong {
+  line-height: 1;
   font-size: 1.6em;
   font-weight: var(--w-black);
   font-variant-numeric: tabular-nums;
@@ -3350,4 +3358,50 @@ html:has(.kolumna) {
   display: block;
   border-radius: var(--r-pole);
   background: var(--kamien2);
+}
+
+/* Rodzaj pytania w kolorze (pilot: następne pytanie w ramce stanu). Kolor zawsze ten sam dla rodzaju, żeby
+   rozpoznawać go wzrokiem, bez czytania (26.10) */
+.rodzaj-pytania {
+  flex: none;
+  padding: 3px 12px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid currentColor;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+}
+
+.rodzaj-pytania.wybor {
+  color: var(--zloto);
+  background: rgba(227, 172, 63, 0.14);
+}
+
+.rodzaj-pytania.wielokrotny {
+  color: #7fb6e6;
+  background: rgba(127, 182, 230, 0.14);
+}
+
+.rodzaj-pytania.prawda_falsz {
+  color: var(--chmiel);
+  background: rgba(143, 182, 58, 0.14);
+}
+
+.rodzaj-pytania.szacowanie {
+  color: #c39bea;
+  background: rgba(195, 155, 234, 0.14);
+}
+
+.rodzaj-pytania.kolejnosc {
+  color: var(--czerwien);
+  background: rgba(226, 115, 90, 0.14);
+}
+
+.rodzaj-pytania.pary {
+  color: #5fc8c0;
+  background: rgba(95, 200, 192, 0.14);
+}
+
+.rodzaj-pytania.ciekawostka {
+  color: var(--szary);
+  background: rgba(150, 160, 170, 0.12);
 }

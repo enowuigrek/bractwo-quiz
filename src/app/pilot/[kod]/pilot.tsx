@@ -19,7 +19,8 @@ import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne
 import { supabase } from "@/lib/supabase/przegladarka";
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { napisMnoznika } from "@/lib/etapy";
-import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
+import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
+import { liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
@@ -220,38 +221,40 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           : faza === "poczekalnia"
             ? ["Graczy w poczekalni", String(stan.liczba_graczy), false]
             : ["Graczy w grze", String(stan.w_grze), false];
-  // druga linijka ramki: co dalej w tej fazie (26.10, Łukasz: zamiast osobnych ramek z informacjami, przez które
-  // skakały przyciski). Zawsze stoi, w razie czego pusta
+  // po prawej w drugim wierszu ramki krótko, co się dzieje z czasem (26.10, Łukasz: zamiast osobnych ramek
+  // z informacjami, przez które skakały przyciski); rodzaj następnego pytania ma pierwszeństwo
   const sekundDo = (iso: string | null) => (iso ? Math.max(0, Math.ceil((Date.parse(iso) - teraz) / 1000)) : null);
   const infoStanu =
     faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null
-      ? `Start ${kiedyStart(startZapowiedzi)} · ${opisOdliczania(doZapowiedzi)}${stan.poczekalnia_otwarta ? "" : " · poczekalnia zamknięta"}`
-      : stan.nastepne_typ &&
-          !stan.quiz?.liczba_etapow &&
-          ["poczekalnia", "wynik", "odpowiedzi", "ranking"].includes(faza)
-        ? // rodzaje pytań się mieszają: prowadzący uprzedza graczy przed startem
-          `Następne: ${NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()} · „${PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”`
-        : faza === "wstep" && klasyczny && stan.faza_do
-          ? `Pierwsze pytanie samo za ${sekundDo(stan.faza_do)} s`
-          : faza === "przygotuj"
-            ? `Pytanie ${z?.lp ?? ""} startuje za ${sekundaOdliczania(doStartu)} s`
-            : faza === "pytanie"
-              ? bezLimitu
-                ? "Bez limitu czasu"
-                : doKonca > 0
-                  ? `Zostało ${Math.ceil(doKonca / 1000)} s`
-                  : "Czas minął"
-              : (faza === "seria" || faza === "pijany") && stan.faza_od && teraz < Date.parse(stan.faza_od)
-                ? `Start za ${sekundDo(stan.faza_od)} s`
-                : (faza === "seria" || faza === "pijany") && stan.faza_do
-                  ? `Do końca ${sekundDo(stan.faza_do)} s`
-                  : faza === "werble"
-                    ? "Werble: odsłoń podium"
-                    : faza === "podium" || faza === "tabela"
-                      ? "TV pokazuje na zmianę podium i tabelę"
-                      : faza === "koniec"
-                        ? "Gra zakończona"
-                        : "";
+      ? `Start ${kiedyStart(startZapowiedzi)} · ${opisOdliczania(doZapowiedzi)}`
+      : faza === "wstep" && klasyczny && stan.faza_do
+        ? `Start za ${sekundDo(stan.faza_do)} s`
+        : faza === "przygotuj"
+          ? `Start za ${sekundaOdliczania(doStartu)} s`
+          : faza === "pytanie"
+            ? bezLimitu
+              ? "Bez limitu"
+              : doKonca > 0
+                ? `Zostało ${Math.ceil(doKonca / 1000)} s`
+                : "Czas minął"
+            : (faza === "seria" || faza === "pijany") && stan.faza_od && teraz < Date.parse(stan.faza_od)
+              ? `Start za ${sekundDo(stan.faza_od)} s`
+              : (faza === "seria" || faza === "pijany") && stan.faza_do
+                ? `Do końca ${sekundDo(stan.faza_do)} s`
+                : faza === "podium" || faza === "tabela"
+                  ? "Podium i tabela na TV"
+                  : faza === "koniec"
+                    ? "Koniec gry"
+                    : "";
+  // gdzie jesteśmy w quizie: w wyścigu etap i pytanie, w klasycznym samo pytanie (przed startem: ile pytań)
+  const postep = !z
+    ? liczbaPytan(liczba)
+    : etap
+      ? `Etap ${etap.nr}/${etap.liczba} · ${z.lp}/${liczba}`
+      : `Pytanie ${z.lp}/${liczba}`;
+  // rodzaj następnego pytania w kolorze (rodzaje się mieszają, prowadzący uprzedza graczy przed startem)
+  const nastepnyRodzaj =
+    stan.nastepne_typ && ["poczekalnia", "wynik", "odpowiedzi", "ranking"].includes(faza) ? stan.nastepne_typ : null;
   const licznik = (
     <div className={`pilot-licznik${komplet ? " komplet" : ""}`} role="status">
       <p>
@@ -265,7 +268,16 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </span>
         <strong>{wartoscLicznika}</strong>
       </p>
-      <p className="pilot-licznik-info">{infoStanu || "\u00a0"}</p>
+      <p className="pilot-licznik-postep">
+        <span>{postep}</span>
+        {nastepnyRodzaj ? (
+          <span className={`rodzaj-pytania ${nastepnyRodzaj}`} title="Następne pytanie">
+            {NAZWY_TYPOW[nastepnyRodzaj]}
+          </span>
+        ) : (
+          infoStanu && <span className="pilot-licznik-info">{infoStanu}</span>
+        )}
+      </p>
     </div>
   );
 
@@ -540,12 +552,12 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         <div className="pilot-podglad">
 
           {faza === "poczekalnia" && (
-            <section className="karta" style={{ marginTop: 18 }}>
-              <p className="etykieta" style={{ marginTop: 0 }}>
+            <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }} open>
+              <summary className="etykieta">
                 {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
-              </p>
+              </summary>
               <GraczePilota kod={kod} token={token} gracze={gracze} pytanie={false} koniec={false} odswiez={pobierz} />
-            </section>
+            </details>
           )}
 
           {faza === "etap" && etap && (

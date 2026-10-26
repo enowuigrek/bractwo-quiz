@@ -174,3 +174,35 @@ export function IkonaMiasto() {
     </svg>
   );
 }
+
+/** Jeden stopień podium z „1”: nagroda tylko za 1. miejsce (kreator gry). */
+export function IkonaPodium1() {
+  return (
+    <svg {...wspolne}>
+      <path d="M7 10h10v11H7zM12 3l1.2 2.4 2.6.4-1.9 1.8.5 2.6L12 9l-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z" />
+      <text x="12" y="18.6" textAnchor="middle" fontSize="7" fontWeight="900" fill="currentColor" stroke="none">
+        1
+      </text>
+    </svg>
+  );
+}
+
+/** Podium z trzema stopniami 2, 1, 3: nagrody dla pierwszej trójki (kreator gry). */
+export function IkonaPodium3() {
+  return (
+    <svg {...wspolne}>
+      <path d="M2 13h6.5v8H2zM8.5 8h7v13h-7zM15.5 15H22v6h-6.5z" />
+      <g fill="currentColor" stroke="none" fontWeight="900" textAnchor="middle">
+        <text x="5.25" y="19.2" fontSize="5.5">
+          2
+        </text>
+        <text x="12" y="16.5" fontSize="6.5">
+          1
+        </text>
+        <text x="18.75" y="20.2" fontSize="4.5">
+          3
+        </text>
+      </g>
+    </svg>
+  );
+}

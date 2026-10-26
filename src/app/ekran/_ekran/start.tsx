@@ -3,12 +3,12 @@
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 
-/** „1 osoba”, „3 osoby”, „5 osób”. */
-function osoby(n: number): string {
-  if (n === 1) return "1 osoba";
+/** „Gra 1 osoba”, „Grają 3 osoby”, „Gra 5 osób” (czasownik zgodny z liczbą, 26.10). */
+function grajaOsoby(n: number): string {
+  if (n === 1) return "Gra 1 osoba";
   const r10 = n % 10;
   const r100 = n % 100;
-  return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "osoby" : "osób"}`;
+  return r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? `Grają ${n} osoby` : `Gra ${n} osób`;
 }
 
 /** Ile kresek ma pasek odliczania (jedna gaśnie co sekundę przy 10 s). */
@@ -66,7 +66,7 @@ export function StartTv({ stan, teraz, loga }: { stan: StanSesji; teraz: number;
             ))}
           </ol>
           <p className="tv-start-podpis">
-            {stan.liczba_graczy > 0 ? `Gra ${osoby(stan.liczba_graczy)}. ` : ""}
+            {stan.liczba_graczy > 0 ? `${grajaOsoby(stan.liczba_graczy)}. ` : ""}
             Odpowiadacie na telefonach, a kto szybciej, ten więcej punktów.
           </p>
         </div>

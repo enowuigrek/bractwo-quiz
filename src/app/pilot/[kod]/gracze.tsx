@@ -146,12 +146,6 @@ export function GraczePilota({ kod, token, gracze, pytanie, koniec, odswiez }: P
           </li>
         ))}
       </ul>
-      {!koniec && (
-        <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-          QR: gracz wypadł z gry albo zmienia telefon, skanuje i gra dalej. ✕ usuwa gracza. Dotknij zdjęcia, żeby je
-          zdjąć.
-        </p>
-      )}
       {blad && (
         <p className="blad" role="alert">
           {blad}

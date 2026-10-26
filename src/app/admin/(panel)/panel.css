@@ -355,13 +355,15 @@ a.przycisk {
   min-width: 0;
 }
 
+/* opis przy przełączniku mniejszy i z oddechem od niego (26.10, DESIGN-SYSTEM.md „Przełączniki”) */
 .przelacznik {
   display: flex !important;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   color: var(--piana) !important;
-  font-size: var(--fs-body) !important;
+  font-size: var(--fs-small) !important;
   font-weight: var(--w-regular) !important;
+  line-height: 1.35;
   cursor: pointer;
 }
 
@@ -516,7 +518,10 @@ a.przycisk {
   gap: 10px;
 }
 
+/* position: relative trzyma ukryte pole wyboru w kafelku: bez tego leżało gdzieś wyżej na stronie i po dotknięciu
+   kafelka telefon przewijał do niego (26.10, Łukasz: „to, w co kliknąłem, przesuwa się”) */
 .kafelek {
+  position: relative;
   display: flex !important;
   flex-direction: column;
   align-items: center;
@@ -573,6 +578,26 @@ a.przycisk {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* kafelek jako przycisk (nagrody w kreatorze) */
+button.kafelek {
+  font-family: inherit;
+}
+
+/* lokale: wszystkie kafelki tej samej wysokości, logo na środku */
+.kafelki-lokali {
+  grid-auto-rows: 1fr;
+}
+
+.kafelki-lokali .kafelek {
+  justify-content: center;
+  min-height: 120px;
+}
+
+.kafelki-lokali .kafelek img {
+  width: 96px;
+  height: 96px;
+}
+
 .kafelki-quizow {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
@@ -625,7 +650,8 @@ a.przycisk {
   pointer-events: none;
 }
 
-.kafelek:has(input:checked) {
+.kafelek:has(input:checked),
+.kafelek.wybrany {
   border-color: var(--zloto);
   box-shadow: var(--glow-md);
 }
@@ -890,6 +916,7 @@ a.przycisk {
 }
 
 .wybor-czasu-opcja {
+  position: relative;
   display: inline-flex !important;
   align-items: center;
   margin: 0 !important;
@@ -1160,6 +1187,7 @@ a.przycisk {
 }
 
 .formularz label.szablon-quizu {
+  position: relative;
   display: grid;
   gap: 4px;
   margin: 0;
@@ -1434,4 +1462,10 @@ button.tag:hover:not(.wybrany) {
 
 .pijany-test button {
   flex: none;
+}
+
+/* Kreator gry: zapas pod formularzem. Gdy wybór (np. rodzaj quizu) skraca treść pod spodem, strona nie robi się
+   krótsza od miejsca, w którym stoi ekran, więc telefon nie podjeżdża widoku pod palcem (26.10) */
+.formularz.kreator {
+  padding-bottom: 45vh;
 }
