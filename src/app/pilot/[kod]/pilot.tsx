@@ -297,6 +297,14 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       {/* na komputerze dwie kolumny: sterowanie po lewej (zawsze pod ręką), podgląd pytania i graczy po prawej */}
       <div className="pilot">
         <div className="pilot-sterowanie">
+          {/* lokal na samej górze, wyraźnie (26.10, Łukasz: przy dwóch grach naraz bał się, że zamyka nie tę) */}
+          <div className={`pilot-lokal${stan.lokal ? "" : " bez"}`}>
+            {stan.lokal?.logo_url && (
+              // eslint-disable-next-line @next/next/no-img-element -- logo lokalu z bazy, dowolny adres
+              <img src={stan.lokal.logo_url} alt="" />
+            )}
+            <strong>{stan.lokal?.nazwa ?? "Bez lokalu"}</strong>
+          </div>
           {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
           {/* kod gry na wierzchu, przy tytule: do podania komuś do wpisania (26.10, w nagłówku jest teraz menu) */}
           <div className="pilot-tytul">
@@ -738,7 +746,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             className="przycisk niebezpieczny"
             disabled={wysylam}
             onClick={() =>
-              akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
+              akcja("koniec", `Zakończyć grę ${kod}${stan.lokal ? ` w lokalu ${stan.lokal.nazwa}` : ""}? Tego nie da się cofnąć.`, {
                 tak: "Zakończ grę",
                 niebezpieczne: true,
               })

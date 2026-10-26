@@ -1383,6 +1383,33 @@ html:has(.kolumna) {
 }
 
 /* kod gry przy tytule pilota */
+/* lokal gry na samej górze pilota (pilot.tsx): logo i nazwa, wyraźnie, żeby nie pomylić gier */
+.pilot-lokal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 2px solid var(--zloto);
+  border-radius: 14px;
+}
+
+.pilot-lokal img {
+  flex: none;
+  height: 44px;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+.pilot-lokal strong {
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.pilot-lokal.bez {
+  border-color: var(--kamien3, #4d4538);
+}
+
 .pilot-tytul {
   display: flex;
   align-items: baseline;
