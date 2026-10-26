@@ -714,6 +714,29 @@
   padding-bottom: 12px;
 }
 
+/* grafika obok odpowiedzi (26.10): obie kolumny tej samej wysokości. Grafika szersza (wysokość z miejsca na scenie,
+   najwyżej 540 px, szerokość z proporcji), a odpowiedzi dzielą tę wysokość po równo. Prawda / fałsz zostaje po
+   staremu: dwa kafle na całą wysokość grafiki byłyby za duże */
+.tv-pytanie-srodek.z-grafika {
+  --wys-grafiki: min(540px, 100%);
+}
+
+.z-grafika .tv-pytanie-grafika {
+  width: auto;
+  height: var(--wys-grafiki);
+  max-width: 55%;
+  max-height: none;
+}
+
+.z-grafika .tv-odp-lista:not(.tv-odp-pf) {
+  height: var(--wys-grafiki);
+  grid-auto-rows: 1fr;
+}
+
+.z-grafika .tv-odp-lista:not(.tv-odp-pf) .tv-odp {
+  min-height: 0;
+}
+
 .tv-odp > :not(.tv-odp-slupek) {
   position: relative;
 }
