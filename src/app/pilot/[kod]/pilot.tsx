@@ -23,6 +23,7 @@ import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania
 import { liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
+import { NagrodyPilota } from "./nagrody";
 import { useAutoProwadzenie } from "./auto";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
@@ -559,6 +560,16 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         </div>
 
         <div className="pilot-podglad">
+
+          {/* nagrody można ustawić albo zmienić aż do startu quizu (26.10) */}
+          {faza === "poczekalnia" && (
+            <details className="karta pilot-nagrody-karta" style={{ marginTop: 18 }}>
+              <summary className="etykieta">
+                Nagrody · {stan.nagrody?.length ? (stan.nagrody.length === 3 ? "pierwsza trójka" : "1. miejsce") : "brak"}
+              </summary>
+              <NagrodyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />
+            </details>
+          )}
 
           {faza === "poczekalnia" && (
             <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }} open>

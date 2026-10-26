@@ -15,10 +15,25 @@ function blad(tekst: string, status = 400) {
 }
 
 /** `plik`: zdjęcie nagrody. Zwraca `{ ok, url }` (publiczny adres). */
-export async function POST(request: Request) {
-  if (!(await czyAdmin())) return blad("Zaloguj się do panelu.", 401);
+/** Prowadzący z pilota (bez logowania w panelu): kod i klucz pilota gry, która jeszcze nie ruszyła. */
+async function pilotPrzedStartem(kod: string, token: string): Promise<boolean> {
+  if (!kod || !token) return false;
+  const { data } = await supabaseAdmin()
+    .from("sesje")
+    .select("id")
+    .eq("kod", kod.toUpperCase())
+    .eq("host_token", token)
+    .eq("faza", "poczekalnia")
+    .maybeSingle();
+  return !!data;
+}
 
+export async function POST(request: Request) {
   const dane = await request.formData().catch(() => null);
+  // z kreatora (zalogowany w panelu) albo z pilota przed startem (26.10: nagrody ustalane na miejscu)
+  const zPilota = await pilotPrzedStartem(String(dane?.get("kod") ?? ""), String(dane?.get("host_token") ?? ""));
+  if (!zPilota && !(await czyAdmin())) return blad("Zaloguj się do panelu.", 401);
+
   const plik = dane?.get("plik");
   if (!(plik instanceof File)) return blad("Brak zdjęcia.");
   if (!TYPY[plik.type]) return blad("Zdjęcie musi być w formacie JPEG, PNG albo WebP.");

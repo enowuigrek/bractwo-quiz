@@ -28,14 +28,35 @@ type Stan = { etap: "pusty" } | { etap: "wysylam"; podglad: string } | { etap: "
  * w buckecie (`/api/nagroda`). Adres idzie w ukrytym polu `nagroda_zdjecie_<miejsce>`. Bez przeróbki przez AI
  * (wyłączona 25.10).
  */
-export function ZdjecieNagrody({ miejsce }: { miejsce: number }) {
-  const [stan, ustaw] = useState<Stan>({ etap: "pusty" });
+export function ZdjecieNagrody({
+  miejsce,
+  poczatkowe = null,
+  pilot = null,
+  onZmiana,
+}: {
+  miejsce: number;
+  /** Zdjęcie, które nagroda już ma (pilot: zmiana nagród przed startem). */
+  poczatkowe?: string | null;
+  /** Wysyłanie z pilota: kod i klucz pilota zamiast logowania w panelu. */
+  pilot?: { kod: string; token: string } | null;
+  /** Adres zdjęcia po każdej zmianie (pilot trzyma nagrody w stanie, nie w formularzu). */
+  onZmiana?: (url: string | null) => void;
+}) {
+  const [stan, ustawStan] = useState<Stan>(poczatkowe ? { etap: "gotowe", url: poczatkowe } : { etap: "pusty" });
+  const ustaw = (s: Stan) => {
+    ustawStan(s);
+    if (s.etap !== "wysylam") onZmiana?.(s.etap === "gotowe" ? s.url : null);
+  };
   const pole = useRef<HTMLInputElement>(null);
 
   async function wyslij(zdjecie: Blob) {
     ustaw({ etap: "wysylam", podglad: URL.createObjectURL(zdjecie) });
     const dane = new FormData();
     dane.append("plik", zdjecie, "nagroda.jpg");
+    if (pilot) {
+      dane.append("kod", pilot.kod);
+      dane.append("host_token", pilot.token);
+    }
     try {
       const odp = await fetch("/api/nagroda", { method: "POST", body: dane });
       const wynik = (await odp.json()) as { ok: boolean; blad?: string; url?: string };

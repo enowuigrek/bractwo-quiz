@@ -1975,6 +1975,82 @@ html:has(.kolumna) {
   color: var(--zloto);
 }
 
+/* Nagrody w pilocie przed startem (pilot/[kod]/nagrody.tsx); zdjęcie nagrody z kreatora (zdjecie-nagrody.tsx) */
+.pilot-nagrody {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pilot-nagrody-ile {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.pilot-nagrody-ile .przycisk-zdjecie {
+  padding: 9px 6px;
+}
+
+.pilot-nagrody-ile .przycisk-zdjecie.wybrany {
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  color: var(--na-zlocie);
+}
+
+.pilot-nagroda {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.pilot-nagroda > div {
+  display: grid;
+  gap: 6px;
+}
+
+.pilot-nagroda-nr {
+  padding-top: 10px;
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+.pilot-nagrody .zdjecie-nagrody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pilot-nagrody .przycisk-maly {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--r-btn-sm);
+  background: var(--kamien2);
+  color: var(--piana);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+  cursor: pointer;
+}
+
+.pilot-nagrody .przycisk-maly.niebezpieczny {
+  background: var(--czerwien);
+  color: var(--na-zlocie);
+}
+
+.pilot-nagrody .zdjecie-nagrody-miniatura,
+.pilot-nagrody .zdjecie-nagrody-trwa img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
 /* okno wycinka: po pół wiersza sąsiadów nad i pod, wygaszone, gdy lista ciągnie się dalej */
 .moj-ranking-okno {
