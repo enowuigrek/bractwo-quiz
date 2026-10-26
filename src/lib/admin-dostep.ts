@@ -1,31 +1,62 @@
 import "server-only";
 import { notFound } from "next/navigation";
-import { widziWszystko, type Rola } from "./admin";
+import { lokalRoli, type Rola } from "./admin";
 import { supabaseAdmin } from "./supabase/serwer";
 
-// Dostęp do pojedynczego quizu albo gry w panelu. Obsługa nie widzi rzeczy „tylko dla głównego”
-// (`quizy.tylko_glowny`, `sesje.tylko_glowny`): strona pokazuje 404, a akcja kończy się błędem.
-// Listy filtrują same: `.in("tylko_glowny", widoczne(rola))`.
+// Kto co widzi w panelu (od 26.10). Główny: wszystko. Lokal:
+// - quizy: swoje (`quizy.lokal_id`) do zmian, a quizy Bractwa (`lokal_id` null) bez `tylko_glowny` tylko do grania
+//   i podglądu, bez edycji i usuwania;
+// - gry: rozegrane w swoim lokalu, bez gier „tylko dla mnie” głównego;
+// - lokale: tylko swój (logo, Instagram, hasło).
+// Strona bez dostępu pokazuje 404, a akcja kończy się błędem. Listy filtrują `filtrQuizow` / `filtrGier`.
 
-/** Wartości `tylko_glowny`, które ta rola widzi na listach. */
-export const widoczne = (rola: Rola): boolean[] => (widziWszystko(rola) ? [true, false] : [false]);
+type ZFiltrem<Q> = { or(filtr: string): Q };
 
-export async function wymagajQuizu(rola: Rola, quizId: string): Promise<void> {
-  if (widziWszystko(rola)) return;
+/** Quizy, które rola widzi na listach i w kreatorze (`wlasne`: tylko te, które może zmieniać, np. w koszu). */
+export function filtrQuizow<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, wlasne = false): Q {
+  const lokal = lokalRoli(rola);
+  if (!lokal) return zapytanie;
+  return zapytanie.or(
+    wlasne ? `lokal_id.eq.${lokal}` : `lokal_id.eq.${lokal},and(lokal_id.is.null,tylko_glowny.is.false)`,
+  );
+}
+
+/** Gry, które rola widzi na listach. */
+export function filtrGier<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola): Q {
+  const lokal = lokalRoli(rola);
+  return lokal ? zapytanie.or(`and(lokal_id.eq.${lokal},tylko_glowny.is.false)`) : zapytanie;
+}
+
+/**
+ * Dostęp do quizu. `podglad`: wystarczy móc go oglądać i grać (quiz Bractwa u lokalu), inaczej trzeba móc go
+ * zmieniać. Zwraca, czy rola może quiz zmieniać.
+ */
+export async function wymagajQuizu(rola: Rola, quizId: string, podglad = false): Promise<{ mozeZmieniac: boolean }> {
+  const lokal = lokalRoli(rola);
+  if (!lokal) return { mozeZmieniac: true };
   const { data } = await supabaseAdmin()
     .from("quizy")
-    .select("tylko_glowny")
+    .select("lokal_id, tylko_glowny")
     .eq("id", quizId)
-    .maybeSingle<{ tylko_glowny: boolean }>();
-  if (!data || data.tylko_glowny) notFound();
+    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean }>();
+  if (data?.lokal_id === lokal) return { mozeZmieniac: true };
+  if (podglad && data && data.lokal_id === null && !data.tylko_glowny) return { mozeZmieniac: false };
+  notFound();
 }
 
 export async function wymagajGry(rola: Rola, sesjaId: string): Promise<void> {
-  if (widziWszystko(rola)) return;
+  const lokal = lokalRoli(rola);
+  if (!lokal) return;
   const { data } = await supabaseAdmin()
     .from("sesje")
-    .select("tylko_glowny")
+    .select("lokal_id, tylko_glowny")
     .eq("id", sesjaId)
-    .maybeSingle<{ tylko_glowny: boolean }>();
-  if (!data || data.tylko_glowny) notFound();
+    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean }>();
+  if (!data || data.lokal_id !== lokal || data.tylko_glowny) notFound();
+}
+
+/** Ustawienia lokalu: główny każdego, lokal tylko swojego. */
+export function wymagajLokalu(rola: Rola, lokalId: string): void {
+  const lokal = lokalRoli(rola);
+  if (lokal && lokal !== lokalId) notFound();
 }

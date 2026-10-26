@@ -67,17 +67,17 @@ export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: Ro
         />
       </div>
       <div>
-        <label htmlFor="opis">Opis (tylko dla obsługi)</label>
+        <label htmlFor="opis">Opis (widać go tylko w panelu)</label>
         <textarea id="opis" name="opis" className="pole" maxLength={LIMITY.opis} rows={2} />
       </div>
       <div>
         <label htmlFor="tagi">Tematy (po przecinku, do filtrowania)</label>
         <input id="tagi" name="tagi" className="pole" placeholder="np. filmy, lata 90." maxLength={200} />
       </div>
-      {/* tylko główny: jego nowe quizy są domyślnie ukryte przed obsługą (zmiana później na stronie quizu) */}
+      {/* tylko główny: jego nowe quizy są domyślnie ukryte przed lokalami (zmiana później na stronie quizu) */}
       {glowny && (
         <label className="przelacznik">
-          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (obsługa nie zobaczy tego quizu)
+          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (lokale nie zobaczą tego quizu)
         </label>
       )}
 

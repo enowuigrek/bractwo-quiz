@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { wymagajGry, wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { kontoInstagram } from "@/lib/instagram";
@@ -32,7 +32,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   if (!lokal_id) return { blad: "Wybierz lokal." };
   if (!quiz_id) return { blad: "Wybierz quiz." };
-  await wymagajQuizu(rola, quiz_id);
+  // lokal gra tylko u siebie, a quizy Bractwa może uruchamiać (bez zmieniania ich)
+  if (lokalRoli(rola) && lokalRoli(rola) !== lokal_id) return { blad: "Możesz uruchomić grę tylko w swoim lokalu." };
+  await wymagajQuizu(rola, quiz_id, true);
   if (czas_s !== null && (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas)) {
     return { blad: "Wybierz czas na odpowiedź." };
   }
@@ -102,8 +104,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań.
   // tylko w wyścigu po piwo (quiz z finałem serią); klasyczny pub quiz nie ma finału
-  const pijany_final = mozePijanyFinal(rola) && !!finalySerii && dane.get("pijany_final") === "on";
-  // gra głównego jest domyślnie tylko jego (przełącznik w kreatorze); gra z jego ukrytego quizu zawsze
+  // (od 26.10 włącza go też lokal; pytania zmienia tylko główny)
+  const pijany_final = !!finalySerii && dane.get("pijany_final") === "on";
+  // gra głównego jest domyślnie tylko jego (lokal jej nie widzi; przełącznik w kreatorze); gra z ukrytego quizu zawsze
   const tylko_glowny = widziWszystko(rola) && (dane.get("tylko_glowny") === "on" || !!quiz?.tylko_glowny);
   const za_barem = pijany_final
     ? String(dane.get("za_barem") ?? "")

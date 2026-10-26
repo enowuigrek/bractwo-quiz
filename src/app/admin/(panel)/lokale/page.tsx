@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { wymagajAdmina } from "@/lib/admin";
+import { redirect } from "next/navigation";
+import { lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
@@ -9,7 +10,9 @@ import { IkonaEdytuj } from "@/components/ikony";
 export const metadata: Metadata = { title: "Ustawienia: lokale · Bractwo Quiz" };
 
 export default async function Lokale() {
-  await wymagajAdmina();
+  // panel lokalu: od razu ustawienia własnego lokalu
+  const lokal = lokalRoli(await wymagajAdmina());
+  if (lokal) redirect(`/admin/lokale/${lokal}`);
   const { data, error } = await supabaseAdmin()
     .from("lokale")
     .select("id, nazwa, miasto, logo_url, adres_ekranu")

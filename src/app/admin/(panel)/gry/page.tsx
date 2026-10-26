@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { wymagajAdmina } from "@/lib/admin";
-import { widoczne } from "@/lib/admin-dostep";
+import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
+import { FiltrLokali, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
 
 export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
 
-export default async function Gry() {
+export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const rola = await wymagajAdmina();
-  const { data, error } = await supabaseAdmin()
-    .from("sesje")
-    .select(ZAPYTANIE_GIER)
-    .in("tylko_glowny", widoczne(rola))
-    .order("utworzono", { ascending: false })
-    .limit(100)
-    .returns<GraNaLiscie[]>();
+  const db = supabaseAdmin();
+  // główny filtruje gry po lokalu (26.10); lokal i tak widzi tylko swoje
+  const { data: lokale } = widziWszystko(rola)
+    ? await db.from("lokale").select("id, nazwa, logo_url").order("nazwa").returns<LokalAutor[]>()
+    : { data: [] as LokalAutor[] };
+  const lokal = wybranyLokal((await searchParams).lokal, lokale ?? [], false);
+  let zapytanie = filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola);
+  if (lokal) zapytanie = zapytanie.eq("lokal_id", lokal);
+  const { data, error } = await zapytanie.order("utworzono", { ascending: false }).limit(100).returns<GraNaLiscie[]>();
 
   const gry = data ?? [];
   return (
@@ -26,6 +29,7 @@ export default async function Gry() {
           ▶ Uruchom quiz
         </Link>
       </p>
+      <FiltrLokali lokale={lokale ?? []} wybrany={lokal} adres={(l) => (l ? `/admin/gry?lokal=${l}` : "/admin/gry")} />
       {error && <p className="blad">Nie udało się pobrać rozgrywek: {error.message}</p>}
 
       <section className="panel-sekcja">

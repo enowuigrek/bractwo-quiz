@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
@@ -59,12 +59,13 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
   const db = supabaseAdmin();
   const { data, error } = await db
     .from("quizy")
-    // główny decyduje, czy quiz widzi obsługa; quiz założony przez obsługę widzą wszyscy
+    // quiz lokalu jest jego (`lokal_id`, widzi go też główny); główny decyduje, czy jego quiz widzą lokale
     .insert({
       tytul,
       opis: tekst(dane, "opis") || null,
       tagi: czytajTagi(tekst(dane, "tagi")),
       tylko_glowny: widziWszystko(rola) && !!dane.get("tylko_glowny"),
+      lokal_id: lokalRoli(rola),
     })
     .select("id")
     .single();
@@ -99,7 +100,7 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   return { ok: "Zapisano." };
 }
 
-/** Przełącznik „Tylko dla mnie” na stronie quizu: obsługa przestaje albo zaczyna widzieć quiz. */
+/** Przełącznik „Tylko dla mnie” na stronie quizu: lokale przestają albo zaczynają widzieć quiz Bractwa. */
 export async function ustawWidocznoscQuizu(id: string, tylkoGlowny: boolean): Promise<void> {
   const rola = await wymagajAdmina();
   if (!widziWszystko(rola)) return;

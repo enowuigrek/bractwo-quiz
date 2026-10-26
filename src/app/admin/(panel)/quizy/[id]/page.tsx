@@ -27,16 +27,17 @@ export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
 export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[id]">) {
   const rola = await wymagajAdmina();
   const { id } = await params;
-  await wymagajQuizu(rola, id);
+  // lokal ogląda quiz Bractwa bez zmian (gra nim, ale nie edytuje i nie usuwa)
+  const { mozeZmieniac } = await wymagajQuizu(rola, id, true);
   const db = supabaseAdmin();
 
   const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { count: wejscie }] =
     await Promise.all([
       db
         .from("quizy")
-        .select("id, tytul, opis, utworzono, tylko_glowny, tagi, usunieto")
+        .select("id, tytul, opis, utworzono, tylko_glowny, tagi, usunieto, lokal_id")
         .eq("id", id)
-        .maybeSingle<Quiz & { usunieto: string | null }>(),
+        .maybeSingle<Quiz & { usunieto: string | null; lokal_id: string | null }>(),
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
@@ -51,6 +52,50 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     ...(bezEtapu.length || !etapy.length ? [{ etap: null, zadania: bezEtapu }] : []),
     ...etapy.map((e) => ({ etap: e, zadania: lista.filter((z) => z.etap_id === e.id) })),
   ];
+
+  if (!mozeZmieniac) {
+    return (
+      <main>
+        <p className="okruchy">
+          <Link href="/admin/quizy">← Quizy</Link>
+        </p>
+        <h1>{quiz.tytul}</h1>
+        <p className="pomocniczy">
+          Quiz Bractwa: możesz go uruchamiać w swoim lokalu, ale nie zmieniać.
+        </p>
+        <section className="panel-sekcja">
+          <h2>{etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
+          {grupy.map(({ etap, zadania: wEtapie }) => (
+            <div key={etap?.id ?? "bez-etapu"} className="etap-blok">
+              {etap && (
+                <h3>
+                  {etap.nr}. {etap.nazwa}
+                </h3>
+              )}
+              {wEtapie.length > 0 && (
+                <ol className="lista">
+                  {wEtapie.map((z) => (
+                    <li key={z.id}>
+                      <span className="krok-nr" style={{ minWidth: "1.6em" }}>
+                        {lista.indexOf(z) + 1}.
+                      </span>
+                      {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
+                      <div className="lista-glowna">
+                        <div className="lista-tytul">{z.tresc}</div>
+                        <div className="lista-opis">
+                          {NAZWY_TYPOW[z.typ]} · {opisRozwiazania(z)}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          ))}
+        </section>
+      </main>
+    );
+  }
 
   const wiersz = (z: Zadanie) => {
     const i = lista.indexOf(z);
@@ -105,18 +150,18 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         <Link href="/admin/quizy">← Quizy</Link>
       </p>
       <NaglowekQuizu quiz={quiz} />
-      {/* tylko główny decyduje, czy obsługa (wspólne hasło) widzi ten quiz */}
-      {widziWszystko(rola) && (
+      {/* tylko główny decyduje, czy lokale widzą jego quiz (do grania); quizów lokali to nie dotyczy */}
+      {widziWszystko(rola) && !quiz.lokal_id && (
         <form action={ustawWidocznoscQuizu.bind(null, quiz.id, !quiz.tylko_glowny)} className="pomocniczy">
           {quiz.tylko_glowny ? (
             <>
-              <IkonaKlodka /> Tylko dla mnie: obsługa nie widzi tego quizu.
+              <IkonaKlodka /> Tylko dla mnie: lokale nie widzą tego quizu.
             </>
           ) : (
-            "Obsługa widzi ten quiz."
+            "Lokale widzą ten quiz i mogą nim grać (bez zmian)."
           )}{" "}
           <button type="submit" className="przycisk-maly">
-            {quiz.tylko_glowny ? "Pokaż obsłudze" : "Ukryj przed obsługą"}
+            {quiz.tylko_glowny ? "Pokaż lokalom" : "Ukryj przed lokalami"}
           </button>
         </form>
       )}
@@ -250,7 +295,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         </section>
       )}
 
-      {/* obsługa nie wie o pijanym finale; jest tylko po finale wyścigu po piwo (klasyczny pub quiz go nie ma) */}
+      {/* pytania pijanego finału zmienia tylko główny; jest tylko po finale wyścigu po piwo */}
       {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
         <section className="panel-sekcja">
           <h2>Pijany finał: wejście</h2>

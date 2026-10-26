@@ -2953,20 +2953,18 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
 }
 
-.drogi-finalu-gracz.lider .awatar {
-  border-color: var(--zloto);
-  box-shadow: var(--glow-lg);
-}
-
-/* podpis nad awatarem, żeby nie zasłaniał sąsiednich dróg */
+/* Lider wygląda jak reszta (26.10, Łukasz: pozycje i tak widać), bez złotej obwódki i złotego podpisu.
+   Podpis z lewej strony awatara, na wysokości jego środka (wcześniej nad nim). Długi nick kończy się wielokropkiem,
+   żeby na starcie drogi nie wychodził za ekran. */
 .drogi-finalu-podpis {
   position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  translate: -50% 0;
+  right: calc(100% + 12px);
+  top: 50%;
+  translate: 0 -50%;
+  max-width: 340px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   white-space: nowrap;
   padding: 4px 16px;
   border-radius: 16px;
@@ -2976,8 +2974,10 @@
   line-height: 1.15;
 }
 
-.drogi-finalu-gracz.lider .drogi-finalu-podpis {
-  color: var(--zloto);
+.drogi-finalu-podpis > span:first-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .drogi-finalu-punkty {

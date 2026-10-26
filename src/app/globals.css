@@ -183,6 +183,22 @@ input.pole[type="time"] {
   font-weight: var(--w-semibold);
 }
 
+/* Logowanie lokalu (/admin/<adres>): logo lokalu z lewej, Bractwo Quiz z prawej, ta sama wysokość */
+.logowanie-lokalu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: var(--section-gap);
+}
+
+.logowanie-lokalu > img {
+  height: 56px;
+  width: auto;
+  max-width: 40%;
+  object-fit: contain;
+}
+
 /* Telefon gracza i pilot */
 .etykieta {
   display: block;

@@ -9,11 +9,13 @@ import { zapiszLokal } from "./akcje";
 
 type Props = {
   lokal?: Lokal;
+  /** Panel lokalu: tylko logo i Instagram (nazwę, miasto i adres ekranu zmienia główny). */
+  ograniczony?: boolean;
   /** Miasta, które już są w bazie, do podpowiedzi. */
   miasta: string[];
 };
 
-export function FormularzLokalu({ lokal, miasta }: Props) {
+export function FormularzLokalu({ lokal, miasta, ograniczony = false }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(
     zapiszLokal.bind(null, lokal?.id ?? null),
     {},
@@ -21,6 +23,8 @@ export function FormularzLokalu({ lokal, miasta }: Props) {
 
   return (
     <form {...bezResetu(akcja)} className="formularz">
+      {!ograniczony && (
+        <>
       <div>
         <label htmlFor="nazwa">Nazwa lokalu</label>
         <input id="nazwa" name="nazwa" className="pole" defaultValue={lokal?.nazwa} required maxLength={80} />
@@ -43,6 +47,8 @@ export function FormularzLokalu({ lokal, miasta }: Props) {
           ))}
         </datalist>
       </div>
+        </>
+      )}
       <div>
         <label htmlFor="instagram">Instagram lokalu (opcjonalnie)</label>
         <input
@@ -56,7 +62,7 @@ export function FormularzLokalu({ lokal, miasta }: Props) {
         />
         <p className="podpowiedz">Gracze zobaczą je przy grafice z wynikiem, żeby oznaczyć lokal w relacji.</p>
       </div>
-      {lokal && (
+      {lokal && !ograniczony && (
         <div>
           <label htmlFor="adres_ekranu">Adres ekranu lokalu</label>
           <div className="pole-z-przedrostkiem">

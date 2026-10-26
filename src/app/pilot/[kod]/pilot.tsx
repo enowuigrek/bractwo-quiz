@@ -737,7 +737,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
         )}
         {faza === "koniec" && (
           <Link href="/admin/gry" className="przycisk zloty">
-            Panel obsługi
+            Panel
           </Link>
         )}
       </div>

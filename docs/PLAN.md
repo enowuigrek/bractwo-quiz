@@ -41,14 +41,22 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Lista drobnych zmian wizualnych od Łukasza (26.10), do zrobienia po kolei w kolejnej sesji:**
   1. ✅ Pilot: ramka „odpowiedziano” (stoi zawsze, opis niżej).
   2. ✅ Po uruchomieniu od razu pilot, przekazywanie pilota w pilocie, menu panelu na telefonie (opis niżej).
-  3. **Do zrobienia (następny krok):** osobne panele dla lokali, a w pilocie osobne panele graczy i pytań. Łukasz opisał to krótko; przed pracą dopytaj o szczegóły. Punkt wyjścia: lokale są dziś w panelu pod „Lokale” (menu → Przygotowanie, `src/app/admin/(panel)/lokale/`), a w pilocie gracze i pytanie to zwijane karty pod przyciskami (`pilot-gracze-karta`, `pilot-pytanie-karta`, `udostepnij.tsx` w `src/app/pilot/[kod]/`). Prawdopodobnie chodzi o osobne widoki (zakładki albo strony) zamiast jednej długiej strony; zasada z pilota zostaje: przyciski sterowania i ramka stanu nie mogą zmieniać pozycji.
+  3. ✅ Osobne panele lokali (26.10, opis niżej w „Panele lokali”). Panele graczy i pytań w pilocie Łukasz uznał za zrobione; wróci do nich po rozdzieleniu lokali, jeśli będzie trzeba.
   4. ✅ „Ile?”: oś na dole, gracze nad nią, poprawna odpowiedź pod nagłówkiem (opis niżej).
   5. ✅ Kreska odpadania z większym odstępem (opis niżej).
 
 - **Dziś (26.10) zmienione, na produkcji, ale niesprawdzone na prawdziwym TV/telefonach w lokalu:** wybuch szklanki na TV z klatek klipu (zamiast konfetti; na komputerze dalej wideo), równoległe drogi finału blisko siebie, scena TV na cały ekran (nagłówek od góry, stopka od dołu), podium i tabela na zmianę na końcu gry, ekran lokalu wraca do logo po „Zakończ grę”, nowy pilot (ramka stanu, ikony muzyki i automatu, menu), kreator na kafelkach. Łukasz testuje na OLED i iPhonie na bieżąco.
 - Muzyka klasycznego pub quizu wyłączona (POMYSLY.md), a „Ile?” ma mnożnik ×2.
 
-**Następny krok:** punkt 3 z listy wyżej (osobne panele), potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
+**Następny krok:** hasła na start dla PPR i Piwiarni (Łukasz w panelu, strona lokalu), potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
+
+### Panele lokali (26.10) ✅
+
+- **Logowanie:** lokal wchodzi pod `/admin/<adres_ekranu>` (np. `quiz.bractwopiwne.pl/admin/ppr`, ten sam adres co ekran, tylko pod `/admin/`), widzi swoje logo i pole hasła. Hasło jest w bazie (`lokale_hasla`, skrót scrypt, migracja `20261026131354_panele_lokali`, dostęp tylko z klucza serwisowego). Główny ustawia hasło na start na stronie lokalu (karta „Hasło panelu” i link do panelu lokalu), lokal zmienia je sam u siebie. Zmiana hasła wylogowuje lokal na innych urządzeniach (znacznik hasła w ciasteczku). Wspólne hasło obsługi (`ADMIN_HASLO`) przestało działać; zmienną na Vercelu można usunąć.
+- **Co widzi lokal:** w nagłówku swoje logo obok logo Bractwa. Swoje gry (bez gier „tylko dla mnie” głównego), swoje quizy (`quizy.lokal_id`, tworzy i zmienia jak dotąd) i quizy Bractwa bez kłódki z podpisem „quiz Bractwa, tylko do grania”: lista z ikoną oka zamiast edycji i kosza, strona quizu tylko do odczytu (pytania z rozwiązaniami), edycja pytań i kosz dają 404. Kreator bez kroków miasta i lokalu (gra tylko u siebie), z pijanym finałem i „Kto dziś stoi za barem”. Ustawienia: tylko swój lokal (logo, Instagram, hasło, ekran z QR); nazwę, miasto i adres ekranu zmienia główny. Historia, wyniki, nagrody i grafika podium swoich gier jak u głównego.
+- **Co widzi główny:** wszystko jak dotąd. W quizach i rozgrywkach filtr „kto” (wszyscy, Bractwo, każdy lokal z logo, `?lokal=`), a przy quizie logo autora (lokalu albo Bractwa). Przełącznik „tylko dla mnie” przy quizie znaczy teraz „lokale nie zobaczą”, a przy grze „lokal nie zobaczy jej w swoim panelu”.
+- **Sprawdzone lokalnie:** logowanie główne i lokalu „Dom” (złe hasło odrzucone), lista quizów lokalu (tylko Piwny jako quiz Bractwa), podgląd Piwnego, 404 na ukrytym quizie, na edycji pytań Piwnego i na cudzym lokalu, kreator lokalu, filtry i ikony u głównego. Na produkcji i na telefonie niesprawdzone. Lokal „Dom” ma testowe hasło lokalu z tego testu: ustaw własne na stronie lokalu. PPR i Piwiarnia w Alejach nie mają jeszcze haseł.
+- **Finał na TV:** lider (także w pijanym finale) bez złotej obwódki i złotego podpisu, podpis z nickiem stoi z lewej strony awatara (na wysokości środka), długi nick kończy się wielokropkiem; drogi zaczynają się dalej od lewej krawędzi (`START_X` 300 zamiast 130 w `drogi.tsx`), żeby podpis mieścił się na starcie.
 
 ## Na 25.10: dźwięki i pijany finał
 

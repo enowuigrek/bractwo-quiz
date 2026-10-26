@@ -23,7 +23,7 @@ export type QuizDoWyboru = {
   pijany: boolean;
 };
 
-/** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) widzi „Pijany finał” i widoczność gry. */
+/** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) ustawia widoczność gry; lokal dostaje tylko swój lokal. */
 type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean };
 
 /** „1 lokal”, „3 lokale”, „5 lokali”. */
@@ -65,7 +65,9 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   );
   const [miasto, setMiasto] = useState(miasta.length === 1 ? miasta[0] : "");
   const lokaleWMiescie = lokale.filter((p) => p.miasto === miasto);
-  const [lokal, setLokal] = useState(lokaleWMiescie.length === 1 ? lokaleWMiescie[0].id : "");
+  const [lokal, setLokal] = useState(
+    lokaleWMiescie.length === 1 ? lokaleWMiescie[0].id : lokale.length === 1 ? lokale[0].id : "",
+  );
   // quiz w trzech krokach: rodzaj, temat (opcjonalnie), quiz z listy już przefiltrowanej
   const [rodzaj, setRodzaj] = useState<RodzajQuizu>("wyscig");
   const [temat, setTemat] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   const klasyczny = wybrany?.rodzaj === "klasyczny";
   const [czas, setCzas] = useState<string>(LIMITY.domyslnyCzas === null ? "bez" : String(LIMITY.domyslnyCzas));
   const [ileNagrod, setIleNagrod] = useState(0);
-  // pijany finał domyślnie włączony (tylko główny go widzi; obsługa nie wysyła tego pola)
+  // pijany finał domyślnie włączony (od 26.10 włącza go też lokal)
   const [pijany, setPijany] = useState(true);
   // zapowiedź (domyślnie włączona): pokazuje na ekranie lokalu godzinę i odliczanie, wyłączona od razu poczekalnię
   // z QR. Data i godzina w czasie lokalnym przeglądarki, domyślnie godzinę od teraz (pola są dopiero po wyborze
@@ -92,6 +94,10 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   );
   const startIso = zapowiedz && godzinaStartu ? isoStartu(dataStartu, godzinaStartu) : "";
 
+  // panel lokalu: jeden lokal, więc bez kroków miasta i lokalu (numeracja od rodzaju)
+  const bezWyboruLokalu = !glowny && lokale.length === 1;
+  const krok = (n: number) => (bezWyboruLokalu ? n - 2 : n);
+
   function wybierzMiasto(m: string) {
     setMiasto(m);
     const nowe = lokale.filter((p) => p.miasto === m);
@@ -101,6 +107,8 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   return (
     <form {...bezResetu(akcja)} className="formularz kreator">
       {/* kafelki zamiast list (26.10, Łukasz): miasto, lokal, rodzaj i quiz wybiera się jednym dotknięciem */}
+      {bezWyboruLokalu && <input type="hidden" name="lokal_id" value={lokale[0].id} />}
+      {!bezWyboruLokalu && (
       <fieldset>
         <legend className="krok">
           <span className="krok-nr">1</span> Miasto
@@ -119,7 +127,9 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
         </div>
       </fieldset>
 
-      {miasto && (
+      )}
+
+      {miasto && !bezWyboruLokalu && (
         <fieldset>
           <legend className="krok">
             <span className="krok-nr">2</span> Lokal
@@ -146,7 +156,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
       {lokal && (
         <fieldset>
           <legend className="krok">
-            <span className="krok-nr">3</span> Rodzaj
+            <span className="krok-nr">{krok(3)}</span> Rodzaj
           </legend>
           <div className="kafelki kafelki-dwa">
             {(["wyscig", "klasyczny"] as const).map((r) => (
@@ -175,7 +185,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
       {lokal && (
         <fieldset>
           <legend className="krok">
-            <span className="krok-nr">4</span> Quiz
+            <span className="krok-nr">{krok(4)}</span> Quiz
           </legend>
           {tematy.length > 0 && (
             <p className="tagi" style={{ margin: "0 0 14px" }}>
@@ -310,16 +320,16 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             )}
           </fieldset>
 
-          {/* tylko główny: obsługa nie wie o pijanym finale, a gry głównego są domyślnie ukryte przed nią */}
+          {/* tylko główny: jego gry są domyślnie ukryte przed panelem lokalu, w którym grał */}
           {glowny && (
-            <>
               <fieldset>
                 <legend>Widoczność</legend>
                 <label className="przelacznik">
-                  <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (obsługa nie zobaczy tej
-                  gry w panelu)
+                  <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (lokal nie zobaczy tej
+                  gry w swoim panelu)
                 </label>
               </fieldset>
+          )}
 
               {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału) */}
               {wybrany?.pijany && (
@@ -342,8 +352,6 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                   )}
                 </fieldset>
               )}
-            </>
-          )}
 
           <fieldset>
             <legend>Zapowiedź</legend>

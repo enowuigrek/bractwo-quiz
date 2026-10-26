@@ -13,7 +13,8 @@ const { szer: SZER, wys: WYS } = PLANSZA_DROG;
 /** Szklanka po prawej, na środku wysokości; drogi kończą się tuż przed nią. */
 export const SZKLANKA_FINALU = { x: 1560, y: 430 };
 const KONIEC_X = 1330;
-const START_X = 130;
+// start dalej od lewej krawędzi (26.10, było 130): podpis z nickiem stoi z lewej strony awatara i musi się zmieścić
+const START_X = 300;
 
 export type Droga = { od: { x: number; y: number }; do: { x: number; y: number }; grubosc: number };
 

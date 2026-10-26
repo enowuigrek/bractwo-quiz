@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { widoczne } from "@/lib/admin-dostep";
+import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_RODZAJOW } from "@/lib/tagi";
 import { IkonaKlodka, IkonaKosz } from "@/components/ikony";
@@ -32,10 +32,12 @@ const BLEDY: Record<string, string> = {
 export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kosz">) {
   const rola = await wymagajAdmina();
   const { blad } = await searchParams;
-  const { data, error } = await supabaseAdmin()
-    .from("quizy")
-    .select("id, tytul, tylko_glowny, usunieto, zadania(count), etapy(count)")
-    .in("tylko_glowny", widoczne(rola))
+  // lokal widzi w koszu tylko swoje quizy (quizów Bractwa nie usuwa)
+  const { data, error } = await filtrQuizow(
+    supabaseAdmin().from("quizy").select("id, tytul, tylko_glowny, usunieto, zadania(count), etapy(count)"),
+    rola,
+    true,
+  )
     .not("usunieto", "is", null)
     .order("usunieto", { ascending: false })
     .returns<QuizWKoszu[]>();

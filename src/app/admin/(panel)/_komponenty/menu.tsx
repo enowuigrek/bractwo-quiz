@@ -38,7 +38,18 @@ export function statusGry(faza: string, poczekalniaOtwarta: boolean): { napis: s
   return { napis: "Zakończona", kolor: "szary" };
 }
 
-export function MenuPanelu({ wyloguj, gra = null }: { wyloguj: () => Promise<void>; gra?: GraWMenu | null }) {
+export function MenuPanelu({
+  wyloguj,
+  gra = null,
+  ustawienia = "/admin/lokale",
+  lokal = false,
+}: {
+  wyloguj: () => Promise<void>;
+  gra?: GraWMenu | null;
+  /** Lista lokali u głównego, strona własnego lokalu w panelu lokalu. */
+  ustawienia?: string;
+  lokal?: boolean;
+}) {
   const sciezka = usePathname();
   const [otwarte, ustawOtwarte] = useState(false);
   const zamknij = () => ustawOtwarte(false);
@@ -113,7 +124,9 @@ export function MenuPanelu({ wyloguj, gra = null }: { wyloguj: () => Promise<voi
         <section>
           <p className="etykieta">Przygotowanie</p>
           {pozycja("/admin/quizy", "Quizy", "pytania, etapy, kosz")}
-          {pozycja("/admin/lokale", "Lokale", "logo, ekran lokalu")}
+          {lokal
+            ? pozycja(ustawienia, "Mój lokal", "logo, hasło, ekran lokalu", sciezka.startsWith("/admin/lokale"))
+            : pozycja("/admin/lokale", "Lokale", "logo, hasła, ekrany lokali")}
         </section>
         <form action={wyloguj} className="panel-menu-wyloguj">
           <button type="submit" className="przycisk">

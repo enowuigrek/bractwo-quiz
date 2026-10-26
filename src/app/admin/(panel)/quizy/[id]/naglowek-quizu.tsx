@@ -38,7 +38,7 @@ export function NaglowekQuizu({ quiz }: { quiz: Quiz }) {
             <input id="tytul" name="tytul" className="pole" defaultValue={quiz.tytul} required maxLength={LIMITY.tytul} autoFocus />
           </div>
           <div>
-            <label htmlFor="opis">Opis (tylko dla obsługi)</label>
+            <label htmlFor="opis">Opis (widać go tylko w panelu)</label>
             <textarea id="opis" name="opis" className="pole" defaultValue={quiz.opis ?? ""} maxLength={LIMITY.opis} rows={2} />
           </div>
           <div>

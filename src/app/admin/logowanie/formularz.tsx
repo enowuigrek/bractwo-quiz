@@ -3,13 +3,19 @@
 import { useActionState } from "react";
 import { zalogujAdmina, type StanLogowania } from "../akcje";
 
-export function FormularzLogowania() {
-  const [stan, akcja, trwa] = useActionState<StanLogowania, FormData>(zalogujAdmina, {});
+type Props = {
+  /** Logowanie lokalu (`zalogujLokal` z jego id); bez tego hasło główne. */
+  akcja?: (stan: StanLogowania, dane: FormData) => Promise<StanLogowania>;
+  etykieta?: string;
+};
+
+export function FormularzLogowania({ akcja: akcjaLogowania = zalogujAdmina, etykieta = "Hasło" }: Props) {
+  const [stan, akcja, trwa] = useActionState<StanLogowania, FormData>(akcjaLogowania, {});
 
   return (
     <form action={akcja} className="karta" style={{ display: "grid", gap: "var(--card-pad)" }}>
       <label htmlFor="haslo" className="pomocniczy">
-        Hasło obsługi
+        {etykieta}
       </label>
       <input
         id="haslo"

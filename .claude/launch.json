@@ -26,7 +26,6 @@
       ],
       "port": 3100,
       "env": {
-        "ADMIN_HASLO": "lokalny-test-panelu",
         "ADMIN_HASLO_GLOWNE": "lokalny-test-glowny"
       }
     }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { widoczne } from "@/lib/admin-dostep";
+import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Kreator } from "./kreator";
@@ -11,12 +11,12 @@ export const metadata: Metadata = { title: "Uruchom quiz · Bractwo Quiz" };
 export default async function NowaGra() {
   const rola = await wymagajAdmina();
   const db = supabaseAdmin();
+  // lokal uruchamia gry tylko u siebie (kreator pomija wtedy miasto i lokal)
+  const lokalId = lokalRoli(rola);
+  const zapytanieLokali = db.from("lokale").select("id, nazwa, miasto, logo_url");
   const [{ data: lokale }, { data: quizy }] = await Promise.all([
-    db.from("lokale").select("id, nazwa, miasto, logo_url").order("nazwa").returns<Lokal[]>(),
-    db
-      .from("quizy")
-      .select("id, tytul, tagi, zadania(count), etapy(finalowy, seria)")
-      .in("tylko_glowny", widoczne(rola))
+    (lokalId ? zapytanieLokali.eq("id", lokalId) : zapytanieLokali).order("nazwa").returns<Lokal[]>(),
+    filtrQuizow(db.from("quizy").select("id, tytul, tagi, zadania(count), etapy(finalowy, seria)"), rola)
       .is("usunieto", null)
       .order("utworzono", { ascending: false })
       .returns<

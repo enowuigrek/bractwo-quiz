@@ -30,6 +30,25 @@ html:has(.panel) {
 .panel-logo {
   grid-area: logo;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* panel lokalu: jego logo z lewej, tej samej wysokości co logo Bractwa */
+.panel-logo-lokalu {
+  height: 44px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+span.panel-logo-lokalu {
+  display: inline-flex;
+  align-items: center;
+  max-width: none;
+  color: var(--piana);
+  font-weight: var(--w-bold);
 }
 
 .panel-wyloguj {
@@ -1439,6 +1458,53 @@ a.tag:hover {
 a.tag.wybrany:hover {
   background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
   color: var(--na-zlocie);
+}
+
+/* filtr „kto” u głównego (lokale-autorzy.tsx): pastylki z logo lokalu */
+.filtr-lokali {
+  margin-bottom: 16px;
+}
+
+.filtr-lokali .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-logo {
+  height: 16px;
+  width: auto;
+  max-width: 40px;
+  object-fit: contain;
+}
+
+/* logo Bractwa ma `display: block` (globals.css); w pastylce i wierszu stoi w linii z tekstem */
+img.tag-logo,
+img.znaczek-lokalu {
+  display: inline-block;
+}
+
+/* autor quizu w wierszu listy: logo lokalu albo Bractwa */
+.znaczek-lokalu {
+  height: 20px;
+  width: auto;
+  max-width: 48px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.znaczek-lokalu-nazwa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  border-radius: var(--r-round);
+  background: var(--kamien2);
+  color: var(--piana);
+  font-size: 10px;
+  font-weight: var(--w-bold);
+  text-transform: uppercase;
 }
 
 button.tag {

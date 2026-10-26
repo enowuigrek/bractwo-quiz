@@ -10,7 +10,8 @@ const POZYCJE = [
   { href: "/admin/quizy", tekst: "Quizy" },
 ] as const;
 
-export function Nawigacja() {
+/** `ustawienia`: lista lokali u głównego, strona własnego lokalu w panelu lokalu. */
+export function Nawigacja({ ustawienia }: { ustawienia: string }) {
   const sciezka = usePathname();
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");
   return (
@@ -33,9 +34,9 @@ export function Nawigacja() {
         ▶ Uruchom<span className="na-szerokim"> quiz</span>
       </Link>
       <Link
-        href="/admin/lokale"
+        href={ustawienia}
         className="przycisk-maly ikona nawigacja-ustawienia"
-        aria-label="Ustawienia: lokale"
+        aria-label="Ustawienia lokalu"
         data-podpis="Ustawienia"
         aria-current={sciezka.startsWith("/admin/lokale") ? "page" : undefined}
       >
