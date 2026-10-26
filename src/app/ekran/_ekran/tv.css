@@ -359,7 +359,8 @@
   z-index: 30;
   margin: 0;
   display: flex;
-  align-items: baseline;
+  /* środki napisu i większej liczby w jednej linii (26.10: przy wyrównaniu do linii pisma pastylka wyglądała krzywo) */
+  align-items: center;
   gap: 12px;
   padding: 8px 24px;
   border: 2px solid var(--kamien2);
@@ -378,11 +379,13 @@
 .tv-gotowi strong {
   color: var(--piana);
   font-size: 34px;
+  line-height: 1;
   letter-spacing: 0;
 }
 
 .tv-gotowi-z {
   margin-left: -10px;
+  line-height: 1;
   color: rgba(244, 236, 216, 0.55);
   font-size: 26px;
   letter-spacing: 0;

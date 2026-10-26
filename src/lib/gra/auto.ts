@@ -4,8 +4,12 @@
 import type { AkcjaPilota, PilotStan } from "./typy";
 import { STRONA_RANKINGU_S, stronyRankingu } from "./wyscig";
 
-/** Plansza (wstęp, etap, ciekawostka): dalej, gdy wszyscy kliknęli „Gotowy” (nie wcześniej niż `min` s), albo po `max` s. */
-const PLANSZA = { wstep: [5, 40], etap: [6, 45], ciekawostka: [6, 40] } as const;
+/**
+ * Plansza (wstęp, etap, ciekawostka): dalej dopiero, gdy wszyscy kliknęli „Gotowy”, i nie wcześniej niż po tylu
+ * sekundach. Bez limitu czasu (26.10, Łukasz: nie puszczać bez wszystkich; zaginionego gracza prowadzący usuwa,
+ * a czekanie to okazja na przerwę).
+ */
+const PLANSZA = { wstep: 5, etap: 6, ciekawostka: 6 } as const;
 /**
  * Ile sekund trwa każdy krok po pytaniu (25.10 skrócone, Łukasz: za długo). Wyścig musi zmieścić jazdę i zamianę
  * torów (ok. 3,5 s, `ekran/_ekran/wyscig.tsx`). Do tego dochodzi do 1,5 s, zanim TV zapyta o krok (/api/auto).
@@ -32,7 +36,7 @@ export function otwarcieAutomatu(stan: { auto: boolean; planowany_start: string 
  */
 export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null {
   const s = stan.faza_od ? (teraz - Date.parse(stan.faza_od)) / 1000 : 0;
-  const plansza = ([min, max]: readonly [number, number]) => s >= max || (stan.gotowi >= stan.gotowi_z && s >= min);
+  const plansza = (min: number) => stan.gotowi >= stan.gotowi_z && s >= min;
   switch (stan.faza) {
     case "poczekalnia": {
       // zapowiedź na godzinę: poczekalnia (QR na TV) chwilę przed, a o tej godzinie start, jeśli ktoś dołączył
