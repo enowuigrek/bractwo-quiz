@@ -199,26 +199,39 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       };
   const etap = stan.etap;
 
-  // licznik odpowiedzi w widocznym miejscu (26.10): w pytaniu rośnie, a komplet świeci na zielono; przy wyniku
-  // zostaje, bo pytanie kończy się samo w chwili, gdy odpowie ostatni gracz
-  const licznik =
-    z && z.typ !== "ciekawostka" && (faza === "przygotuj" || faza === "pytanie" || faza === "wynik") ? (
-      <p className={`pilot-licznik${wszyscy ? " komplet" : ""}`} role="status">
-        {wszyscy ? (
-          <>
-            <span className="pilot-licznik-znak" aria-hidden>
-              ✓
-            </span>{" "}
-            Wszyscy odpowiedzieli
-          </>
-        ) : (
-          "Odpowiedziało"
-        )}
-        <strong>
-          {stan.liczba_odpowiedzi}/{grajacy}
-        </strong>
-      </p>
-    ) : null;
+  // Licznik w stałym miejscu nad przyciskami (26.10): stoi zawsze, żeby przyciski pod nim nie skakały, gdy znika
+  // (Łukasz: w pilocie przyciski nie mogą zmieniać pozycji), a w każdej fazie pokazuje coś przydatnego. W pytaniu
+  // odpowiedzi rosną, a komplet świeci na zielono; przy wyniku i dalej zostaje wynik ostatniego pytania
+  const planszaGotowych =
+    (faza === "wstep" && !klasyczny) || faza === "etap" || (faza === "wynik" && z?.typ === "ciekawostka");
+  const poPytaniu = z && z.typ !== "ciekawostka" && ["przygotuj", "pytanie", "wynik", "odpowiedzi", "ranking"].includes(faza);
+  const [napisLicznika, wartoscLicznika, komplet]: [string, string, boolean] =
+    stan.auto && planszaGotowych
+      ? ["Gotowi do dalszej gry", `${stan.gotowi}/${stan.w_grze}`, stan.gotowi >= stan.w_grze]
+      : poPytaniu
+        ? [
+            wszyscy ? "Wszyscy odpowiedzieli" : "Odpowiedziało",
+            `${stan.liczba_odpowiedzi}/${grajacy}`,
+            wszyscy && ["przygotuj", "pytanie", "wynik"].includes(faza),
+          ]
+        : faza === "seria"
+          ? ["Odpowiedzi w serii", String((stan.seria ?? []).reduce((s, g) => s + g.odpowiedzi, 0)), false]
+          : faza === "poczekalnia"
+            ? ["Graczy w poczekalni", String(stan.liczba_graczy), false]
+            : ["Graczy w grze", String(stan.w_grze), false];
+  const licznik = (
+    <p className={`pilot-licznik${komplet ? " komplet" : ""}`} role="status">
+      <span>
+        {komplet && (
+          <span className="pilot-licznik-znak" aria-hidden>
+            ✓
+          </span>
+        )}{" "}
+        {napisLicznika}
+      </span>
+      <strong>{wartoscLicznika}</strong>
+    </p>
+  );
 
   return (
     <>
@@ -234,9 +247,10 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki).
               Klasyczny pub quiz na razie nie ma muzyki, więc bez przełącznika (26.10) */}
           {!klasyczny && (
-            <p className="pilot-przelacznik">
+            <p className={`pilot-przelacznik${stan.muzyka ? " wlaczony" : ""}`}>
               {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
-              <span>{stan.muzyka ? "Muzyka i dźwięki na TV grają" : "Muzyka i dźwięki na TV wyłączone"}</span>
+              {/* stałe napisy: zmienny tekst zmieniał wysokość i przesuwał przyciski niżej; stan widać po przycisku */}
+              <span>Muzyka i dźwięki na TV</span>
               <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
                 {stan.muzyka ? "Wyłącz" : "Włącz"}
               </button>
@@ -245,16 +259,11 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
           <p className={`pilot-przelacznik${stan.auto ? " wlaczony" : ""}`}>
             <IkonaAutomat />
-            <span>{stan.auto ? "Gra prowadzi się sama" : "Prowadzenie automatyczne"}</span>
+            <span>Prowadzenie automatyczne</span>
             <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => void przelaczAuto()}>
               {stan.auto ? "Wyłącz" : "Włącz"}
             </button>
           </p>
-          {stan.auto && ((faza === "wstep" && !klasyczny) || faza === "etap" || (faza === "wynik" && stan.zadanie?.typ === "ciekawostka")) && (
-            <p className="pomocniczy" style={{ margin: "0 0 4px" }}>
-              Gotowi: <strong>{stan.gotowi}/{stan.w_grze}</strong>, dalej, gdy klikną wszyscy (albo po czasie).
-            </p>
-          )}
 
           {licznik}
 

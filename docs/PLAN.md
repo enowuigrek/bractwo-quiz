@@ -39,7 +39,7 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY, KSHD, TJPR, LTQA, FVRR, FRQE, AUYD, UXQZ (i wcześniejsze, jeśli zostały).
 
 - **Lista drobnych zmian wizualnych od Łukasza (26.10), do zrobienia po kolei w kolejnej sesji:**
-  1. Pilot: ramka „odpowiedziano”.
+  1. ✅ Pilot: ramka „odpowiedziano” (stoi zawsze, opis niżej).
   2. Pilot: „uruchomiona gra” i przekazywanie pilota oraz nagłówek w wersji na telefon.
   3. Osobne panele dla lokali, a w pilocie osobne panele graczy i pytań.
   4. Oś czasu w wynikach konkurencji „Ile?”.
@@ -313,6 +313,11 @@ Do zaprojektowania razem:
 - **Wejście w pijany finał bez drżenia:** bez podskoku ekranu („czkawka”), bujanie dróg, zjeżdżanie i chwianie awatarów rosną od zera.
 - **Zegar:** przy pijanym finale seria staje na 0 bez „Koniec!”, a zegar pijanego finału leci w górę od tej samej liczby (`zegarPijany(…, start)`; `start` to sekundy, które zostały w serii, `zapamietajKoniecSerii` / `startZegaraPijanego` w `src/lib/pijany.ts`, po przeładowaniu od 0), potem zakręty i miganie jak dotąd. TV i telefon tak samo.
 - **Nowy quiz w rodzaju zakładki:** „Nowy wyścig po piwo” / „Nowy klasyczny pub quiz” z zakładki listy quizów otwiera formularz bez wyboru rodzaju (opis rodzaju, etapy szablonu przy wyścigu), powrót do tej samej zakładki.
+
+### Pilot: licznik w stałym miejscu (26.10) ✅
+
+- Ramka nad przyciskami pilota stoi teraz w każdej fazie (wcześniej znikała poza pytaniem i przyciski pod nią skakały; Łukasz: w pilocie przyciski nie mogą zmieniać pozycji). Treść według fazy: poczekalnia — graczy w poczekalni; plansze przy automacie — „Gotowi do dalszej gry x/y” (zastępuje osobną linijkę); pytanie i po nim — „Odpowiedziało x/y” (komplet na zielono tylko do wyniku); seria — odpowiedzi w serii; reszta — graczy w grze. Jedna linijka, stała wysokość.
+- Przełączniki muzyki i automatu mają stałe napisy („Muzyka i dźwięki na TV”, „Prowadzenie automatyczne”), stan widać po przycisku Włącz/Wyłącz i podświetleniu: zmienny tekst zmieniał wysokość i też przesuwał przyciski. Sprawdzone na telefonie 375 px: ramka i pierwszy przycisk w tym samym miejscu na planszy etapu, w pytaniu i w rankingu, z automatem i bez.
 
 ## Ustalenia
 

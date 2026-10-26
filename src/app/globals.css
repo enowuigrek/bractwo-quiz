@@ -2824,11 +2824,15 @@ html:has(.kolumna) {
 
 /* Pilot: licznik odpowiedzi w widocznym miejscu (pilot.tsx, 26.10). Komplet świeci na zielono, jak przycisk,
    którym prowadzący idzie dalej. */
+/* stała wysokość w każdej fazie (napis w jednej linii), żeby przyciski pod licznikiem nie skakały */
 .pilot-licznik {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 64px;
+  box-sizing: border-box;
+  white-space: nowrap;
   margin: 18px 0 0;
   padding: 14px 18px;
   border-radius: var(--r-card);
@@ -2838,6 +2842,11 @@ html:has(.kolumna) {
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
+}
+
+.pilot-licznik > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pilot-licznik strong {
