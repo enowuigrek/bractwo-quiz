@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- logo lokalu z bucketu Supabase, skalowane CSS-em */
 
 // Ruchome tło wszystkich ekranów TV: ciepłe plamy światła jak od świec i szerokie smugi światła,
 // które powoli się kołyszą, jak światło z okna baru albo lampy nad nalewakami. Bardzo słabe, żeby nie
@@ -22,6 +23,26 @@ export function TloTv() {
       {/* nastroje etapów (tv.css, [data-nastroj]): cienie żaluzji w etapach noir, winieta w walce o finał */}
       <span className="tv-zaluzje" />
       <span className="tv-winieta" />
+    </div>
+  );
+}
+
+/**
+ * Tło klasycznego pub quizu i ekranu lokalu (26.10): zamiast baru i nastrojów wyścigu logo lokalu na cały ekran,
+ * przygaszone, które bardzo powoli oddycha i się kołysze, plus dwie ciepłe plamy światła. Tylko transformacje
+ * i przezroczystość, bez `clip-path`, więc działa też na starszych Samsungach (prosty ekran ma swoją kopię).
+ * Bez logo zostaje nazwa lokalu.
+ */
+export function TloLokalu({ lokal }: { lokal: { nazwa: string; logo_url: string | null } | null }) {
+  return (
+    <div className="tv-tlo tv-tlo-lokalu" aria-hidden>
+      <span className="tv-blask tv-blask-1" />
+      <span className="tv-blask tv-blask-2" />
+      {lokal?.logo_url ? (
+        <img src={lokal.logo_url} alt="" className="tv-tlo-logo" />
+      ) : lokal?.nazwa ? (
+        <span className="tv-tlo-logo tv-tlo-nazwa">{lokal.nazwa}</span>
+      ) : null}
     </div>
   );
 }

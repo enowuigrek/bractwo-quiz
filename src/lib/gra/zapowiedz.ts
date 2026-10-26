@@ -16,6 +16,8 @@ export type Zapowiedz = {
   muzyka?: boolean;
   /** Automatyczne prowadzenie: poczekalnia otworzy się sama o godzinie startu (ekran-lokalu.tsx). */
   auto?: boolean;
+  /** Klasyczny pub quiz (bez etapów): ekran z logo lokalu zamiast plansz wyścigu (ekran-logo.tsx). */
+  klasyczny?: boolean;
 };
 
 /** Godzina startu do wyświetlenia, np. „20:00”. */

@@ -1,7 +1,8 @@
 /* Prosty ekran TV (prosty.tsx) dla starszych przeglądarek telewizorów (Chrome od 69). Celowo bez nowszych rzeczy:
    bez `gap` we flexie (marginesy), bez `translate`/`scale` jako osobnych właściwości (tylko `transform`), bez
-   `inset`, `aspect-ratio`, `color-mix()`, `:is`/`:where`/`:has`, `min()`/`max()`/`clamp()` i bez animacji.
-   Siatka (`display: grid`) z `grid-gap` jest w Chrome od 57. Kolory z docs/tokens.css (zmienne CSS: Chrome 49+). */
+   `inset`, `aspect-ratio`, `color-mix()`, `:is`/`:where`/`:has`, `min()`/`max()`/`clamp()`.
+   Siatka (`display: grid`) z `grid-gap` jest w Chrome od 57. Kolory z docs/tokens.css (zmienne CSS: Chrome 49+).
+   Jedyna animacja to powolny ruch logo w tle klasycznego quizu (sam `transform`). */
 
 .pr-tv {
   position: fixed;
@@ -600,4 +601,51 @@
   margin-left: 28px;
   font-size: 0.6em;
   color: var(--szary);
+}
+
+/* Tło klasycznego pub quizu i ekranu lokalu: przygaszone logo lokalu z jednym powolnym ruchem (`transform`
+   w @keyframes jest w Chrome od dawna, bez `clip-path` i nowszych rzeczy) */
+.pr-tlo-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92vmin;
+  height: 92vmin;
+  margin: -46vmin 0 0 -46vmin;
+  object-fit: contain;
+  opacity: 0.09;
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+  -webkit-animation: pr-logo-tla 48s ease-in-out infinite alternate;
+  animation: pr-logo-tla 48s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes pr-logo-tla {
+  from {
+    -webkit-transform: scale(1) rotate(-2deg);
+  }
+  to {
+    -webkit-transform: scale(1.05) rotate(2deg);
+  }
+}
+
+@keyframes pr-logo-tla {
+  from {
+    transform: scale(1) rotate(-2deg);
+  }
+  to {
+    transform: scale(1.05) rotate(2deg);
+  }
+}
+
+/* ekran lokalu: duże logo na środku */
+.pr-logo-ekranu {
+  width: 620px;
+  height: 620px;
+  object-fit: contain;
+}
+
+.pr-logo-ekranu-male {
+  width: 420px;
+  height: 420px;
 }

@@ -11,7 +11,8 @@ import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { MuzykaTv } from "./muzyka";
 import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
-import { PlanszaProsta, ScenaProsta } from "../_prosty/prosty";
+import { LogoProste, PlanszaProsta, ScenaProsta } from "../_prosty/prosty";
+import { EkranLogo } from "./ekran-logo";
 import { useTrybProsty } from "@/lib/gra/prosty";
 
 type Props = {
@@ -22,9 +23,9 @@ type Props = {
 };
 
 /**
- * Stały ekran lokalu (zakładka na TV). Bez gry pokazuje plansze, a gdy w lokalu ruszy gra,
- * sam przechodzi na nią (zdarzenie `gra` z bazy, zapasowo odpytywanie co 5 s). Po grze plansze
- * przez kilka godzin pokazują też jej podium.
+ * Stały ekran lokalu (zakładka na TV). Bez gry jeden ekran z logo lokalu (z godziną, gdy zapowiedziany jest
+ * klasyczny pub quiz), a przy zapowiedzianym wyścigu po piwo plansze (też z podium ostatniego quizu). Gdy w lokalu
+ * ruszy gra, sam przechodzi na nią (zdarzenie `gra` z bazy, zapasowo odpytywanie co 5 s).
  */
 export function EkranLokalu({ adres, lokal, baza }: Props) {
   const [kod, ustawKod] = useState<string | null>(null);
@@ -111,17 +112,32 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
       )}
     </>
   );
+  // zapowiedziany wyścig po piwo: dotychczasowe plansze (lokal z Bractwem, browar, zmiany co 10 s); bez zapowiedzi
+  // i przy klasycznym pub quizie jeden ekran z logo lokalu (26.10), przy klasycznym z godziną i odliczaniem
+  const wyscig = !!zapowiedz && !zapowiedz.klasyczny;
   if (prosty) {
     return (
-      <ScenaProsta>
-        <PlanszaProsta lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+      <ScenaProsta lokalTla={wyscig ? undefined : lokal}>
+        {wyscig ? (
+          <PlanszaProsta lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+        ) : (
+          <LogoProste lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+        )}
         {dzwieki}
       </ScenaProsta>
     );
   }
+  if (wyscig) {
+    return (
+      <Scena nastroj="poczekalnia">
+        <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+        {dzwieki}
+      </Scena>
+    );
+  }
   return (
-    <Scena nastroj={zapowiedz ? "poczekalnia" : undefined}>
-      <Plansze lokal={lokal} ostatnia={ostatnia} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
+    <Scena lokalTla={lokal}>
+      <EkranLogo lokal={lokal} zapowiedz={zapowiedz} przesuniecie={przesuniecie} />
       {dzwieki}
     </Scena>
   );

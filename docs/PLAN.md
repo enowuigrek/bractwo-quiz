@@ -230,6 +230,14 @@ Do zaprojektowania razem:
 - **Telefon:** „Zaczynamy! Pierwsze pytanie za N s”, bez przycisku „Gotowy”. **Pilot:** „Pierwsze pytanie od razu” i ile sekund zostało.
 - **Sprawdzone lokalnie:** gra z quizu „Dinozaury” z botami, bez automatu: plansza odliczała, po 10 s samo odliczanie 3-2-1 i pytanie 1. Wyścig dalej wchodzi we wstęp bez zegara.
 
+### Logo lokalu w tle pub quizu, prostszy ekran lokalu, odbudowa Piwnego quizu (26.10) ✅
+
+- **Logo Bractwa z prawego górnego rogu** zniknęło ze wszystkich ekranów gry (komponent `LogoNaglowka` usunięty, nagłówki dosuwają ostatni element do prawej).
+- **Klasyczny pub quiz w trakcie gry:** tło `TloLokalu` (`ekran/_ekran/tlo.tsx`, `Scena` z `lokalTla`): przygaszone logo lokalu na cały ekran z wolnym ruchem i dwiema plamami światła; bez logo nazwa lokalu. Wyścig po piwo dalej ma bar i nastroje. Prosty ekran: `ScenaProsta` z `lokalTla` (to samo logo, jeden ruch `transform`).
+- **Ekran lokalu:** bez zapowiedzi jeden ekran `EkranLogo` (`ekran-logo.tsx`): duże logo lokalu nad złotym blaskiem, w tle to samo logo przygaszone. Zapowiedziany klasyczny: ten sam ekran z okazją, tytułem, godziną i odliczaniem. Zapowiedziany wyścig po piwo: dotychczasowe plansze (lokal z Bractwem, browar, podium ostatniego quizu). Zapowiedź z bazy mówi, czy quiz jest klasyczny (migracja `zapowiedz_rodzaj_quizu`). Prosty ekran: `LogoProste` i `PlanszaProsta` w ten sam sposób.
+- **Odbudowa Piwnego quizu Bractwa Piwnego** (Łukasz usunął go przy porządkach): migracja `przywrocenie_piwnego_quizu` z pełnego zrzutu pytań etapów 1–4 z 24.10 (zapis rozmowy), finału ze zrzutu z 24.10 i migracji, etapów w stanie z 26.10 rano, a potem wszystkich późniejszych poprawek danych z migracji. 63 pozycje, 5 etapów, 4 ciekawostki, 11 grafik, pijane wejście; pierwsze pytania każdego rodzaju na tych samych numerach co przed usunięciem. Ręcznych edycji z panelu (jeśli były) nie dało się odtworzyć.
+- **Sprawdzone lokalnie i na Chromium 69:** ekran lokalu bez gry, zapowiedź klasycznego, poczekalnia, plansza startowa i pytanie z logo w tle.
+
 ## Ustalenia
 
 | Temat | Decyzja |

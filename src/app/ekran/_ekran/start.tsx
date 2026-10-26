@@ -2,7 +2,6 @@
 
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
-import { LogoNaglowka } from "./logo";
 
 /** „1 osoba”, „3 osoby”, „5 osób”. */
 function osoby(n: number): string {
@@ -34,7 +33,6 @@ export function StartTv({ stan, teraz, loga }: { stan: StanSesji; teraz: number;
       <div className="tv-start-quizu">
         <header className="tv-naglowek">
           {loga}
-          <LogoNaglowka />
         </header>
         <div className="tv-start-srodek">
           <motion.p

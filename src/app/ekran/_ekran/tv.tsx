@@ -33,12 +33,12 @@ import { OsLiczbowa } from "./szacowanie";
 import { OdpowiedziTv, TabelaTv } from "./odpowiedzi";
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { Plansze } from "./plansze";
-import { TloTv } from "./tlo";
+import { TloLokalu, TloTv } from "./tlo";
 import { WyscigTv } from "./wyscig";
 import { quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { StartTv } from "./start";
+import { EkranLogo } from "./ekran-logo";
 import { PodiumTv, RankingTv } from "./ranking";
-import { LogoNaglowka } from "./logo";
 import { NickiPoczekalni } from "./nicki";
 import { WstepTv } from "./wstep";
 import { ProstyTv, ScenaProsta } from "../_prosty/prosty";
@@ -67,18 +67,24 @@ export function Scena({
   children,
   zgaszona = false,
   nastroj,
+  lokalTla,
 }: {
   children: React.ReactNode;
   /** Werble: czarny ekran bez smug tła. */
   zgaszona?: boolean;
   /** Nastrój tła według etapu (src/lib/gra/nastroj.ts); bez niego zwykłe ciepłe tło. */
   nastroj?: Nastroj;
+  /**
+   * Klasyczny pub quiz i ekran lokalu: w tle logo lokalu (tlo.tsx) zamiast baru i nastrojów, które zostają dla
+   * wyścigu po piwo. `null`: tło z logo, ale gra bez lokalu (same plamy światła).
+   */
+  lokalTla?: { nazwa: string; logo_url: string | null } | null;
 }) {
   const skala = useSkala();
   useBezWygaszacza();
   return (
-    <div className={`tv${zgaszona ? " zgaszona" : ""}`} data-nastroj={nastroj}>
-      <TloTv />
+    <div className={`tv${zgaszona ? " zgaszona" : ""}`} data-nastroj={lokalTla === undefined ? nastroj : undefined}>
+      {lokalTla === undefined ? <TloTv /> : <TloLokalu lokal={lokalTla} />}
       <div
         className="scena"
         style={{
@@ -164,7 +170,10 @@ export function Tv({ kod, qr, host }: Props) {
   const prosty = useTrybProsty();
   if (prosty) {
     return (
-      <ScenaProsta ciemna={stan?.faza === "werble"}>
+      <ScenaProsta
+        ciemna={stan?.faza === "werble"}
+        lokalTla={stan && quizKlasyczny(stan) ? (stan.lokal ?? null) : undefined}
+      >
         <ProstyTv
           stan={stan}
           blad={blad}
@@ -187,7 +196,11 @@ export function Tv({ kod, qr, host }: Props) {
   const zapowiedz = stan?.faza === "poczekalnia" && !stan.poczekalnia_otwarta;
 
   return (
-    <Scena zgaszona={stan?.faza === "werble"} nastroj={stan ? nastrojFazy(stan) : undefined}>
+    <Scena
+      zgaszona={stan?.faza === "werble"}
+      nastroj={stan ? nastrojFazy(stan) : undefined}
+      lokalTla={stan && quizKlasyczny(stan) ? (stan.lokal ?? null) : undefined}
+    >
       {!stan ? (
         <div className="tv-srodek">
           <p className="tv-duzy">{blad && !blad.startsWith("Brak połączenia") ? blad : "Łączę z grą…"}</p>
@@ -200,7 +213,13 @@ export function Tv({ kod, qr, host }: Props) {
       ) : (
         // nowa faza wchodzi łagodnie; pytanie od odliczania do wyniku to jeden ekran
         <div key={kluczEkranu(stan)} className="tv-ekran">
-          {zapowiedz ? (
+          {zapowiedz && quizKlasyczny(stan) ? (
+            <EkranLogo
+              lokal={stan.lokal ?? null}
+              przesuniecie={przesuniecie}
+              zapowiedz={{ planowany_start: stan.planowany_start, tytul: stan.quiz?.tytul ?? null, okazja: stan.okazja }}
+            />
+          ) : zapowiedz ? (
             <Plansze
               lokal={stan.lokal ?? { nazwa: "", logo_url: null }}
               ostatnia={null}
@@ -425,7 +444,6 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       <div className="tv-ciekawostka">
         <header className="tv-naglowek">
           <Loga lokal={stan.lokal} browar={stan.browar} />
-          <LogoNaglowka />
         </header>
         <div className="tv-ciekawostka-tresc">
           {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-ciekawostka-grafika" />}
@@ -483,7 +501,6 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         ) : (
           <p className={`tv-zegar${doKonca <= 5000 ? " malo" : ""}`}>{Math.ceil(doKonca / 1000)}</p>
         )}
-        <LogoNaglowka />
       </header>
       {z.czas_s ? (
         <div className="tv-czas" aria-hidden>
@@ -662,7 +679,6 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
       {/* nad podium tylko loga: tytuł quizu jest na dole, żeby nie wisiał nad zwycięzcą */}
       <header className="tv-naglowek">
         <Loga lokal={stan.lokal} browar={stan.browar} />
-        <LogoNaglowka />
       </header>
       {bylaGra ? (
         <PodiumTv

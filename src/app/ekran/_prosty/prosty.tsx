@@ -25,11 +25,23 @@ function subskrybuj(zmiana: () => void) {
 }
 const skalaOkna = () => Math.min(window.innerWidth / SZER, window.innerHeight / WYS);
 
-/** Scena 1920×1080 przeskalowana do ekranu (jak w pełnym, ale bez tła z animacjami). */
-export function ScenaProsta({ children, ciemna = false }: { children: React.ReactNode; ciemna?: boolean }) {
+/**
+ * Scena 1920×1080 przeskalowana do ekranu (jak w pełnym, ale bez tła z animacjami). `lokalTla`: klasyczny pub quiz
+ * i ekran lokalu mają w tle przygaszone logo lokalu (jak tlo.tsx pełnego ekranu, tu z jednym powolnym ruchem).
+ */
+export function ScenaProsta({
+  children,
+  ciemna = false,
+  lokalTla,
+}: {
+  children: React.ReactNode;
+  ciemna?: boolean;
+  lokalTla?: Lokal;
+}) {
   const skala = useSyncExternalStore(subskrybuj, skalaOkna, () => 1);
   return (
     <div className={`pr-tv${ciemna ? " pr-ciemna" : ""}`}>
+      {lokalTla?.logo_url && !ciemna && <img src={lokalTla.logo_url} alt="" className="pr-tlo-logo" aria-hidden />}
       <div
         className="pr-scena"
         style={{
@@ -55,7 +67,43 @@ function Loga({ lokal }: { lokal: Lokal }) {
   );
 }
 
-/** Plansza ekranu lokalu bez gry albo z zapowiedzią (zamiast przewijanych plansz pełnego ekranu). */
+/**
+ * Ekran lokalu bez gry albo z zapowiedzią klasycznego pub quizu (jak ekran-logo.tsx): duże logo lokalu, a przy
+ * zapowiedzi tytuł, godzina i odliczanie.
+ */
+export function LogoProste({
+  lokal,
+  zapowiedz,
+  przesuniecie,
+}: {
+  lokal: Lokal;
+  zapowiedz: Pick<Zapowiedz, "planowany_start" | "tytul" | "okazja"> | null;
+  przesuniecie: number;
+}) {
+  const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
+  return (
+    <div className="pr-srodek">
+      {lokal?.logo_url ? (
+        <img
+          src={lokal.logo_url}
+          alt={lokal.nazwa}
+          className={`pr-logo-ekranu${zapowiedz ? " pr-logo-ekranu-male" : ""}`}
+        />
+      ) : (
+        <h1 className="pr-tytul">{lokal?.nazwa ?? "Quiz"}</h1>
+      )}
+      {zapowiedz?.okazja && <p className="pr-nadtytul">{zapowiedz.okazja}</p>}
+      {zapowiedz && <h1 className="pr-tytul pr-tytul-maly">{zapowiedz.tytul ?? "Pub quiz"}</h1>}
+      {zapowiedz?.planowany_start && doStartu !== null && (
+        <p className="pr-start">
+          Start <strong>{kiedyStart(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Plansza ekranu lokalu z zapowiedzią wyścigu po piwo (zamiast przewijanych plansz pełnego ekranu). */
 export function PlanszaProsta({
   lokal,
   zapowiedz,
@@ -108,6 +156,12 @@ export function ProstyTv({ stan, blad, gracze, ranking, odpowiedzi, qr, host, te
     case "poczekalnia":
       return stan.poczekalnia_otwarta ? (
         <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
+      ) : quizKlasyczny(stan) ? (
+        <LogoProste
+          lokal={stan.lokal}
+          przesuniecie={przesuniecie}
+          zapowiedz={{ planowany_start: stan.planowany_start, tytul: stan.quiz?.tytul ?? null, okazja: stan.okazja }}
+        />
       ) : (
         <PlanszaProsta
           lokal={stan.lokal}

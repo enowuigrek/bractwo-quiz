@@ -40,21 +40,6 @@
   pointer-events: none;
 }
 
-/* logo Bractwa po prawej w nagłówku ekranów gry (logo.tsx) */
-.tv-logo-naglowek {
-  flex: none;
-  align-self: center;
-  height: 76px;
-  width: auto;
-  margin-left: auto;
-  opacity: 0.9;
-}
-
-/* nagłówek z zegarem po prawej (pytanie, seria): zegar dosuwa się do logo */
-.tv-zegar ~ .tv-logo-naglowek {
-  margin-left: 0;
-}
-
 .tv-pytanie-gora {
   gap: 40px;
 }
@@ -63,12 +48,8 @@
   margin-left: auto;
 }
 
-/* nagłówek z logami lokalu po lewej: tytuł albo droga etapów zostaje po prawej, tuż przed logo Bractwa */
-.tv-naglowek > .tv-logo-naglowek {
-  margin-left: 0;
-}
-
-.tv-naglowek > :nth-last-child(2):not(:first-child) {
+/* nagłówek z logami lokalu po lewej: tytuł albo droga etapów po prawej (bez logo Bractwa w rogu od 26.10) */
+.tv-naglowek > :last-child:not(:first-child) {
   margin-left: auto;
 }
 
@@ -3926,4 +3907,126 @@
   margin: 0;
   font-size: 34px;
   color: var(--szary);
+}
+
+/* Tło klasycznego pub quizu i ekranu lokalu (tlo.tsx, 26.10): logo lokalu na cały ekran, przygaszone, które bardzo
+   powoli oddycha i się kołysze. Tylko `transform` i `opacity` (bez `clip-path`), więc działa też na Samsungach. */
+.tv-tlo-lokalu {
+  background: radial-gradient(ellipse at 50% 40%, #241a0b 0%, #0d0905 55%, #000 100%);
+}
+
+.tv-tlo-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92vmin;
+  height: 92vmin;
+  margin: -46vmin 0 0 -46vmin;
+  object-fit: contain;
+  opacity: 0.09;
+  filter: grayscale(1);
+  will-change: transform;
+  animation: logo-tla 48s ease-in-out infinite alternate;
+}
+
+/* bez logo: nazwa lokalu jako znak wodny */
+.tv-tlo-nazwa {
+  display: grid;
+  place-items: center;
+  font-size: 16vmin;
+  font-weight: var(--w-black);
+  line-height: 1;
+  text-align: center;
+  color: var(--piana);
+}
+
+@keyframes logo-tla {
+  0% {
+    transform: scale(1) rotate(-2.5deg) translate(-1.5%, 0);
+  }
+  50% {
+    transform: scale(1.06) rotate(0deg) translate(0, -1.5%);
+  }
+  100% {
+    transform: scale(1.02) rotate(2.5deg) translate(1.5%, 0.5%);
+  }
+}
+
+/* Ekran lokalu (ekran-logo.tsx): duże logo na środku unosi się nad ciepłym, pulsującym blaskiem */
+.ekran-logo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 40px;
+}
+
+.ekran-logo-znak {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 640px;
+  height: 640px;
+}
+
+.ekran-logo.z-zapowiedzia .ekran-logo-znak {
+  width: 460px;
+  height: 460px;
+}
+
+.ekran-logo-blask {
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(227, 172, 63, 0.22) 0%, rgba(227, 172, 63, 0.06) 40%, transparent 68%);
+  animation: blask-logo 7s ease-in-out infinite alternate;
+}
+
+.ekran-logo-obraz,
+.ekran-logo-nazwa {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  animation: unoszenie-logo 9s ease-in-out infinite alternate;
+}
+
+.ekran-logo-nazwa {
+  font-size: 120px;
+  font-weight: var(--w-black);
+  line-height: 1.05;
+  color: var(--zloto);
+}
+
+.ekran-logo-zapowiedz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.ekran-logo-zapowiedz .tv-okazja {
+  margin: 0;
+}
+
+@keyframes unoszenie-logo {
+  from {
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    transform: translateY(-12px) scale(1.02);
+  }
+}
+
+@keyframes blask-logo {
+  from {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
 }

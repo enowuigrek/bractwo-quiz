@@ -6,7 +6,6 @@ import { naDrodzeFinalu } from "@/lib/gra/final";
 import type { SeriaGracz, StanSesji } from "@/lib/gra/typy";
 import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
-import { LogoNaglowka } from "./logo";
 import { OkrzykiNaDrogach } from "./okrzyki";
 import { IkonaMegafon } from "@/components/ikony";
 
@@ -131,7 +130,6 @@ export function NaglowekSerii({
           {zostalo > 0 ? zostalo : "Koniec!"}
         </p>
       )}
-      <LogoNaglowka />
     </header>
   );
 }

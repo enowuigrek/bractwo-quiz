@@ -10,7 +10,6 @@ import { MAX_W_WYSCIGU, NA_TORACH_W_TLOKU, naTrasie, naTrasieFinalu } from "@/li
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
-import { LogoNaglowka } from "./logo";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
 const START_S = 0.8;
@@ -83,7 +82,6 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
     <header className="tv-ranking-gora">
       <h1>{etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
       {z && <p className="tv-okazja">{`${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}</p>}
-      <LogoNaglowka />
     </header>
   );
 

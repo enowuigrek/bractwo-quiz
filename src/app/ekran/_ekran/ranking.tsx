@@ -9,7 +9,6 @@ import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { zagraj } from "@/lib/gra/efekty";
-import { LogoNaglowka } from "./logo";
 
 /** Ile wierszy mieści ranking na scenie 1920×1080. */
 const W_RANKINGU = 10;
@@ -96,7 +95,6 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
               {stan.etap && stan.ostatnie_w_etapie ? `${stan.etap.nazwa} · po pytaniu ${z.lp}` : `po pytaniu ${z.lp}`}
             </p>
           )}
-          <LogoNaglowka />
         </header>
         <KoniecEtapu stan={stan} />
 

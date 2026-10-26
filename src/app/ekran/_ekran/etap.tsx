@@ -8,7 +8,6 @@ import { napisMnoznika } from "@/lib/etapy";
 import { kolejneOdciecia } from "@/lib/gra/odpadanie";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
-import { LogoNaglowka } from "./logo";
 import { IkonaPuchar } from "@/components/ikony";
 
 /**
@@ -75,7 +74,6 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               </li>
             ))}
           </ol>
-          <LogoNaglowka />
         </header>
 
         <div ref={tresc} className="tv-etap-tresc">

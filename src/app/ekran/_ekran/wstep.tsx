@@ -3,7 +3,6 @@
 
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
-import { LogoNaglowka } from "./logo";
 
 /**
  * Plansza wstępu (faza `wstep`, quiz z etapami): zanim ruszy rozgrzewka, prowadzący opowiada całą drogę.
@@ -29,7 +28,6 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
       <div className="tv-wstep">
         <header className="tv-naglowek">
           {loga}
-          <LogoNaglowka />
         </header>
         <motion.p className="tv-okazja" {...wejscie(0)}>
           {stan.quiz?.tytul ?? "Quiz"}
