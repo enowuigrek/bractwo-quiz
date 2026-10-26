@@ -359,17 +359,17 @@
   z-index: 30;
   margin: 0;
   display: flex;
-  /* środki napisu i większej liczby w jednej linii (26.10: przy wyrównaniu do linii pisma pastylka wyglądała krzywo) */
   align-items: center;
   gap: 12px;
   padding: 8px 24px;
   border: 2px solid var(--kamien2);
   border-radius: var(--r-pill);
   background: rgba(0, 0, 0, 0.6);
-  /* Napis „Gotowi” zielony i mniejszy, liczba gotowych duża i jasna (kremowa), „/z ilu” przygaszone. Gdy gotowi są
+  /* Napis „Gotowi” zielony, liczba gotowych jasna (kremowa), „/z ilu” przygaszone, wszystko jednej wielkości. Gdy gotowi są
      wszyscy, cała pastylka zielona z poświatą (26.10: szara liczba wyglądała na nieaktywną). */
   color: var(--chmiel);
-  font-size: 24px;
+  font-size: 28px;
+  line-height: 1;
   font-weight: var(--w-black);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -377,17 +377,14 @@
 }
 
 .tv-gotowi strong {
+  /* liczba tej samej wielkości co napis (26.10: większa cyfra wybijała napis ze środka pastylki); wyróżnia ją kolor */
   color: var(--piana);
-  font-size: 34px;
-  line-height: 1;
   letter-spacing: 0;
 }
 
 .tv-gotowi-z {
-  margin-left: -10px;
-  line-height: 1;
+  margin-left: -12px;
   color: rgba(244, 236, 216, 0.55);
-  font-size: 26px;
   letter-spacing: 0;
 }
 
