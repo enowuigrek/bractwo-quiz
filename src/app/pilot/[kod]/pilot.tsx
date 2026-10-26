@@ -79,7 +79,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   const [stan, ustawStan] = useState<PilotStan | null>(null);
   const [gracze, ustawGraczy] = useState<GraczPilota[]>([]);
-  const [ekranOddany, ustawEkranOddany] = useState(false);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [bladDostepu, ustawBladDostepu] = useState<string | null>(null);
   const [bladSieci, ustawBladSieci] = useState<string | null>(null);
@@ -232,14 +231,17 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           <p className="pomocniczy" style={{ marginTop: 0 }}>
             {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
           </p>
-          {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
-          <p className="pilot-przelacznik">
-            {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
-            <span>{stan.muzyka ? "Muzyka i dźwięki na TV grają" : "Muzyka i dźwięki na TV wyłączone"}</span>
-            <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
-              {stan.muzyka ? "Wyłącz" : "Włącz"}
-            </button>
-          </p>
+          {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki).
+              Klasyczny pub quiz na razie nie ma muzyki, więc bez przełącznika (26.10) */}
+          {!klasyczny && (
+            <p className="pilot-przelacznik">
+              {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
+              <span>{stan.muzyka ? "Muzyka i dźwięki na TV grają" : "Muzyka i dźwięki na TV wyłączone"}</span>
+              <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
+                {stan.muzyka ? "Wyłącz" : "Włącz"}
+              </button>
+            </p>
+          )}
           {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
           <p className={`pilot-przelacznik${stan.auto ? " wlaczony" : ""}`}>
             <IkonaAutomat />
@@ -509,22 +511,13 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
               </>
             )}
 
-            {faza === "podium" && (
+            {/* TV sam pokazuje na zmianę podium i tabelę (co 10 s, od drugiej pętli z podziękowaniem) */}
+            {(faza === "podium" || faza === "tabela") && (
               <>
-                <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
-                  Pokaż pełną tabelę
-                </button>
-                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
-                  Zakończ grę
-                </button>
-              </>
-            )}
-
-            {faza === "tabela" && (
-              <>
-                <button className="przycisk" disabled={wysylam} onClick={() => akcja("podium")}>
-                  Pokaż podium
-                </button>
+                <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
+                  TV pokazuje na zmianę podium i tabelę wyników. Możesz to tak zostawić: „Zakończ grę” wycisza muzykę
+                  {stan.lokal ? " i oddaje ekran lokalowi (wraca jego logo)." : "."}
+                </p>
                 <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
                   Zakończ grę
                 </button>
@@ -532,27 +525,9 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             )}
 
             {faza === "koniec" && (
-              <>
-                <p className="pomocniczy">Gra zakończona. Piwu Cześć!</p>
-                {stan.lokal && (
-                  <>
-                    <button
-                      className="przycisk"
-                      disabled={wysylam || ekranOddany}
-                      onClick={async () => {
-                        await akcja("plansze");
-                        ustawEkranOddany(true);
-                      }}
-                    >
-                      {ekranOddany ? "Ekran lokalu pokazuje plansze" : "Pokaż plansze na ekranie lokalu"}
-                    </button>
-                    <p className="pomocniczy" style={{ margin: 0 }}>
-                      Bez tego ekran lokalu wróci do plansz sam po 10 minutach. Podium tego quizu będzie wracać na planszach
-                      jeszcze przez kilka godzin.
-                    </p>
-                  </>
-                )}
-              </>
+              <p className="pomocniczy">
+                Gra zakończona. Piwu Cześć!{stan.lokal ? " Ekran lokalu wrócił do logo lokalu." : ""}
+              </p>
             )}
           </section>
 

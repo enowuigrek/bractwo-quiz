@@ -11,7 +11,7 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { GASNIECIE_S, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { DROGA_PRZED_META, KROK_FINALU } from "@/lib/gra/final";
 import { useWideoWybuchu } from "./wideo-wybuchu";
-import { awatarNaDrogach, drogi, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
+import { awatarNaDrogach, drogi, type Droga, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
 
@@ -27,8 +27,9 @@ const ODLOT = 1700;
 const BUJANIE_DEG = { od: 0.6, do: 2.8 };
 const ZJEZDZANIE = { od: 0.012, do: 0.06 };
 
-/** Pozorowany wyścig: na starcie wszyscy cofają się o tyle kroków, potem co 3–5 s krok naprzód albo w tył. */
-const COFNIECIE_KROKOW = 2;
+/** Każda droga buja się osobno (stopnie, na początku i pod koniec fazy), we własnym rytmie. */
+const BUJANIE_DROGI_DEG = { od: 0.3, do: 1.8 };
+/** Pozorowany wyścig: wszyscy zaczynają tam, gdzie skończyła się seria, potem co 3–5 s krok naprzód albo w tył. */
 const PIERWSZY_KROK_S = 4;
 /** Szansa na krok naprzód (reszta to krok w tył), w procentach. */
 const NAPRZOD_PROC = 58;
@@ -54,8 +55,8 @@ function skrot(t: string): number {
  */
 function polozeniePijane(nick: string, start: number, t: number, koniecKrokow: number): number {
   const min = 0.04;
-  const max = DROGA_PRZED_META - KROK_FINALU / 2;
-  let p = Math.max(min, Math.min(start, max) - COFNIECIE_KROKOW * KROK_FINALU);
+  const max = DROGA_PRZED_META;
+  let p = start;
   const h = skrot(nick);
   const okres = 3 + (h % 21) / 10;
   const ile = Math.floor((Math.min(t, koniecKrokow) - PIERWSZY_KROK_S - (h % 10) / 10) / okres) + 1;
@@ -67,6 +68,18 @@ function polozeniePijane(nick: string, start: number, t: number, koniecKrokow: n
 }
 
 const ograniczone = (x: number) => Math.min(1, Math.max(0, x));
+
+/** Punkt na drodze obróconej o `kat` stopni wokół jej środka (tak samo jak `rotate` drogi w CSS). */
+function naBujajacejDrodze(d: Droga, u: number, kat: number): { x: number; y: number } {
+  const p = punktNaDrodze(d, u);
+  if (!kat) return p;
+  const cx = (d.od.x + d.do.x) / 2;
+  const cy = (d.od.y + d.do.y) / 2;
+  const r = (kat * Math.PI) / 180;
+  const dx = p.x - cx;
+  const dy = p.y - cy;
+  return { x: cx + dx * Math.cos(r) - dy * Math.sin(r), y: cy + dx * Math.sin(r) + dy * Math.cos(r) };
+}
 
 /** Odłamki szkła, krople piwa i piana przy wybuchu bez wideo: stałe, policzone raz (złoty kąt, bez losowania). */
 const ODLAMKI = Array.from({ length: 34 }, (_, i) => {
@@ -90,8 +103,8 @@ const ODLAMKI = Array.from({ length: 34 }, (_, i) => {
  * dogrywki). Od 26.10 subtelnie, żeby wybuch zaskoczył: nagłówek się kołysze, plansza z drogami buja się w rytm
  * muzyki (ten sam okres co kołysanie tempa, muzyka-pijana.ts), a zawodnicy zjeżdżają po drogach w stronę
  * przechyłu, coraz mocniej (`--poziom` 0..1). Wyścig udaje, że trwa: od położeń z chwili wejścia (zamrożonych,
- * ostatni krok serii, który dotrze później, nic nie zmienia) wszyscy cofają się o dwa kroki, a potem idą
- * pseudolosowo krok naprzód albo w tył (`polozeniePijane`); nikt nie dobiega do szklanki. Na koniec szklanka wybucha, a nagłówek, zawodnicy
+ * ostatni krok serii, który dotrze później, nic nie zmienia) wszyscy zaczynają tam, gdzie
+ * skończyli (płynne przejście), a potem idą pseudolosowo krok naprzód albo w tył (`polozeniePijane`); nikt nie dobiega do szklanki. Na koniec szklanka wybucha, a nagłówek, zawodnicy
  * i drogi odlatują. Położenia liczy pętla klatek, nie React, więc odświeżanie stanu niczego nie zrywa.
  */
 export function PijanyTv({
@@ -138,6 +151,7 @@ export function PijanyTv({
     // wybuch: każdy odlatuje od szklanki z miejsca, w którym był w tej chwili
     const ostatnie = new Map<string, { x: number; y: number }>();
     const odloty = new Map<string, Lot>();
+    let ostatnieKaty: number[] = [];
     let poprzednia = performance.now();
     let klatka = 0;
 
@@ -157,6 +171,18 @@ export function PijanyTv({
       if (plansza.current && !wybuch) {
         plansza.current.style.transform = `rotate(${przechyl}deg) translateY(${Math.abs(fala) * 6 * poziom}px)`;
       }
+      // każda droga buja się jeszcze osobno wokół swojego środka (w wybuchu zostaje, jak była, i odlatuje)
+      const pasy = plansza.current?.querySelectorAll<SVGGElement>(".drogi-finalu-pas");
+      const katy = lista.map((_, i) => {
+        if (!ruch) return 0;
+        const okres = 7 + ((i * 1.7) % 4);
+        const kat =
+          (BUJANIE_DROGI_DEG.od + (BUJANIE_DROGI_DEG.do - BUJANIE_DROGI_DEG.od) * poziom) *
+          Math.sin((2 * Math.PI * (teraz - od)) / (okres * 1000) + i * 2.1);
+        if (!wybuch && pasy?.[i]) pasy[i].style.rotate = `${kat}deg`;
+        return kat;
+      });
+      if (!wybuch) ostatnieKaty = katy;
 
       gracze.forEach((g, i) => {
         const el = elementy.current.get(g.nick);
@@ -167,7 +193,7 @@ export function PijanyTv({
         if (ruch && wybuch) {
           let o = odloty.get(g.nick);
           if (!o) {
-            const s = ostatnie.get(g.nick) ?? punktNaDrodze(lista[i], start);
+            const s = ostatnie.get(g.nick) ?? naBujajacejDrodze(lista[i], start, ostatnieKaty[i] ?? 0);
             const dx = s.x - SZKLANKA_FINALU.x;
             const dy = s.y - SZKLANKA_FINALU.y;
             const d = Math.hypot(dx, dy) || 1;
@@ -184,7 +210,12 @@ export function PijanyTv({
           const obecne = widac.get(g.nick) ?? start;
           const nowe = ruch ? obecne + (cel - obecne) * (1 - Math.exp(-DOJAZD * dt)) : cel;
           widac.set(g.nick, nowe);
-          p = punktNaDrodze(lista[i], ograniczone(nowe + zjazd));
+          p = naBujajacejDrodze(
+            lista[i],
+            // zjeżdżanie też nie dowozi lidera do szklanki
+            ograniczone(Math.min(DROGA_PRZED_META + 0.02, nowe + zjazd)),
+            ostatnieKaty[i] ?? 0,
+          );
         }
         ostatnie.set(g.nick, { x: p.x, y: p.y });
         el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;

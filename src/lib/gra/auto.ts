@@ -13,7 +13,6 @@ const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 
 /** Pytanie bez limitu czasu: po tylu sekundach automat sam pokazuje wynik. */
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
-const PODIUM_S = 30;
 /**
  * Gra zapowiedziana na godzinę z automatem: godzina z kreatora to start quizu (26.10, Łukasz), a poczekalnia
  * z QR otwiera się tyle minut wcześniej, żeby gracze zdążyli dołączyć. To samo w bazie: `wewn.otworz_o_czasie`.
@@ -28,7 +27,7 @@ export function otwarcieAutomatu(stan: { auto: boolean; planowany_start: string 
 
 /**
  * Co teraz kliknąłby prowadzący: krok pilota albo null (czekamy). Pytanie i seria kończą się same (zegar i baza),
- * a gra zatrzymuje się na pełnej tabeli (koniec prowadzący klika sam). Start sam tylko w grze zapowiedzianej na godzinę.
+ * a gra zatrzymuje się na podium (TV sam pokazuje na zmianę podium i tabelę, koniec prowadzący klika sam). Start sam tylko w grze zapowiedzianej na godzinę.
  */
 export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null {
   const s = stan.faza_od ? (teraz - Date.parse(stan.faza_od)) / 1000 : 0;
@@ -61,8 +60,6 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
       return !stan.faza_do && s >= BEZ_LIMITU_S ? "wynik" : null;
     case "werble":
       return s >= WERBLE_S ? "podium" : null;
-    case "podium":
-      return s >= PODIUM_S ? "tabela" : null;
     default:
       return null;
   }

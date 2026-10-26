@@ -5,6 +5,7 @@ import { wczytajEfekty, wznowEfekty, zagraj, type Efekt } from "@/lib/gra/efekty
 import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
+import { GASNIECIE_S, WYBUCH_PRZED_S } from "@/lib/pijany";
 import type { StanSesji } from "@/lib/gra/typy";
 
 /** Tyle ostatnich sekund pytania tyka zegar. */
@@ -80,7 +81,10 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       ? sekundaOdliczania(doStartu - WYPRZEDZENIE_MS)
       : faza === "pytanie" && !bezLimitu
         ? Math.ceil((doKonca - WYPRZEDZENIE_MS) / 1000)
-        : null;
+        : stan.faza === "pijany" && stan.faza_do
+          ? // pijany finał: sekundy do wybuchu szklanki (tykanie po zgaszeniu telefonów i muzyki)
+            Math.ceil((Date.parse(stan.faza_do) - WYBUCH_PRZED_S * 1000 - teraz - WYPRZEDZENIE_MS) / 1000)
+          : null;
   const biezaca: Migawka = {
     faza,
     zadanie: stan.zadanie?.id ?? null,
@@ -117,6 +121,17 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       b.sekunda !== p.sekunda &&
       b.sekunda >= 1 &&
       b.sekunda <= TYKANIE_S
+    ) {
+      zagraj("tik");
+    }
+    // pijany finał: muzyka i telefony gasną (GASNIECIE_S), a do wybuchu tyka zegar jak w końcówce pytania
+    if (
+      stan.faza === "pijany" &&
+      p.faza === b.faza &&
+      b.sekunda !== null &&
+      b.sekunda !== p.sekunda &&
+      b.sekunda >= 1 &&
+      b.sekunda <= Math.floor(GASNIECIE_S - WYBUCH_PRZED_S)
     ) {
       zagraj("tik");
     }

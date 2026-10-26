@@ -1418,3 +1418,15 @@ button.tag:hover:not(.wybrany) {
   background: var(--kamien3);
   color: var(--piana);
 }
+
+/* Pijany finał: przycisk testu na ekranie z opisem obok */
+.pijany-test {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.pijany-test button {
+  flex: none;
+}

@@ -162,7 +162,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!stan || sprawdzamToken) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} />
         <p className="pomocniczy">Łączę z grą…</p>
       </>
     );
@@ -171,7 +171,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!ja) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} />
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
@@ -214,7 +214,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   return (
     <>
-      <Naglowek lokal={stan?.lokal} />
+      <Naglowek lokal={stan?.lokal} browar={stan?.browar} />
       <WGrze
         stan={stan}
         ja={ja}
@@ -230,15 +230,24 @@ export function Gracz({ kod }: { kod: string }) {
 }
 
 /**
- * Nagłówek telefonu: Bractwo z lewej, „Quiz” na środku, logo lokalu z prawej (jak na TV gospodarze obok siebie).
- * Kod gry jest wewnętrzny (gracz wchodzi z QR), więc go nie pokazujemy.
+ * Nagłówek telefonu: jak na TV (26.10) lokal z lewej (obok gościnny browar), „Quiz” na środku, Bractwo z prawej.
+ * Wszystkie loga tej samej wysokości. Kod gry jest wewnętrzny (gracz wchodzi z QR), więc go nie pokazujemy.
  */
-function Naglowek({ lokal }: { lokal?: { nazwa: string; logo_url: string | null } | null }) {
+function Naglowek({
+  lokal,
+  browar,
+}: {
+  lokal?: { nazwa: string; logo_url: string | null } | null;
+  browar?: { nazwa: string; logo_url: string | null } | null;
+}) {
   return (
     <header className="gra-naglowek trzy">
-      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo gra-logo-bractwa" />
+      <span className="gra-loga-gospodarzy">
+        {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="gra-logo" />}
+        {browar?.logo_url && <img src={browar.logo_url} alt={browar.nazwa} className="gra-logo" />}
+      </span>
       <span className="logo-quiz-napis gra-napis-quiz">Quiz</span>
-      {lokal?.logo_url ? <img src={lokal.logo_url} alt={lokal.nazwa} className="gra-logo-lokalu" /> : <span />}
+      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo gra-logo" />
     </header>
   );
 }

@@ -170,11 +170,14 @@ const STOPNIE = [1, 0, 2] as const;
 export function PodiumTv({
   ranking,
   odRazu,
+  konfetti = true,
   start,
   nagrody,
 }: {
   ranking: WierszRankingu[];
   odRazu: boolean;
+  /** false: bez konfetti (kolejne pokazy podium na zmianę z tabelą na końcu gry) */
+  konfetti?: boolean;
   start: number | null;
   nagrody: Nagroda[] | null;
 }) {
@@ -188,7 +191,7 @@ export function PodiumTv({
 
   // fanfara: gdy wjeżdża zwycięzca, konfetti z obu stron i złoty deszcz; na końcu gry krótszy wybuch
   useEffect(() => {
-    if (top.length === 0) return;
+    if (top.length === 0 || !konfetti) return;
     if (odRazu) {
       wybuchKonfetti();
       return;
@@ -208,7 +211,7 @@ export function PodiumTv({
       clearTimeout(zegar);
       przerwij?.();
     };
-  }, [odRazu, top.length, uplynelo]);
+  }, [odRazu, konfetti, top.length, uplynelo]);
 
   return (
     <MotionConfig reducedMotion="user">

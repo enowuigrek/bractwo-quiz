@@ -209,7 +209,7 @@ input.pole[type="time"] {
   margin-bottom: var(--section-gap);
 }
 
-/* telefon: Bractwo z lewej, „Quiz” na środku, logo lokalu z prawej (gracz.tsx) */
+/* telefon: lokal (i browar) z lewej, „Quiz” na środku, Bractwo z prawej (gracz.tsx), loga równej wysokości */
 .gra-naglowek.trzy {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -219,19 +219,22 @@ input.pole[type="time"] {
   justify-self: end;
 }
 
-.gra-logo-bractwa {
+.gra-loga-gospodarzy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gra-logo {
   height: 40px;
   width: auto;
+  max-width: 96px;
+  object-fit: contain;
 }
 
 .gra-napis-quiz {
   font-size: 1.35rem;
-}
-
-.gra-logo-lokalu {
-  height: 46px;
-  width: 46px;
-  object-fit: contain;
 }
 
 /* Czas odpowiedzi na telefonie: sam czas w akcencie, reszta zdania szara */

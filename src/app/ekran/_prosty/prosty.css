@@ -67,9 +67,11 @@
   margin-left: 80px;
 }
 
+/* loga lokalu i Bractwa tej samej wysokości (26.10) */
 .pr-logo-lokalu {
-  width: 300px;
-  height: 300px;
+  width: auto;
+  max-width: 420px;
+  height: 280px;
   object-fit: contain;
 }
 
@@ -215,8 +217,8 @@
 }
 
 .pr-prawa .pr-logo-lokalu {
-  width: 150px;
-  height: 150px;
+  max-width: 220px;
+  height: 140px;
 }
 
 .pr-prawa .pr-logo-bractwa {

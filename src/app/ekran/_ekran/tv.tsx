@@ -42,6 +42,7 @@ import { wczytajMuzykePijana } from "@/lib/gra/muzyka-pijana";
 import { czyTelewizor } from "@/lib/gra/telewizor";
 import { EkranLogo } from "./ekran-logo";
 import { PodiumTv, RankingTv } from "./ranking";
+import { RESZTA_PODIUM_S } from "@/lib/gra/podium";
 import { NickiPoczekalni } from "./nicki";
 import { WstepTv } from "./wstep";
 import { ProstyTv, ScenaProsta } from "../_prosty/prosty";
@@ -277,10 +278,8 @@ export function Tv({ kod, qr, host }: Props) {
             ) : (
               <RankingTv stan={stan} ranking={wGrze} />
             )
-          ) : stan.faza === "tabela" ? (
-            <TabelaTv stan={stan} ranking={ranking} />
           ) : (
-            <Koniec stan={stan} ranking={ranking} przesuniecie={przesuniecie} />
+            <KoniecNaZmiane stan={stan} ranking={ranking} przesuniecie={przesuniecie} />
           )}
         </div>
       )}
@@ -357,8 +356,8 @@ function Poczekalnia({
   const doStartu = useDoStartu(start, przesuniecie);
   return (
     <div className="poczekalnia">
-      {/* gospodarze obok siebie, równej wielkości: lokal (logo, a bez logo nazwa) | Bractwo (× browar przy
-          kranoprzejęciu); bez powtórzonej nazwy lokalu i małego logo Bractwa po drugiej stronie */}
+      {/* loga równej wysokości, zawsze tak samo (26.10, jak na telefonach): lokal (logo, a bez logo nazwa) z lewej,
+          obok niego browar przy kranoprzejęciu, Bractwo w prawym rogu */}
       <header className="tv-naglowek">
         <div className="tv-loga tv-loga-poczekalni">
           {stan.lokal &&
@@ -367,8 +366,6 @@ function Poczekalnia({
             ) : (
               <span className="tv-lokal-nazwa">{stan.lokal.nazwa}</span>
             ))}
-          {stan.lokal && <span className="tv-loga-kreska" aria-hidden />}
-          <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwa" />
           {stan.browar && (
             <>
               <span className="tv-loga-x" aria-hidden>
@@ -382,6 +379,7 @@ function Poczekalnia({
             </>
           )}
         </div>
+        <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwa" />
       </header>
 
       <div className="poczekalnia-tresc">
@@ -682,9 +680,74 @@ function kluczEkranu(stan: StanSesji): string {
   return `${pytanie ? "pytanie" : stan.faza}:${stan.zadanie?.nr ?? 0}`;
 }
 
-/** Podium (z wjazdem po kolei) i koniec gry (podium od razu + podziękowanie). */
-function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: WierszRankingu[]; przesuniecie: number }) {
+/** Na końcu gry podium i tabela wyników zmieniają się co tyle sekund (pierwsze podium dłużej, o czas wjazdu). */
+const ZMIANA_KONCA_S = 10;
+
+/**
+ * Koniec gry na TV (26.10, Łukasz): po podium (z wjazdem po kolei) TV sam pokazuje na zmianę pełną tabelę i podium
+ * co `ZMIANA_KONCA_S`, bez klikania w pilocie. Od drugiej pętli pod spodem „Dziękujemy za grę! Piwu Cześć!”. Tak samo
+ * po „Zakończ grę” (od razu z podziękowaniem; ekran lokalu i tak wraca wtedy do logo, ekran-lokalu.tsx) i w fazie
+ * `tabela` (wcześniej klikana z pilota), która zaczyna od tabeli.
+ */
+function KoniecNaZmiane({
+  stan,
+  ranking,
+  przesuniecie,
+}: {
+  stan: StanSesji;
+  ranking: WierszRankingu[];
+  przesuniecie: number;
+}) {
+  const [teraz, ustawTeraz] = useState(() => Date.now() + przesuniecie);
+  useEffect(() => {
+    const zegar = window.setInterval(() => ustawTeraz(Date.now() + przesuniecie), 1000);
+    return () => clearInterval(zegar);
+  }, [przesuniecie]);
+  const s = stan.faza_od ? Math.max(0, (teraz - Date.parse(stan.faza_od)) / 1000) : 0;
   const koniec = stan.faza === "koniec";
+  // pierwsze podium z wjazdem trwa dłużej; `tabela` i `koniec` od razu w rytmie co 10 s
+  const pierwsze = stan.faza === "podium" ? RESZTA_PODIUM_S + ZMIANA_KONCA_S : ZMIANA_KONCA_S;
+  const nr = (s < pierwsze ? 0 : 1 + Math.floor((s - pierwsze) / ZMIANA_KONCA_S)) + (stan.faza === "tabela" ? 1 : 0);
+  const tabela = nr % 2 === 1;
+  const dziekujemy = koniec || nr >= 2;
+  return (
+    <div key={nr} className="tv-ekran">
+      {tabela ? (
+        <div className="tv-koniec">
+          <TabelaTv stan={stan} ranking={ranking} />
+          {dziekujemy && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
+        </div>
+      ) : (
+        <Koniec
+          stan={stan}
+          ranking={ranking}
+          przesuniecie={przesuniecie}
+          // wjazd i fanfara tylko w pierwszym podium (po „Zakończ grę” krótki wybuch konfetti jak dotąd)
+          odRazu={nr > 0 || koniec}
+          konfetti={nr === 0}
+          dziekujemy={dziekujemy}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Podium (z wjazdem po kolei albo od razu) z tytułem quizu, a od drugiej pętli z podziękowaniem. */
+function Koniec({
+  stan,
+  ranking,
+  przesuniecie,
+  odRazu,
+  konfetti,
+  dziekujemy,
+}: {
+  stan: StanSesji;
+  ranking: WierszRankingu[];
+  przesuniecie: number;
+  odRazu: boolean;
+  konfetti: boolean;
+  dziekujemy: boolean;
+}) {
   const bylaGra = stan.zadanie !== null && ranking.length > 0;
   return (
     <div className="tv-koniec">
@@ -695,7 +758,8 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
       {bylaGra ? (
         <PodiumTv
           ranking={ranking}
-          odRazu={koniec}
+          odRazu={odRazu}
+          konfetti={konfetti}
           // początek podium w zegarze tego urządzenia: TV i telefony odsłaniają miejsca razem
           start={stan.faza_od ? Date.parse(stan.faza_od) - przesuniecie : null}
           nagrody={stan.nagrody}
@@ -708,7 +772,7 @@ function Koniec({ stan, ranking, przesuniecie }: { stan: StanSesji; ranking: Wie
       <p className="tv-koniec-tytul">
         {[stan.okazja, stan.quiz?.tytul ?? "Quiz", stan.lokal?.nazwa].filter(Boolean).join(" · ")}
       </p>
-      {koniec && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
+      {dziekujemy && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
     </div>
   );
 }

@@ -73,26 +73,18 @@
 
 /* Poczekalnia */
 
-/* nagłówek poczekalni: lokal i Bractwo obok siebie, tej samej wysokości, rozdzielone złotą kreską */
+/* nagłówek poczekalni: lokal (i browar) z lewej, Bractwo w prawym rogu, wszystkie loga tej samej wysokości */
 .tv-loga-poczekalni {
   gap: 36px;
 }
 
-.tv-logo-bractwa {
+.tv-logo-bractwa,
+.tv-loga-poczekalni .tv-logo-lokalu,
+.tv-loga-poczekalni .tv-logo-browaru {
   height: 130px;
   width: auto;
-}
-
-.tv-loga-poczekalni .tv-logo-lokalu {
-  width: 130px;
-  height: 130px;
-}
-
-.tv-loga-kreska {
-  width: 2px;
-  height: 90px;
-  background: var(--zloto);
-  opacity: 0.5;
+  max-width: 360px;
+  object-fit: contain;
 }
 
 .tv-lokal-nazwa {
@@ -3698,9 +3690,9 @@
     opacity 1.1s ease-in;
 }
 
-/* Gdy wideo gra, pod nim nie może być nic jasnego, bo czerń klipu przepuszcza (screen): drogi i ich pasy
-   (na Samsungu nie spadały i prześwitywały przez wybuch) i smugi tła znikają. Zostają nagłówek i awatary. */
-.tv-pijany.wylewa .drogi-finalu-svg {
+/* Gdy wideo gra, znikają smugi tła i szklanka pod klipem (pierwsza klatka klipu to ta sama szklanka, a plansza
+   się buja, więc widać było dwie). Drogi zostają i odlatują z wybuchem (26.10, Łukasz). */
+.tv-pijany.wylewa .drogi-finalu-szklanka {
   visibility: hidden;
 }
 
@@ -3739,10 +3731,14 @@
   }
 }
 
-/* wybuch: drogi odlatują każda w swoją stronę (--i, --obrot z drogi.tsx) */
-.tv-pijany.wybuch .drogi-finalu-pas {
+/* każda droga buja się wokół swojego środka (`rotate` z pętli klatek w pijany.tsx) */
+.tv-pijany .drogi-finalu-pas {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* wybuch: drogi odlatują każda w swoją stronę (--i, --obrot z drogi.tsx) */
+.tv-pijany.wybuch .drogi-finalu-pas {
   transform: translate(calc(-640px + var(--i) * 300px), calc((var(--i) - 1.5) * 520px)) rotate(calc(var(--obrot) * 4));
   opacity: 0;
   transition:

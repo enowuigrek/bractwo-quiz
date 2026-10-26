@@ -38,7 +38,14 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - W bazie zostały nieużywane rzeczy dla zgodności: tabela `przerobki_ai`, kolumna `sesje.widok_rankingu`, funkcja `gracze_sesji`. Nie przeszkadzają.
 - Gry testowe do usunięcia w panelu: JLUL, QDSD, DTFB, PLWK, RMTV, PVQS, KUQY, KSHD, TJPR, LTQA, FVRR, FRQE, AUYD, UXQZ (i wcześniejsze, jeśli zostały).
 
-**Następny krok:** odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
+- **Lista drobnych zmian wizualnych od Łukasza (26.10), do zrobienia po kolei w kolejnej sesji:**
+  1. Pilot: ramka „odpowiedziano”.
+  2. Pilot: „uruchomiona gra” i przekazywanie pilota oraz nagłówek w wersji na telefon.
+  3. Osobne panele dla lokali, a w pilocie osobne panele graczy i pytań.
+  4. Oś czasu w wynikach konkurencji „Ile?”.
+  5. Półfinał: odgrodzenie trzech przechodzących od odpadających.
+
+**Następny krok:** lista drobnych zmian wizualnych wyżej, potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
 
 ## Na 25.10: dźwięki i pijany finał
 
@@ -281,7 +288,16 @@ Do zaprojektowania razem:
 - **Szybciej uciekające punkty:** bez limitu czasu punkty spadają od 1000 do 500 w 20 s (było 30 s), a wielokrotny, kolejność i pary w 40 s (było 60 s); `wewn.okno_bez_limitu_ms`. Z limitem jak dotąd (przez cały limit). Opis w kreatorze poprawiony.
 - **Nalewanie szklanki:** szklanka nalewa się pytaniami przed finałem, nie wszystkimi (z pulą finału była w połowie przed finałem). Pod koniec ostatniego etapu jest nalana w 95% (`NALANE_PRZED_FINALEM`, `nalanieSzklanki` w `src/lib/gra/wyscig.ts`), a pełna w finale. `stan_sesji` podaje `quiz.liczba_przed_finalem` (migracja `liczba_przed_finalem`).
 - **Lider nie stoi przy szklance przed pijanym finałem:** gdy gra ma pijany finał, finał serią rysuje metę jako `DROGA_PRZED_META` (85% drogi) zamiast szklanki (`naDrodzeFinalu(g, bezMety)` w `src/lib/gra/final.ts`; prosty ekran: najwyżej META−1). Zwycięzca też stoi krok przed piwem.
-- **Pozorowany wyścig w pijanym finale:** na wejściu wszyscy cofają się o 2 kroki, a potem co 3–5 s (każdy w swoim rytmie) robią krok naprzód (58%) albo w tył, płynnie, razem z bujaniem i zjeżdżaniem. Kroki są pseudolosowe z nicku (odświeżenie TV daje to samo), kończą się przy gaśnięciu telefonów, nikt nie przekracza 0,81 drogi (`polozeniePijane` w `pijany.tsx`). Sprawdzone symulacją funkcji; animacji przy schowanym panelu przeglądarki nie dało się obejrzeć, więc warto zerknąć na TV.
+- **Pozorowany wyścig w pijanym finale** (zmienione tego samego dnia, niżej: bez cofania na starcie): na wejściu wszyscy cofają się o 2 kroki, a potem co 3–5 s (każdy w swoim rytmie) robią krok naprzód (58%) albo w tył, płynnie, razem z bujaniem i zjeżdżaniem. Kroki są pseudolosowe z nicku (odświeżenie TV daje to samo), kończą się przy gaśnięciu telefonów, nikt nie przekracza 0,81 drogi (`polozeniePijane` w `pijany.tsx`). Sprawdzone symulacją funkcji; animacji przy schowanym panelu przeglądarki nie dało się obejrzeć, więc warto zerknąć na TV.
+
+### Pijany finał bez cofania, tykanie przed wybuchem, test w panelu, koniec gry na zmianę, klasyczny bez muzyki, loga (26.10) ✅
+
+- **Pijany finał:** gracze zaczynają dokładnie tam, gdzie skończyła się seria (płynne przejście), potem pseudolosowe kroki jak wyżej (najwyżej `DROGA_PRZED_META`, zjeżdżanie dokłada do 2%). Każda droga buja się dodatkowo osobno wokół swojego środka (0,3° → 1,8°, własny okres 7–11 s), a awatary jadą razem z nią (`naBujajacejDrodze`). Na komputerze drogi nie znikają już pod wideo wybuchu, tylko odlatują z wybuchem; szklanka pod klipem jest schowana (Edge: dwie szklanki przed wybuchem). Po zgaszeniu telefonów i muzyki do wybuchu tyka zegar (efekt `tik` co sekundę, `efekty.tsx`).
+- **Test pijanego finału:** panel → Quizy → Pijany finał → „Test na ekranie” (tylko główny) zakłada grę bez lokalu z 5 botami, wybraną trójką, losową przewagą i automatem, z krótką serią (start za 15 s, 25 s) i przechodzi na stronę gry, skąd otwiera się ekran w dowolnej przeglądarce. `pilot_akcja` dostało `grant execute … to service_role` (migracja `pilot_akcja_dla_serwera`). Grę usuwa się po teście.
+- **Koniec gry:** automat zostaje na podium; TV sam pokazuje na zmianę podium i pełną tabelę co 10 s (pierwsze podium dłużej, o wjazd), od drugiej pętli z „Dziękujemy za grę! Piwu Cześć!” (`KoniecNaZmiane` w `tv.tsx`; kolejne podium bez konfetti). W pilocie na podium tylko „Zakończ grę”: muzyka cichnie (`koniec` bez utworu), a ekran lokalu od razu wraca do logo (`ekran_lokalu` bez 10 minut po końcu, migracja `ekran_lokalu_wraca_po_koncu`). Przycisk „Pokaż plansze na ekranie lokalu” zniknął. Prosty ekran (stare TV) bez zmian.
+- **Klasyczny pub quiz bez muzyki** (utwory z promptów nie pasowały, wrócimy innym razem, POMYSLY.md): `utworFazy` zwraca ciszę dla klasycznego (też zapowiedź na ekranie lokalu), w pilocie nie ma przełącznika muzyki. Efekty dźwiękowe grają.
+- **Loga:** zawsze lokal z lewej (obok gościnny browar), Bractwo z prawej, wszystkie tej samej wysokości: poczekalnia TV (Bractwo w prawym rogu), nagłówek telefonu (lokal i browar z lewej, „Quiz” na środku, Bractwo z prawej), prosty ekran.
+- **„Ile?” a inne konkurencje:** punkty mnoży etap: Na jedno ×1, Jednak więcej ×1,5, Ile? ×1,5, Jakoś się ułoży ×2 (Piwny quiz i Muzyka ponadczasowa), więc „Ile?” daje do 1500.
 
 ## Ustalenia
 
