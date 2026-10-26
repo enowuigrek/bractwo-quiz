@@ -221,8 +221,8 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         )}
       </section>
 
-      {/* obsługa nie wie o pijanym finale */}
-      {mozePijanyFinal(rola) && (
+      {/* obsługa nie wie o pijanym finale; jest tylko po finale wyścigu po piwo (klasyczny pub quiz go nie ma) */}
+      {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
         <section className="panel-sekcja">
           <h2>Pijany finał: wejście</h2>
           <p className="pomocniczy" style={{ marginTop: 0 }}>

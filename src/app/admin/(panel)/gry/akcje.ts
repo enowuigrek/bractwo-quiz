@@ -68,10 +68,16 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     });
   }
 
-  const [{ data: lokal }, { count: pytania }, { data: quiz }] = await Promise.all([
+  const [{ data: lokal }, { count: pytania }, { data: quiz }, { count: finalySerii }] = await Promise.all([
     db.from("lokale").select("id").eq("id", lokal_id).maybeSingle(),
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
     db.from("quizy").select("tylko_glowny").eq("id", quiz_id).maybeSingle<{ tylko_glowny: boolean }>(),
+    db
+      .from("etapy")
+      .select("id", { count: "exact", head: true })
+      .eq("quiz_id", quiz_id)
+      .eq("finalowy", true)
+      .eq("seria", true),
   ]);
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
@@ -85,8 +91,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   // pilot może go wyłączyć i włączyć w trakcie gry
   const auto = dane.get("auto") === "on";
 
-  // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań
-  const pijany_final = mozePijanyFinal(rola) && dane.get("pijany_final") === "on";
+  // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań.
+  // tylko w wyścigu po piwo (quiz z finałem serią); klasyczny pub quiz nie ma finału
+  const pijany_final = mozePijanyFinal(rola) && !!finalySerii && dane.get("pijany_final") === "on";
   // gra głównego jest domyślnie tylko jego (przełącznik w kreatorze); gra z jego ukrytego quizu zawsze
   const tylko_glowny = widziWszystko(rola) && (dane.get("tylko_glowny") === "on" || !!quiz?.tylko_glowny);
   const za_barem = pijany_final

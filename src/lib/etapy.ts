@@ -27,49 +27,58 @@ export type SzablonEtapu = {
   seria: boolean;
   /** Jakie pytania tu pasują (podpowiedź w panelu). */
   typy: TypZadania[];
+  /** Ikona etapu na planszy TV (`etapy.ikona`). */
+  ikona?: string;
 };
 
-/** Szablony etapów: wypełniają formularz, a potem wszystko można zmienić. */
+/**
+ * Szablony etapów: konkurencje „Wyścigu po piwo” jak w Piwnym quizie Bractwa (nazwy, opisy i ikony z bazy, 26.10)
+ * i degustacja. Wypełniają formularz etapu, a potem wszystko można zmienić.
+ */
 export const SZABLONY_ETAPOW: SzablonEtapu[] = [
   {
-    klucz: "rozgrzewka",
-    nazwa: "Rozgrzewka",
-    opis: "Jedna dobra odpowiedź. Im szybciej, tym więcej punktów.",
+    klucz: "na-jedno",
+    nazwa: "Na jedno",
+    opis: "Jedna dobra odpowiedź, jak to jedno piwo. Im szybciej, tym więcej punktów.",
     mnoznik: 1,
     czas_s: null,
     finalowy: false,
     seria: false,
     typy: ["wybor"],
+    ikona: "/grafiki/etapy/na-jedno.webp",
   },
   {
-    klucz: "kilka",
-    nazwa: "Kilka dobrych",
-    opis: "Dobrych odpowiedzi może być kilka. Zaznacz wszystkie, za złe tracisz część punktów pytania.",
+    klucz: "jednak-wiecej",
+    nazwa: "Jednak więcej",
+    opis: "Dobrych odpowiedzi może być więcej. Zaznacz wszystkie, za złe tracisz część punktów pytania.",
     mnoznik: 1.5,
     czas_s: null,
     finalowy: false,
     seria: false,
     typy: ["wielokrotny"],
+    ikona: "/grafiki/etapy/jednak-wiecej.webp",
   },
   {
-    klucz: "szacowanie",
-    nazwa: "Strzał liczbowy",
+    klucz: "ile",
+    nazwa: "Ile?",
     opis: "Podaj liczbę. Trafienie to pełne punkty, a im bliżej, tym więcej.",
     mnoznik: 1.5,
     czas_s: null,
     finalowy: false,
     seria: false,
     typy: ["szacowanie"],
+    ikona: "/grafiki/etapy/ile.webp",
   },
   {
-    klucz: "laczenie",
-    nazwa: "Połącz i ułóż",
-    opis: "Łączenie w pary i układanie po kolei. Punkty za każdy dobry kawałek.",
+    klucz: "jakos-sie-ulozy",
+    nazwa: "Jakoś się ułoży",
+    opis: "Ułóż pary i kolejność. Punkty za każdy dobry kawałek, a do finału wchodzi tylko trójka.",
     mnoznik: 2,
     czas_s: null,
     finalowy: false,
     seria: false,
     typy: ["pary", "kolejnosc"],
+    ikona: "/grafiki/etapy/poskladaj-sie.webp",
   },
   {
     klucz: "degustacja",
@@ -82,8 +91,8 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     typy: ["wybor", "pary"],
   },
   {
-    klucz: "final",
-    nazwa: "Finał",
+    klucz: "jeszcze-zdaze",
+    nazwa: "Jeszcze zdążę",
     opis:
       "Trzej najlepsi ścigają się do piwa: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Lider ma kilka kroków przewagi. Kto pierwszy dobiegnie, wygrywa.",
     mnoznik: 2,
@@ -91,6 +100,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     finalowy: true,
     seria: true,
     typy: ["prawda_falsz"],
+    ikona: "/grafiki/etapy/jeszcze-zdaze.webp",
   },
 ];
 
@@ -108,20 +118,20 @@ export type SzablonQuizu = {
 };
 
 /**
- * Szablony nowego quizu (25.10, Łukasz): klasyczny pub quiz to same pytania po kolei, a turniej ma stały zestaw
- * etapów, którego kreator nie zmienia (liczbę pytań i etapy można poprawić potem na stronie quizu).
+ * Szablony nowego quizu (25–26.10, Łukasz): „Wyścig po piwo” ma stały zestaw konkurencji jak Piwny quiz (kreator
+ * ich nie zmienia, poprawki potem na stronie quizu), klasyczny pub quiz to same pytania po kolei, bez finału.
  */
 export const SZABLONY_QUIZU: SzablonQuizu[] = [
   {
-    klucz: "turniej",
-    nazwa: "Turniej z finałem",
-    opis: "Stałe etapy od rozgrzewki do wyścigu trójki o piwo.",
+    klucz: "wyscig",
+    nazwa: "Wyścig po piwo",
+    opis: "Konkurencje jak w Piwnym quizie, a na koniec trójka ściga się do piwa.",
     etapy: [
-      { szablon: "rozgrzewka", pytania: 6 },
-      { szablon: "kilka", pytania: 3 },
-      { szablon: "szacowanie", pytania: 3 },
-      { szablon: "laczenie", pytania: 3 },
-      { szablon: "final", pytania: 14 },
+      { szablon: "na-jedno", pytania: 10 },
+      { szablon: "jednak-wiecej", pytania: 8 },
+      { szablon: "ile", pytania: 5 },
+      { szablon: "jakos-sie-ulozy", pytania: 6 },
+      { szablon: "jeszcze-zdaze", pytania: 14 },
     ],
   },
   {

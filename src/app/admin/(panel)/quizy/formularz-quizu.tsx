@@ -10,8 +10,8 @@ import { utworzQuiz } from "./akcje";
 import { LIMITY, liczbaPytan } from "./limity";
 
 /**
- * Nowy quiz: tytuł, opis i szablon. Turniej ma stały zestaw etapów (kreator ich nie zmienia), klasyczny pub quiz
- * to same pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
+ * Nowy quiz: najpierw szablon, potem tytuł i opis. „Wyścig po piwo” ma stały zestaw konkurencji (kreator ich nie
+ * zmienia), klasyczny pub quiz to same pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
  */
 export function FormularzQuizu({ glowny }: { glowny: boolean }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(utworzQuiz, {});
@@ -21,31 +21,8 @@ export function FormularzQuizu({ glowny }: { glowny: boolean }) {
 
   return (
     <form {...bezResetu(akcja)} className="formularz">
-      <div>
-        <label htmlFor="tytul">Tytuł</label>
-        <input
-          id="tytul"
-          name="tytul"
-          className="pole"
-          placeholder="np. Portery i stouty"
-          required
-          maxLength={LIMITY.tytul}
-          autoFocus
-        />
-      </div>
-      <div>
-        <label htmlFor="opis">Opis (tylko dla obsługi)</label>
-        <textarea id="opis" name="opis" className="pole" maxLength={LIMITY.opis} rows={2} />
-      </div>
-      {/* tylko główny: jego nowe quizy są domyślnie ukryte przed obsługą (zmiana później na stronie quizu) */}
-      {glowny && (
-        <label className="przelacznik">
-          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (obsługa nie zobaczy tego quizu)
-        </label>
-      )}
-
       <fieldset>
-        <legend>Szablon</legend>
+        <legend>Rodzaj quizu</legend>
         <div className="szablony-quizu">
           {SZABLONY_QUIZU.map((s) => (
             <label key={s.klucz} className={`szablon-quizu${szablon === s.klucz ? " wybrany" : ""}`}>
@@ -89,6 +66,28 @@ export function FormularzQuizu({ glowny }: { glowny: boolean }) {
             })}
           </ol>
         </fieldset>
+      )}
+
+      <div>
+        <label htmlFor="tytul">Tytuł</label>
+        <input
+          id="tytul"
+          name="tytul"
+          className="pole"
+          placeholder="np. Portery i stouty"
+          required
+          maxLength={LIMITY.tytul}
+        />
+      </div>
+      <div>
+        <label htmlFor="opis">Opis (tylko dla obsługi)</label>
+        <textarea id="opis" name="opis" className="pole" maxLength={LIMITY.opis} rows={2} />
+      </div>
+      {/* tylko główny: jego nowe quizy są domyślnie ukryte przed obsługą (zmiana później na stronie quizu) */}
+      {glowny && (
+        <label className="przelacznik">
+          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (obsługa nie zobaczy tego quizu)
+        </label>
       )}
 
       <KomunikatFormularza stan={stan} />

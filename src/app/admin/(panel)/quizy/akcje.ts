@@ -50,6 +50,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       seria: szablon.seria,
       plan_pytan: e.pytania,
       typ_domyslny: typDomyslny(szablon),
+      ikona: szablon.ikona ?? null,
     });
   }
 

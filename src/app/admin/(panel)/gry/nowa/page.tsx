@@ -15,10 +15,12 @@ export default async function NowaGra() {
     db.from("lokale").select("id, nazwa, miasto, logo_url").order("nazwa").returns<Lokal[]>(),
     db
       .from("quizy")
-      .select("id, tytul, zadania(count)")
+      .select("id, tytul, zadania(count), etapy(finalowy, seria)")
       .in("tylko_glowny", widoczne(rola))
       .order("utworzono", { ascending: false })
-      .returns<{ id: string; tytul: string; zadania: { count: number }[] }[]>(),
+      .returns<
+        { id: string; tytul: string; zadania: { count: number }[]; etapy: { finalowy: boolean; seria: boolean }[] }[]
+      >(),
   ]);
 
   return (
@@ -31,7 +33,12 @@ export default async function NowaGra() {
         <Kreator
           glowny={widziWszystko(rola)}
           lokale={lokale ?? []}
-          quizy={(quizy ?? []).map((q) => ({ id: q.id, tytul: q.tytul, pytania: q.zadania[0]?.count ?? 0 }))}
+          quizy={(quizy ?? []).map((q) => ({
+            id: q.id,
+            tytul: q.tytul,
+            pytania: q.zadania[0]?.count ?? 0,
+            wyscig: q.etapy.some((e) => e.finalowy && e.seria),
+          }))}
         />
       </section>
     </main>

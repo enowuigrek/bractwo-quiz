@@ -11,7 +11,13 @@ import { LIMITY } from "../../quizy/limity";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 
-export type QuizDoWyboru = { id: string; tytul: string; pytania: number };
+export type QuizDoWyboru = {
+  id: string;
+  tytul: string;
+  pytania: number;
+  /** Wyścig po piwo: finał serią, po którym może być pijany finał (klasyczny pub quiz go nie ma). */
+  wyscig: boolean;
+};
 
 /** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) widzi „Pijany finał” i widoczność gry. */
 type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean };
@@ -222,31 +228,34 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                 </label>
               </fieldset>
 
-              <fieldset>
-                <legend>Pijany finał</legend>
-                <label className="przelacznik">
-                  <input
-                    type="checkbox"
-                    name="pijany_final"
-                    checked={pijany}
-                    onChange={(e) => setPijany(e.target.checked)}
-                  />{" "}
-                  po finale dogrywka „Pijany finał”
-                </label>
-                <p className="podpowiedz">
-                  Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze przez 60 s odpowiadają jeszcze na
-                  pytania, które nic nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał
-                  trwa dalej (pytanie 15/14…). Potem werble i podium. Działa w quizie z finałem serią. Pytania zmieniasz
-                  w Quizy → Pijany finał.
-                </p>
-                {pijany && (
-                  <div style={{ marginTop: 10 }}>
-                    <label htmlFor="za_barem">Kto dziś stoi za barem (opcjonalnie)</label>
-                    <input id="za_barem" name="za_barem" className="pole" placeholder="np. Kasia" maxLength={40} />
-                    <p className="podpowiedz">Do pytania z {"{za_barem}"}. Bez imienia to pytanie odpada.</p>
-                  </div>
-                )}
-              </fieldset>
+              {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału) */}
+              {quizy.find((q) => q.id === quiz)?.wyscig && (
+                <fieldset>
+                  <legend>Pijany finał</legend>
+                  <label className="przelacznik">
+                    <input
+                      type="checkbox"
+                      name="pijany_final"
+                      checked={pijany}
+                      onChange={(e) => setPijany(e.target.checked)}
+                    />{" "}
+                    po finale dogrywka „Pijany finał”
+                  </label>
+                  <p className="podpowiedz">
+                    Wynik jest już ustalony (prowadzący go widzi na pilocie), a gracze przez 60 s odpowiadają jeszcze na
+                    pytania, które nic nie liczą, z coraz większym chaosem na ekranach. Tryb jest ukryty: telefony i TV udają, że finał
+                    trwa dalej (pytanie 15/14…). Potem werble i podium. Pytania zmieniasz
+                    w Quizy → Pijany finał.
+                  </p>
+                  {pijany && (
+                    <div style={{ marginTop: 10 }}>
+                      <label htmlFor="za_barem">Kto dziś stoi za barem (opcjonalnie)</label>
+                      <input id="za_barem" name="za_barem" className="pole" placeholder="np. Kasia" maxLength={40} />
+                      <p className="podpowiedz">Do pytania z {"{za_barem}"}. Bez imienia to pytanie odpada.</p>
+                    </div>
+                  )}
+                </fieldset>
+              )}
             </>
           )}
 
