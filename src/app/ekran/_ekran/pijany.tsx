@@ -225,6 +225,16 @@ export function PijanyTv({
           const cel = polozeniePijane(g.nick, start, t, (do_ - od) / 1000 - GASNIECIE_S);
           const poprzedni = cele.get(g.nick);
           cele.set(g.nick, cel);
+          // krok naprzód błyska na zielono, w tył na czerwono, jak w finale (`drogi-ocena`, 26.10); klasa od nowa,
+          // żeby animacja ruszyła przy każdym kroku
+          if (poprzedni !== undefined && cel !== poprzedni) {
+            const ocena = el.querySelector<HTMLElement>(".pijany-ocena");
+            if (ocena) {
+              ocena.classList.remove("dobrze", "zle");
+              void ocena.offsetWidth;
+              ocena.classList.add(cel > poprzedni ? "dobrze" : "zle");
+            }
+          }
           if (dzwieki && poprzedni !== undefined && cel !== poprzedni && chwila - ostatniDzwiek > 250) {
             ostatniDzwiek = chwila;
             zagraj(cel > poprzedni ? "krok" : "pudlo");
@@ -358,7 +368,9 @@ export function PijanyTv({
           >
             <div className="pijany-drzenie">
               <div className="pijany-awatar">
-                <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
+                <div className="pijany-ocena drogi-ocena">
+                  <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
+                </div>
               </div>
               <span className="drogi-finalu-podpis">
                 <span>{g.nick}</span>

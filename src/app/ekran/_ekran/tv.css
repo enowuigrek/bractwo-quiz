@@ -3713,6 +3713,11 @@
   animation-delay: calc(var(--i) * -0.8s);
 }
 
+/* błysk kroku w pijanym finale (pijany.tsx): `drogi-ocena` na osobnym elemencie, bo awatar sam się chwieje */
+.pijany-ocena {
+  display: grid;
+}
+
 @keyframes chwianie-pijane {
   from {
     rotate: calc(var(--poziom) * -9deg);

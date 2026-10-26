@@ -25,8 +25,11 @@ const UTWORY = {
 type Utwor = keyof typeof UTWORY;
 
 const GLOSNOSC = 0.55;
-/** Muzyka pijanego finału (Web Audio) gra z tą częścią `GLOSNOSC`. */
-const PIJANA_CISZEJ = 0.7;
+/**
+ * Muzyka pijanego finału (Web Audio) gra z tą częścią `GLOSNOSC`. Telewizor ścisza `<audio>` mocniej niż liniowo,
+ * więc ta sama liczba w Web Audio brzmi głośniej (26.10: przy 0,7 pijany finał wciąż był głośniejszy od finału).
+ */
+const PIJANA_CISZEJ = 0.45;
 /** Stary utwór cichnie przy zmianie tyle ms. Nowy wchodzi od razu na pełną głośność: utwory mają własne wstępy. */
 const PRZENIKANIE_MS = 1500;
 /**
