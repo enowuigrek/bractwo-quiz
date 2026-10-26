@@ -3,7 +3,8 @@
 import { motion } from "motion/react";
 import { Awatar } from "@/components/awatar";
 
-// Plansza finału: równe drewniane drogi z lewej, które zbiegają się pod szklanką po prawej.
+// Plansza finału: równe drewniane drogi z lewej, równoległe (od 26.10; wcześniej zbiegały się pod szklanką),
+// a szklanka po prawej na środku wysokości.
 // Wspólna dla serii na żywo (seria.tsx), rankingu po finale (wyscig.tsx) i pijanego finału (pijany.tsx).
 // Piksele planszy 1760×780.
 
@@ -16,18 +17,13 @@ const START_X = 130;
 
 export type Droga = { od: { x: number; y: number }; do: { x: number; y: number }; grubosc: number };
 
-/** `n` dróg prawie równej długości: starty rozłożone na wysokości, końce blisko siebie przy szklance. */
+/** `n` równoległych dróg tej samej długości, rozłożonych na wysokości wokół szklanki (łatwiej porównać wyścig). */
 export function drogi(n: number): Droga[] {
   const grubosc = Math.min(96, Math.floor(560 / Math.max(1, n)));
-  const zakresStart = Math.min(560, n * 190);
-  const zakresKoniec = Math.min(260, n * 90);
+  const zakres = Math.min(560, n * 190);
   return Array.from({ length: n }, (_, i) => {
-    const u = n === 1 ? 0.5 : i / (n - 1);
-    return {
-      od: { x: START_X, y: SZKLANKA_FINALU.y - zakresStart / 2 + u * zakresStart },
-      do: { x: KONIEC_X, y: SZKLANKA_FINALU.y - zakresKoniec / 2 + u * zakresKoniec },
-      grubosc,
-    };
+    const y = SZKLANKA_FINALU.y - zakres / 2 + (n === 1 ? 0.5 : i / (n - 1)) * zakres;
+    return { od: { x: START_X, y }, do: { x: KONIEC_X, y }, grubosc };
   });
 }
 

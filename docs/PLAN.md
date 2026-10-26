@@ -299,6 +299,13 @@ Do zaprojektowania razem:
 - **Loga:** zawsze lokal z lewej (obok gościnny browar), Bractwo z prawej, wszystkie tej samej wysokości: poczekalnia TV (Bractwo w prawym rogu), nagłówek telefonu (lokal i browar z lewej, „Quiz” na środku, Bractwo z prawej), prosty ekran.
 - **„Ile?” ×2:** punkty mnoży etap: Na jedno ×1, Jednak więcej ×1,5, Ile? ×2 (było ×1,5, migracja `ile_mnoznik_2`), Jakoś się ułoży ×2, w Piwnym quizie, Muzyce ponadczasowej i w szablonie etapu (`src/lib/etapy.ts`). Trafienie w „Ile?” daje do 2000.
 
+### Scena na cały ekran, Gotowi przy logo, równoległe drogi, szklanka bez bujania (26.10) ✅
+
+- **Scena wypełnia ekran:** zamiast stałego 1920×1080 między czarnymi pasami scena ma co najmniej 1920×1080 i dochodzi do krawędzi ekranu (`useSkala` w `tv.tsx`: wyższa albo szersza w swoich pikselach). Nagłówek stoi zawsze 64 px od góry, stopka (np. „Odpowiedziało” ze złotą kreską nad nim) 96 px od dołu, niezależnie od kształtu ekranu (sprawdzone 16:9 i 16:10). Plansza dróg ma stałe 1760×780 tuż pod nagłówkiem, w poziomie na środku.
+- **Gotowi x/y** na wysokości środka logo lokalu w nagłówku planszy (było za wysoko, przy górnej krawędzi).
+- **Drogi finału równoległe** (`drogi()` w `drogi.tsx`), także w rankingu po finale i w pijanym finale.
+- **Pijany finał:** plansza i szklanka już się nie bujają (kołysząca się szklanka dublowała się z pierwszą klatką wideo, 26.10 na Edge), każda droga buja się osobno i nieregularnie (dwie fale o różnych okresach, do 2,8°), zawodnik zjeżdża według przechyłu swojej drogi. Klip wybuchu jest przypięty do planszy dróg z przesunięciem `WIDEO_NA_PLANSZY` (80, 199 = miejsce planszy na scenie 16:9 w pijanym finale, zmierzone z pierwszą klatką `docs/wideo/pekniecie-start.png`), więc szklanka klipu trafia w naszą na każdym kształcie ekranu.
+
 ## Ustalenia
 
 | Temat | Decyzja |

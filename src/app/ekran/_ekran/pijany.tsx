@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import { ogloszWybuch, useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import { zagraj } from "@/lib/gra/efekty";
@@ -23,12 +22,16 @@ export type GraczPijany = { nick: string; zdjecie: string | null; start: number;
 
 /** Prędkość odlotu awatarów od wybuchu szklanki w px/s. */
 const ODLOT = 1700;
-/** Bujanie planszy (stopnie) i zjeżdżanie po drodze (część drogi) na początku i pod koniec fazy. */
-const BUJANIE_DEG = { od: 0.6, do: 2.8 };
+/**
+ * Gdzie na scenie 16:9 leży plansza dróg (px): klip wybuchu 1920×1080 jest ułożony pod tę scenę, więc przypięty
+ * do planszy przesuwa się o tyle w lewo i w górę, a jego szklanka trafia w naszą na każdym kształcie ekranu.
+ */
+const WIDEO_NA_PLANSZY = { x: 80, y: 199 };
+/** Zjeżdżanie po drodze (część drogi) na początku i pod koniec fazy. */
 const ZJEZDZANIE = { od: 0.012, do: 0.06 };
 
-/** Każda droga buja się osobno (stopnie, na początku i pod koniec fazy), we własnym rytmie. */
-const BUJANIE_DROGI_DEG = { od: 0.3, do: 1.8 };
+/** Każda droga buja się osobno (stopnie, na początku i pod koniec fazy), we własnym, nieregularnym rytmie. */
+const BUJANIE_DROGI_DEG = { od: 0.6, do: 2.8 };
 /** Pozorowany wyścig: wszyscy zaczynają tam, gdzie skończyła się seria, potem co 3–5 s krok naprzód albo w tył. */
 const PIERWSZY_KROK_S = 4;
 /** Szansa na krok naprzód (reszta to krok w tył), w procentach. */
@@ -164,25 +167,24 @@ export function PijanyTv({
       const teraz = Date.now() + przesuniecie;
       const poziom = ograniczone((teraz - od) / Math.max(1, do_ - od));
       const lista = drogi(gracze.length);
-      // bujanie w rytm kołysania muzyki: przechył w prawo, zawodnicy zjeżdżają w prawo (i na odwrót)
-      const fala = ruch ? Math.sin((2 * Math.PI * (teraz - od)) / (OKRES_KOLYSANIA_S * 1000)) : 0;
-      const przechyl = (BUJANIE_DEG.od + (BUJANIE_DEG.do - BUJANIE_DEG.od) * poziom) * fala;
-      const zjazd = (ZJEZDZANIE.od + (ZJEZDZANIE.do - ZJEZDZANIE.od) * poziom) * fala;
-      if (plansza.current && !wybuch) {
-        plansza.current.style.transform = `rotate(${przechyl}deg) translateY(${Math.abs(fala) * 6 * poziom}px)`;
-      }
-      // każda droga buja się jeszcze osobno wokół swojego środka (w wybuchu zostaje, jak była, i odlatuje)
+      // każda droga buja się osobno i nieregularnie wokół swojego środka (dwie fale o różnych okresach), a plansza
+      // i szklanka stoją (26.10: kołysząca się szklanka dublowała się z pierwszą klatką wideo wybuchu). Przechył
+      // w prawo: zawodnik zjeżdża w stronę szklanki (i na odwrót). W wybuchu droga zostaje, jak była, i odlatuje
       const pasy = plansza.current?.querySelectorAll<SVGGElement>(".drogi-finalu-pas");
-      const katy = lista.map((_, i) => {
+      const fale = lista.map((_, i) => {
         if (!ruch) return 0;
-        const okres = 7 + ((i * 1.7) % 4);
-        const kat =
-          (BUJANIE_DROGI_DEG.od + (BUJANIE_DROGI_DEG.do - BUJANIE_DROGI_DEG.od) * poziom) *
-          Math.sin((2 * Math.PI * (teraz - od)) / (okres * 1000) + i * 2.1);
+        const t = (teraz - od) / 1000;
+        const wolna = Math.sin((2 * Math.PI * t) / (OKRES_KOLYSANIA_S - 2 + ((i * 2.3) % 4)) + i * 2.1);
+        const szybka = Math.sin((2 * Math.PI * t) / (2.9 + ((i * 1.3) % 2)) + i * 4.7);
+        return 0.7 * wolna + 0.3 * szybka;
+      });
+      const katy = fale.map((f, i) => {
+        const kat = (BUJANIE_DROGI_DEG.od + (BUJANIE_DROGI_DEG.do - BUJANIE_DROGI_DEG.od) * poziom) * f;
         if (!wybuch && pasy?.[i]) pasy[i].style.rotate = `${kat}deg`;
         return kat;
       });
       if (!wybuch) ostatnieKaty = katy;
+      const zjazd = (i: number) => (ZJEZDZANIE.od + (ZJEZDZANIE.do - ZJEZDZANIE.od) * poziom) * (fale[i] ?? 0);
 
       gracze.forEach((g, i) => {
         const el = elementy.current.get(g.nick);
@@ -213,7 +215,7 @@ export function PijanyTv({
           p = naBujajacejDrodze(
             lista[i],
             // zjeżdżanie też nie dowozi lidera do szklanki
-            ograniczone(Math.min(DROGA_PRZED_META + 0.02, nowe + zjazd)),
+            ograniczone(Math.min(DROGA_PRZED_META + 0.02, nowe + zjazd(i))),
             ostatnieKaty[i] ?? 0,
           );
         }
@@ -239,10 +241,10 @@ export function PijanyTv({
     if (bezWideo && stan.muzyka) zagraj("wybuch");
   }, [bezWideo, stan.muzyka]);
 
-  // Wideo pękającej szklanki (tylko komputer): leży na całej scenie 1920×1080 (portal do `.scena`, bo plansza się
-  // buja), czeka zatrzymane na pierwszej klatce i rusza tak, żeby wybuch w klipie wypadł `WYBUCH_PRZED_S` przed
-  // końcem fazy. Plik jest pobierany z wyprzedzeniem (wideo-wybuchu.ts).
-  const [scena, ustawScene] = useState<Element | null>(null);
+  // Wideo pękającej szklanki (tylko komputer): klip 1920×1080 przypięty do planszy dróg (`WIDEO_NA_PLANSZY`), więc
+  // jego szklanka leży zawsze na naszej, także na ekranie innym niż 16:9; plansza i szklanka się nie bujają (26.10).
+  // Czeka zatrzymane na pierwszej klatce i rusza tak, żeby wybuch w klipie wypadł `WYBUCH_PRZED_S` przed końcem
+  // fazy. Plik jest pobierany z wyprzedzeniem (wideo-wybuchu.ts).
   const wideo = useRef<HTMLVideoElement>(null);
   // `widac`: wideo już gra (pokazujemy je), `gra`: klip przewinął pierwsze klatki, więc chowamy drogi i tło pod nim
   const [widac, ustawWidac] = useState(false);
@@ -255,7 +257,7 @@ export function PijanyTv({
   const wideoNaScenie = !telewizor && teraz >= od && do_ - teraz <= Math.max(GASNIECIE_S, przedKoncem + 2) * 1000;
   useEffect(() => {
     if (wideo.current) wideo.current.muted = !dzwiek;
-  }, [dzwiek, scena, wideoNaScenie]);
+  }, [dzwiek, wideoNaScenie]);
   // start klipu; gdy przeglądarka nie pozwoli grać z dźwiękiem, druga próba bez dźwięku (obraz jest ważniejszy)
   useEffect(() => {
     const v = wideo.current;
@@ -267,7 +269,7 @@ export function PijanyTv({
         return v.play();
       })
       .catch(() => undefined);
-  }, [czasWylewania, scena, wideoNaScenie, bezWideo]);
+  }, [czasWylewania, wideoNaScenie, bezWideo]);
   const adresWideo = useWideoWybuchu();
 
   return (
@@ -276,15 +278,14 @@ export function PijanyTv({
         bezWideo ? " bez-wideo" : ""
       }`}
       style={{ "--poziom": poziom } as React.CSSProperties}
-      ref={(el) => {
-        if (el && !scena) ustawScene(el.closest(".scena"));
-      }}
     >
-      {scena &&
-        wideoNaScenie &&
-        !bezWideo &&
-        createPortal(
+      {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
+      <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000)} />
+
+      <div className="drogi-finalu pijany-plansza" ref={plansza}>
+        {wideoNaScenie && !bezWideo && (
           <video
+            style={{ left: -WIDEO_NA_PLANSZY.x, top: -WIDEO_NA_PLANSZY.y }}
             ref={wideo}
             className={`pijany-wideo${widac ? " gra" : ""}${splywa ? " splywa" : ""}`}
             src={adresWideo}
@@ -298,13 +299,8 @@ export function PijanyTv({
               const v = e.currentTarget;
               if (!splywa && v.duration && v.duration - v.currentTime <= 1.3) ustawSplywa(true);
             }}
-          />,
-          scena,
+          />
         )}
-      {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
-      <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000)} />
-
-      <div className="drogi-finalu pijany-plansza" ref={plansza}>
         <PlanszaDrog lista={lista} szklanka={<Szklanka przed={1} teraz={1} doKonca={0} />} />
         {/* wybuch bez wideo: błysk i rozprysk szkła, piwa i piany z miejsca szklanki */}
         {bezWideo && (

@@ -344,11 +344,12 @@
 /* Automatyczne prowadzenie: ile osób kliknęło „Gotowy” na planszy (tv.tsx, GotowiTv) */
 /* górny środek: wolny pas nad treścią na wstępie, planszach etapów i ciekawostce (logo lokalu i numery
    etapów stoją po bokach). Na dole zasłaniało raz podpis demo telefonu, raz przyciski etapu (25.10). */
+/* na wysokości środka logo lokalu w nagłówku planszy (padding sceny 64px + połowa loga 150px) */
 .tv-gotowi {
   position: absolute;
   left: 50%;
-  top: 28px;
-  translate: -50% 0;
+  top: calc(64px + 75px);
+  translate: -50% -50%;
   z-index: 30;
   margin: 0;
   padding: 6px 20px;
@@ -2898,12 +2899,14 @@
 }
 
 /* Finał (drogi.tsx): równe drewniane drogi z lewej zbiegają się pod szklanką po prawej */
+/* stała wielkość tuż pod nagłówkiem, w poziomie na środku: na ekranie innym niż 16:9 scena jest wyższa albo
+   szersza (tv.tsx), a klip wybuchu jest przypięty do planszy (pijany.tsx) */
 .drogi-finalu {
   position: relative;
-  flex: 1;
+  flex: none;
   width: 1760px;
   height: 780px;
-  margin-top: 10px;
+  margin: 10px auto 0;
 }
 
 .drogi-finalu-svg {
@@ -3663,10 +3666,10 @@
   }
 }
 
-/* Wideo pękającej szklanki: cała scena 1920×1080 nad wszystkim, czarne tło klipu znika (screen) */
+/* Wideo pękającej szklanki: klip 1920×1080 nad planszą dróg (przesunięcie w pijany.tsx), czarne tło klipu znika
+   (screen) */
 .pijany-wideo {
   position: absolute;
-  inset: 0;
   z-index: 30;
   width: 1920px;
   height: 1080px;
@@ -3704,12 +3707,6 @@
 .pijany-gracz {
   left: 0;
   top: 0;
-  will-change: transform;
-}
-
-/* plansza buja się wokół środka (rotate z pętli klatek w pijany.tsx) */
-.pijany-plansza {
-  transform-origin: 50% 55%;
   will-change: transform;
 }
 

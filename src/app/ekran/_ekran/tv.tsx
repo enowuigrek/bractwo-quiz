@@ -48,7 +48,9 @@ import { WstepTv } from "./wstep";
 import { ProstyTv, ScenaProsta } from "../_prosty/prosty";
 import { useTrybProsty } from "@/lib/gra/prosty";
 
-// Scena ma stałe 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo.
+// Scena ma co najmniej 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo. Na ekranie
+// o innym kształcie niż 16:9 scena wypełnia go całego (wyższa albo szersza w swoich pikselach), zamiast stać
+// między czarnymi pasami: nagłówek trzyma się wtedy góry ekranu, a stopka dołu, zawsze w tej samej odległości.
 const SZER = 1920;
 const WYS = 1080;
 
@@ -56,10 +58,16 @@ function subskrybujRozmiar(zmiana: () => void) {
   window.addEventListener("resize", zmiana);
   return () => window.removeEventListener("resize", zmiana);
 }
-const skalaOkna = () => Math.min(window.innerWidth / SZER, window.innerHeight / WYS);
+// napis, bo migawka musi być stała między odczytami (liczby z obiektu byłyby nowym obiektem)
+const rozmiarOkna = () => `${window.innerWidth}x${window.innerHeight}`;
 
-function useSkala() {
-  return useSyncExternalStore(subskrybujRozmiar, skalaOkna, () => 1);
+/** Skala sceny i jej rozmiar w pikselach sceny (co najmniej 1920×1080, reszta ekranu dochodzi z jednej strony). */
+function useSkala(): { skala: number; szer: number; wys: number } {
+  const [w, h] = useSyncExternalStore(subskrybujRozmiar, rozmiarOkna, () => `${SZER}x${WYS}`)
+    .split("x")
+    .map(Number);
+  const skala = Math.min(w / SZER, h / WYS);
+  return { skala, szer: Math.max(SZER, w / skala), wys: Math.max(WYS, h / skala) };
 }
 
 /**
@@ -84,7 +92,7 @@ export function Scena({
    */
   lokalTla?: { nazwa: string; logo_url: string | null } | null;
 }) {
-  const skala = useSkala();
+  const { skala, szer, wys } = useSkala();
   useBezWygaszacza();
   return (
     <div className={`tv${zgaszona ? " zgaszona" : ""}`} data-nastroj={lokalTla === undefined ? nastroj : undefined}>
@@ -93,8 +101,10 @@ export function Scena({
         className="scena"
         style={{
           transform: `scale(${skala})`,
-          left: `calc(50% - ${(SZER * skala) / 2}px)`,
-          top: `calc(50% - ${(WYS * skala) / 2}px)`,
+          width: szer,
+          height: wys,
+          left: `calc(50% - ${(szer * skala) / 2}px)`,
+          top: `calc(50% - ${(wys * skala) / 2}px)`,
         }}
       >
         {children}
