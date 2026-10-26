@@ -8,6 +8,7 @@ import { RESZTA_PODIUM_S, WJAZD_PODIUM_S } from "@/lib/gra/podium";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
+import { zagraj } from "@/lib/gra/efekty";
 import { LogoNaglowka } from "./logo";
 
 /** Ile wierszy mieści ranking na scenie 1920×1080. */
@@ -73,6 +74,15 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
     .slice(0, W_RANKINGU);
   const reszta = ranking.length - wiersze.length;
   const z = stan.zadanie;
+  // „fiuu” przy przetasowaniu, gdy ktoś zmienia miejsce (jak zamiana torów w wyścigu; w klasycznym pub quizie
+  // tabela zastępuje wyścig, 26.10). Po pierwszym pytaniu i w finale bez dźwięku, jak w wyścigu.
+  const zamiana = (z?.lp ?? 0) > 1 && !stan.etap?.finalowy && wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce);
+  const dzwieki = stan.muzyka;
+  useEffect(() => {
+    if (!dzwieki || !zamiana) return;
+    const minutnik = window.setTimeout(() => zagraj("zamiana"), PRZETASOWANIE_MS);
+    return () => window.clearTimeout(minutnik);
+  }, [dzwieki, zamiana]);
   // odcięcie po etapie (jak w wyścigu): kreska pod ostatnim, kto gra dalej
   const odciecie = odciecieEtapu(stan);
 

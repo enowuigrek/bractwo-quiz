@@ -221,7 +221,7 @@ Do zaprojektowania razem:
 
 - **Godzina z kreatora to start quizu** (Łukasz, test klasycznego z botami: poczekalnia otworzyła się o godzinie, a quiz czekał jeszcze 5 minut, co wyglądało jak zawieszenie). Teraz poczekalnia z QR otwiera się `NA_ZAPISY_MIN` = 5 minut wcześniej (`otwarcieAutomatu`, w bazie `wewn.otworz_o_czasie`, migracja `poczekalnia_przed_startem`), a quiz rusza o tej godzinie, jeśli ktoś dołączył. TV, pilot i zapowiedź pokazują jedną godzinę: start quizu.
 - **Kreator gry:** wybór klasycznego od razu włącza prowadzenie automatyczne (wyścig domyślnie bez); przełącznik dalej działa.
-- **Klasyczny bez nalewania:** ranking w klasycznym nie gra dźwięku nalewania (nie ma szklanki), pozostałe efekty bez zmian.
+- **Klasyczny bez nalewania:** ranking w klasycznym nie gra dźwięku nalewania (nie ma szklanki). Za to tabela rankingu gra „zamianę” (`fiuu`) w chwili przetasowania, gdy ktoś zmienia miejsce (od 2. pytania, nie w finale), jak zamiana torów w wyścigu.
 
 ## Ustalenia
 
