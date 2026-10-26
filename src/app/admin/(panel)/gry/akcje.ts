@@ -72,7 +72,11 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     await Promise.all([
     db.from("lokale").select("id").eq("id", lokal_id).maybeSingle(),
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
-    db.from("quizy").select("tylko_glowny").eq("id", quiz_id).maybeSingle<{ tylko_glowny: boolean }>(),
+    db
+      .from("quizy")
+      .select("tylko_glowny, usunieto")
+      .eq("id", quiz_id)
+      .maybeSingle<{ tylko_glowny: boolean; usunieto: string | null }>(),
     db
       .from("etapy")
       .select("id", { count: "exact", head: true })
@@ -85,6 +89,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const klasyczny = !etapow;
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
+  if (quiz?.usunieto) return { blad: "Ten quiz jest w koszu. Przywróć go w Quizy → Kosz." };
 
   // zapowiedź: godzina startu (ISO z przeglądarki), poczekalnia zamknięta do otwarcia na pilocie
   const zapowiedz = dane.get("start_tryb") === "zapowiedz";

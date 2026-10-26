@@ -8,7 +8,15 @@ import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
 import { IkonaKlodka, IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
-import { przesunEtap, przesunZadanie, ustawWidocznoscQuizu, usunEtap, usunZadanie, zmienPlanEtapu } from "../akcje";
+import {
+  przesunEtap,
+  przesunZadanie,
+  przywrocQuiz,
+  ustawWidocznoscQuizu,
+  usunEtap,
+  usunZadanie,
+  zmienPlanEtapu,
+} from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { WklejPytania } from "./wklej";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
@@ -24,7 +32,11 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
 
   const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { count: wejscie }] =
     await Promise.all([
-      db.from("quizy").select("id, tytul, opis, utworzono, tylko_glowny, tagi").eq("id", id).maybeSingle<Quiz>(),
+      db
+        .from("quizy")
+        .select("id, tytul, opis, utworzono, tylko_glowny, tagi, usunieto")
+        .eq("id", id)
+        .maybeSingle<Quiz & { usunieto: string | null }>(),
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
@@ -105,6 +117,14 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
           )}{" "}
           <button type="submit" className="przycisk-maly">
             {quiz.tylko_glowny ? "Pokaż obsłudze" : "Ukryj przed obsługą"}
+          </button>
+        </form>
+      )}
+      {quiz.usunieto && (
+        <form action={przywrocQuiz.bind(null, quiz.id)} className="blad" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          Ten quiz jest w koszu: nie ma go na liście ani przy uruchamianiu gry.
+          <button type="submit" className="przycisk-maly">
+            Przywróć
           </button>
         </form>
       )}

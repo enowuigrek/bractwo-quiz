@@ -238,6 +238,14 @@ Do zaprojektowania razem:
 - **Odbudowa Piwnego quizu Bractwa Piwnego** (Łukasz usunął go przy porządkach): migracja `przywrocenie_piwnego_quizu` z pełnego zrzutu pytań etapów 1–4 z 24.10 (zapis rozmowy), finału ze zrzutu z 24.10 i migracji, etapów w stanie z 26.10 rano, a potem wszystkich późniejszych poprawek danych z migracji. 63 pozycje, 5 etapów, 4 ciekawostki, 11 grafik, pijane wejście; pierwsze pytania każdego rodzaju na tych samych numerach co przed usunięciem. Ręcznych edycji z panelu (jeśli były) nie dało się odtworzyć.
 - **Sprawdzone lokalnie i na Chromium 69:** ekran lokalu bez gry, zapowiedź klasycznego, poczekalnia, plansza startowa i pytanie z logo w tle.
 
+### Kosz na quizy (26.10) ✅
+
+- **Po co:** Piwny quiz przepadł po jednym kliknięciu „Usuń”. Teraz „Usuń” na liście quizów przenosi quiz do kosza (kolumna `quizy.usunieto`, migracja `kosz_quizow`), z pytaniem „Przenieść do kosza? Możesz go stamtąd przywrócić.” i komunikatem po przeniesieniu.
+- **Kosz** (`/admin/quizy/kosz`, przycisk „Kosz (n)” pod listą): rodzaj, liczba pytań i od kiedy w koszu, „Przywróć” i „Usuń na dobre” (z potwierdzeniem, razem z pytaniami i grafikami z magazynu; nadal niemożliwe, gdy były na nim gry). Usunąć na dobre da się tylko quiz z kosza.
+- Quiz z kosza nie pokazuje się na liście, w liczniku na stronie głównej panelu ani przy uruchamianiu gry (serwer też go nie uruchomi). Jego strona dalej się otwiera, z paskiem „Ten quiz jest w koszu” i przyciskiem „Przywróć”. Trwająca gra z takim quizem gra dalej (dane zostają).
+- Kosz nie opróżnia się sam.
+- **Sprawdzone lokalnie:** do kosza, przywróć, znów do kosza, usuń na dobre (wiersz zniknął z bazy).
+
 ## Ustalenia
 
 | Temat | Decyzja |

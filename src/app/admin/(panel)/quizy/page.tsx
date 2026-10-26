@@ -22,21 +22,26 @@ type QuizNaLiscie = {
 };
 
 const BLEDY: Record<string, string> = {
-  gry: "Tego quizu nie da się usunąć, bo były na nim rozegrane gry. Najpierw usuń te gry w zakładce „Gry”.",
-  usuwanie: "Nie udało się usunąć quizu.",
+  usuwanie: "Nie udało się przenieść quizu do kosza.",
 };
 
 export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">) {
   const rola = await wymagajAdmina();
-  const { blad, rodzaj: rodzajZAdresu, tag } = await searchParams;
+  const { blad, rodzaj: rodzajZAdresu, tag, kosz } = await searchParams;
   // dwie zakładki: wyścig po piwo (quiz z etapami) i klasyczny pub quiz (bez etapów); w każdej filtr tematów
   const rodzaj: RodzajQuizu = rodzajZAdresu === "klasyczny" ? "klasyczny" : "wyscig";
   const { data: wszystkie, error } = await supabaseAdmin()
     .from("quizy")
     .select("id, tytul, opis, tylko_glowny, tagi, zadania(count), etapy(count)")
     .in("tylko_glowny", widoczne(rola))
+    .is("usunieto", null)
     .order("utworzono", { ascending: false })
     .returns<QuizNaLiscie[]>();
+  const { count: wKoszu } = await supabaseAdmin()
+    .from("quizy")
+    .select("id", { count: "exact", head: true })
+    .in("tylko_glowny", widoczne(rola))
+    .not("usunieto", "is", null);
   const wRodzaju = (wszystkie ?? []).filter((q) => ((q.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny") === rodzaj);
   const tagi = wszystkieTagi(wRodzaju);
   const wybranyTag = typeof tag === "string" && tagi.includes(tag) ? tag : null;
@@ -53,6 +58,11 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         </p>
       )}
       {error && <p className="blad">Nie udało się pobrać quizów: {error.message}</p>}
+      {kosz === "1" && (
+        <p className="sukces" role="status">
+          Quiz trafił do kosza. Możesz go stamtąd przywrócić.
+        </p>
+      )}
 
       <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
         {(["wyscig", "klasyczny"] as const).map((r) => (
@@ -110,8 +120,9 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
                 </Link>
                 <PrzyciskPotwierdz
                   akcja={usunQuiz.bind(null, q.id)}
-                  pytanie={`Usunąć quiz „${q.tytul}” razem ze wszystkimi pytaniami?`}
-                  tytul="Usuń"
+                  pytanie={`Przenieść quiz „${q.tytul}” do kosza? Możesz go stamtąd przywrócić.`}
+                  tytul="Do kosza"
+                  tak="Do kosza"
                   className="przycisk-maly ikona niebezpieczny"
                 >
                   <IkonaKosz />
@@ -139,6 +150,10 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
             Pijany finał: pytania
           </Link>
         )}
+        {/* usunięte quizy czekają w koszu na przywrócenie albo usunięcie na dobre */}
+        <Link href="/admin/quizy/kosz" className="przycisk">
+          Kosz{wKoszu ? ` (${wKoszu})` : ""}
+        </Link>
       </p>
     </main>
   );

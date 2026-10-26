@@ -17,6 +17,7 @@ export default async function NowaGra() {
       .from("quizy")
       .select("id, tytul, tagi, zadania(count), etapy(finalowy, seria)")
       .in("tylko_glowny", widoczne(rola))
+      .is("usunieto", null)
       .order("utworzono", { ascending: false })
       .returns<
         {

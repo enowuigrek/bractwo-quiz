@@ -9,7 +9,11 @@ export default async function Panel() {
   const db = supabaseAdmin();
   const [lokale, quizy, trwajace] = await Promise.all([
     db.from("lokale").select("*", { count: "exact", head: true }),
-    db.from("quizy").select("*", { count: "exact", head: true }).in("tylko_glowny", widoczne(rola)),
+    db
+      .from("quizy")
+      .select("*", { count: "exact", head: true })
+      .in("tylko_glowny", widoczne(rola))
+      .is("usunieto", null),
     db
       .from("sesje")
       .select(ZAPYTANIE_GIER)

@@ -108,21 +108,44 @@ export async function ustawWidocznoscQuizu(id: string, tylkoGlowny: boolean): Pr
   refresh();
 }
 
+/**
+ * „Usuń” na liście quizów: quiz trafia do kosza (`usunieto`), skąd da się go przywrócić. Na dobre kasuje go dopiero
+ * `usunQuizNaZawsze` z kosza (26.10, po przypadkowym usunięciu Piwnego quizu).
+ */
 export async function usunQuiz(id: string): Promise<void> {
   await wymagajQuizu(await wymagajAdmina(), id);
   const db = supabaseAdmin();
-
   // powrót na zakładkę rodzaju tego quizu (klasyczny = bez etapów)
   const { count: etapow } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", id);
   const lista = etapow ? "/admin/quizy?" : "/admin/quizy?rodzaj=klasyczny&";
+  const { error } = await db.from("quizy").update({ usunieto: new Date().toISOString() }).eq("id", id).is("usunieto", null);
+  if (error) redirect(`${lista}blad=usuwanie`);
+  redirect(`${lista}kosz=1`);
+}
+
+/** Przywraca quiz z kosza na listę. */
+export async function przywrocQuiz(id: string): Promise<void> {
+  await wymagajQuizu(await wymagajAdmina(), id);
+  const { error } = await supabaseAdmin().from("quizy").update({ usunieto: null }).eq("id", id);
+  if (error) throw new Error(`Nie udało się przywrócić quizu: ${error.message}`);
+  refresh();
+}
+
+/** Kasuje quiz z kosza na dobre, razem z pytaniami, etapami i grafikami z magazynu. Nie da się tego cofnąć. */
+export async function usunQuizNaZawsze(id: string): Promise<void> {
+  await wymagajQuizu(await wymagajAdmina(), id);
+  const db = supabaseAdmin();
+  const { data: quiz } = await db.from("quizy").select("usunieto").eq("id", id).maybeSingle<{ usunieto: string | null }>();
+  // tylko z kosza: quiz z listy najpierw trafia do kosza
+  if (!quiz?.usunieto) redirect("/admin/quizy/kosz");
   const { count } = await db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id);
-  if (count) redirect(`${lista}blad=gry`);
+  if (count) redirect("/admin/quizy/kosz?blad=gry");
 
   const { data: zadania } = await db.from("zadania").select("grafika_url").eq("quiz_id", id);
-  const { error } = await db.from("quizy").delete().eq("id", id);
-  if (error) redirect(`${lista}blad=usuwanie`);
+  const { error } = await db.from("quizy").delete().eq("id", id).not("usunieto", "is", null);
+  if (error) redirect("/admin/quizy/kosz?blad=usuwanie");
   await Promise.all((zadania ?? []).map((z) => usunGrafike(z.grafika_url)));
-  redirect(lista.slice(0, -1));
+  refresh();
 }
 
 // ---------------------------------------------------------------------------
