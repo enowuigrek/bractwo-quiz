@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Browar Kwadrat (domowy browar Łukasza, browarkwadrat.pl): znak kwadratu w okrągłym logo jak u innych lokali -->
+  <circle cx="100" cy="100" r="100" fill="#0b0b0b"/>
+  <circle cx="100" cy="100" r="92" fill="none" stroke="#fff" stroke-width="3"/>
+  <path fill="#fff" fill-rule="evenodd" d="M52 52H148V148H52Z M65.7 65.7V134.3H134.3V65.7Z"/>
+</svg>
