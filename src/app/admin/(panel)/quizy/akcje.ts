@@ -256,7 +256,15 @@ function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & 
     const tolerancja = liczbaZPola(surowe.tolerancja) ?? (max - min) / 4;
     if (tolerancja <= 0) return { blad: "Odległość do zera punktów musi być większa od zera." };
     const jednostka = typeof surowe.jednostka === "string" ? surowe.jednostka.trim().slice(0, 12) || null : null;
-    return { tresc, typ, dane: { min, max, krok, tolerancja, jednostka, poprawna } };
+    // przedział dobrych odpowiedzi (np. tripel 7,5–9,5%): pełne punkty w całym przedziale
+    const poprawna_do = liczbaZPola(surowe.poprawna_do);
+    if (poprawna_do !== null && (poprawna_do <= poprawna || poprawna_do > max))
+      return { blad: "„Poprawna do” musi być większa od poprawnej i w zakresie suwaka." };
+    return {
+      tresc,
+      typ,
+      dane: { min, max, krok, tolerancja, jednostka, poprawna, ...(poprawna_do !== null ? { poprawna_do } : {}) },
+    };
   }
 
   if (typ === "wybor" || typ === "wielokrotny") {

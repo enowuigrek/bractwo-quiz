@@ -2,16 +2,18 @@
 
 import { Awatar } from "@/components/awatar";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
-import { liczbaZJednostka } from "@/lib/zadania";
+import { liczbaZJednostka, poprawnaSzacowania, przedzialSzacowania } from "@/lib/zadania";
 
 /**
  * Szacowanie na TV: oś od `min` do `max`. W trakcie pytania pusta (z zakresem), po wyniku każda podana
- * liczba to kropka (te same liczby piętrzą się w górę), a złota kreska z napisem to poprawna liczba.
+ * liczba to kropka (te same liczby piętrzą się w górę), a złota kreska z napisem to poprawna liczba
+ * (przy przedziale kreska na środku, a sam przedział to złoty pas na osi).
  */
 export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean }) {
   const min = z.dane.min ?? 0;
   const max = z.dane.max ?? 1;
-  const p = typeof z.dane.poprawna === "number" ? z.dane.poprawna : null;
+  const zakres = typeof z.dane.poprawna === "number" ? przedzialSzacowania(z.dane.poprawna, z.dane.poprawna_do) : null;
+  const p = zakres ? (zakres[0] + zakres[1]) / 2 : null;
   const gdzie = (x: number) => `${((x - min) / (max - min)) * 100}%`;
   const liczby = wynik ? (z.rozklad ?? []) : [];
   // ile kropek już stoi w danym miejscu (zaokrąglonym do 1% osi), żeby kolejne szły wyżej
@@ -37,9 +39,15 @@ export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean })
             style={{ left: gdzie(x), bottom: 18 + wysokosc * 30, animationDelay: `${0.2 + i * 0.05}s` }}
           />
         ))}
+        {wynik && zakres && zakres[1] > zakres[0] && (
+          <span
+            className="tv-os-przedzial"
+            style={{ left: gdzie(zakres[0]), width: `${((zakres[1] - zakres[0]) / (max - min)) * 100}%` }}
+          />
+        )}
         {wynik && p !== null && (
           <span className="tv-os-poprawna" style={{ left: gdzie(p), height: kreska }}>
-            <span>{liczbaZJednostka(p, z.dane.jednostka)}</span>
+            <span>{poprawnaSzacowania(zakres![0], zakres![1], z.dane.jednostka)}</span>
           </span>
         )}
         <div className="tv-os-linia" />
@@ -92,7 +100,10 @@ export function OdpowiedziSzacowania({
     czas_ms: number | null;
   }[];
 }) {
-  const p = typeof z.dane.poprawna === "number" ? z.dane.poprawna : 0;
+  const [od, do_] = przedzialSzacowania(typeof z.dane.poprawna === "number" ? z.dane.poprawna : 0, z.dane.poprawna_do);
+  // środek przedziału (albo sama poprawna), a odległość strzału od najbliższego brzegu przedziału
+  const p = (od + do_) / 2;
+  const odleglosc = (v: number) => Math.max(0, od - v, v - do_);
   const jednostka = z.dane.jednostka;
   const krok = z.dane.krok ?? 1;
   const strzaly: Odpowiedz[] = odpowiedzi
@@ -108,11 +119,11 @@ export function OdpowiedziSzacowania({
   const bez = odpowiedzi.filter((o) => typeof o.dane?.liczba !== "number");
 
   // oś symetryczna wokół poprawnej, przybliżona do najdalszego strzału (z zapasem)
-  const pol = Math.max(krok * 5, ...strzaly.map((s) => Math.abs(s.liczba - p))) * 1.15;
+  const pol = Math.max(krok * 5 + (do_ - od) / 2, ...strzaly.map((s) => Math.abs(s.liczba - p))) * 1.15;
   const x = (v: number) => ((v - (p - pol)) / (2 * pol)) * SZEROKOSC_OSI;
 
   const najblizsi = [...strzaly].sort(
-    (a, b) => Math.abs(a.liczba - p) - Math.abs(b.liczba - p) || (a.czas_ms ?? 0) - (b.czas_ms ?? 0),
+    (a, b) => odleglosc(a.liczba) - odleglosc(b.liczba) || (a.czas_ms ?? 0) - (b.czas_ms ?? 0),
   );
   // rzędy od osi w górę: podpisy dostają najpierw najbliżsi poprawnej (26.10: trafiający w punkt zostawali bez
   // podpisu, gdy miejsca zajęli ci z lewej), każdy w najniższym rzędzie, w którym nie zachodzi na inny podpis.
@@ -132,8 +143,9 @@ export function OdpowiedziSzacowania({
     <div className="tv-os-odp">
       <div className="tv-os-odp-pole" style={{ width: SZEROKOSC_OSI }}>
         <div className="tv-os-odp-linia" />
+        {do_ > od && <span className="tv-os-przedzial" style={{ left: x(od), width: x(do_) - x(od) }} />}
         <span className="tv-os-odp-poprawna" style={{ left: x(p) }}>
-          <span>{liczbaZJednostka(p, jednostka)}</span>
+          <span>{poprawnaSzacowania(od, do_, jednostka)}</span>
         </span>
         {ulozone.map((s, i) => (
           <div

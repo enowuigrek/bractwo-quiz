@@ -2866,6 +2866,25 @@
   background: linear-gradient(90deg, var(--kamien2), var(--kamien3), var(--kamien2));
 }
 
+/* szacowanie z przedziałem: dobre liczby jako złoty pas na osi */
+.tv-os-przedzial {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--zloto);
+  box-shadow: var(--glow-lg);
+  animation: odslona 0.8s var(--ease-wjazd) both;
+}
+
+.tv-os-odp-pole > .tv-os-przedzial {
+  bottom: var(--os);
+  height: 10px;
+  margin-bottom: -5px;
+  border-radius: 5px;
+}
+
 .tv-os-kropka {
   position: absolute;
   width: 26px;

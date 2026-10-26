@@ -25,7 +25,8 @@ export type DaneWybor = { odpowiedzi: string[]; poprawna: number };
 export type DanePrawdaFalsz = DaneWybor;
 /**
  * Szacowanie liczby z zakresu `min`–`max` co `krok`. Pełne punkty za trafienie, dalej coraz mniej,
- * aż do zera w odległości `tolerancja`. Odpowiedź gracza: `{ liczba: 1516 }`.
+ * aż do zera w odległości `tolerancja`. Z `poprawna_do` dobry jest cały przedział `poprawna`–`poprawna_do`
+ * (np. tripel 7,5–9,5%), a odległość liczy się od najbliższego brzegu. Odpowiedź gracza: `{ liczba: 1516 }`.
  */
 export type DaneSzacowanie = {
   min: number;
@@ -34,6 +35,7 @@ export type DaneSzacowanie = {
   tolerancja: number;
   jednostka: string | null;
   poprawna: number;
+  poprawna_do?: number;
 };
 /** Kilka poprawnych (indeksy). Odpowiedź gracza: `{ odpowiedzi: [0, 2] }`. */
 export type DaneWielokrotny = { odpowiedzi: string[]; poprawna: number[] };
@@ -72,6 +74,8 @@ export type DaneWidoczne = {
   jednostka?: string | null;
   odslaniaj?: boolean;
   poprawna?: number | number[];
+  /** Szacowanie z przedziałem: górny brzeg dobrych odpowiedzi (od fazy `wynik`, jak `poprawna`). */
+  poprawna_do?: number;
   /** Ciekawostka: tekst pod tytułem. */
   tekst?: string;
 };
@@ -120,6 +124,17 @@ export function liczbaZJednostka(n: number, jednostka?: string | null): string {
   return jednostka ? `${tekst} ${jednostka}` : tekst;
 }
 
+/** Przedział dobrych odpowiedzi w szacowaniu: `[od, do]` (pojedyncza liczba: `od` = `do`). */
+export function przedzialSzacowania(poprawna: number, poprawna_do?: number | null): [number, number] {
+  return [poprawna, typeof poprawna_do === "number" ? Math.max(poprawna, poprawna_do) : poprawna];
+}
+
+/** Poprawna w szacowaniu do pokazania: „8,5 %” albo przedział „7,5–9,5 %”. */
+export function poprawnaSzacowania(poprawna: number, poprawna_do?: number | null, jednostka?: string | null): string {
+  const [od, do_] = przedzialSzacowania(poprawna, poprawna_do);
+  return od === do_ ? liczbaZJednostka(od, jednostka) : `${liczbaZJednostka(od)}–${liczbaZJednostka(do_, jednostka)}`;
+}
+
 export const LITERY = "ABCDEF";
 
 export function czyTypZadania(typ: unknown): typ is TypZadania {
@@ -134,7 +149,7 @@ export function opisRozwiazania(z: ZadanieDane): string {
     case "prawda_falsz":
       return `Poprawna: ${z.dane.odpowiedzi[z.dane.poprawna] ?? "?"}`;
     case "szacowanie":
-      return `Poprawna: ${liczbaZJednostka(z.dane.poprawna, z.dane.jednostka)} (zakres ${liczbaZJednostka(z.dane.min)}–${liczbaZJednostka(z.dane.max)})`;
+      return `Poprawna: ${poprawnaSzacowania(z.dane.poprawna, z.dane.poprawna_do, z.dane.jednostka)} (zakres ${liczbaZJednostka(z.dane.min)}–${liczbaZJednostka(z.dane.max)})`;
     case "wielokrotny":
       return `Poprawne: ${z.dane.poprawna.map((i) => `${LITERY[i]}. ${z.dane.odpowiedzi[i]}`).join(", ")}`;
     case "kolejnosc":

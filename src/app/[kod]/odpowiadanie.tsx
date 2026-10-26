@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
-import { LITERY, liczbaZJednostka, type DaneOdpowiedzi } from "@/lib/zadania";
+import { LITERY, liczbaZJednostka, poprawnaSzacowania, type DaneOdpowiedzi } from "@/lib/zadania";
 
 // Odpowiadanie na telefonie w nowych typach pytań. Każdy komponent dostaje `key={zadanie.id}`,
 // więc zaznaczenia czyszczą się przy następnym pytaniu. `wyslana`: odpowiedź już zapisana (blokuje zmiany).
@@ -375,7 +375,7 @@ export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowie
     return (
       <div className="odp-liczba-wynik">
         <p>
-          Poprawna: <strong className="ok">{liczbaZJednostka(p, z.dane.jednostka)}</strong>
+          Poprawna: <strong className="ok">{poprawnaSzacowania(p, z.dane.poprawna_do, z.dane.jednostka)}</strong>
         </p>
       </div>
     );

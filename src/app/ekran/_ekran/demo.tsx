@@ -205,11 +205,12 @@ function scena(typ: TypZadania, t: number): Scena {
     }
     case "pary": {
       // Łączenie par w dwóch kolumnach na pionowym ekranie telefonu.
-      // bez stylów i krajów: pary styl–kraj są w quizie o piwie, a plansza nie może zdradzać odpowiedzi
-      const lewe = ["Kufel", "Kieliszek", "Filiżanka"];
-      const prawe = ["Kawa", "Piwo", "Wino"];
+      // bez stylów i krajów: pary styl–kraj są w quizie o piwie, a plansza nie może zdradzać odpowiedzi;
+      // krótkie słowa, bo dłuższe („Filiżanka”) wychodziły z kafelków
+      const lewe = ["Kot", "Pies", "Krowa"];
+      const prawe = ["Hau", "Muu", "Miau"];
       // lewy i → prawy pary[i]; stuknięcia: lewy, potem prawy
-      const pary = [1, 2, 0];
+      const pary = [2, 0, 1];
       const chwile = [0.18, 0.4, 0.62];
       const y = (i: number) => 250 + i * 126;
       const lewySrodek = (i: number) => ({ x: 98, y: y(i) + 39 });
@@ -217,7 +218,7 @@ function scena(typ: TypZadania, t: number): Scena {
       const polaczona = (i: number) => poStuku(chwile[i] + 0.12);
       const kolor = (i: number) => (polaczona(i) ? (["para0", "para1", "para2"] as const)[i] : undefined);
       return {
-        tresc: "Połącz naczynie z napojem.",
+        tresc: "Połącz zwierzę z odgłosem.",
         elementy: (
           <>
             <svg className="demo-linie" width={PIONOWO.szer} height={PIONOWO.wys} aria-hidden>

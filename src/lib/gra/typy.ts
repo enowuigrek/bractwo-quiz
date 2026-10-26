@@ -147,6 +147,8 @@ export type StanSesji = {
 export type PilotStan = StanSesji & {
   /** Rozwiązanie bieżącego zadania (kształt jak `dane.poprawna`). */
   poprawna: number | number[] | null;
+  /** Szacowanie z przedziałem: górny brzeg dobrych odpowiedzi. */
+  poprawna_do?: number | null;
   ostatnie_zadanie: boolean;
   /** Rodzaj następnego pytania (null po ostatnim): prowadzący uprzedza graczy przed startem. */
   nastepne_typ: TypZadania | null;

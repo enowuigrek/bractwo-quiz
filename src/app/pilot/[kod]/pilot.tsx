@@ -19,7 +19,7 @@ import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne
 import { supabase } from "@/lib/supabase/przegladarka";
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { napisMnoznika } from "@/lib/etapy";
-import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka } from "@/lib/zadania";
+import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
@@ -682,7 +682,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                   </p>
                 )}
                 <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
-                <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
+                <RozwiazaniePilota z={z} poprawna={stan.poprawna} poprawnaDo={stan.poprawna_do} />
                 {stan.wszystkie_podpowiedzi.length > 0 && (
                   <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
                     {stan.wszystkie_podpowiedzi.map((p, i) => (
@@ -759,7 +759,15 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 }
 
 /** Pytanie na pilocie z rozwiązaniem (prowadzący widzi je od początku). */
-function RozwiazaniePilota({ z, poprawna }: { z: ZadanieWidoczne; poprawna: PilotStan["poprawna"] }) {
+function RozwiazaniePilota({
+  z,
+  poprawna,
+  poprawnaDo,
+}: {
+  z: ZadanieWidoczne;
+  poprawna: PilotStan["poprawna"];
+  poprawnaDo: PilotStan["poprawna_do"];
+}) {
   const p = Array.isArray(poprawna) ? poprawna : null;
   if (z.typ === "szacowanie" && typeof poprawna === "number") {
     return (
@@ -769,7 +777,7 @@ function RozwiazaniePilota({ z, poprawna }: { z: ZadanieWidoczne; poprawna: Pilo
         </p>
         <ol className="pilot-odpowiedzi">
           <li className="poprawna">
-            Poprawna: <strong>{liczbaZJednostka(poprawna, z.dane.jednostka)}</strong>
+            Poprawna: <strong>{poprawnaSzacowania(poprawna, poprawnaDo, z.dane.jednostka)}</strong>
           </li>
           {z.najblizej?.map((n) => (
             <li key={n.nick}>

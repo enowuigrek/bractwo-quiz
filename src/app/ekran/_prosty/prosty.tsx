@@ -8,7 +8,7 @@ import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
-import { LITERY, PRAWDA_FALSZ, liczbaZJednostka } from "@/lib/zadania";
+import { LITERY, PRAWDA_FALSZ, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
 
@@ -392,7 +392,7 @@ function OdpowiedziPytania({ stan, wynik }: { stan: StanSesji; wynik: boolean })
       <div className="pr-szacowanie">
         {wynik && typeof poprawna === "number" ? (
           <>
-            <p className="pr-odliczanie">{liczbaZJednostka(poprawna, d.jednostka)}</p>
+            <p className="pr-odliczanie">{poprawnaSzacowania(poprawna, d.poprawna_do, d.jednostka)}</p>
             {z.najblizej?.length ? (
               <p className="pr-opis pr-opis-duzy">
                 Najbliżej: {z.najblizej.map((n) => `${n.nick} (${liczbaZJednostka(n.liczba, d.jednostka)})`).join(", ")}

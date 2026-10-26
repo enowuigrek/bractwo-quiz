@@ -47,7 +47,15 @@ const MIN_WIERSZY: Record<TypZadania, number> = {
 };
 
 /** Pola szacowania jako tekst (przecinek albo kropka), zamiana na liczby na serwerze. */
-type PolaLiczby = { min: string; max: string; krok: string; tolerancja: string; jednostka: string; poprawna: string };
+type PolaLiczby = {
+  min: string;
+  max: string;
+  krok: string;
+  tolerancja: string;
+  jednostka: string;
+  poprawna: string;
+  poprawna_do: string;
+};
 
 const liczbaNaTekst = (n: number) => String(n).replace(".", ",");
 
@@ -106,8 +114,9 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
           tolerancja: liczbaNaTekst(zadanie.dane.tolerancja),
           jednostka: zadanie.dane.jednostka ?? "",
           poprawna: liczbaNaTekst(zadanie.dane.poprawna),
+          poprawna_do: zadanie.dane.poprawna_do === undefined ? "" : liczbaNaTekst(zadanie.dane.poprawna_do),
         }
-      : { min: "", max: "", krok: "1", tolerancja: "", jednostka: "", poprawna: "" },
+      : { min: "", max: "", krok: "1", tolerancja: "", jednostka: "", poprawna: "", poprawna_do: "" },
   );
   const [podpowiedzi, setPodpowiedzi] = useState<string[]>(() => zadanie?.dane.podpowiedzi ?? []);
   const [tekst, setTekst] = useState(zadanie?.typ === "ciekawostka" ? zadanie.dane.tekst : "");
@@ -269,6 +278,7 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
             {(
               [
                 ["poprawna", "Poprawna liczba", "np. 1516"],
+                ["poprawna_do", "Poprawna do (przedział)", "np. 9,5"],
                 ["jednostka", "Jednostka (opcjonalnie)", "np. %, IBU, rok"],
                 ["min", "Suwak od", "np. 1400"],
                 ["max", "Suwak do", "np. 1700"],
@@ -289,7 +299,7 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
                   value={liczba[pole]}
                   onChange={(e) => setLiczba((l) => ({ ...l, [pole]: e.target.value }))}
                   placeholder={przyklad}
-                  required={pole !== "jednostka" && pole !== "tolerancja"}
+                  required={pole !== "jednostka" && pole !== "tolerancja" && pole !== "poprawna_do"}
                   maxLength={pole === "jednostka" ? 12 : 16}
                 />
               </div>
