@@ -225,6 +225,18 @@ const GRAFIKI = {
       "no facets, no handle) of amber ale with a creamy head, standing on a dark wooden bar counter of a traditional " +
       "English pub, brass beer taps and warm lights blurred behind.",
   ),
+  // ciekawostka w pijanym finale (src/lib/pijany.ts, CIEKAWOSTKA_PIJANA), na telefonach
+  "pijany-kalsarikannit": {
+    ...zdjecie(
+      "",
+      "A cosy Finnish living room at night seen from the sofa: a pair of feet in thick wool socks resting on a low " +
+        "coffee table next to an open can and a glass of lager, a bowl of crisps, a TV glowing softly in the dark, " +
+        "a pair of boxer shorts tossed on the sofa armrest. Warm lamp light, snowy window behind, relaxed and funny mood.",
+      // tylko stopy w skarpetach, bez twarzy (domyślne style mają „no people”)
+      "Cinematic photograph, warm natural light, rich detail, no text, no letters, no labels, no logos, no faces.",
+    ),
+    plik: "pijany/kalsarikannit.webp",
+  },
   "pyt-tripel": zdjecie(
     "tripel.webp",
     "A Belgian tripel, hazy deep golden strong ale with a thick white foam head, in a stemmed Belgian tulip glass on " +

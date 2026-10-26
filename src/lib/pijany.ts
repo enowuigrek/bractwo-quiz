@@ -145,3 +145,18 @@ export function startZegaraPijanego(stan: { kod: string; faza_od: string | null 
   if (!koniec || !stan.faza_od) return 0;
   return Math.max(0, Math.ceil((koniec - Date.parse(stan.faza_od)) / 1000));
 }
+
+/**
+ * Ciekawostka w środku dogrywki (26.10, pomysł Łukasza): „z czapy”, ale prawdziwa, z grafiką i dłuższym tekstem,
+ * który faluje razem z ekranem. Na telefonie po `po` pytaniach, dalej przyciskiem. Grafika z ChatGPT
+ * (prompt w `scripts/grafiki.mjs`, `pijany-kalsarikannit`); bez pliku plansza jest bez obrazka.
+ */
+export const CIEKAWOSTKA_PIJANA = {
+  po: 3,
+  tytul: "Kalsarikännit",
+  tekst:
+    "Finowie mają osobne słowo na picie w domu, w samych gaciach, bez zamiaru wychodzenia gdziekolwiek: kalsarikännit. " +
+    "Fińskie MSZ zrobiło nawet dla niego oficjalną emotkę, obok sauny i heavy metalu. " +
+    "Uczony termin dla zjawiska, które znasz z każdego piątku.",
+  grafika: "/grafiki/pijany/kalsarikannit.webp",
+} as const;

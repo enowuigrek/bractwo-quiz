@@ -2793,6 +2793,15 @@ html:has(.kolumna) {
   }
 }
 
+/* ciekawostka w pijanym finale ([kod]/pijany.tsx): faluje razem z ekranem, „Dalej” na dole */
+.pijana-ciekawostka p:not(.nadtytul) {
+  line-height: 1.55;
+}
+
+.pijana-ciekawostka .przycisk {
+  margin-top: 8px;
+}
+
 /* Pijany finał na telefonie ([kod]/pijany.tsx): cały ekran faluje tym mocniej, im dalej (--poziom 0..1),
    a każde pytanie ma swój przeszkadzacz (.efekt-*). Same transformacje i filtry, bez clip-path. */
 .pijany {

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Werble } from "@/components/werble";
 import type { StanSesji } from "@/lib/gra/typy";
 import {
+  CIEKAWOSTKA_PIJANA,
   czasReakcjiPijanej,
   efektNaPozycji,
   GASNIECIE_S,
@@ -36,6 +37,9 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
   const [pytania, ustawPytania] = useState<PijanePytanie[] | null>(null);
   const [nr, ustawNr] = useState(0);
   const [reakcja, ustawReakcja] = useState<Reakcja | null>(null);
+  // ciekawostka po `CIEKAWOSTKA_PIJANA.po` pytaniach, raz (dalej przyciskiem)
+  const [poCiekawostce, ustawPoCiekawostce] = useState(false);
+  const [bezGrafiki, ustawBezGrafiki] = useState(false);
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   // numeracja ciągnie się dalej po serii: 15, 16…
@@ -55,6 +59,7 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
 
   // bez powtórek: kto przejdzie całą pulę, czeka z samym paskiem jak po końcu prawdziwej serii
   const p = pytania?.[nr] ?? null;
+  const ciekawostka = !!p && nr === CIEKAWOSTKA_PIJANA.po && !poCiekawostce && !reakcja;
   // przeszkadzacz według pozycji w dogrywce, nie według pytania: zawsze narasta tak samo
   const efekt = efektNaPozycji(nr);
   const poziom = Math.min(1, Math.max(0, (teraz - od) / Math.max(1, do_ - od)));
@@ -131,6 +136,25 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
         {!p ? (
           // chwila ładowania albo koniec puli: sam pasek, bez napisu, który zdradzałby dogrywkę
           pasek
+        ) : ciekawostka ? (
+          // ciekawostka „z czapy”: grafika i dłuższy tekst falują razem z ekranem (26.10)
+          <div key="ciekawostka" className="pijana-ciekawostka">
+            <p className="nadtytul">Ciekawostka</p>
+            <h2 className="gra-pytanie">{CIEKAWOSTKA_PIJANA.tytul}</h2>
+            {!bezGrafiki && (
+              // eslint-disable-next-line @next/next/no-img-element -- grafika z /public
+              <img
+                src={CIEKAWOSTKA_PIJANA.grafika}
+                alt=""
+                className="gra-grafika"
+                onError={() => ustawBezGrafiki(true)}
+              />
+            )}
+            <p>{CIEKAWOSTKA_PIJANA.tekst}</p>
+            <button type="button" className="przycisk zloty" onClick={() => ustawPoCiekawostce(true)}>
+              Dalej
+            </button>
+          </div>
         ) : (
           <div key={nr}>
             <p className="etykieta gra-pasek">
