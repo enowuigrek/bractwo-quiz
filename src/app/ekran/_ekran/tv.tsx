@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- loga i grafiki z bucketu Supabase albo z /public */
 
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import {
   fazaTeraz,
   komunikatBledu,
@@ -37,6 +37,7 @@ import { TloLokalu, TloTv } from "./tlo";
 import { WyscigTv } from "./wyscig";
 import { quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { StartTv } from "./start";
+import { wczytajWideoWybuchu } from "./wideo-wybuchu";
 import { EkranLogo } from "./ekran-logo";
 import { PodiumTv, RankingTv } from "./ranking";
 import { NickiPoczekalni } from "./nicki";
@@ -155,6 +156,11 @@ export function Tv({ kod, qr, host }: Props) {
   useKoniecPytania(kod, stan, teraz);
   // automatyczne prowadzenie i boty także stąd: pilot w tle prawie stoi
   useAutoZTv(kod, stan);
+  // pijany finał: wideo wybuchu szklanki pobiera się już w finale serią, żeby na końcu ruszyło od razu
+  const wczytajWybuch = !!stan?.pijany_final && (stan.faza === "seria" || stan.faza === "pijany");
+  useEffect(() => {
+    if (wczytajWybuch) void wczytajWideoWybuchu();
+  }, [wczytajWybuch]);
 
   // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację);
   // przy grającej muzyce dopiero po grze, bo po przeładowaniu przeglądarka znów czeka na OK na pilocie

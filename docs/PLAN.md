@@ -246,6 +246,13 @@ Do zaprojektowania razem:
 - Kosz nie opróżnia się sam.
 - **Sprawdzone lokalnie:** do kosza, przywróć, znów do kosza, usuń na dobre (wiersz zniknął z bazy).
 
+### Pijany finał na OLED: pewny wybuch, muzyka bez przerywania (26.10) ✅
+
+- **Szklanka nie wybuchała** na Samsungu (test Łukasza: szklanka tylko lekko urosła). Wideo (2,4 MB) wchodziło na scenę 7,5 s przed końcem i miało ruszyć 4,5 s przed końcem; przy wolniejszym Wi-Fi telewizor nie zdążał go wczytać. Teraz klip pobiera się w tle zwykłym `fetch` już od finału serią (`wideo-wybuchu.ts`, nie dotyka odtwarzaczy, więc nie ucisza muzyki) i wideo dostaje gotowy adres `blob:`. Gdy przeglądarka nie pozwoli grać z dźwiękiem, druga próba bez dźwięku. Gdy klip mimo to nie ruszy, szklanka i tak pęka 0,8 s po zaplanowanym wybuchu (interfejs się rozpada, muzyka urywa).
+- **Muzyka przerywała:** tempo zmieniało się co tyknięcie zegara (4 razy na sekundę), a Samsung przy każdej zmianie `playbackRate` na chwilę gubi dźwięk. Teraz tempo zmienia się najwyżej co 4 s (`ZMIANA_TEMPA_MS`), w krokach 0,01, najwyżej ok. 8% wolniej z lekkim falowaniem w obie strony; bez falowania głośności. Jeśli na TV nadal słychać dziury, zostaje wyłączenie zmian tempa w pijanym finale.
+- **Sprawdzone lokalnie:** klip pobrany w finale serią, w pijanym finale grał z pamięci z dźwiękiem, wybuch w zaplanowanej chwili. Muzyki na Samsungu nie dało się sprawdzić lokalnie.
+- **OLED / wygaszacz:** bez zmian (Łukasz klika OK na pilocie TV, klik niczego nie zmienia na ekranie).
+
 ## Ustalenia
 
 | Temat | Decyzja |

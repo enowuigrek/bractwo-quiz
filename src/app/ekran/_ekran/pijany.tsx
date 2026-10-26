@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import { ogloszWybuch, useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
 import type { StanSesji } from "@/lib/gra/typy";
-import { GASNIECIE_S, WIDEO_WYLEWANIA, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { GASNIECIE_S, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { useWideoWybuchu } from "./wideo-wybuchu";
 import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
@@ -63,7 +64,10 @@ export function PijanyTv({
   const awatar = awatarNaDrogach(lista);
 
   // wybuch w wideo pękającej szklanki: interfejs się rozpada (niżej przy wideo)
-  const [wybuch, ustawWybuch] = useState(false);
+  const [wybuchKlipu, ustawWybuchKlipu] = useState(false);
+  // zapas: gdy klip nie ruszył (sieć, odmowa), szklanka i tak pęka chwilę po zaplanowanym wybuchu
+  const czasWybuchu = do_ - WYBUCH_PRZED_S * 1000;
+  const wybuch = wybuchKlipu || (teraz >= czasWybuchu + 800 && teraz < do_);
 
   // pętla klatek czyta zawsze najnowsze dane, a nie startuje od nowa przy każdym odświeżeniu stanu
   const dane = useRef({ gracze, od, do_, przesuniecie, wybuch });
@@ -169,7 +173,8 @@ export function PijanyTv({
   // Koniec dogrywki: ostatnie sekundy to wideo pękającej szklanki (pierwsza klatka = ta szklanka w tym samym
   // miejscu sceny). Wideo leży na całej scenie 1920×1080 (portal do `.scena`, bo tu wszystko się przesuwa),
   // czeka zatrzymane na pierwszej klatce i rusza tak, żeby skończyć się z werblami (src/lib/pijany.ts). Nasza szklanka
-  // pęka sama z wybuchem w klipie (tv.css): bez pliku albo bez zgody przeglądarki na odtwarzanie zostaje jak była.
+  // pęka sama z wybuchem w klipie (tv.css), a gdy klip nie ruszy, chwilę później i tak (zapas niżej). Plik jest
+  // pobierany z wyprzedzeniem (wideo-wybuchu.ts).
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
   // `widac`: wideo już gra (pokazujemy je), `gra`: klip przewinął pierwsze klatki, więc chowamy drogi i tło pod nim
@@ -189,9 +194,23 @@ export function PijanyTv({
   useEffect(() => {
     if (wideo.current) wideo.current.muted = !dzwiek;
   }, [dzwiek, scena, wideoNaScenie]);
+  // start klipu; gdy przeglądarka nie pozwoli grać z dźwiękiem, druga próba bez dźwięku (obraz jest ważniejszy)
   useEffect(() => {
-    if (czasWylewania) void wideo.current?.play().catch(() => undefined);
+    const v = wideo.current;
+    if (!czasWylewania || !v) return;
+    void v
+      .play()
+      .catch(() => {
+        v.muted = true;
+        return v.play();
+      })
+      .catch(() => undefined);
   }, [czasWylewania, scena, wideoNaScenie]);
+  // wybuch (z klipu albo zapasowy) urywa muzykę TV (muzyka.tsx)
+  useEffect(() => {
+    if (wybuch) ogloszWybuch();
+  }, [wybuch]);
+  const adresWideo = useWideoWybuchu();
 
   return (
     <div
@@ -207,17 +226,14 @@ export function PijanyTv({
           <video
             ref={wideo}
             className={`pijany-wideo${widac ? " gra" : ""}${splywa ? " splywa" : ""}`}
-            src={WIDEO_WYLEWANIA}
+            src={adresWideo}
             muted
             playsInline
             preload="auto"
             onPlaying={() => ustawWidac(true)}
             onTimeUpdate={(e) => {
               if (!gra && e.currentTarget.currentTime >= 0.2) ustawGra(true);
-              if (!wybuch && e.currentTarget.currentTime >= WYBUCH_S) {
-                ustawWybuch(true);
-                ogloszWybuch();
-              }
+              if (!wybuchKlipu && e.currentTarget.currentTime >= WYBUCH_S) ustawWybuchKlipu(true);
               const v = e.currentTarget;
               if (!splywa && v.duration && v.duration - v.currentTime <= 1.3) ustawSplywa(true);
             }}

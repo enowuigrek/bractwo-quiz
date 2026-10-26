@@ -26,6 +26,8 @@ const UTWORY = {
 type Utwor = keyof typeof UTWORY;
 
 const GLOSNOSC = 0.55;
+/** Pijany finał: tempo muzyki zmienia się najwyżej co tyle ms (każda zmiana to na Samsungu krótka dziura w dźwięku). */
+const ZMIANA_TEMPA_MS = 4000;
 /** Stary utwór cichnie przy zmianie tyle ms. Nowy wchodzi od razu na pełną głośność: utwory mają własne wstępy. */
 const PRZENIKANIE_MS = 1500;
 /**
@@ -133,8 +135,8 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
  * Muzyka na TV, gdy jest włączona (`sesje.muzyka`, domyślnie tak; pilot może wyłączyć). Dwa stałe odtwarzacze
  * na zmianę: zmiana utworu i powrót pętli to przenikanie z jednego na drugi, więc nie ma dziury na końcu pliku.
  * Stałe, bo Safari pozwala grać tylko elementom, które raz zagrały po geście; nowy element zostałby zablokowany.
- * W pijanym finale muzyka coraz bardziej się psuje: zwalnia i obniża się jak rozciągana taśma
- * (`preservesPitch = false`) i faluje głośnością (bez dziur), a urywa się razem z gaśnięciem telefonów
+ * W pijanym finale muzyka subtelnie zwalnia i przyspiesza jak rozciągana taśma (`preservesPitch = false`, rzadkie
+ * małe zmiany tempa, bez falowania głośności), a urywa się razem z gaśnięciem telefonów
  * (`GASNIECIE_S` przed końcem), żeby przed wybuchem szklanki była chwila ciszy; `naWybuch` to zapas na wypadek,
  * gdyby zegar TV się spóźniał. Bez przewijania (`currentTime`): telewizor po takim skoku potrafił ucichnąć.
  * Przeglądarka nie zagra bez gestu, więc gdy w poczekalni długo jest cicho, na dole jest prośba o OK na pilocie TV.
@@ -359,14 +361,18 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     [],
   );
 
-  // pijany finał: rozciągana taśma i falująca głośność, coraz mocniej (co tyknięcie zegara)
+  // pijany finał: muzyka subtelnie zwalnia i przyspiesza jak rozciągana taśma. Tempo zmienia się rzadko i małymi
+  // krokami (26.10): Samsung przy każdej zmianie `playbackRate` na chwilę gubi dźwięk, a zmiana co tyknięcie zegara
+  // (4 razy na sekundę) brzmiała jak przerywanie
   const pijany = stan.faza === "pijany" && cel === "final";
+  const tempo = useRef({ czas: 0, wartosc: 1 });
   useEffect(() => {
     const w = strona();
     const a = w.aktywny;
     if (!a) return;
     if (!pijany) {
-      a.playbackRate = 1;
+      if (a.playbackRate !== 1) a.playbackRate = 1;
+      tempo.current = { czas: 0, wartosc: 1 };
       return;
     }
     if (w.grany !== "final" || a.paused || w.zatrzymana || !stan.faza_od || !stan.faza_do) return;
@@ -381,9 +387,12 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     const poziom = Math.min(1, Math.max(0, (teraz - od) / Math.max(1, do_ - od)));
     // pierwsza połowa dogrywki gra czysto (jak dalsza seria), psucie rośnie dopiero od połowy
     const psucie = Math.max(0, (poziom - 0.5) / 0.5);
-    a.playbackRate = Math.max(0.5, 1 - 0.3 * psucie + 0.05 * psucie * Math.sin(teraz / 700));
-    // głośność faluje, ale bez dziur (25.10, Łukasz: przerywanie brzmiało jak zepsuty sprzęt, a ma być pijany)
-    a.volume = GLOSNOSC * (1 - 0.3 * psucie * (0.5 + 0.5 * Math.sin(teraz / 900)));
+    // najwyżej ok. 8% wolniej, z lekkim falowaniem w obie strony; nowe tempo co `ZMIANA_TEMPA_MS` i w krokach 0,01
+    const docelowe = 1 - 0.06 * psucie + 0.03 * psucie * Math.sin(teraz / 4000);
+    const nowe = Math.round(docelowe * 100) / 100;
+    if (teraz - tempo.current.czas < ZMIANA_TEMPA_MS || nowe === tempo.current.wartosc) return;
+    tempo.current = { czas: teraz, wartosc: nowe };
+    a.playbackRate = nowe;
   }, [pijany, teraz, stan.faza_od, stan.faza_do]);
 
   if (!cel || stan.faza !== "poczekalnia" || cichoOd === null || !prosba) return null;
