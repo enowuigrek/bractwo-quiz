@@ -1757,6 +1757,9 @@
 
 .tv-koniec .tv-stopien .tv-stopien-blok {
   position: relative;
+  /* cyfra na środku stopnia (26.10: przyklejona do górnego odstępu stała przy dolnej krawędzi niskiej „3”) */
+  align-items: center;
+  padding-top: 0;
   margin-top: 12px;
   border: 0;
   border-radius: 0;
@@ -1787,18 +1790,19 @@
 }
 
 .tv-koniec .tv-stopien-1 .tv-stopien-blok {
-  height: 180px;
+  /* stopnie wyższe w tych samych proporcjach (26.10: „3” dotykała dolnej krawędzi bloku 90 px) */
+  height: 230px;
   box-shadow:
     0 40px 60px -20px rgba(0, 0, 0, 0.8),
     0 0 70px rgba(227, 172, 63, 0.45);
 }
 
 .tv-koniec .tv-stopien-2 .tv-stopien-blok {
-  height: 130px;
+  height: 166px;
 }
 
 .tv-koniec .tv-stopien-3 .tv-stopien-blok {
-  height: 90px;
+  height: 115px;
 }
 
 .tv-koniec .tv-stopien-3 .tv-stopien-nr {
