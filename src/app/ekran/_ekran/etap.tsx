@@ -5,7 +5,6 @@ import { motion, MotionConfig } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { napisMnoznika } from "@/lib/etapy";
-import { kolejneOdciecia } from "@/lib/gra/odpadanie";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { IkonaPuchar } from "@/components/ikony";
@@ -54,7 +53,6 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
     return ile === null ? null : `✂ ${ile}`;
   };
   // dalsze odcięcia (bez bieżącego etapu, o nim mówi osobny napis niżej)
-  const dalej = e.finalowy ? [] : kolejneOdciecia(stan, e.nr + 1);
   const wejscie = (i: number) => ({
     initial: { opacity: 0, y: 24 },
     animate: { opacity: 1, y: 0 },
@@ -106,12 +104,14 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               {!e.finalowy && <li>{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} ${e.liczba_pytan % 10 >= 2 && e.liczba_pytan % 10 <= 4 && (e.liczba_pytan % 100 < 12 || e.liczba_pytan % 100 > 14) ? "pytania" : "pytań"}`}</li>}
             </motion.ul>
             {/* odpadanie: walka o finał (trójka) albo próg po etapie z `etap.przechodzi` (src/app/pilot/[kod]/progi.tsx) */}
-            {e.final_po_etapie ? (
+            {/* tylko gdy ktoś naprawdę odpada (26.10: przy 2–3 graczach nic) */}
+            {e.final_po_etapie && stan.w_grze > 3 ? (
               <motion.p className="tv-etap-walka" {...wejscie(4)}>
-                <IkonaPuchar /> Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału
-                {stan.w_grze > 3 ? `, ${stan.w_grze - 3} odpada i kibicuje` : ""}.
+                <IkonaPuchar /> Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału,{" "}
+                {stan.w_grze - 3} odpada i kibicuje.
               </motion.p>
             ) : (
+              !e.final_po_etapie &&
               e.przechodzi !== null &&
               stan.w_grze > e.przechodzi && (
                 <motion.p className="tv-etap-walka" {...wejscie(4)}>
@@ -120,12 +120,8 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
                 </motion.p>
               )
             )}
-            {/* etap bez odcięcia, ale dalej się odpada: gracze wiedzą od początku, o co grają */}
-            {!e.final_po_etapie && e.przechodzi === null && dalej.length > 0 && (
-              <motion.p className="tv-etap-plan" {...wejscie(4)}>
-                Po drodze odpada się: {dalej.join(", ")}. Odpadnięci kibicują.
-              </motion.p>
-            )}
+            {/* bez zapowiedzi „po drodze odpada się” w etapach bez odcięcia (26.10): o odpadaniu mówi etap, w którym się
+                odpada */}
             {stan.finalisci && (
               <motion.div className="tv-etap-final" {...wejscie(4)}>
                 <p className="tv-etykieta">W finale grają</p>

@@ -424,7 +424,8 @@
 
 /* 25.10: nad tytułem mniej, a więcej między opisem a drogą etapów z ikonami (ikony prawie dotykały tekstu) */
 .tv-wstep > .tv-okazja {
-  margin-top: 0;
+  /* odstęp od logo lokalu w nagłówku (26.10: logo prawie dotykało tytułu quizu) */
+  margin-top: 28px;
 }
 
 /* 26.10 (OLED Łukasza): tytuł i opis mniejsze, żeby ikony etapów miały oddech */

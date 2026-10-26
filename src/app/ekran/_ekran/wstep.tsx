@@ -37,7 +37,9 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
         </motion.h1>
         <motion.p className="tv-wstep-opis" {...wejscie(2)}>
           Przed nami {plan.length} {plan.length >= 5 ? "etapów" : "etapy"}. Z każdym pytaniem nalewa się piwo, a wy
-          ścigacie się do niego. Po drodze odpadają najsłabsi, a o piwo walczy finałowa trójka.
+          ścigacie się do niego.
+          {/* o odpadaniu tylko, gdy ktoś odpadnie (przy 2–3 graczach wszyscy grają w finale) */}
+          {stan.w_grze > 3 ? " Po drodze odpadają najsłabsi, a o piwo walczy finałowa trójka." : " Na końcu finał o piwo."}
         </motion.p>
 
         <ol className="tv-wstep-droga">

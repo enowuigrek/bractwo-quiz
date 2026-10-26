@@ -98,7 +98,8 @@ async function rysujLoga(ctx: CanvasRenderingContext2D, d: Wspolne, szer: number
     elementy.push({ img: null, w: wys * 0.3, tekst: "×" });
     elementy.push(browar ? { img: browar, w: wys } : { img: null, w: wys * 2, tekst: d.browar.nazwa });
   }
-  const odstep = 44;
+  // loga z wyraźnym oddechem (26.10: lokal i Bractwo prawie się stykały)
+  const odstep = 90;
   const calosc = elementy.reduce((s, e) => s + e.w, 0) + odstep * (elementy.length - 1);
   let x = (szer - calosc) / 2;
   for (const e of elementy) {

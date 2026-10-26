@@ -10,26 +10,6 @@ export function odciecieEtapu(stan: StanSesji): number | null {
 }
 
 /**
- * Kolejne odcięcia od etapu `odNr` (włącznie), np. ["po 3. etapie zostaje 6", "do finału wchodzi 3 najlepszych"].
- * Puste, gdy nikt już nie odpada (albo quiz nie ma finału trójki).
- */
-export function kolejneOdciecia(stan: StanSesji, odNr: number): string[] {
-  const plan = stan.plan_etapow ?? [];
-  const final = plan.find((e) => e.finalowy);
-  const wynik: string[] = [];
-  for (const e of plan) {
-    if (e.nr < odNr || e.finalowy) continue;
-    // tylko odcięcia, które kogoś wyrzucą przy obecnej liczbie grających
-    if (final && e.nr === final.nr - 1) {
-      if (stan.w_grze > 3) wynik.push("do finału wchodzi 3 najlepszych");
-    } else if (e.przechodzi !== null && stan.w_grze > e.przechodzi) {
-      wynik.push(`po ${e.nr}. etapie zostaje ${e.przechodzi}`);
-    }
-  }
-  return wynik;
-}
-
-/**
  * Ruch względem kreski w rankingu etapu z odcięciem: `awans` (był pod kreską, teraz nad), `spadek` (odwrotnie),
  * `zagrozony` (dalej pod kreską) albo null (nad kreską, bez zmian, albo etap bez odcięcia).
  */
