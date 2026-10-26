@@ -14,16 +14,20 @@ const linia = {
   "aria-hidden": true,
 } as const;
 
-/** „Na jedno”: pinta (nonic) z pianą. */
+/** „Na jedno”: szklanka shaker z pianą, która spływa po szkle, i bąbelkami. */
 function Pinta() {
   return (
     <svg {...linia}>
-      <path d="M19 9h26l-1.5 9 1.5 3.5-3.6 32.2a3 3 0 0 1-3 2.7H25.6a3 3 0 0 1-3-2.7L19 21.5l1.5-3.5z" />
-      <path d="M20.6 18h22.8" />
-      <path d="M24 9c0-3 3-4 5-2.6C30 4 34 4 35.4 6.4 37.6 5 41 6.4 40 9" />
-      <circle cx="29" cy="32" r="1.2" />
-      <circle cx="35" cy="40" r="1.2" />
-      <circle cx="30.5" cy="46" r="1.2" />
+      <path d="M16.5 16l4.5 39.5a2.5 2.5 0 0 0 2.5 2h17a2.5 2.5 0 0 0 2.5-2l4.5-39.5" />
+      <path d="M20.5 51h23" />
+      <path
+        d="M15 16c-4 0-4-7 1-6 0-5 7-6 10-3 2-4 10-4 12 0 3-3 9-1 9 3 5 0 5 6 2 6h-6v4a2.5 2.5 0 0 1-5 0v-4H27v7a3 3 0 0 1-6 0v-7z"
+        fill="currentColor"
+        fillOpacity={0.2}
+      />
+      <circle cx="33" cy="30" r="1" />
+      <circle cx="29" cy="38" r="1.3" />
+      <circle cx="35" cy="45" r="1.6" />
     </svg>
   );
 }
