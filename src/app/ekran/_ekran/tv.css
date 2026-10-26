@@ -402,16 +402,17 @@
   margin-top: 0;
 }
 
+/* 26.10 (OLED Łukasza): tytuł i opis mniejsze, żeby ikony etapów miały oddech */
 .tv .tv-wstep-tytul {
   margin: 6px 0 16px;
-  font-size: 128px;
+  font-size: 104px;
   line-height: 1;
 }
 
 .tv-wstep-opis {
   margin: 0;
-  max-width: 1450px;
-  font-size: 44px;
+  max-width: 1300px;
+  font-size: 36px;
   line-height: 1.5;
   color: var(--piana);
 }
@@ -420,9 +421,8 @@
   list-style: none;
   /* odstęp od opisu nawet przy długim tekście (25.10: ikony prawie dotykały tekstu) */
   margin: auto 0 40px;
-  padding-top: 56px;
   flex-shrink: 0;
-  padding: 0;
+  padding: 56px 0 0;
   display: flex;
   align-items: flex-start;
   gap: 18px;

@@ -482,6 +482,7 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
   - Pilot: ramka stanu ma dwa wiersze: licznik, a pod nim postęp („Pytanie 4/10”, w wyścigu „Etap 2/5 · 14/59”, przed startem liczba pytań) i po prawej rodzaj następnego pytania jako kolorowa pastylka (`.rodzaj-pytania` w `globals.css`: jedna odpowiedź złota, kilka niebieska, prawda/fałsz zielona, szacowanie fioletowa, kolejność czerwona, pary turkusowa, ciekawostka szara) albo krótko czas („Zostało 12 s”, „Start za 3 s”). Gracze w poczekalni zwijani (domyślnie rozwinięci), bez tekstu o QR, ✕ i zdjęciach.
   - Plansza „Zaczynamy!”: „Gra 1 osoba”, „Grają 2–4 osoby”, „Gra 5 osób” (`grajaOsoby` w `start.tsx`).
   - Pilot: przełączniki muzyki i automatu jako okrągłe przyciski z samą ikoną (`.pilot-ikona`, złote = włączone, nazwa w `title` i `aria-label`) w jednym wierszu z lokalem i fazą; w wyścigu oba mieszczą się obok siebie.
+  - Plansza wstępu wyścigu na TV: tytuł 104 px (było 128), opis 36 px (było 44), a odstęp 56 px nad drogą etapów wreszcie działa (`padding-top` był nadpisywany przez `padding: 0`), więc ikony etapów mają oddech.
 ### Dzień 1
 
 - **Next.js 16.4** (Turbopack). `cacheComponents` wyłączone: panel i tak jest dynamiczny, a gra działa po stronie klienta na Realtime. Middleware nazywa się teraz `proxy` (`src/proxy.ts`).
