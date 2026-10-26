@@ -1679,7 +1679,18 @@
 }
 
 .tv-koniec .tv-podium {
-  margin-top: 8px;
+  margin-top: 56px;
+}
+
+/* koniec gry niżej (27.10, Łukasz: zwycięzca prawie przy górnej krawędzi, a pod podziękowaniem pusto): podium
+   z odstępem od góry, a ekran końca (podium i tabela) schodzi w dolny margines sceny, więc podziękowanie stoi niżej */
+.tv-ekran > .tv-koniec {
+  margin-bottom: -48px;
+}
+
+/* tabela i tak sięga do dołu: tylko o połowę, żeby podziękowanie nie stało przy samej krawędzi */
+.tv-ekran > .tv-koniec-tabela {
+  margin-bottom: -24px;
 }
 
 /* tytuł quizu pod podium (okazja · tytuł · lokal) */

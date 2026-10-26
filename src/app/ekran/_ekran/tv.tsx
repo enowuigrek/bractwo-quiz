@@ -728,7 +728,7 @@ function KoniecNaZmiane({
   return (
     <div key={nr} className="tv-ekran">
       {tabela ? (
-        <div className="tv-koniec">
+        <div className="tv-koniec tv-koniec-tabela">
           <TabelaTv stan={stan} ranking={ranking} />
           {dziekujemy && <p className="tv-dziekujemy">Dziękujemy za grę! Piwu Cześć!</p>}
         </div>
