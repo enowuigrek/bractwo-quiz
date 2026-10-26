@@ -8,6 +8,7 @@ import {
   efektNaPozycji,
   GASNIECIE_S,
   KOMENTARZE_OGOLNE,
+  startZegaraPijanego,
   zegarPijany,
   type PijanePytanie,
 } from "@/lib/pijany";
@@ -93,7 +94,7 @@ export function PijanyFinal({ stan, teraz }: { stan: StanSesji; teraz: number })
 
   // jak w serii: pasek i sekundy, tylko zegar wariuje jak na TV (w górę, w kółko, znika) i pasek razem z nim
   const calosc = Math.max(1, (do_ - od) / 1000);
-  const zegar = zegarPijany((teraz - od) / 1000, calosc);
+  const zegar = zegarPijany((teraz - od) / 1000, calosc, startZegaraPijanego(stan));
   const pasek = (
     <div className="gra-czas" aria-hidden>
       <div style={{ transform: `scaleX(${Math.min(1, (zegar ?? 0) / calosc)})` }} />

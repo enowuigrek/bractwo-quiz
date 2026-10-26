@@ -3,8 +3,8 @@
 import { motion } from "motion/react";
 import { Awatar } from "@/components/awatar";
 
-// Plansza finału: równe drewniane drogi z lewej, równoległe (od 26.10; wcześniej zbiegały się pod szklanką),
-// a szklanka po prawej na środku wysokości.
+// Plansza finału: równe drewniane drogi z lewej, równoległe i blisko siebie (od 26.10; wcześniej zbiegały się
+// pod szklanką), a szklanka po prawej na środku wysokości, na wprost dróg.
 // Wspólna dla serii na żywo (seria.tsx), rankingu po finale (wyscig.tsx) i pijanego finału (pijany.tsx).
 // Piksele planszy 1760×780.
 
@@ -17,10 +17,14 @@ const START_X = 130;
 
 export type Droga = { od: { x: number; y: number }; do: { x: number; y: number }; grubosc: number };
 
-/** `n` równoległych dróg tej samej długości, rozłożonych na wysokości wokół szklanki (łatwiej porównać wyścig). */
+/**
+ * `n` równoległych dróg tej samej długości, blisko siebie (przerwa tylko na awatar z nickiem), żeby wszystkie
+ * prowadziły w szklankę (26.10, Łukasz: skrajne mijały ją z góry i z dołu). Trzy drogi zajmują 300 px, mniej niż
+ * wysokość szklanki. Przy wielu graczach węższe, najwyżej na 560 px.
+ */
 export function drogi(n: number): Droga[] {
   const grubosc = Math.min(96, Math.floor(560 / Math.max(1, n)));
-  const zakres = Math.min(560, n * 190);
+  const zakres = Math.min(560, (n - 1) * (grubosc + 54));
   return Array.from({ length: n }, (_, i) => {
     const y = SZKLANKA_FINALU.y - zakres / 2 + (n === 1 ? 0.5 : i / (n - 1)) * zakres;
     return { od: { x: START_X, y }, do: { x: KONIEC_X, y }, grubosc };

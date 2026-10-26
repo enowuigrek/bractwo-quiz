@@ -124,11 +124,12 @@ export function NaglowekSerii({
         </p>
       ) : (
         <p
-          className={`tv-zegar${zostalo <= 10 ? " malo" : ""}`}
+          className={`tv-zegar${zegar === undefined && zostalo <= 10 ? " malo" : ""}`}
           // znikający zegar trzyma miejsce, żeby nagłówek nie skakał
           style={zegar === null ? { visibility: "hidden" } : undefined}
         >
-          {zostalo > 0 ? zostalo : "Koniec!"}
+          {/* przed pijanym finałem bez „Koniec!”: zegar staje na 0 i stamtąd w pijanym leci w górę */}
+          {zostalo > 0 || zegar !== undefined || stan.pijany_final ? zostalo : "Koniec!"}
         </p>
       )}
     </header>

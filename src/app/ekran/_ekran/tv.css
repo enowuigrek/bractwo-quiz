@@ -3534,26 +3534,10 @@
 /* Pijany finał na TV (pijany.tsx, od 26.10 subtelnie): nagłówek się kołysze, plansza z drogami buja się
    (transform z pętli klatek), awatary lekko się chwieją. Wszystko rośnie z --poziom (0..1 przez całą fazę).
    Na koniec wybuch: szklanka pęka, nagłówek, awatary i drogi odlatują. Same transformacje, bez clip-path (Samsung). */
+/* wejście w tryb bez żadnego podskoku ani drżenia (26.10, Łukasz): seria przechodzi w pijany finał niezauważenie,
+   a wszystko rozkręca się od zera z --poziom */
 .tv-pijany {
   --poziom: 0;
-  /* bez mrugania ekranu na wejściu (25.10, Łukasz: miganie to bardziej psucie niż pijaństwo) */
-  animation: czkawka-tv 0.8s ease-out both;
-}
-
-/* wejście w tryb: ekran podskakuje jak po czkawce */
-@keyframes czkawka-tv {
-  0% {
-    translate: 0 -18px;
-  }
-  25% {
-    translate: 0 12px;
-  }
-  50% {
-    translate: 0 -6px;
-  }
-  100% {
-    translate: 0 0;
-  }
 }
 
 /* cały nagłówek kołysze się i delikatnie traci ostrość, od zera do końca fazy */
@@ -3721,10 +3705,10 @@
 
 @keyframes chwianie-pijane {
   from {
-    rotate: calc(var(--poziom) * -7deg - 2deg);
+    rotate: calc(var(--poziom) * -9deg);
   }
   to {
-    rotate: calc(var(--poziom) * 7deg + 2deg);
+    rotate: calc(var(--poziom) * 9deg);
   }
 }
 

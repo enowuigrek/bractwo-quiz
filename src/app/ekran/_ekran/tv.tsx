@@ -26,6 +26,7 @@ import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
 import { SeriaTv } from "./seria";
 import { PijanyTv, type GraczPijany } from "./pijany";
+import { zapamietajKoniecSerii } from "@/lib/pijany";
 import { useAutoZTv } from "./auto";
 import { EfektyTv } from "./efekty";
 import { MuzykaTv } from "./muzyka";
@@ -38,6 +39,7 @@ import { WyscigTv } from "./wyscig";
 import { quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { StartTv } from "./start";
 import { wczytajWideoWybuchu } from "./wideo-wybuchu";
+import { wczytajKlatkiWybuchu } from "./klatki-wybuchu";
 import { wczytajMuzykePijana } from "@/lib/gra/muzyka-pijana";
 import { czyTelewizor } from "@/lib/gra/telewizor";
 import { EkranLogo } from "./ekran-logo";
@@ -129,6 +131,7 @@ export function Tv({ kod, qr, host }: Props) {
   const pobierz = useCallback(async () => {
     try {
       const { stan, przesuniecie } = await pobierzStan(kod);
+      zapamietajKoniecSerii(stan);
       // lista nicków w poczekalni, a w pijanym finale bez finału trójki: kto lata po ekranie
       if (stan.faza === "poczekalnia" || (stan.faza === "pijany" && !stan.finalisci)) {
         const { data, error } = await supabase().rpc("lista_graczy", {
@@ -169,13 +172,14 @@ export function Tv({ kod, qr, host }: Props) {
   useKoniecPytania(kod, stan, teraz);
   // automatyczne prowadzenie i boty także stąd: pilot w tle prawie stoi
   useAutoZTv(kod, stan);
-  // pijany finał: już w finale serią pobiera się utwór finału do kołysania (Web Audio) i, poza telewizorem, wideo
-  // wybuchu szklanki, żeby na końcu ruszyło od razu (na telewizorze wybuch jest bez wideo, pijany.tsx)
+  // pijany finał: już w finale serią pobiera się utwór finału do kołysania (Web Audio) i wybuch szklanki, żeby na
+  // końcu ruszył od razu: na komputerze wideo, na telewizorze jego klatki (pijany.tsx, klatki-wybuchu.ts)
   const wczytajPijany = !!stan?.pijany_final && (stan.faza === "seria" || stan.faza === "pijany");
   useEffect(() => {
     if (!wczytajPijany) return;
     wczytajMuzykePijana();
-    if (!czyTelewizor()) void wczytajWideoWybuchu();
+    if (czyTelewizor()) void wczytajKlatkiWybuchu();
+    else void wczytajWideoWybuchu();
   }, [wczytajPijany]);
 
   // nowe wdrożenie: przeładowanie poza pytaniem, serią i odsłoną (tam przerwałoby odliczanie albo animację);

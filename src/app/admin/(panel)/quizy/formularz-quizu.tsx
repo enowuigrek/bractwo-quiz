@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { SZABLONY_ETAPOW, SZABLONY_QUIZU, napisMnoznika } from "@/lib/etapy";
 import type { RodzajQuizu } from "@/lib/tagi";
 import type { StanFormularza } from "@/lib/typy";
@@ -11,36 +11,21 @@ import { utworzQuiz } from "./akcje";
 import { LIMITY, liczbaPytan } from "./limity";
 
 /**
- * Nowy quiz: najpierw szablon, potem tytuł i opis. „Wyścig po piwo” ma stały zestaw konkurencji (kreator ich nie
- * zmienia), klasyczny pub quiz to same pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
+ * Nowy quiz w rodzaju z zakładki listy quizów (26.10, Łukasz: bez przełączania rodzaju w formularzu), potem tytuł
+ * i opis. „Wyścig po piwo” ma stały zestaw konkurencji (kreator ich nie zmienia), klasyczny pub quiz to same
+ * pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
  */
 export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: RodzajQuizu }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(utworzQuiz, {});
-  // rodzaj z zakładki listy quizów (klucze szablonów to rodzaje)
-  const [szablon, ustawSzablon] = useState<string>(rodzaj);
-  const etapy = SZABLONY_QUIZU.find((s) => s.klucz === szablon)?.etapy ?? [];
+  // klucze szablonów to rodzaje
+  const szablon = SZABLONY_QUIZU.find((s) => s.klucz === rodzaj);
+  const etapy = szablon?.etapy ?? [];
   const razem = etapy.reduce((s, e) => s + e.pytania, 0);
 
   return (
     <form {...bezResetu(akcja)} className="formularz">
-      <fieldset>
-        <legend>Rodzaj quizu</legend>
-        <div className="szablony-quizu">
-          {SZABLONY_QUIZU.map((s) => (
-            <label key={s.klucz} className={`szablon-quizu${szablon === s.klucz ? " wybrany" : ""}`}>
-              <input
-                type="radio"
-                name="szablon"
-                value={s.klucz}
-                checked={szablon === s.klucz}
-                onChange={() => ustawSzablon(s.klucz)}
-              />
-              <strong>{s.nazwa}</strong>
-              <span>{s.opis}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <input type="hidden" name="szablon" value={rodzaj} />
+      {szablon && <p className="pomocniczy">{szablon.opis}</p>}
 
       {etapy.length > 0 && (
         <fieldset>

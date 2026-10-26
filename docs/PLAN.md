@@ -306,6 +306,14 @@ Do zaprojektowania razem:
 - **Drogi finału równoległe** (`drogi()` w `drogi.tsx`), także w rankingu po finale i w pijanym finale.
 - **Pijany finał:** plansza i szklanka już się nie bujają (kołysząca się szklanka dublowała się z pierwszą klatką wideo, 26.10 na Edge), każda droga buja się osobno i nieregularnie (dwie fale o różnych okresach, do 2,8°), zawodnik zjeżdża według przechyłu swojej drogi. Klip wybuchu jest przypięty do planszy dróg z przesunięciem `WIDEO_NA_PLANSZY` (80, 199 = miejsce planszy na scenie 16:9 w pijanym finale, zmierzone z pierwszą klatką `docs/wideo/pekniecie-start.png`), więc szklanka klipu trafia w naszą na każdym kształcie ekranu.
 
+### Wybuch z klatek na TV, drogi przy szklance, spokojne wejście, zegar w górę, nowy quiz w rodzaju zakładki (26.10) ✅
+
+- **Wybuch na telewizorze z klatek klipu:** wybuch z CSS wyglądał jak konfetti, a wideo na komputerze wygląda bardzo dobrze. TV rysuje teraz te same klatki na `<canvas>` (Samsung nie pokazuje `<video>` nad treścią): `public/wideo/wybuch/01–58.jpg` (klip od 1,0 do 4,8 s, 15 kl./s, 960×540, razem 1,8 MB, polecenie ffmpeg w `klatki-wybuchu.ts`), wczytywane z wyprzedzeniem w finale serią, numer klatki z zegara serwera, ostatnie 0,6 s gaśnie, huk z pliku. Wybuch z CSS (odłamki) został tylko jako zapas, gdy klatki się nie wczytają. Wczytywanie przez `load`, nie `decode()` (w karcie w tle `decode()` wisiał). Sprawdzone z `?tv` (klasy i płótno), samego obrazu na OLED jeszcze nie.
+- **Drogi blisko siebie:** przerwa tylko na awatar z nickiem (grubość + 54 px), trzy drogi zajmują 300 px, mniej niż wysokość szklanki, więc wszystkie prowadzą w nią (skrajne mijały ją z góry i z dołu).
+- **Wejście w pijany finał bez drżenia:** bez podskoku ekranu („czkawka”), bujanie dróg, zjeżdżanie i chwianie awatarów rosną od zera.
+- **Zegar:** przy pijanym finale seria staje na 0 bez „Koniec!”, a zegar pijanego finału leci w górę od tej samej liczby (`zegarPijany(…, start)`; `start` to sekundy, które zostały w serii, `zapamietajKoniecSerii` / `startZegaraPijanego` w `src/lib/pijany.ts`, po przeładowaniu od 0), potem zakręty i miganie jak dotąd. TV i telefon tak samo.
+- **Nowy quiz w rodzaju zakładki:** „Nowy wyścig po piwo” / „Nowy klasyczny pub quiz” z zakładki listy quizów otwiera formularz bez wyboru rodzaju (opis rodzaju, etapy szablonu przy wyścigu), powrót do tej samej zakładki.
+
 ## Ustalenia
 
 | Temat | Decyzja |

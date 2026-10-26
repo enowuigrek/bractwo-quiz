@@ -26,6 +26,7 @@ import { Gotowy } from "./gotowy";
 import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "@/components/ikony";
 import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
+import { zapamietajKoniecSerii } from "@/lib/pijany";
 import { SeriaGracza } from "./seria";
 import { KoniecGracza } from "./fanfara";
 import { Kibicowanie } from "./kibic";
@@ -75,6 +76,7 @@ export function Gracz({ kod }: { kod: string }) {
   const pobierz = useCallback(async () => {
     try {
       const { stan, przesuniecie } = await pobierzStan(kod);
+      zapamietajKoniecSerii(stan);
       ustawStan(stan);
       ustawPrzesuniecie(przesuniecie);
       ustawBladGry(null);

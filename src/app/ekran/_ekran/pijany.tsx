@@ -7,9 +7,10 @@ import { zagraj } from "@/lib/gra/efekty";
 import { OKRES_KOLYSANIA_S } from "@/lib/gra/muzyka-pijana";
 import { czyTelewizor } from "@/lib/gra/telewizor";
 import type { StanSesji } from "@/lib/gra/typy";
-import { GASNIECIE_S, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { GASNIECIE_S, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, startZegaraPijanego, zegarPijany } from "@/lib/pijany";
 import { DROGA_PRZED_META, KROK_FINALU } from "@/lib/gra/final";
 import { useWideoWybuchu } from "./wideo-wybuchu";
+import { FPS, OD_S, useKlatkiWybuchu } from "./klatki-wybuchu";
 import { awatarNaDrogach, drogi, type Droga, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
@@ -28,10 +29,10 @@ const ODLOT = 1700;
  */
 const WIDEO_NA_PLANSZY = { x: 80, y: 199 };
 /** Zjeżdżanie po drodze (część drogi) na początku i pod koniec fazy. */
-const ZJEZDZANIE = { od: 0.012, do: 0.06 };
+const ZJEZDZANIE = { od: 0, do: 0.06 };
 
 /** Każda droga buja się osobno (stopnie, na początku i pod koniec fazy), we własnym, nieregularnym rytmie. */
-const BUJANIE_DROGI_DEG = { od: 0.6, do: 2.8 };
+const BUJANIE_DROGI_DEG = { od: 0, do: 2.8 };
 /** Pozorowany wyścig: wszyscy zaczynają tam, gdzie skończyła się seria, potem co 3–5 s krok naprzód albo w tył. */
 const PIERWSZY_KROK_S = 4;
 /** Szansa na krok naprzód (reszta to krok w tył), w procentach. */
@@ -128,13 +129,22 @@ export function PijanyTv({
   const awatar = awatarNaDrogach(lista);
   const [telewizor] = useState(czyTelewizor);
 
-  // Wybuch: na komputerze w wideo pękającej szklanki (`WYBUCH_S` klipu), na telewizorze bez wideo dokładnie
-  // `WYBUCH_PRZED_S` przed końcem fazy; na komputerze też bez wideo, gdy klip nie ruszył (sieć, odmowa)
+  // Wybuch: na komputerze w wideo pękającej szklanki (`WYBUCH_S` klipu), na telewizorze z klatek tego klipu na
+  // <canvas> (klatki-wybuchu.ts), dokładnie `WYBUCH_PRZED_S` przed końcem fazy. Bez klatek (nie wczytały się) i na
+  // komputerze, gdy klip nie ruszył (sieć, odmowa), wybuch z samego CSS (odłamki)
   const [wybuchKlipu, ustawWybuchKlipu] = useState(false);
   const czasWybuchu = do_ - WYBUCH_PRZED_S * 1000;
+  const klatki = useKlatkiWybuchu(telewizor);
+  const zKlatek = telewizor && !!klatki;
+  // klatki zaczynają się od `OD_S` klipu, tak żeby wybuch w klipie (`WYBUCH_S`) wypadł w `czasWybuchu`
+  const startKlatek = czasWybuchu - (WYBUCH_S - OD_S) * 1000;
+  const klatkiGraja = zKlatek && teraz >= startKlatek;
+  const wybuchKlatek = zKlatek && teraz >= czasWybuchu;
   // bez górnej granicy: po końcu fazy wybuch trwa, aż przyjdą werble (inaczej nagłówek i drogi wracały na chwilę)
-  const bezWideo = !wybuchKlipu && teraz >= czasWybuchu + (telewizor ? 0 : 800);
-  const wybuch = wybuchKlipu || bezWideo;
+  const bezWideo = !wybuchKlipu && !zKlatek && teraz >= czasWybuchu + (telewizor ? 0 : 800);
+  const wybuch = wybuchKlipu || bezWideo || wybuchKlatek;
+  // huk z pliku (efekty.ts) tam, gdzie nie gra dźwięk wideo
+  const hukZPliku = bezWideo || wybuchKlatek;
 
 
   // pętla klatek czyta zawsze najnowsze dane, a nie startuje od nowa przy każdym odświeżeniu stanu
@@ -238,8 +248,8 @@ export function PijanyTv({
     if (wybuch) ogloszWybuch();
   }, [wybuch]);
   useEffect(() => {
-    if (bezWideo && stan.muzyka) zagraj("wybuch");
-  }, [bezWideo, stan.muzyka]);
+    if (hukZPliku && stan.muzyka) zagraj("wybuch");
+  }, [hukZPliku, stan.muzyka]);
 
   // Wideo pękającej szklanki (tylko komputer): klip 1920×1080 przypięty do planszy dróg (`WIDEO_NA_PLANSZY`), więc
   // jego szklanka leży zawsze na naszej, także na ekranie innym niż 16:9; plansza i szklanka się nie bujają (26.10).
@@ -274,13 +284,13 @@ export function PijanyTv({
 
   return (
     <div
-      className={`tv-wyscig tv-seria tv-pijany${gra && !bezWideo ? " wylewa" : ""}${wybuch ? " wybuch" : ""}${
+      className={`tv-wyscig tv-seria tv-pijany${(gra && !bezWideo) || klatkiGraja ? " wylewa" : ""}${wybuch ? " wybuch" : ""}${
         bezWideo ? " bez-wideo" : ""
       }`}
       style={{ "--poziom": poziom } as React.CSSProperties}
     >
       {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
-      <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000)} />
+      <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000, startZegaraPijanego(stan))} />
 
       <div className="drogi-finalu pijany-plansza" ref={plansza}>
         {wideoNaScenie && !bezWideo && (
@@ -300,6 +310,9 @@ export function PijanyTv({
               if (!splywa && v.duration && v.duration - v.currentTime <= 1.3) ustawSplywa(true);
             }}
           />
+        )}
+        {klatkiGraja && klatki && (
+          <KlatkiWybuchu klatki={klatki} start={startKlatek} przesuniecie={przesuniecie} />
         )}
         <PlanszaDrog lista={lista} szklanka={<Szklanka przed={1} teraz={1} doKonca={0} />} />
         {/* wybuch bez wideo: błysk i rozprysk szkła, piwa i piany z miejsca szklanki */}
@@ -345,5 +358,54 @@ export function PijanyTv({
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * Wybuch na telewizorze: klatki klipu po kolei na <canvas> w miejscu wideo (Samsung nie pokazuje <video> nad
+ * treścią). Numer klatki z zegara serwera, więc po przeładowaniu TV klip jest w tym samym miejscu. Ostatnie 0,6 s
+ * klipu gaśnie.
+ */
+function KlatkiWybuchu({
+  klatki,
+  start,
+  przesuniecie,
+}: {
+  klatki: HTMLImageElement[];
+  start: number;
+  przesuniecie: number;
+}) {
+  const plotno = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = plotno.current?.getContext("2d");
+    if (!c) return;
+    const { width, height } = c.canvas;
+    let ostatnia = -1;
+    let klatka = 0;
+    const rysuj = () => {
+      const i = Math.floor(((Date.now() + przesuniecie - start) / 1000) * FPS);
+      if (i !== ostatnia) {
+        ostatnia = i;
+        c.clearRect(0, 0, width, height);
+        if (i >= 0 && i < klatki.length) {
+          c.globalAlpha = Math.min(1, (klatki.length - i) / (FPS * 0.6));
+          c.drawImage(klatki[i], 0, 0, width, height);
+        }
+      }
+      if (i < klatki.length) klatka = requestAnimationFrame(rysuj);
+    };
+    klatka = requestAnimationFrame(rysuj);
+    return () => cancelAnimationFrame(klatka);
+  }, [klatki, start, przesuniecie]);
+  // płótno w rozmiarze klatek, rozciągnięte CSS-em na całą scenę 16:9 (jak wideo, .pijany-wideo)
+  return (
+    <canvas
+      ref={plotno}
+      width={960}
+      height={540}
+      className="pijany-wideo gra"
+      style={{ left: -WIDEO_NA_PLANSZY.x, top: -WIDEO_NA_PLANSZY.y }}
+      aria-hidden
+    />
   );
 }

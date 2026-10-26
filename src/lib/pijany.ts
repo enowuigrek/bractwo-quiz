@@ -108,19 +108,17 @@ export const WYBUCH_S = 1.5;
 
 /**
  * Sekundy na zegarze w pijanym finale (TV i telefon pokazują to samo, bo liczą z czasu serwera). Zegar
- * coraz bardziej wariuje: najpierw liczy normalnie w dół, potem leci w górę, potem co chwilę zmienia
- * kierunek, a pod koniec miga przypadkowymi liczbami i znika. `null`: w tej sekundzie zegara nie ma.
+ * coraz bardziej wariuje: od chwili, w której stanął w finale serią (`start`, zwykle 0, bo seria kończy się
+ * z czasem), leci w drugą stronę, w górę (26.10, Łukasz: bez „Koniec!” i bez skoku na 60), potem co chwilę
+ * zmienia kierunek, a pod koniec miga przypadkowymi liczbami i znika. `null`: w tej sekundzie zegara nie ma.
  * `minelo` i `calosc` w sekundach (cała dogrywka: `faza_do` − `faza_od`).
  */
-export function zegarPijany(minelo: number, calosc: number): number | null {
+export function zegarPijany(minelo: number, calosc: number, start = 0): number | null {
   const s = Math.max(0, Math.floor(minelo));
-  const [gora, zakrety, miganie] = [0.2, 0.45, 0.75].map((u) => Math.round(u * calosc));
-  if (s < gora) return calosc - s;
-  // w górę od miejsca, w którym przestał liczyć w dół
-  const odGory = calosc - gora;
-  if (s < zakrety) return odGory + (s - gora);
+  const [zakrety, miganie] = [0.45, 0.75].map((u) => Math.round(u * calosc));
+  if (s < zakrety) return start + s;
   // zmiany kierunku: 4 s w dół, 2 s w górę, i tak w kółko (powoli schodzi)
-  const odZakretow = odGory + (zakrety - gora);
+  const odZakretow = start + zakrety;
   if (s < miganie) {
     const k = s - zakrety;
     const r = k % 6;
@@ -128,4 +126,22 @@ export function zegarPijany(minelo: number, calosc: number): number | null {
   }
   // co druga sekunda pusto, w pozostałych liczby z kosmosu
   return s % 2 ? null : (s * 37) % 100;
+}
+
+/** Kiedy miała się skończyć seria finału (ms), dla każdej gry: w pijanym finale baza już tego nie podaje. */
+const koniecSerii = new Map<string, number>();
+
+/** TV i telefon zapamiętują to z każdego stanu serii (`pobierz`), żeby pijany zegar ruszył od tej samej liczby. */
+export function zapamietajKoniecSerii(stan: { kod: string; faza: string; faza_do: string | null }): void {
+  if (stan.faza === "seria" && stan.faza_do) koniecSerii.set(stan.kod, Date.parse(stan.faza_do));
+}
+
+/**
+ * Od ilu sekund pijany zegar leci w górę: tyle zostało w serii, gdy przeszła w pijany finał (zwykle 0). Po
+ * przeładowaniu w trakcie pijanego finału stanu serii już nie ma: wtedy od 0.
+ */
+export function startZegaraPijanego(stan: { kod: string; faza_od: string | null }): number {
+  const koniec = koniecSerii.get(stan.kod);
+  if (!koniec || !stan.faza_od) return 0;
+  return Math.max(0, Math.ceil((koniec - Date.parse(stan.faza_od)) / 1000));
 }
