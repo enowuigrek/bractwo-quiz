@@ -40,10 +40,10 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 
 - **Lista drobnych zmian wizualnych od Łukasza (26.10), do zrobienia po kolei w kolejnej sesji:**
   1. ✅ Pilot: ramka „odpowiedziano” (stoi zawsze, opis niżej).
-  2. Pilot: „uruchomiona gra” i przekazywanie pilota oraz nagłówek w wersji na telefon.
-  3. Osobne panele dla lokali, a w pilocie osobne panele graczy i pytań.
-  4. Oś czasu w wynikach konkurencji „Ile?”.
-  5. Półfinał: odgrodzenie trzech przechodzących od odpadających.
+  2. Pilot: „uruchomiona gra” i przekazywanie pilota oraz nagłówek w wersji na telefon (osobny krok).
+  3. Osobne panele dla lokali, a w pilocie osobne panele graczy i pytań (osobny krok).
+  4. ✅ „Ile?”: oś na dole, gracze nad nią, poprawna odpowiedź pod nagłówkiem (opis niżej).
+  5. ✅ Kreska odpadania z większym odstępem (opis niżej).
 
 **Następny krok:** lista drobnych zmian wizualnych wyżej, potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
 
@@ -318,6 +318,11 @@ Do zaprojektowania razem:
 
 - Ramka nad przyciskami pilota stoi teraz w każdej fazie (wcześniej znikała poza pytaniem i przyciski pod nią skakały; Łukasz: w pilocie przyciski nie mogą zmieniać pozycji). Treść według fazy: poczekalnia — graczy w poczekalni; plansze przy automacie — „Gotowi do dalszej gry x/y” (zastępuje osobną linijkę); pytanie i po nim — „Odpowiedziało x/y” (komplet na zielono tylko do wyniku); seria — odpowiedzi w serii; reszta — graczy w grze. Jedna linijka, stała wysokość.
 - Przełączniki muzyki i automatu mają stałe napisy („Muzyka i dźwięki na TV”, „Prowadzenie automatyczne”), stan widać po przycisku Włącz/Wyłącz i podświetleniu: zmienny tekst zmieniał wysokość i też przesuwał przyciski. Sprawdzone na telefonie 375 px: ramka i pierwszy przycisk w tym samym miejscu na planszy etapu, w pytaniu i w rankingu, z automatem i bez.
+
+### „Ile?”: oś na dole, kreska odpadania z oddechem (26.10) ✅
+
+- **Odpowiedzi „Ile?” na TV** (`OdpowiedziSzacowania`): oś przy dole pola, wszyscy gracze w rzędach nad nią (wcześniej nad i pod osią), plakietka z poprawną liczbą przypięta do góry pola ze złotą kreską w dół do osi. Pole wypełnia miejsce między nagłówkiem a dolną linijką, więc plakietka nigdy nie wchodzi na nagłówek. Podpisy rozdawane od najbliższych poprawnej (trafiający w punkt stoją najniżej i zawsze mają podpis), każdy w najniższym wolnym rzędzie (5 rzędów); kto się nie zmieści, ma sam awatar. Sprawdzone z 8 botami.
+- **Kreska odpadania w wyścigu** (`.wyscig-strefa-finalu`): 56 px zamiast 22 (przerywana kreska 14 px pod torem, pod nią napis 24 px), tory zmniejszają się o tyle samo (`STREFA_PX`).
 
 ## Ustalenia
 

@@ -3187,35 +3187,36 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: 24px;
+  margin-top: 24px;
 }
 
-/* oś nie w połowie: nad nią 3 rzędy podpisów i plakietka poprawnej, pod nią 4 rzędy (szacowanie.tsx, RZEDY_POD) */
+/* Pole wypełnia miejsce między nagłówkiem a dolną linijką (26.10): plakietka poprawnej przypięta do jego góry, więc
+   nigdy nie wchodzi na nagłówek, a oś leży przy dole (--os od dołu), z rzędami podpisów nad nią (szacowanie.tsx) */
 .tv-os-odp-pole {
-  --os: 320px;
+  --os: 44px;
   position: relative;
-  height: 704px;
+  flex: 1;
+  min-height: 0;
 }
 
 .tv-os-odp-linia {
   position: absolute;
   left: 0;
   right: 0;
-  top: var(--os);
+  bottom: var(--os);
   height: 10px;
-  margin-top: -5px;
+  margin-bottom: -5px;
   border-radius: 5px;
   background: linear-gradient(90deg, transparent, var(--kamien3) 8%, var(--kamien3) 92%, transparent);
 }
 
-/* kreska poprawnej z plakietką na górze; plakietka mieści się w polu osi (wcześniej wystawała 23 px na linię
-   nagłówka przy dwuwierszowym pytaniu, 25.10) */
+/* kreska poprawnej od plakietki u góry pola (plakietka nad kreską, 76 px) w dół, kawałek za oś */
 .tv-os-odp-poprawna {
   position: absolute;
-  top: calc(9% + 32px);
-  bottom: 3%;
+  top: 76px;
+  bottom: calc(var(--os) - 20px);
   width: 6px;
   margin-left: -3px;
   background: linear-gradient(180deg, transparent, var(--zloto) 15%, var(--zloto) 85%, transparent);
@@ -3241,8 +3242,8 @@
 /* gracz: awatar na osi, cienka kreska do podpisu w swoim rzędzie (--rzad: 0 najbliżej osi) */
 .tv-os-odp-gracz {
   position: absolute;
-  top: var(--os);
-  translate: -50% -50%;
+  bottom: var(--os);
+  translate: -50% 50%;
   display: grid;
   place-items: center;
   z-index: 2;
@@ -3268,12 +3269,8 @@
   background: rgba(244, 236, 216, 0.35);
 }
 
-.tv-os-odp-gracz.nad .tv-os-odp-kreska {
+.tv-os-odp-gracz .tv-os-odp-kreska {
   bottom: 50%;
-}
-
-.tv-os-odp-gracz.pod .tv-os-odp-kreska {
-  top: 50%;
 }
 
 .tv-os-odp-podpis {
@@ -3293,13 +3290,9 @@
   white-space: nowrap;
 }
 
-/* od krawędzi awatara: rząd 0 tuż nad (pod) nim, kolejne co 82 px */
-.tv-os-odp-gracz.nad .tv-os-odp-podpis {
+/* od krawędzi awatara: rząd 0 tuż nad nim, kolejne co 82 px w górę */
+.tv-os-odp-gracz .tv-os-odp-podpis {
   bottom: calc(100% + 18px + var(--rzad) * 82px);
-}
-
-.tv-os-odp-gracz.pod .tv-os-odp-podpis {
-  top: calc(100% + 18px + var(--rzad) * 82px);
 }
 
 .tv-os-odp-podpis strong {
@@ -3456,19 +3449,32 @@
   font-weight: var(--w-black);
 }
 
+/* kreska odpadania z oddechem (26.10, Łukasz: było za ciasno): odstęp od toru nad nią, kreska, a pod nią napis,
+   razem STREFA_PX (wyscig.tsx) */
 .wyscig-strefa-finalu {
+  position: relative;
   margin: 0;
-  height: 22px;
+  height: 56px;
+  box-sizing: border-box;
   display: grid;
-  place-items: center;
-  border-top: 3px dashed var(--zloto);
+  align-items: end;
+  justify-items: center;
+  padding-bottom: 4px;
   color: var(--zloto);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: var(--w-black);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
-  padding-top: 6px;
+}
+
+.wyscig-strefa-finalu::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 14px;
+  border-top: 3px dashed var(--zloto);
 }
 
 /* Seria na TV: odliczanie do startu i potem zegar w nagłówku, plansza zostaje odsłonięta */

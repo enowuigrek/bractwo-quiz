@@ -17,8 +17,8 @@ const RUCH_S = 2.4;
 /** Zamiana torów (awans i spadek w rankingu) rusza pod koniec jazdy awatarów i trwa tyle sekund. */
 const ZAMIANA_OD_S = START_S + RUCH_S * 0.75;
 const ZAMIANA_S = 0.9;
-/** Wysokość napisu „ta trójka wchodzi do finału” (`.wyscig-strefa-finalu`). */
-const STREFA_PX = 22;
+/** Wysokość kreski odpadania z napisem „ta trójka wchodzi do finału” (`.wyscig-strefa-finalu`). */
+const STREFA_PX = 56;
 
 /**
  * „Wyścig po piwo”: na końcu torów stoi szklanka, która z każdym pytaniem napełnia się piwem
@@ -55,7 +55,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
     92,
     Math.floor(
       (700 -
-        (strefaFinalu ? 34 : 0) -
+        (strefaFinalu ? STREFA_PX + odstep : 0) -
         (koniecEtapu ? KONIEC_ETAPU_PX : 0) -
         (reszta.length ? RESZTA_PX : 0) -
         (wiersze.length - 1) * odstep) /

@@ -62,21 +62,22 @@ export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean })
   );
 }
 
-/** Szerokość podpisu gracza na osi (px sceny) i ile rzędów podpisów mieści się nad i pod osią. */
+/** Szerokość podpisu gracza na osi (px sceny). */
 const PODPIS_PX = 230;
-/** Rzędy podpisów nad osią i pod nią (pod osią jeden więcej: nad osią jest jeszcze plakietka poprawnej odpowiedzi). */
-const RZEDY = 3;
-const RZEDY_POD = 4;
-/** Pół szerokości plakietki z poprawną odpowiedzią (z zapasem), np. „568 ml” albo „1849”. */
-const POPRAWNA_POL_PX = 150;
+/**
+ * Rzędy podpisów nad osią (od 26.10 wszystkie nad nią, oś na dole). Pięć mieści się pod plakietką poprawnej
+ * odpowiedzi na scenie 16:9 nawet przy dwuwierszowym pytaniu.
+ */
+const RZEDY = 5;
 const SZEROKOSC_OSI = 1640;
 
 type Odpowiedz = { nick: string; zdjecie: string | null; liczba: number; punkty: number; czas_ms: number | null };
 
 /**
  * Odpowiedzi w szacowaniu (faza `odpowiedzi`): zamiast ramek „dobrze / źle” jedna oś przybliżona do odpowiedzi.
- * Na środku złota kreska z poprawną liczbą, gracze tam, gdzie strzelali,
- * każdy z podpisem: nick, liczba i punkty. Podpisy układają się w rzędy nad i pod osią, żeby na siebie nie wchodziły.
+ * Oś na dole, nad nią gracze tam, gdzie strzelali, każdy z podpisem (nick, liczba i punkty) w rzędach, żeby na siebie
+ * nie wchodziły. Poprawna liczba na plakietce u góry pola, zawsze pod nagłówkiem, ze złotą kreską w dół do osi
+ * (26.10, Łukasz: wcześniej gracze stali nad osią i pod nią, a plakietka czasem wchodziła na nagłówek).
  */
 export function OdpowiedziSzacowania({
   z,
@@ -110,25 +111,22 @@ export function OdpowiedziSzacowania({
   const pol = Math.max(krok * 5, ...strzaly.map((s) => Math.abs(s.liczba - p))) * 1.15;
   const x = (v: number) => ((v - (p - pol)) / (2 * pol)) * SZEROKOSC_OSI;
 
-  // rzędy: na zmianę nad i pod osią; podpis trafia do pierwszego rzędu, w którym się mieści. Najwyższy rząd nad osią
-  // dzieli wysokość z plakietką poprawnej odpowiedzi, więc obok niej podpis idzie gdzie indziej (25.10: zasłaniał ją)
-  const konce: number[] = Array(RZEDY + RZEDY_POD).fill(-Infinity);
-  const przyPoprawnej = (srodek: number) => Math.abs(srodek - x(p)) < PODPIS_PX / 2 + POPRAWNA_POL_PX;
-  const ulozone = strzaly.map((s) => {
-    const srodek = x(s.liczba);
-    // na zmianę: nad 0, pod 0, nad 1, pod 1…, a gdy rzędów nad osią zabraknie, już tylko pod
-    const kolejnosc = [
-      ...Array.from({ length: RZEDY * 2 }, (_, i) => (i % 2 ? RZEDY + (i >> 1) : i >> 1)),
-      ...Array.from({ length: RZEDY_POD - RZEDY }, (_, i) => RZEDY * 2 + i),
-    ];
-    const rzad =
-      kolejnosc.find((r) => konce[r] < srodek - PODPIS_PX / 2 - 8 && !(r === RZEDY - 1 && przyPoprawnej(srodek))) ?? -1;
-    if (rzad >= 0) konce[rzad] = srodek + PODPIS_PX / 2;
-    return { ...s, srodek, rzad };
-  });
   const najblizsi = [...strzaly].sort(
     (a, b) => Math.abs(a.liczba - p) - Math.abs(b.liczba - p) || (a.czas_ms ?? 0) - (b.czas_ms ?? 0),
   );
+  // rzędy od osi w górę: podpisy dostają najpierw najbliżsi poprawnej (26.10: trafiający w punkt zostawali bez
+  // podpisu, gdy miejsca zajęli ci z lewej), każdy w najniższym rzędzie, w którym nie zachodzi na inny podpis.
+  // Kto się nie zmieści w żadnym rzędzie, ma sam awatar na osi
+  const zajete: [number, number][][] = Array.from({ length: RZEDY }, () => []);
+  const rzedy = new Map<string, number>();
+  for (const s of najblizsi) {
+    const od = x(s.liczba) - PODPIS_PX / 2 - 4;
+    const do_ = od + PODPIS_PX + 8;
+    const rzad = zajete.findIndex((w) => w.every(([a, b]) => do_ <= a || od >= b));
+    if (rzad >= 0) zajete[rzad].push([od, do_]);
+    rzedy.set(s.nick, rzad);
+  }
+  const ulozone = strzaly.map((s) => ({ ...s, srodek: x(s.liczba), rzad: rzedy.get(s.nick) ?? -1 }));
 
   return (
     <div className="tv-os-odp">
@@ -137,28 +135,24 @@ export function OdpowiedziSzacowania({
         <span className="tv-os-odp-poprawna" style={{ left: x(p) }}>
           <span>{liczbaZJednostka(p, jednostka)}</span>
         </span>
-        {ulozone.map((s, i) => {
-          const nad = s.rzad >= 0 && s.rzad < RZEDY;
-          const poziomRzedu = s.rzad < 0 ? 0 : nad ? s.rzad : s.rzad - RZEDY;
-          return (
-            <div
-              key={s.nick}
-              className={`tv-os-odp-gracz${nad ? " nad" : " pod"}${najblizsi[0]?.nick === s.nick ? " najblizej" : ""}`}
-              style={{ left: s.srodek, ["--rzad" as string]: poziomRzedu, animationDelay: `${0.2 + i * 0.08}s` }}
-            >
-              <span className="tv-os-odp-kreska" />
-              <Awatar nick={s.nick} zdjecie={s.zdjecie} rozmiar={62} />
-              {s.rzad >= 0 && (
-                <span className="tv-os-odp-podpis">
-                  <strong>{s.nick}</strong>
-                  <span>
-                    {liczbaZJednostka(s.liczba, jednostka)} · <em>+{s.punkty}</em>
-                  </span>
+        {ulozone.map((s, i) => (
+          <div
+            key={s.nick}
+            className={`tv-os-odp-gracz${najblizsi[0]?.nick === s.nick ? " najblizej" : ""}`}
+            style={{ left: s.srodek, ["--rzad" as string]: Math.max(0, s.rzad), animationDelay: `${0.2 + i * 0.08}s` }}
+          >
+            <span className="tv-os-odp-kreska" />
+            <Awatar nick={s.nick} zdjecie={s.zdjecie} rozmiar={62} />
+            {s.rzad >= 0 && (
+              <span className="tv-os-odp-podpis">
+                <strong>{s.nick}</strong>
+                <span>
+                  {liczbaZJednostka(s.liczba, jednostka)} · <em>+{s.punkty}</em>
                 </span>
-              )}
-            </div>
-          );
-        })}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
       <p className="tv-os-odp-dol">
         {najblizsi[0] ? (
