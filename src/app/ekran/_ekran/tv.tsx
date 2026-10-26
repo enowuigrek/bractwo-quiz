@@ -661,7 +661,8 @@ type ZapamietanaSeria = { etap: string | null; gracze: SeriaGracz[] };
 function graczePijani(stan: StanSesji, seria: ZapamietanaSeria | null, gracze: GraczNaLiscie[]): GraczPijany[] {
   const n = Math.max(1, stan.etap?.liczba_pytan ?? 1);
   if (seria && seria.etap === (stan.etap?.id ?? null)) {
-    const naDrodze = (g: SeriaGracz) => (stan.etap?.finalowy ? naDrodzeFinalu(g) : Math.min(1, g.dobre / n));
+    const naDrodze = (g: SeriaGracz) =>
+      stan.etap?.finalowy ? naDrodzeFinalu(g, stan.pijany_final) : Math.min(1, g.dobre / n);
     const najlepszy = Math.max(0, ...seria.gracze.map(naDrodze));
     return seria.gracze.map((g) => ({
       nick: g.nick,

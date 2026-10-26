@@ -6,7 +6,7 @@ import { Awatar } from "@/components/awatar";
 import { zagraj } from "@/lib/gra/efekty";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
-import { MAX_W_WYSCIGU, NA_TORACH_W_TLOKU, naTrasie, naTrasieFinalu } from "@/lib/gra/wyscig";
+import { MAX_W_WYSCIGU, NA_TORACH_W_TLOKU, naTrasie, naTrasieFinalu, nalanieSzklanki } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
@@ -22,7 +22,7 @@ const STREFA_PX = 22;
 
 /**
  * „Wyścig po piwo”: na końcu torów stoi szklanka, która z każdym pytaniem napełnia się piwem
- * (pytanie lp z n to lp/n szklanki), a gracze jadą po barowej ladzie w jej stronę. Najpierw widać stan
+ * (do 95% po ostatnim pytaniu przed finałem, `nalanieSzklanki`), a gracze jadą po barowej ladzie w jej stronę. Najpierw widać stan
  * sprzed pytania, po chwili piwo dolewa się, a awatary przesuwają (zasady: src/lib/gra/wyscig.ts).
  * Grafiki szklanki i lady: public/grafiki, generowane skryptem scripts/grafiki.mjs.
  */
@@ -194,8 +194,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
           </div>
 
           <Szklanka
-            przed={n ? (lp - 1) / n : 0}
-            teraz={n ? lp / n : 0}
+            przed={nalanieSzklanki(stan.quiz, lp - 1)}
+            teraz={nalanieSzklanki(stan.quiz, lp)}
             doKonca={Math.max(0, n - lp)}
             nagroda={nagroda}
           />

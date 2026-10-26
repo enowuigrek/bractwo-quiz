@@ -9,6 +9,7 @@ import { OKRES_KOLYSANIA_S } from "@/lib/gra/muzyka-pijana";
 import { czyTelewizor } from "@/lib/gra/telewizor";
 import type { StanSesji } from "@/lib/gra/typy";
 import { GASNIECIE_S, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
+import { DROGA_PRZED_META, KROK_FINALU } from "@/lib/gra/final";
 import { useWideoWybuchu } from "./wideo-wybuchu";
 import { awatarNaDrogach, drogi, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
@@ -26,7 +27,44 @@ const ODLOT = 1700;
 const BUJANIE_DEG = { od: 0.6, do: 2.8 };
 const ZJEZDZANIE = { od: 0.012, do: 0.06 };
 
+/** Pozorowany wyścig: na starcie wszyscy cofają się o tyle kroków, potem co 3–5 s krok naprzód albo w tył. */
+const COFNIECIE_KROKOW = 2;
+const PIERWSZY_KROK_S = 4;
+/** Szansa na krok naprzód (reszta to krok w tył), w procentach. */
+const NAPRZOD_PROC = 58;
+/** Jak szybko awatar dojeżdża do nowego położenia (na sekundę): płynnie, bez skoków. */
+const DOJAZD = 3;
+
 type Lot = { x: number; y: number; vx: number; vy: number };
+
+/** Liczba z napisu, zawsze ta sama (FNV-1a): kroki są „losowe”, ale po odświeżeniu TV wychodzą tak samo. */
+function skrot(t: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < t.length; i++) {
+    h ^= t.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/**
+ * Położenie gracza w pijanym finale (0..1): pijany finał udaje dalszy wyścig (26.10, Łukasz). Odpowiedzi dogrywki nie
+ * trafiają do bazy, więc kroki są pseudolosowe z nicku i czasu, każdy w swoim rytmie; nikt nie dobiega do szklanki.
+ * `t`: sekundy od początku fazy, `koniecKrokow`: od tej sekundy (telefony gasną) nikt się już nie rusza.
+ */
+function polozeniePijane(nick: string, start: number, t: number, koniecKrokow: number): number {
+  const min = 0.04;
+  const max = DROGA_PRZED_META - KROK_FINALU / 2;
+  let p = Math.max(min, Math.min(start, max) - COFNIECIE_KROKOW * KROK_FINALU);
+  const h = skrot(nick);
+  const okres = 3 + (h % 21) / 10;
+  const ile = Math.floor((Math.min(t, koniecKrokow) - PIERWSZY_KROK_S - (h % 10) / 10) / okres) + 1;
+  for (let k = 0; k < ile; k++) {
+    p += (skrot(`${nick}:${k}`) % 100 < NAPRZOD_PROC ? 1 : -1) * KROK_FINALU;
+    p = Math.max(min, Math.min(max, p));
+  }
+  return p;
+}
 
 const ograniczone = (x: number) => Math.min(1, Math.max(0, x));
 
@@ -51,8 +89,9 @@ const ODLAMKI = Array.from({ length: 34 }, (_, i) => {
  * nie liczą. Tryb jest ukryty przed graczami: nagłówek ten sam co w serii (finał trwa, zegar liczy czas
  * dogrywki). Od 26.10 subtelnie, żeby wybuch zaskoczył: nagłówek się kołysze, plansza z drogami buja się w rytm
  * muzyki (ten sam okres co kołysanie tempa, muzyka-pijana.ts), a zawodnicy zjeżdżają po drogach w stronę
- * przechyłu, coraz mocniej (`--poziom` 0..1). Położenia są zamrożone z chwili wejścia: nikt nie dojeżdża do
- * szklanki, nawet gdy ostatni krok serii dotrze później. Na koniec szklanka wybucha, a nagłówek, zawodnicy
+ * przechyłu, coraz mocniej (`--poziom` 0..1). Wyścig udaje, że trwa: od położeń z chwili wejścia (zamrożonych,
+ * ostatni krok serii, który dotrze później, nic nie zmienia) wszyscy cofają się o dwa kroki, a potem idą
+ * pseudolosowo krok naprzód albo w tył (`polozeniePijane`); nikt nie dobiega do szklanki. Na koniec szklanka wybucha, a nagłówek, zawodnicy
  * i drogi odlatują. Położenia liczy pętla klatek, nie React, więc odświeżanie stanu niczego nie zrywa.
  */
 export function PijanyTv({
@@ -92,8 +131,10 @@ export function PijanyTv({
 
   useLayoutEffect(() => {
     const ruch = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // położenia z chwili wejścia, zamrożone (nowy gracz dostaje swoje przy pierwszym pojawieniu się)
+    // położenia z chwili wejścia, zamrożone (nowy gracz dostaje swoje przy pierwszym pojawieniu się), i to, co
+    // widać teraz (dojeżdża płynnie do pozorowanego wyścigu)
     const poczatki = new Map<string, number>();
+    const widac = new Map<string, number>();
     // wybuch: każdy odlatuje od szklanki z miejsca, w którym był w tej chwili
     const ostatnie = new Map<string, { x: number; y: number }>();
     const odloty = new Map<string, Lot>();
@@ -138,7 +179,12 @@ export function PijanyTv({
           o.y += o.vy * ODLOT * dt;
           p = o;
         } else {
-          p = punktNaDrodze(lista[i], ograniczone(start + zjazd));
+          const t = (teraz - od) / 1000;
+          const cel = polozeniePijane(g.nick, start, t, (do_ - od) / 1000 - GASNIECIE_S);
+          const obecne = widac.get(g.nick) ?? start;
+          const nowe = ruch ? obecne + (cel - obecne) * (1 - Math.exp(-DOJAZD * dt)) : cel;
+          widac.set(g.nick, nowe);
+          p = punktNaDrodze(lista[i], ograniczone(nowe + zjazd));
         }
         ostatnie.set(g.nick, { x: p.x, y: p.y });
         el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;

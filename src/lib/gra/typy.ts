@@ -111,6 +111,8 @@ export type StanSesji = {
   quiz: {
     tytul: string;
     liczba_zadan: number;
+    /** Pytania przed etapem finałowym (bez ciekawostek): według nich nalewa się szklanka wyścigu. */
+    liczba_przed_finalem?: number;
     liczba_etapow: number;
     /** Maksimum punktów przed finałem (1000 × mnożnik za pytanie): skala wyścigu. */
     max_przed_finalem: number;

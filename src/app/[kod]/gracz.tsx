@@ -20,7 +20,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
 import { kiedyStart } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
-import { quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
+import { nalanieSzklanki, quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { Gotowy } from "./gotowy";
 import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "@/components/ikony";
@@ -521,7 +521,13 @@ function WGrze({
         )}
         {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV (w klasycznym nie ma) */}
         {mojWiersz && rankingJakoWyscig(stan, stan.w_grze) && (
-          <MojWyscig key={stan.zadanie?.nr ?? 0} lp={stan.zadanie?.lp ?? 0} n={stan.quiz?.liczba_zadan ?? 0} />
+          <MojWyscig
+            key={stan.zadanie?.nr ?? 0}
+            lp={stan.zadanie?.lp ?? 0}
+            n={stan.quiz?.liczba_zadan ?? 0}
+            przed={nalanieSzklanki(stan.quiz, (stan.zadanie?.lp ?? 0) - 1)}
+            teraz={nalanieSzklanki(stan.quiz, stan.zadanie?.lp ?? 0)}
+          />
         )}
       </>
     );

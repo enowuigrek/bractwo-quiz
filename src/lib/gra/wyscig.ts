@@ -46,3 +46,22 @@ export function naTrasieFinalu(punkty: number, lider: number, lp: number, liczba
   const lidera = START_LIDERA + (1 - START_LIDERA) * Math.min(1, lp / liczbaPytan);
   return Math.max(0, Math.min(1, lidera * (punkty / lider)));
 }
+
+/** Tyle szklanki jest nalane po ostatnim pytaniu przed finałem: pełna jest dopiero w finale. */
+const NALANE_PRZED_FINALEM = 0.95;
+
+/**
+ * Ile szklanki jest nalane po pytaniu `lp` (0..1): według pytań przed finałem (`liczba_przed_finalem`), nie
+ * wszystkich, bo pula finału to drugie tyle i szklanka była przed finałem w połowie (26.10, Łukasz). Przed finałem
+ * dochodzi do 95%, a pełna jest w finale. Quiz bez finału: według wszystkich pytań, do pełna.
+ */
+export function nalanieSzklanki(
+  quiz: { liczba_zadan: number; liczba_przed_finalem?: number } | null,
+  lp: number,
+): number {
+  const wszystkie = quiz?.liczba_zadan ?? 0;
+  const przed = quiz?.liczba_przed_finalem ?? wszystkie;
+  if (przed <= 0) return 0;
+  const zFinalem = przed < wszystkie;
+  return Math.max(0, Math.min(1, (lp / przed) * (zFinalem ? NALANE_PRZED_FINALEM : 1)));
+}

@@ -558,7 +558,8 @@ function Seria({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       />
       <ul className="pr-final">
         {gracze.map((g) => {
-          const kroki = Math.min(META_FINALU, krokiFinalu(g));
+          // z pijanym finałem nikt nie dobiega do mety (wyścig udaje, że trwa dalej)
+          const kroki = Math.min(stan.pijany_final ? META_FINALU - 1 : META_FINALU, krokiFinalu(g));
           return (
             <li key={g.nick}>
               <span className="pr-nick">{g.nick}</span>

@@ -274,6 +274,15 @@ Do zaprojektowania razem:
 - **Muzyka:** utwór finału na czas pijanego finału przechodzi z odtwarzacza na Web Audio (`src/lib/gra/muzyka-pijana.ts`, kontekst efektów): ten sam moment utworu, tempo kołysze się płynnie (oscylator 1/9 Hz na `playbackRate`, głębokość do 5%, średnio do 4% wolniej), bez dziur. Utwór dekoduje się już w finale serią. Gdy przejęcie się nie uda, gra zwykły odtwarzacz bez kołysania.
 - **Sprawdzone lokalnie:** z `?tv` bujanie, zamrożone położenia, wybuch bez wideo w zaplanowanej chwili i do werbli; bez `?tv` wideo jak dotąd. **Na OLED Łukasza (26.10):** szklanka wybucha, tory odlatują, muzyka kołysze się bez przerw.
 
+### Uczciwsze punkty, szybsze nalewanie, pozorowany wyścig w pijanym finale (26.10) ✅
+
+- **Punkty w jednym miejscu:** `wewn.punkty_odpowiedzi(typ, ocena, czas_ms, limit_ms, bonus, mnoznik)` liczy punkty dla `zapisz_odpowiedz` i udawanego czasu botów (migracja `punkty_precyzja_i_szybkosc`).
+- **„Ile?” (szacowanie):** precyzja przed szybkością. Trafienie w punkt 900–1000 (szybciej = więcej), każda odpowiedź obok najwyżej 850 × ocena (szybkość dokłada do 10%). Trafienie zawsze bije szybkie, ale nieprecyzyjne (np. 905 wolno w punkt wobec 831 szybko obok).
+- **Szybciej uciekające punkty:** bez limitu czasu punkty spadają od 1000 do 500 w 20 s (było 30 s), a wielokrotny, kolejność i pary w 40 s (było 60 s); `wewn.okno_bez_limitu_ms`. Z limitem jak dotąd (przez cały limit). Opis w kreatorze poprawiony.
+- **Nalewanie szklanki:** szklanka nalewa się pytaniami przed finałem, nie wszystkimi (z pulą finału była w połowie przed finałem). Pod koniec ostatniego etapu jest nalana w 95% (`NALANE_PRZED_FINALEM`, `nalanieSzklanki` w `src/lib/gra/wyscig.ts`), a pełna w finale. `stan_sesji` podaje `quiz.liczba_przed_finalem` (migracja `liczba_przed_finalem`).
+- **Lider nie stoi przy szklance przed pijanym finałem:** gdy gra ma pijany finał, finał serią rysuje metę jako `DROGA_PRZED_META` (85% drogi) zamiast szklanki (`naDrodzeFinalu(g, bezMety)` w `src/lib/gra/final.ts`; prosty ekran: najwyżej META−1). Zwycięzca też stoi krok przed piwem.
+- **Pozorowany wyścig w pijanym finale:** na wejściu wszyscy cofają się o 2 kroki, a potem co 3–5 s (każdy w swoim rytmie) robią krok naprzód (58%) albo w tył, płynnie, razem z bujaniem i zjeżdżaniem. Kroki są pseudolosowe z nicku (odświeżenie TV daje to samo), kończą się przy gaśnięciu telefonów, nikt nie przekracza 0,81 drogi (`polozeniePijane` w `pijany.tsx`). Sprawdzone symulacją funkcji; animacji przy schowanym panelu przeglądarki nie dało się obejrzeć, więc warto zerknąć na TV.
+
 ## Ustalenia
 
 | Temat | Decyzja |

@@ -23,11 +23,16 @@ export function krokiFinalu(g: PostepFinalisty): number {
  * Ile drogi przechodzi się przed metą: krok przed szklanką to 85% drogi, a do szklanki awatar dobiega dopiero
  * na mecie (25.10, Łukasz: z perspektywy widza nikt nie stoi przy piwie przed samym końcem).
  */
-const DROGA_PRZED_META = 0.85;
+export const DROGA_PRZED_META = 0.85;
+/** Jeden krok finału jako część drogi (pijany finał rusza awatarami o tyle). */
+export const KROK_FINALU = DROGA_PRZED_META / (META_FINALU - 1);
 
-/** Położenie na drodze 0..1 (1 = przy szklance, tylko po dobiegnięciu do mety). */
-export function naDrodzeFinalu(g: PostepFinalisty): number {
+/**
+ * Położenie na drodze 0..1 (1 = przy szklance, tylko po dobiegnięciu do mety). `bezMety`: gra z pijanym finałem,
+ * gdzie po serii wyścig udaje, że trwa dalej, więc nawet zwycięzca stoi krok przed szklanką (26.10, Łukasz).
+ */
+export function naDrodzeFinalu(g: PostepFinalisty, bezMety = false): number {
   const kroki = krokiFinalu(g);
-  if (kroki >= META_FINALU) return 1;
+  if (kroki >= META_FINALU) return bezMety ? DROGA_PRZED_META : 1;
   return (DROGA_PRZED_META * Math.max(0, kroki)) / (META_FINALU - 1);
 }

@@ -26,7 +26,8 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const przedStartem = teraz < od;
   // finał: wyścig na 12 kroków z przewagą (src/lib/gra/final.ts); zwykła seria: dobre / liczba pytań
-  const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g) : Math.min(1, g.dobre / n));
+  // z pijanym finałem nikt nie dobiega do szklanki: wyścig ma wyglądać, jakby trwał dalej
+  const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g, stan.pijany_final) : Math.min(1, g.dobre / n));
   const najlepszy = Math.max(0, ...gracze.map(naDrodze));
 
   // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie
