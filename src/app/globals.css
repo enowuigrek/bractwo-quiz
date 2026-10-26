@@ -1334,9 +1334,14 @@ html:has(.kolumna) {
 /* Pilot: lista graczy z kodem powrotu i usuwaniem */
 /* Rozwijane karty pilota (gracze, dołączanie): strzałka po prawej obraca się przy rozwinięciu (26.10: bez niej
    nie wyglądały na rozwijane) */
-.pilot-gracze-karta summary,
-.pilot-udostepnij summary,
-.pilot-pytanie-karta summary {
+/* Zwijana karta pilota (`<details className="karta karta-zwijana">`: nagrody, gracze, pytanie z rozwiązaniem,
+   dołączanie): nagłówek z etykietą i złotą strzałką, ten sam odstęp od karty wyżej. Nowa zwijana karta dostaje tę
+   klasę, a nie własną kopię reguł (27.10: nagrody bez niej miały nagłówek niżej i bez strzałki). */
+.karta-zwijana {
+  margin-top: 18px;
+}
+
+.karta-zwijana summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1346,15 +1351,11 @@ html:has(.kolumna) {
   list-style: none;
 }
 
-.pilot-gracze-karta summary::-webkit-details-marker,
-.pilot-udostepnij summary::-webkit-details-marker,
-.pilot-pytanie-karta summary::-webkit-details-marker {
+.karta-zwijana summary::-webkit-details-marker {
   display: none;
 }
 
-.pilot-gracze-karta summary::after,
-.pilot-udostepnij summary::after,
-.pilot-pytanie-karta summary::after {
+.karta-zwijana summary::after {
   content: "";
   flex: none;
   width: 10px;
@@ -1366,15 +1367,11 @@ html:has(.kolumna) {
   transition: transform 0.25s var(--ease-std);
 }
 
-.pilot-gracze-karta[open] summary::after,
-.pilot-udostepnij[open] summary::after,
-.pilot-pytanie-karta[open] summary::after {
+.karta-zwijana[open] summary::after {
   transform: translateY(2px) rotate(-135deg);
 }
 
-.pilot-gracze-karta[open] summary,
-.pilot-udostepnij[open] summary,
-.pilot-pytanie-karta[open] summary {
+.karta-zwijana[open] summary {
   margin-bottom: 12px;
 }
 
@@ -2012,43 +2009,6 @@ html:has(.kolumna) {
 .pilot-nagrody {
   display: grid;
   gap: 12px;
-  margin-top: 12px;
-}
-
-.pilot-nagrody .zdjecie-nagrody {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-.pilot-nagrody .przycisk-maly {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  padding: 6px 14px;
-  border: 0;
-  border-radius: var(--r-btn-sm);
-  background: var(--kamien2);
-  color: var(--piana);
-  font: inherit;
-  font-size: var(--fs-xs);
-  font-weight: var(--w-black);
-  cursor: pointer;
-}
-
-.pilot-nagrody .przycisk-maly.niebezpieczny {
-  background: var(--czerwien);
-  color: var(--na-zlocie);
-}
-
-.pilot-nagrody .zdjecie-nagrody-miniatura,
-.pilot-nagrody .zdjecie-nagrody-trwa img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border-radius: 6px;
 }
 
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
@@ -3733,7 +3693,7 @@ html:has(.kolumna) {
 }
 
 /* ---- Wspólne elementy formularzy panelu i pilota (26.10: przeniesione z panel.css, bo nagrody w pilocie mają
-   wyglądać jak w kreatorze gry): przełącznik, kafelki z ikoną, pola nagród ---- */
+   wyglądać jak w kreatorze gry): przełącznik, kafelki z ikoną, pola i zdjęcie nagrody, mały przycisk ---- */
 
 /* opis przy przełączniku mniejszy i z oddechem od niego (26.10, DESIGN-SYSTEM.md „Przełączniki”) */
 .przelacznik {
@@ -3940,4 +3900,89 @@ button.kafelek {
 .pole.pole-male {
   font-size: var(--fs-small);
   padding: 10px 14px;
+}
+
+/* Małe przyciski w wierszach: pigułki z wypełnieniem, jak duże przyciski */
+.przycisk-maly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 40px;
+  min-height: 40px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: var(--kamien2);
+  border: 0;
+  border-radius: var(--r-btn-sm);
+  padding: 8px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.35s var(--ease-std), filter 0.35s var(--ease-std);
+}
+
+.przycisk-maly:not(.zloty, .niebezpieczny):hover:not(:disabled) {
+  background: var(--kamien3);
+}
+
+.przycisk-maly:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.przycisk-maly.zloty {
+  color: var(--na-zlocie);
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+}
+
+.przycisk-maly.niebezpieczny {
+  background: var(--czerwien-tlo);
+}
+
+.przycisk-maly.zloty:hover:not(:disabled),
+.przycisk-maly.niebezpieczny:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+/* Zdjęcie nagrody (kreator gry i pilot, zdjecie-nagrody.tsx): przycisk, miniatura i podpis w jednym wierszu */
+.zdjecie-nagrody {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* zdjęcie nagrody jak pole pliku z logo browaru: przycisk, miniatura i podpis w jednym wierszu */
+.zdjecie-nagrody-miniatura {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--kamien2);
+}
+
+.zdjecie-nagrody-trwa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.zdjecie-nagrody-trwa img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--r-btn-sm);
+  animation: pulsuj 1.4s ease-in-out infinite;
+}
+
+@keyframes pulsuj {
+  50% {
+    opacity: 0.4;
+  }
 }

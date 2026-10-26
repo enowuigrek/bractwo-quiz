@@ -576,7 +576,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
 
           {/* nagrody można ustawić albo zmienić aż do startu quizu (26.10) */}
           {faza === "poczekalnia" && (
-            <details className="karta pilot-nagrody-karta" style={{ marginTop: 18 }}>
+            <details className="karta karta-zwijana">
               <summary className="etykieta">
                 Nagrody · {stan.nagrody?.length ? (stan.nagrody.length === 3 ? "pierwsza trójka" : "1. miejsce") : "brak"}
               </summary>
@@ -585,7 +585,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
           )}
 
           {faza === "poczekalnia" && (
-            <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }} open>
+            <details className="karta karta-zwijana" open>
               <summary className="etykieta">
                 {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
               </summary>
@@ -683,7 +683,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
             faza !== "podium" &&
             faza !== "tabela" && (
               // pytanie z rozwiązaniem zwinięte: rozwija się, gdy prowadzący chce zajrzeć (26.10)
-              <details className="karta pilot-pytanie-karta" style={{ marginTop: 18 }}>
+              <details className="karta karta-zwijana">
                 {/* czas do końca stoi w ramce stanu nad przyciskami */}
                 <summary className="etykieta">
                   Pytanie {z.lp}/{liczba} z rozwiązaniem
@@ -723,7 +723,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
             )}
 
           {faza !== "poczekalnia" && (
-            <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
+            <details className="karta karta-zwijana">
               <summary className="etykieta">
                 {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
               </summary>

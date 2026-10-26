@@ -42,8 +42,7 @@ export function UdostepnijPilota({ kod, token }: { kod: string; token: string })
 
   return (
     <details
-      className="karta pilot-udostepnij"
-      style={{ marginTop: 18 }}
+      className="karta karta-zwijana pilot-udostepnij"
       onToggle={(e) => ustawOtwarte(e.currentTarget.open)}
     >
       <summary className="etykieta">Dołączanie, przekazanie pilota, ekran</summary>

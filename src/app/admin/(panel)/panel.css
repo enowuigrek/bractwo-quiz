@@ -251,50 +251,6 @@ h2 {
   flex-shrink: 0;
 }
 
-/* Małe przyciski w wierszach: pigułki z wypełnieniem, jak duże przyciski */
-.przycisk-maly {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 40px;
-  min-height: 40px;
-  font: inherit;
-  font-size: var(--fs-xs);
-  font-weight: var(--w-black);
-  color: var(--piana);
-  background: var(--kamien2);
-  border: 0;
-  border-radius: var(--r-btn-sm);
-  padding: 8px 16px;
-  cursor: pointer;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background 0.35s var(--ease-std), filter 0.35s var(--ease-std);
-}
-
-.przycisk-maly:not(.zloty, .niebezpieczny):hover:not(:disabled) {
-  background: var(--kamien3);
-}
-
-.przycisk-maly:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
-.przycisk-maly.zloty {
-  color: var(--na-zlocie);
-  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
-}
-
-.przycisk-maly.niebezpieczny {
-  background: var(--czerwien-tlo);
-}
-
-.przycisk-maly.zloty:hover:not(:disabled),
-.przycisk-maly.niebezpieczny:hover:not(:disabled) {
-  filter: brightness(1.15);
-}
 
 /* Okrągły przycisk z samą ikoną (np. kosz) */
 .przycisk-maly.ikona {
@@ -1123,45 +1079,6 @@ a.przycisk {
   gap: 12px;
 }
 
-/* Zdjęcie nagrody w kreatorze: przycisk, czekanie na przeróbkę, wybór przeróbka / oryginał */
-.zdjecie-nagrody {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-/* zdjęcie nagrody jak pole pliku z logo browaru: przycisk, miniatura i podpis w jednym wierszu */
-.zdjecie-nagrody-miniatura {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--kamien2);
-}
-
-.zdjecie-nagrody-trwa {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--szary);
-  font-size: var(--fs-small);
-}
-
-.zdjecie-nagrody-trwa img {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  border-radius: var(--r-btn-sm);
-  animation: pulsuj 1.4s ease-in-out infinite;
-}
-
-@keyframes pulsuj {
-  50% {
-    opacity: 0.4;
-  }
-}
 
 /* Rodzaje pytań w prompcie (wklej.tsx): równe kafelki po dwa w wierszu w kolorach rodzajów (.rodzaj-pytania),
    wyłączony szary */

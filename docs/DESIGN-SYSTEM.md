@@ -118,7 +118,13 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Akcje to przyciski, nie napisy do klikania** (Łukasz, 25.10). Przejście do innej strony też dostaje wygląd przycisku (`<Link className="przycisk">`, np. „Panel obsługi” w pilocie, po grze złoty, „Wpisz inny kod” na telefonie). Tekstowe linki zostają tylko tam, gdzie to nawigacja „← wstecz” w panelu albo podpis autora.
 
-**Pilot (Quiz).** Przyciski akcji zawsze od razu pod nagłówkiem, nad kartą pytania, odpowiedziami i listą graczy, żeby nie uciekały w dół, gdy lista rośnie. „Zakończ grę” (niebezpieczny) osobno na samym dole strony, z dala od zwykłych akcji.
+**Pilot (Quiz).** Przyciski akcji zawsze od razu pod nagłówkiem, nad kartą pytania, odpowiedziami i listą graczy, żeby nie uciekały w dół, gdy lista rośnie. „Zakończ grę” (niebezpieczny) osobno na samym dole strony, z dala od zwykłych akcji, a jego pytanie podaje kod gry i lokal.
+
+**Lokal na górze pilota (27.10).** Pierwsza rzecz w pilocie to ramka lokalu gry (`.pilot-lokal`): logo 44 px i nazwa (1,35 rem, pogrubiona) w złotym obrysie 2 px; gra bez lokalu ma „Bez lokalu” w obrysie `--kamien3`. Stoi tak samo we wszystkich fazach, więc nie przesuwa przycisków, a przy dwóch grach naraz od razu widać, którą się prowadzi.
+
+**Zwijane karty pilota (27.10).** Wszystko do wglądu pod przyciskami (nagrody, gracze, pytanie z rozwiązaniem, dołączanie) to `<details className="karta karta-zwijana">` z `<summary className="etykieta">`: etykieta z lewej, złota strzałka z prawej, 18 px od karty wyżej, 12 px pod nagłówkiem po rozwinięciu. Nowa karta dostaje tę klasę, a nie własne reguły. Kod QR w karcie ma szerokość linku pod nim (`.pilot-udostepnij .qr`).
+
+**Boty do testów (pilot).** Karta „Boty do testów” tylko dla głównego admina, w poczekalni (także zamkniętej). Lokale jej nie widzą.
 
 **Nagłówek telefonu (Quiz).** Sam znak Quizu, bez kodu gry (od 24.10): kod jest wewnętrzny, gracz wchodzi z QR. Kod zostaje tam, gdzie jest potrzebny: na TV pod QR („Bez skanowania”), w pilocie, w panelu i na karcie nagrody jako dowód dla obsługi.
 
@@ -177,7 +183,11 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Przełącznik (panel Quiz).** Ustawienia tak/nie (widoczność „tylko dla mnie”, pijany finał, seria i finał trójki w etapie, odsłaniana grafika, usunięcie grafiki) to przełącznik, nie checkbox: szyna 44×24 px z gałką 18 px, wyłączony `--kamien2` z obrysem `--kamien3` i szarą gałką, włączony złoty (`--zloto`) z gałką `--na-zlocie` przesuniętą w prawo, 0,18 s. Focus: złota obwódka 2 px. Klasy `.przelacznik` (sam napis obok) i `.pole-wyboru` (pogrubiona nazwa i opis w kilku liniach). Zaznaczanie poprawnych odpowiedzi w edytorze pytań zostaje zwykłym checkboxem, bo to wybór z listy, a nie ustawienie. Napis obok przełącznika jest mniejszy od tekstu formularza (`--fs-small`, interlinia 1,35) i stoi 14 px od szyny (26.10: pełna wielkość zajmowała za dużo miejsca i lepiła się do przełącznika). Bez zdań objaśniających pod przełącznikiem: sama krótka etykieta.
 
-**Wybór nagród (kreator gry i pilot przed startem).** Zawsze ten sam układ: przełącznik „z nagrodami”, a po włączeniu dwa kafelki z ikoną podium (`IkonaPodium1` „1. miejsce”, `IkonaPodium3` „pierwsza trójka”) i pola nagród (`.nagrody-pola`, `.nagroda-pole`: numer miejsca, nagroda, mniejsze pole „jak odebrać”, zdjęcie). Bez osobnego przycisku „bez nagród”: to wyłączony przełącznik. Przełącznik, kafelki i pola nagród są w `globals.css` (26.10), żeby pilot wyglądał jak panel; nowe miejsca z tymi samymi wyborami składamy z tych klas, a nie z własnych przycisków.
+**Kreski między graczami w listach odpowiedzi (TV).** Ramki „Dobrze / Częściowo / Źle” rysują cienką kreskę `--kamien2` pod każdym graczem, ale nie pod ostatnim w kolumnie: przy kilku kolumnach (siatka układana kolumnami) bez kreski jest dół każdej kolumny (`.na-dole`, liczone w `odpowiedzi.tsx`), bo niczego już nie oddziela.
+
+**Koniec gry na TV (27.10).** Podium ma 56 px odstępu od nagłówka, a ekran końca schodzi w dolny margines sceny (podium o 48 px, tabela o 24 px), więc „Dziękujemy za grę! Piwu Cześć!” stoi nisko, z zapasem ok. 45–60 px nad krawędzią (overscan telewizora). Szacowanie na TV bez podpowiedzi o suwaku pod osią: tylko zakres.
+
+**Wybór nagród (kreator gry i pilot przed startem).** Zawsze ten sam układ: przełącznik „z nagrodami”, a po włączeniu dwa kafelki z ikoną podium (`IkonaPodium1` „1. miejsce”, `IkonaPodium3` „pierwsza trójka”) i pola nagród (`.nagrody-pola`, `.nagroda-pole`: numer miejsca, nagroda, mniejsze pole „jak odebrać”, zdjęcie). Bez osobnego przycisku „bez nagród”: to wyłączony przełącznik. Przełącznik, kafelki, pola i zdjęcie nagrody oraz `.przycisk-maly` są we wspólnej sekcji na końcu `globals.css` (26–27.10), żeby pilot wyglądał jak panel bez kopii reguł; nowe miejsca z tymi samymi wyborami składamy z tych klas, a nie z własnych przycisków.
 
 **Ukryte pola wyboru (kafelki, przyciski czasu, szablony).** Kafelek z ukrytym `input` (radio albo checkbox, `position: absolute; opacity: 0`) zawsze ma `position: relative`. Bez tego pole leży gdzieś wyżej na stronie, a telefon po dotknięciu kafelka przewija do niego i ekran skacze.
 
