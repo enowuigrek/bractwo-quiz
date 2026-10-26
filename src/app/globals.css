@@ -1304,7 +1304,8 @@ html:has(.kolumna) {
 /* Rozwijane karty pilota (gracze, dołączanie): strzałka po prawej obraca się przy rozwinięciu (26.10: bez niej
    nie wyglądały na rozwijane) */
 .pilot-gracze-karta summary,
-.pilot-udostepnij summary {
+.pilot-udostepnij summary,
+.pilot-pytanie-karta summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1315,12 +1316,14 @@ html:has(.kolumna) {
 }
 
 .pilot-gracze-karta summary::-webkit-details-marker,
-.pilot-udostepnij summary::-webkit-details-marker {
+.pilot-udostepnij summary::-webkit-details-marker,
+.pilot-pytanie-karta summary::-webkit-details-marker {
   display: none;
 }
 
 .pilot-gracze-karta summary::after,
-.pilot-udostepnij summary::after {
+.pilot-udostepnij summary::after,
+.pilot-pytanie-karta summary::after {
   content: "";
   flex: none;
   width: 10px;
@@ -1333,12 +1336,14 @@ html:has(.kolumna) {
 }
 
 .pilot-gracze-karta[open] summary::after,
-.pilot-udostepnij[open] summary::after {
+.pilot-udostepnij[open] summary::after,
+.pilot-pytanie-karta[open] summary::after {
   transform: translateY(2px) rotate(-135deg);
 }
 
 .pilot-gracze-karta[open] summary,
-.pilot-udostepnij[open] summary {
+.pilot-udostepnij[open] summary,
+.pilot-pytanie-karta[open] summary {
   margin-bottom: 12px;
 }
 
@@ -2880,17 +2885,14 @@ html:has(.kolumna) {
 
 /* Pilot: licznik odpowiedzi w widocznym miejscu (pilot.tsx, 26.10). Komplet świeci na zielono, jak przycisk,
    którym prowadzący idzie dalej. */
-/* stała wysokość w każdej fazie (napis w jednej linii), żeby przyciski pod licznikiem nie skakały */
+/* Ramka stanu pilota: licznik i pod nim linijka „co dalej”. Stała wysokość w każdej fazie (każda linijka w jednym
+   wierszu, druga zawsze stoi), żeby przyciski pod ramką nie skakały (26.10) */
 .pilot-licznik {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 64px;
+  display: grid;
+  gap: 4px;
   box-sizing: border-box;
-  white-space: nowrap;
   margin: 18px 0 0;
-  padding: 14px 18px;
+  padding: 12px 18px;
   border-radius: var(--r-card);
   border: 2px solid var(--kamien2);
   background: var(--kamien);
@@ -2900,9 +2902,33 @@ html:has(.kolumna) {
     border-color 0.3s ease;
 }
 
-.pilot-licznik > span {
+.pilot-licznik > p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.pilot-licznik > p > span {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.pilot-licznik > p.pilot-licznik-info {
+  display: block;
+  min-height: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--szary);
+  font-weight: var(--w-regular);
+  font-size: var(--fs-small);
+}
+
+.pilot-licznik.komplet > p.pilot-licznik-info {
+  color: inherit;
 }
 
 .pilot-licznik strong {
@@ -3212,19 +3238,70 @@ html:has(.kolumna) {
   object-fit: contain;
 }
 
-.panel-menu-gra > span {
+.panel-menu-gra-opis {
+  flex: 1;
   display: grid;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 
-.panel-menu-gra strong {
+/* tytuł z kodem gry na końcu tego samego wiersza */
+.panel-menu-gra-tytul {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel-menu-gra-tytul strong {
+  min-width: 0;
   font-weight: var(--w-black);
 }
 
-.panel-menu-gra > span > span {
+.panel-menu-gra-tytul .gra-kod {
+  flex: none;
+}
+
+.panel-menu-gra-lokal {
   color: var(--szary);
   font-size: var(--fs-small);
+}
+
+/* Pastylka stanu gry (menu): kolor mówi, co się dzieje, bez czytania (statusGry w menu.tsx) */
+.status-gry {
+  justify-self: start;
+  padding: 3px 12px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid currentColor;
+  font-size: var(--fs-micro);
+  font-weight: var(--w-black);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.status-gry.szary {
+  color: var(--szary);
+  background: rgba(150, 160, 170, 0.12);
+}
+
+.status-gry.zielony {
+  color: var(--chmiel);
+  background: rgba(143, 182, 58, 0.14);
+}
+
+.status-gry.zloty {
+  color: var(--zloto);
+  background: rgba(227, 172, 63, 0.14);
+}
+
+.status-gry.czerwony {
+  color: var(--czerwien);
+  background: rgba(226, 115, 90, 0.14);
+}
+
+.status-gry.niebieski {
+  color: #7fb6e6;
+  background: rgba(127, 182, 230, 0.14);
 }
 
 /* pozycje jako sam tekst, bez tła i ramek (26.10) */

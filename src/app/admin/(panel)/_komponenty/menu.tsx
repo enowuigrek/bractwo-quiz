@@ -16,9 +16,27 @@ export type GraWMenu = {
   href: string;
   tytul: string;
   kod: string;
-  status: string;
+  faza: string;
+  poczekalniaOtwarta: boolean;
   lokal: { nazwa: string; logo_url: string | null } | null;
 };
+
+type KolorStatusu = "szary" | "zielony" | "zloty" | "czerwony" | "niebieski";
+
+/** Status gry w menu: krótki napis i kolor pastylki, żeby stan było widać bez czytania (26.10). */
+export function statusGry(faza: string, poczekalniaOtwarta: boolean): { napis: string; kolor: KolorStatusu } {
+  if (faza === "poczekalnia") {
+    return poczekalniaOtwarta ? { napis: "Poczekalnia", kolor: "zielony" } : { napis: "Zapowiedź", kolor: "szary" };
+  }
+  if (faza === "wstep" || faza === "etap") return { napis: "Plansza", kolor: "zloty" };
+  if (faza === "przygotuj" || faza === "pytanie") return { napis: "Pytanie", kolor: "zloty" };
+  if (faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") return { napis: "Wyniki pytania", kolor: "zloty" };
+  if (faza === "seria") return { napis: "Finał", kolor: "czerwony" };
+  if (faza === "pijany") return { napis: "Pijany finał", kolor: "czerwony" };
+  if (faza === "werble") return { napis: "Werble", kolor: "czerwony" };
+  if (faza === "podium" || faza === "tabela") return { napis: "Podium", kolor: "niebieski" };
+  return { napis: "Zakończona", kolor: "szary" };
+}
 
 export function MenuPanelu({ wyloguj, gra = null }: { wyloguj: () => Promise<void>; gra?: GraWMenu | null }) {
   const sciezka = usePathname();
@@ -74,10 +92,14 @@ export function MenuPanelu({ wyloguj, gra = null }: { wyloguj: () => Promise<voi
               ) : (
                 <span className="miniatura-pusta" aria-hidden />
               )}
-              <span>
-                <strong>{gra.tytul}</strong>
-                <span>
-                  {[gra.kod, gra.lokal?.nazwa, gra.status].filter(Boolean).join(" · ")}
+              <span className="panel-menu-gra-opis">
+                <span className="panel-menu-gra-tytul">
+                  <strong>{gra.tytul}</strong>
+                  <span className="gra-kod">{gra.kod}</span>
+                </span>
+                {gra.lokal && <span className="panel-menu-gra-lokal">{gra.lokal.nazwa}</span>}
+                <span className={`status-gry ${statusGry(gra.faza, gra.poczekalniaOtwarta).kolor}`}>
+                  {statusGry(gra.faza, gra.poczekalniaOtwarta).napis}
                 </span>
               </span>
             </Link>

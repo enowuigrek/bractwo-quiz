@@ -5,7 +5,7 @@ import { wylogujAdmina } from "../akcje";
 import { MenuPanelu, type GraWMenu } from "./_komponenty/menu";
 import { widoczne } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { NAZWY_FAZ, type Faza } from "@/lib/typy";
+import type { Faza } from "@/lib/typy";
 import { Nawigacja } from "./_komponenty/nawigacja";
 import "./panel.css";
 
@@ -32,7 +32,8 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
         href: `/pilot/${trwa.kod}?t=${trwa.host_token}`,
         tytul: trwa.quizy?.tytul ?? "Quiz",
         kod: trwa.kod,
-        status: trwa.faza === "poczekalnia" && !trwa.poczekalnia_otwarta ? "zapowiedź" : (NAZWY_FAZ[trwa.faza] ?? "trwa"),
+        faza: trwa.faza,
+        poczekalniaOtwarta: trwa.poczekalnia_otwarta,
         lokal: trwa.lokale,
       }
     : null;

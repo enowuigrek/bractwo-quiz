@@ -23,7 +23,6 @@ import { LITERY, NAZWY_TYPOW, PODPOWIEDZI_TYPOW, jedenWybor, liczbaZJednostka } 
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
-import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
@@ -221,18 +220,53 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           : faza === "poczekalnia"
             ? ["Graczy w poczekalni", String(stan.liczba_graczy), false]
             : ["Graczy w grze", String(stan.w_grze), false];
+  // druga linijka ramki: co dalej w tej fazie (26.10, Łukasz: zamiast osobnych ramek z informacjami, przez które
+  // skakały przyciski). Zawsze stoi, w razie czego pusta
+  const sekundDo = (iso: string | null) => (iso ? Math.max(0, Math.ceil((Date.parse(iso) - teraz) / 1000)) : null);
+  const infoStanu =
+    faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null
+      ? `Start ${kiedyStart(startZapowiedzi)} · ${opisOdliczania(doZapowiedzi)}${stan.poczekalnia_otwarta ? "" : " · poczekalnia zamknięta"}`
+      : stan.nastepne_typ &&
+          !stan.quiz?.liczba_etapow &&
+          ["poczekalnia", "wynik", "odpowiedzi", "ranking"].includes(faza)
+        ? // rodzaje pytań się mieszają: prowadzący uprzedza graczy przed startem
+          `Następne: ${NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()} · „${PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”`
+        : faza === "wstep" && klasyczny && stan.faza_do
+          ? `Pierwsze pytanie samo za ${sekundDo(stan.faza_do)} s`
+          : faza === "przygotuj"
+            ? `Pytanie ${z?.lp ?? ""} startuje za ${sekundaOdliczania(doStartu)} s`
+            : faza === "pytanie"
+              ? bezLimitu
+                ? "Bez limitu czasu"
+                : doKonca > 0
+                  ? `Zostało ${Math.ceil(doKonca / 1000)} s`
+                  : "Czas minął"
+              : (faza === "seria" || faza === "pijany") && stan.faza_od && teraz < Date.parse(stan.faza_od)
+                ? `Start za ${sekundDo(stan.faza_od)} s`
+                : (faza === "seria" || faza === "pijany") && stan.faza_do
+                  ? `Do końca ${sekundDo(stan.faza_do)} s`
+                  : faza === "werble"
+                    ? "Werble: odsłoń podium"
+                    : faza === "podium" || faza === "tabela"
+                      ? "TV pokazuje na zmianę podium i tabelę"
+                      : faza === "koniec"
+                        ? "Gra zakończona"
+                        : "";
   const licznik = (
-    <p className={`pilot-licznik${komplet ? " komplet" : ""}`} role="status">
-      <span>
-        {komplet && (
-          <span className="pilot-licznik-znak" aria-hidden>
-            ✓
-          </span>
-        )}{" "}
-        {napisLicznika}
-      </span>
-      <strong>{wartoscLicznika}</strong>
-    </p>
+    <div className={`pilot-licznik${komplet ? " komplet" : ""}`} role="status">
+      <p>
+        <span>
+          {komplet && (
+            <span className="pilot-licznik-znak" aria-hidden>
+              ✓
+            </span>
+          )}{" "}
+          {napisLicznika}
+        </span>
+        <strong>{wartoscLicznika}</strong>
+      </p>
+      <p className="pilot-licznik-info">{infoStanu || "\u00a0"}</p>
+    </div>
   );
 
   return (
@@ -242,7 +276,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           href: `/pilot/${kod}`,
           tytul: stan.quiz?.tytul ?? "Quiz",
           kod,
-          status: NAZWY[faza],
+          faza,
+          poczekalniaOtwarta: stan.poczekalnia_otwarta,
           lokal: stan.lokal ?? null,
         }}
       />
@@ -291,40 +326,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           )}
           {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
 
-          {/* rodzaj następnego pytania zawsze: rodzaje się mieszają, prowadzący uprzedza graczy przed startem */}
-          {/* przy etapach niepotrzebne: plansza etapu na TV sama pokazuje, jak odpowiadać */}
-          {stan.nastepne_typ &&
-            !stan.quiz?.liczba_etapow &&
-            (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
-              <p className="pilot-zapowiedz" role="status">
-                <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed
-                startem: „{PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”.
-              </p>
-            )}
-
-          {/* zapowiedź: godzina i odliczanie jak na TV; start i tak klika prowadzący */}
-          {faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null && (
-            <p className="pilot-start">
-              <span>
-                Start <strong>{kiedyStart(startZapowiedzi)}</strong> ·{" "}
-                <span className="gra-kod">{opisOdliczania(doZapowiedzi)}</span>
-              </span>
-              {!stan.poczekalnia_otwarta && (
-                <span className="pomocniczy">
-                  Na ekranie lokalu jest zapowiedź z odliczaniem.{" "}
-                  {stan.auto
-                    ? `Poczekalnia otworzy się sama ${NA_ZAPISY_MIN} minut przed tą godziną, a quiz ruszy o czasie.`
-                    : "Gracze dołączą po otwarciu poczekalni."}
-                </span>
-              )}
-              {stan.poczekalnia_otwarta && stan.auto && (
-                <span className="pomocniczy">
-                  Automat wystartuje quiz o tej godzinie, jeśli ktoś dołączy. Możesz też kliknąć start wcześniej.
-                </span>
-              )}
-            </p>
-          )}
-
           <section style={{ marginTop: 18, display: "grid", gap: 12 }}>
             {faza === "poczekalnia" && !stan.poczekalnia_otwarta && (
               <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("otworz")}>
@@ -364,10 +365,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
                   Pierwsze pytanie od razu
                 </button>
-                <p className="pilot-zapowiedz" role="status">
-                  Na TV plansza „Zaczynamy!” z odliczaniem. Pierwsze pytanie ruszy samo
-                  {stan.faza_do ? ` za ${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}.
-                </p>
               </>
             )}
 
@@ -377,11 +374,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
                   {nastepne.napis}
                 </button>
-                <p className="pilot-zapowiedz" role="status">
-                  <strong>Opowiedz graczom:</strong> przed nami {stan.plan_etapow.length} etapów, z każdym pytaniem
-                  nalewa się piwo, a oni ścigają się do niego; po drodze odpadają najsłabsi, a o piwo walczy finałowa
-                  trójka.
-                </p>
               </>
             )}
 
@@ -419,9 +411,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 </button>
               ) : (
                 <>
-                  <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
-                    Wynik pokaże się sam, gdy minie czas albo odpowiedzą wszyscy.
-                  </p>
                   {doKonca > 0 && (
                     <button
                       className={`przycisk${wszyscy ? " pozytywny" : ""}`}
@@ -527,9 +516,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             {/* po finale serią TV i telefony czekają w ciemności, aż prowadzący odsłoni podium */}
             {faza === "werble" && (
               <>
-                <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
-                  Finał skończony. TV i telefony zgasły i grają werble. Zbuduj napięcie i odsłoń wynik.
-                </p>
                 <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
                   Pokaż podium
                 </button>
@@ -539,21 +525,12 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             {/* TV sam pokazuje na zmianę podium i tabelę (co 10 s, od drugiej pętli z podziękowaniem) */}
             {(faza === "podium" || faza === "tabela") && (
               <>
-                <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
-                  TV pokazuje na zmianę podium i tabelę wyników. Możesz to tak zostawić: „Zakończ grę” wycisza muzykę
-                  {stan.lokal ? " i oddaje ekran lokalowi (wraca jego logo)." : "."}
-                </p>
                 <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
                   Zakończ grę
                 </button>
               </>
             )}
 
-            {faza === "koniec" && (
-              <p className="pomocniczy">
-                Gra zakończona. Piwu Cześć!{stan.lokal ? " Ekran lokalu wrócił do logo lokalu." : ""}
-              </p>
-            )}
           </section>
 
           {/* odpadanie przed finałem ustalone na sztywno (26.10), progi zmienia się już tylko w bazie */}
@@ -602,9 +579,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                   {etap.final_po_etapie ? "trójka (finał)" : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
                 </p>
               )}
-              <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-                TV pokazuje planszę z zasadami i animacją. Wytłumacz etap i wystartuj, kiedy wszyscy będą gotowi.
-              </p>
             </section>
           )}
 
@@ -638,12 +612,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                   ),
                 )}
               </ol>
-              {stan.pijany_final && (
-                <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-                  Po serii zamiast werbli przyjdzie pijany finał (nic nie liczy), a po nim werble. Zwycięzcę zobaczysz tutaj
-                  od razu.
-                </p>
-              )}
             </section>
           )}
 
@@ -657,10 +625,6 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 </span>
               </p>
               <PodiumPilota gracze={gracze} />
-              <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-                Widzisz to tylko Ty. Gracze odpowiadają na pytania, które nic nie liczą, a TV i telefony wariują coraz
-                bardziej. Po czasie same przyjdą werble, a potem odsłaniasz podium.
-              </p>
             </section>
           )}
 
@@ -673,34 +637,12 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             faza !== "koniec" &&
             faza !== "podium" &&
             faza !== "tabela" && (
-              <section className="karta" style={{ marginTop: 18 }}>
-                <p
-                  className="etykieta"
-                  style={{
-                    marginTop: 0,
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span>
-                    Pytanie {z.lp}/{liczba}
-                  </span>
-                  {faza === "przygotuj" && (
-                    <span className="gra-kod">start za {sekundaOdliczania(doStartu)} s</span>
-                  )}
-                  {faza === "pytanie" && (
-                    <span className="gra-kod">
-                      {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
-                      {bezLimitu
-                        ? ""
-                        : doKonca > 0
-                          ? `${Math.ceil(doKonca / 1000)} s`
-                          : wszyscy
-                            ? "wszyscy odpowiedzieli"
-                            : "czas minął"}
-                    </span>
-                  )}
-                </p>
+              // pytanie z rozwiązaniem zwinięte: rozwija się, gdy prowadzący chce zajrzeć (26.10)
+              <details className="karta pilot-pytanie-karta" style={{ marginTop: 18 }}>
+                {/* czas do końca stoi w ramce stanu nad przyciskami */}
+                <summary className="etykieta">
+                  Pytanie {z.lp}/{liczba} z rozwiązaniem
+                </summary>
                 {etap && (
                   <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
                     {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
@@ -732,7 +674,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                     </>
                   )}
                 </p>
-              </section>
+              </details>
             )}
 
           {faza !== "poczekalnia" && (
