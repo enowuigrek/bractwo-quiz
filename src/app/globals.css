@@ -2916,10 +2916,11 @@ html:has(.kolumna) {
   display: grid;
   /* kolumna nie szersza od ramki: długi wiersz skraca się, zamiast wypychać liczbę za krawędź */
   grid-template-columns: minmax(0, 1fr);
-  gap: 4px;
+  /* z oddechem wokół dużej liczby i pastylki rodzaju (26.10) */
+  gap: 10px;
   box-sizing: border-box;
   margin: 18px 0 0;
-  padding: 12px 18px;
+  padding: 16px 18px;
   border-radius: var(--r-card);
   border: 2px solid var(--kamien2);
   background: var(--kamien);
