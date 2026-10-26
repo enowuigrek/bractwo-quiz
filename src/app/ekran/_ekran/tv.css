@@ -1256,8 +1256,10 @@
   padding: 4px 0;
 }
 
-/* pod ostatnim graczem bez kreski: niczego już nie oddziela (26.10) */
-.tv-odpowiedzi-lista > :last-child {
+/* pod ostatnim graczem w każdej kolumnie bez kreski: niczego już nie oddziela (26.10, kolumny 27.10;
+   `na-dole` liczy odpowiedzi.tsx) */
+.tv-odpowiedzi-lista > :last-child,
+.tv-odpowiedzi-wiersz.na-dole {
   border-bottom: 0;
 }
 

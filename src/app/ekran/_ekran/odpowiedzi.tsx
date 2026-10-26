@@ -27,6 +27,12 @@ function siatka(n: number, k = kolumny(n)): CSSProperties {
   };
 }
 
+/**
+ * Czy gracz `j` z `n` stoi na dole swojej kolumny (siatka układa się kolumnami po `ceil(n / k)` wierszy): tam bez kreski
+ * pod spodem, bo niczego już nie oddziela (27.10: w dwóch kolumnach kreska zostawała pod ostatnim z pierwszej).
+ */
+const naDoleKolumny = (j: number, n: number, k: number) => (j + 1) % Math.ceil(n / k) === 0 || j === n - 1;
+
 /** Wiersz pojawia się z małym opóźnieniem po poprzednim. */
 const wjazd = (i: number) => ({
   initial: { opacity: 0, y: 14 },
@@ -39,6 +45,8 @@ type PropsWiersza = {
   i: number;
   nr?: number;
   z: ZadanieWidoczne | null;
+  /** Ostatni w swojej kolumnie: bez kreski pod spodem. */
+  naDole: boolean;
 };
 
 /** Co gracz odpowiedział: litera i tekst (jedna odpowiedź), litery (kilka) albo ułamek „3/4”. */
@@ -78,11 +86,14 @@ function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null })
   );
 }
 
-function Wiersz({ o, i, nr, z }: PropsWiersza) {
+function Wiersz({ o, i, nr, z, naDole }: PropsWiersza) {
   // dobre odpowiedzi są wszystkie takie same (dobra jest już na ekranie wyniku): bez kolumny odpowiedzi
   const bezOdpowiedzi = o.poprawna === true;
   return (
-    <motion.li className={`tv-odpowiedzi-wiersz${bezOdpowiedzi ? " bez-odp" : ""}`} {...wjazd(i)}>
+    <motion.li
+      className={`tv-odpowiedzi-wiersz${bezOdpowiedzi ? " bez-odp" : ""}${naDole ? " na-dole" : ""}`}
+      {...wjazd(i)}
+    >
       <span className="tv-odpowiedzi-nr">{nr ? `${nr}.` : ""}</span>
       <span className="tv-odpowiedzi-nick">
         <Awatar nick={o.nick} zdjecie={o.zdjecie} rozmiar={38} />
@@ -153,7 +164,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           ) : (
             <ol className="tv-odpowiedzi-lista" style={siatka(dobre.length, k)}>
               {dobre.map((o, i) => (
-                <Wiersz key={o.nick} o={o} i={i} nr={i + 1} z={z} />
+                <Wiersz key={o.nick} o={o} i={i} nr={i + 1} z={z} naDole={naDoleKolumny(i, dobre.length, k)} />
               ))}
             </ol>
           )}
@@ -166,7 +177,13 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             </p>
             <ul className="tv-odpowiedzi-lista" style={siatka(czesciowo.length, k)}>
               {czesciowo.map((o, i) => (
-                <Wiersz key={o.nick} o={o} i={dobre.length + i} z={z} />
+                <Wiersz
+                  key={o.nick}
+                  o={o}
+                  i={dobre.length + i}
+                  z={z}
+                  naDole={naDoleKolumny(i, czesciowo.length, k)}
+                />
               ))}
             </ul>
           </section>
@@ -179,7 +196,13 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             </p>
             <ul className="tv-odpowiedzi-lista" style={siatka(zle.length, k)}>
               {zle.map((o, i) => (
-                <Wiersz key={o.nick} o={o} i={dobre.length + czesciowo.length + i} z={z} />
+                <Wiersz
+                  key={o.nick}
+                  o={o}
+                  i={dobre.length + czesciowo.length + i}
+                  z={z}
+                  naDole={naDoleKolumny(i, zle.length, k)}
+                />
               ))}
             </ul>
           </section>
