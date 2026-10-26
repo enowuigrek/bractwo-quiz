@@ -92,6 +92,15 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   // klasyczny pub quiz (bez etapów): bez kranoprzejęcia i grafiki na poczekalnię (kreator ich nie pokazuje)
   const klasyczny = !etapow;
   if (!lokal) return { blad: "Nie ma takiego lokalu." };
+  // jeden lokal = jeden ekran, więc najwyżej jedna niezakończona gra (w bazie pilnuje tego `sesje_jedna_w_lokalu`)
+  const { data: trwajaca } = await db
+    .from("sesje")
+    .select("kod")
+    .eq("lokal_id", lokal_id)
+    .neq("faza", "koniec")
+    .limit(1)
+    .maybeSingle<{ kod: string }>();
+  if (trwajaca) return { blad: `W tym lokalu jest już gra ${trwajaca.kod}. Zakończ ją w pilocie, zanim uruchomisz nową.` };
   if (!pytania) return { blad: "Ten quiz nie ma jeszcze pytań." };
   if (quiz?.usunieto) return { blad: "Ten quiz jest w koszu. Przywróć go w Quizy → Kosz." };
 
@@ -165,6 +174,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     .single<{ kod: string; host_token: string }>();
   if (error) {
     await usunGrafike(browar_logo_url);
+    // dwa kliknięcia naraz: drugie zatrzymuje indeks `sesje_jedna_w_lokalu`
+    if (error.code === "23505") return { blad: "W tym lokalu jest już gra. Zakończ ją w pilocie, zanim uruchomisz nową." };
     return { blad: `Nie udało się uruchomić gry: ${error.message}` };
   }
   // od razu pilot (26.10, Łukasz: na stronie gry i tak zawsze klikał „Prowadź”); rzeczy ze strony gry są na dole
