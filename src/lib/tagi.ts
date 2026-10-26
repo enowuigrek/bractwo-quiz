@@ -18,7 +18,7 @@ export type RodzajQuizu = "wyscig" | "klasyczny";
 
 export const NAZWY_RODZAJOW: Record<RodzajQuizu, string> = {
   wyscig: "Wyścig po piwo",
-  klasyczny: "Klasyczny pub quiz",
+  klasyczny: "Pub quiz",
 };
 
 /** Wszystkie tagi z listy quizów, alfabetycznie. */

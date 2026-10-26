@@ -374,84 +374,6 @@ a.przycisk {
   min-width: 0;
 }
 
-/* opis przy przełączniku mniejszy i z oddechem od niego (26.10, DESIGN-SYSTEM.md „Przełączniki”) */
-.przelacznik {
-  display: flex !important;
-  align-items: center;
-  gap: 14px;
-  color: var(--piana) !important;
-  font-size: var(--fs-small) !important;
-  font-weight: var(--w-regular) !important;
-  line-height: 1.35;
-  cursor: pointer;
-}
-
-/* Przełącznik zamiast checkboxa w ustawieniach tak/nie (`.przelacznik`, `.pole-wyboru`): złota szyna z gałką.
-   Zaznaczanie poprawnych odpowiedzi w edytorze pytań zostaje zwykłym checkboxem (to wybór z listy). */
-.przelacznik input[type="checkbox"],
-.pole-wyboru input[type="checkbox"] {
-  appearance: none;
-  position: relative;
-  flex: none;
-  width: 44px;
-  height: 24px;
-  margin: 0;
-  border: 1px solid var(--kamien3);
-  border-radius: var(--r-pill);
-  background: var(--kamien2);
-  cursor: pointer;
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease;
-}
-
-.przelacznik input[type="checkbox"]::before,
-.pole-wyboru input[type="checkbox"]::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--szary);
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease;
-}
-
-.przelacznik input[type="checkbox"]:checked,
-.pole-wyboru input[type="checkbox"]:checked {
-  border-color: var(--zloto);
-  background: var(--zloto);
-}
-
-.przelacznik input[type="checkbox"]:checked::before,
-.pole-wyboru input[type="checkbox"]:checked::before {
-  transform: translateX(20px);
-  background: var(--na-zlocie);
-}
-
-.przelacznik input[type="checkbox"]:focus-visible,
-.pole-wyboru input[type="checkbox"]:focus-visible {
-  outline: 2px solid var(--zloto);
-  outline-offset: 2px;
-}
-
-.przelacznik input[type="checkbox"]:disabled,
-.pole-wyboru input[type="checkbox"]:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .przelacznik input[type="checkbox"],
-  .pole-wyboru input[type="checkbox"],
-  .przelacznik input[type="checkbox"]::before,
-  .pole-wyboru input[type="checkbox"]::before {
-    transition: none;
-  }
-}
 
 .podpowiedz {
   color: var(--szary);
@@ -530,77 +452,6 @@ a.przycisk {
   font-size: var(--fs-body);
 }
 
-/* Wybór lokalu przy uruchamianiu gry */
-.kafelki {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
-}
-
-/* position: relative trzyma ukryte pole wyboru w kafelku: bez tego leżało gdzieś wyżej na stronie i po dotknięciu
-   kafelka telefon przewijał do niego (26.10, Łukasz: „to, w co kliknąłem, przesuwa się”) */
-.kafelek {
-  position: relative;
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 10px;
-  margin: 0 !important;
-  border: 2px solid var(--kamien2);
-  border-radius: var(--r-pole);
-  background: var(--pole);
-  color: var(--piana) !important;
-  font-weight: var(--w-semibold) !important;
-  font-size: var(--fs-small) !important;
-  text-align: center;
-  cursor: pointer;
-}
-
-/* Kreator gry (26.10): kafelki z ikoną (miasto, rodzaj), kafelki quizów z opisem, równe przyciski czasu i nagród */
-.kafelek-ikona {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  color: var(--zloto);
-}
-
-.kafelek-ikona svg {
-  width: 36px;
-  height: 36px;
-}
-
-.kafelek-ikona.duza {
-  width: 72px;
-  height: 72px;
-}
-
-.kafelek-ikona.duza svg {
-  width: 60px;
-  height: 60px;
-  stroke-width: 1.6;
-}
-
-.kafelek strong {
-  font-size: var(--fs-body);
-  font-weight: var(--w-black);
-}
-
-.kafelek-opis {
-  color: var(--szary);
-  font-weight: var(--w-regular);
-  font-size: var(--fs-xs);
-}
-
-.kafelki-dwa {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-/* kafelek jako przycisk (nagrody w kreatorze) */
-button.kafelek {
-  font-family: inherit;
-}
 
 /* lokale: wszystkie kafelki tej samej wysokości, logo na środku */
 .kafelki-lokali {
@@ -657,28 +508,6 @@ button.kafelek {
   margin-top: 12px;
 }
 
-.kafelek img {
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-}
-
-.kafelek input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.kafelek:has(input:checked),
-.kafelek.wybrany {
-  border-color: var(--zloto);
-  box-shadow: var(--glow-md);
-}
-
-.kafelek:has(input:focus-visible) {
-  outline: 3px solid var(--zloto);
-  outline-offset: 3px;
-}
 
 .krok {
   display: flex;
@@ -686,10 +515,6 @@ button.kafelek {
   align-items: baseline;
 }
 
-.krok-nr {
-  color: var(--zloto);
-  font-weight: var(--w-black);
-}
 
 /* Uruchomiona gra */
 .akcje-gry {
@@ -1014,33 +839,6 @@ button.kafelek {
   }
 }
 
-/* Nagrody w kreatorze gry: przy każdym miejscu nagroda i instrukcja odbioru */
-.nagrody-pola {
-  display: grid;
-  gap: 14px;
-  margin-top: 14px;
-}
-
-.nagroda-pole {
-  display: grid;
-  grid-template-columns: 2em 1fr;
-  align-items: start;
-  gap: 8px;
-}
-
-.nagroda-pole .krok-nr {
-  padding-top: 14px;
-}
-
-.nagroda-pole > div {
-  display: grid;
-  gap: 6px;
-}
-
-.pole.pole-male {
-  font-size: var(--fs-small);
-  padding: 10px 14px;
-}
 
 /* Pasek nawigacji: na telefonie przewija się w poziomie, więc dajemy zapas na obwódkę aktywnej ⚙.
    Na komputerze nic nie przycinamy (dymek „Ustawienia” i obwódka mieszczą się w całości). */

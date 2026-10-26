@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { komunikatBledu } from "@/lib/gra/nasluch";
 import type { PilotStan } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { dodajBoty } from "./akcje";
 
 /**
  * Co ile pilot pyta bazę, czy któryś bot ma odpowiedzieć (`boty_odpowiadaj` losuje, kto teraz): w pytaniu boty
@@ -29,7 +29,10 @@ export function useBoty(kod: string, token: string | null, stan: PilotStan | nul
   }, [aktywne, kod, token]);
 }
 
-/** Karta w poczekalni: dodaje boty (nicki „Zenek Bot”, „Halina Bot”…), żeby testując nie grać samemu. */
+/**
+ * Karta w poczekalni: dodaje boty (nicki „Zenek Bot”, „Halina Bot”…), żeby testując nie grać samemu. Tylko dla
+ * głównego (26.10), także przed otwarciem poczekalni: boty czekają w grze.
+ */
 export function BotyPilota({
   stan,
   kod,
@@ -48,13 +51,13 @@ export function BotyPilota({
     if (wysylam) return;
     ustawWysylam(true);
     ustawBlad(null);
-    const { data, error } = await supabase().rpc("dodaj_boty", { p_kod: kod, p_host_token: token, p_ile: ile });
+    const wynik = await dodajBoty(kod, token, ile).catch(() => ({ blad: "Brak połączenia. Spróbuj jeszcze raz." }));
     ustawWysylam(false);
-    if (error) {
-      ustawBlad(komunikatBledu(error));
+    if ("blad" in wynik) {
+      ustawBlad(wynik.blad);
       return;
     }
-    onZmiana(data as PilotStan);
+    onZmiana(wynik.stan);
   }
 
   return (

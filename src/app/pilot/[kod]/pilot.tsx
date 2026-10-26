@@ -53,9 +53,14 @@ const NAZWY: Record<FazaWidoczna, string> = {
 
 const bezSubskrypcji = () => () => {};
 
-type Props = { kod: string; tokenZAdresu: string | null };
+type Props = {
+  kod: string;
+  tokenZAdresu: string | null;
+  /** Karta „Boty do testów” (tylko główny admin). */
+  boty: boolean;
+};
 
-export function Pilot({ kod, tokenZAdresu }: Props) {
+export function Pilot({ kod, tokenZAdresu, boty }: Props) {
   // Token z linku zapisujemy w localStorage i usuwamy z paska adresu,
   // żeby nie wyciekł przy pokazywaniu ekranu. Odświeżenie strony bierze go z pamięci.
   const zamontowany = useSyncExternalStore(
@@ -564,7 +569,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </section>
 
           {/* odpadanie przed finałem ustalone na sztywno (26.10), progi zmienia się już tylko w bazie */}
-          {faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
+          {boty && faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
         </div>
 
         <div className="pilot-podglad">

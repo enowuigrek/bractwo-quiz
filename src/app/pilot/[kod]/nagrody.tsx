@@ -5,6 +5,7 @@ import { ZdjecieNagrody } from "@/app/admin/(panel)/gry/nowa/zdjecie-nagrody";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import type { PilotStan } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
+import { IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
 
 type Pole = { nagroda: string; instrukcja: string; zdjecie: string | null };
 
@@ -12,7 +13,8 @@ const pustePole = (): Pole => ({ nagroda: "", instrukcja: "", zdjecie: null });
 
 /**
  * Nagrody z pilota przed startem quizu (26.10, Łukasz: gra jest zapowiedziana wcześniej, a nagrody ustala się na
- * miejscu). Tak jak w kreatorze: bez nagród, za 1. miejsce albo pierwszą trójkę, każda z „jak odebrać” i zdjęciem.
+ * miejscu). Tak jak w kreatorze (te same elementy): przełącznik, potem 1. miejsce albo pierwsza trójka, każda z „jak
+ * odebrać” i zdjęciem.
  * Zapis przez `ustaw_nagrody` (tylko w poczekalni); TV i telefony dostają je od razu.
  */
 export function NagrodyPilota({
@@ -64,58 +66,75 @@ export function NagrodyPilota({
 
   return (
     <div className="pilot-nagrody">
-      <div className="pilot-nagrody-ile" role="radiogroup" aria-label="Nagrody">
-        {(
-          [
-            [0, "Bez nagród"],
-            [1, "1. miejsce"],
-            [3, "Pierwsza trójka"],
-          ] as const
-        ).map(([n, napis]) => (
-          <button
-            key={n}
-            type="button"
-            role="radio"
-            aria-checked={ile === n}
-            className={`przycisk-zdjecie${ile === n ? " wybrany" : ""}`}
-            onClick={() => {
-              ustawIle(n);
-              ustawKomunikat(null);
-            }}
-          >
-            {napis}
-          </button>
-        ))}
-      </div>
-      {pola.slice(0, ile).map((p, i) => (
-        <div key={i} className="pilot-nagroda">
-          <span className="pilot-nagroda-nr">{i + 1}.</span>
-          <div>
-            <input
-              className="pole"
-              value={p.nagroda}
-              onChange={(e) => zmien(i, { nagroda: e.target.value })}
-              placeholder={i === 0 ? "np. Lane Piwo gratis" : "Nagroda"}
-              aria-label={`Nagroda za ${i + 1}. miejsce`}
-              maxLength={80}
-            />
-            <input
-              className="pole"
-              value={p.instrukcja}
-              onChange={(e) => zmien(i, { instrukcja: e.target.value })}
-              placeholder="Jak odebrać, np. przy barze"
-              aria-label={`Jak odebrać nagrodę za ${i + 1}. miejsce`}
-              maxLength={160}
-            />
-            <ZdjecieNagrody
-              miejsce={i + 1}
-              poczatkowe={p.zdjecie}
-              pilot={{ kod, token }}
-              onZmiana={(url) => zmien(i, { zdjecie: url })}
-            />
+      {/* te same elementy co w kreatorze gry: przełącznik, kafelki z podium, pola nagród (26.10) */}
+      <label className="przelacznik">
+        <input
+          type="checkbox"
+          checked={ile > 0}
+          onChange={(e) => {
+            ustawIle(e.target.checked ? 1 : 0);
+            ustawKomunikat(null);
+          }}
+        />{" "}
+        z nagrodami
+      </label>
+      {ile > 0 && (
+        <>
+          <div className="kafelki kafelki-dwa">
+            {(
+              [
+                [1, "1. miejsce", <IkonaPodium1 key="1" />],
+                [3, "pierwsza trójka", <IkonaPodium3 key="3" />],
+              ] as const
+            ).map(([n, napis, ikona]) => (
+              <button
+                key={n}
+                type="button"
+                className={`kafelek${ile === n ? " wybrany" : ""}`}
+                aria-pressed={ile === n}
+                onClick={() => {
+                  ustawIle(n);
+                  ustawKomunikat(null);
+                }}
+              >
+                <span className="kafelek-ikona duza">{ikona}</span>
+                <span className="kafelek-opis">{napis}</span>
+              </button>
+            ))}
           </div>
-        </div>
-      ))}
+          <div className="nagrody-pola">
+            {pola.slice(0, ile).map((p, i) => (
+              <div key={i} className="nagroda-pole">
+                <span className="krok-nr">{i + 1}.</span>
+                <div>
+                  <input
+                    className="pole"
+                    value={p.nagroda}
+                    onChange={(e) => zmien(i, { nagroda: e.target.value })}
+                    placeholder={i === 0 ? "np. Lane Piwo gratis" : "Nagroda"}
+                    aria-label={`Nagroda za ${i + 1}. miejsce`}
+                    maxLength={80}
+                  />
+                  <input
+                    className="pole pole-male"
+                    value={p.instrukcja}
+                    onChange={(e) => zmien(i, { instrukcja: e.target.value })}
+                    placeholder="Jak odebrać, np. przy barze"
+                    aria-label={`Jak odebrać nagrodę za ${i + 1}. miejsce`}
+                    maxLength={160}
+                  />
+                  <ZdjecieNagrody
+                    miejsce={i + 1}
+                    poczatkowe={p.zdjecie}
+                    pilot={{ kod, token }}
+                    onZmiana={(url) => zmien(i, { zdjecie: url })}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
       {komunikat && (
         <p className={komunikat.ok ? "sukces" : "blad"} role={komunikat.ok ? "status" : "alert"} style={{ margin: 0 }}>
           {komunikat.tekst}

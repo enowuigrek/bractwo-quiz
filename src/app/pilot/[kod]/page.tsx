@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { rolaAdmina, widziWszystko } from "@/lib/admin";
 import { poprawnyKod } from "@/lib/gra/kod";
 import { Pilot } from "./pilot";
 
@@ -17,9 +18,11 @@ export default async function StronaPilota({ params, searchParams }: PageProps<"
     redirect(`/pilot/${kod.toUpperCase()}${token ? `?t=${encodeURIComponent(token)}` : ""}`);
   }
 
+  // boty do testów tylko dla głównego (26.10): lokale ich nie potrzebują
+  const rola = await rolaAdmina();
   return (
     <main className="kolumna kolumna-pilot">
-      <Pilot kod={kod} tokenZAdresu={token} />
+      <Pilot kod={kod} tokenZAdresu={token} boty={!!rola && widziWszystko(rola)} />
     </main>
   );
 }
