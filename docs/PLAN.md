@@ -328,7 +328,7 @@ Do zaprojektowania razem:
 
 - **Po „Uruchom grę” od razu pilot** (`/pilot/<kod>?t=…`, `uruchomGre`), bez strony gry: Łukasz i tak zawsze klikał tam „Prowadź”. Na liście rozgrywek trwająca gra (tytuł i złoty przycisk „Prowadź”) też otwiera pilota, zakończona dalej stronę gry z wynikami.
 - **Dół pilota:** rozwijane „Dołączanie, przekazanie pilota, ekran” (`udostepnij.tsx`): QR i link dla gracza (z kodem do wpisania), QR i link do przekazania pilota (z ostrzeżeniem o tajnym kluczu), adres ekranu TV i „Strona gry w panelu” (usunięcie gry, szczegóły; `/admin/gry/<kod>` przekierowuje na stronę gry). Kod gry stoi w nagłówku pilota, gracze z usuwaniem jak dotąd w „Gracze”. Style QR, linku do kopiowania i dymka przeszły z `panel.css` do `globals.css`.
-- **Panel na telefonie** (do 959 px): w nagłówku samo logo i przycisk menu (`_komponenty/menu.tsx`); menu: Gra (Rozgrywki, „▶ Uruchom quiz”), Przygotowanie (Quizy, Lokale), Wyloguj. Na komputerze pasek jak dotąd.
+- **Panel na telefonie** (do 959 px): w nagłówku samo logo i trzy kreski bez kółka (`_komponenty/menu.tsx`), które po kliknięciu zamieniają się w złoty krzyżyk, a z prawej wysuwa się panel na całą wysokość (przyciemnione tło, Escape i klik obok zamykają, strona pod spodem stoi): Gra („▶ Uruchom quiz”, Rozgrywki), Przygotowanie (Quizy, Lokale) jako karty z krótkim opisem, Wyloguj na dole. Na komputerze pasek jak dotąd.
 - Niesprawdzone kliknięciem: samo przekierowanie z kreatora (narzędzie nie przestawia list w kreatorze); lista rozgrywek → pilot, dół pilota i link do panelu sprawdzone.
 
 ## Ustalenia

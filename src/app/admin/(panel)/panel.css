@@ -59,65 +59,162 @@ html:has(.panel) {
   }
 }
 
+/* trzy kreski bez kółka, które zamieniają się w krzyżyk */
 .panel-menu-przycisk {
-  color: var(--piana);
+  position: relative;
+  z-index: 52;
+  display: grid;
+  align-content: center;
+  justify-items: end;
+  gap: 7px;
+  width: 48px;
+  height: 48px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
+.panel-menu-przycisk span {
+  display: block;
+  width: 32px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--piana);
+  transition:
+    transform 0.3s var(--ease-std),
+    opacity 0.2s ease,
+    width 0.3s var(--ease-std),
+    background-color 0.3s ease;
+}
+
+/* środkowa krótsza: wygląda lżej niż trzy równe paski */
+.panel-menu-przycisk span:nth-child(2) {
+  width: 24px;
+}
+
+.panel-menu.otwarte .panel-menu-przycisk span {
+  background: var(--zloto);
+}
+
+.panel-menu.otwarte .panel-menu-przycisk span:nth-child(1) {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.panel-menu.otwarte .panel-menu-przycisk span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+
+.panel-menu.otwarte .panel-menu-przycisk span:nth-child(3) {
+  transform: translateY(-10px) rotate(-45deg);
+}
+
+/* przyciemnienie strony pod panelem */
 .panel-menu-tlo {
   position: fixed;
   inset: 0;
-  z-index: 40;
-  border: 0;
-  padding: 0;
-  background: rgba(0, 0, 0, 0.55);
-  cursor: default;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
-.panel-menu-lista {
-  position: absolute;
+.panel-menu.otwarte .panel-menu-tlo {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* panel wysuwa się z prawej na całą wysokość; przycisk z krzyżykiem zostaje nad nim w tym samym miejscu */
+.panel-menu-szuflada {
+  position: fixed;
+  top: 0;
   right: 0;
-  top: calc(100% + 10px);
-  z-index: 41;
-  width: min(300px, calc(100vw - 32px));
-  display: grid;
-  gap: 6px;
-  padding: 16px;
-  border: 1px solid var(--kamien2);
-  border-radius: var(--r-card);
+  bottom: 0;
+  z-index: 51;
+  width: min(340px, 86vw);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: calc(env(safe-area-inset-top) + 96px) 24px calc(env(safe-area-inset-bottom) + 28px);
+  box-sizing: border-box;
+  overflow-y: auto;
   background: var(--kamien);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  border-left: 1px solid var(--kamien2);
+  box-shadow: -18px 0 40px rgba(0, 0, 0, 0.55);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform 0.35s var(--ease-std),
+    visibility 0s linear 0.35s;
 }
 
-.panel-menu-lista .etykieta {
-  margin: 6px 0 0;
+.panel-menu.otwarte .panel-menu-szuflada {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.35s var(--ease-std);
 }
 
-.panel-menu-lista .etykieta:first-child {
-  margin-top: 0;
+.panel-menu-szuflada section {
+  display: grid;
+  gap: 10px;
 }
 
-.panel-menu-lista > a:not(.przycisk) {
-  padding: 10px 12px;
-  border-radius: var(--r-pole);
+.panel-menu-szuflada .etykieta {
+  margin: 0 0 2px;
+}
+
+.panel-menu-start {
+  width: 100%;
+}
+
+.panel-menu-pozycja {
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--kamien2);
+  background: var(--bg);
   color: var(--piana);
-  font-weight: var(--w-semibold);
   text-decoration: none;
 }
 
-.panel-menu-lista > a[aria-current="page"] {
-  color: var(--zloto);
-  background: rgba(227, 172, 63, 0.1);
+.panel-menu-pozycja strong {
+  font-size: 1.15rem;
+  font-weight: var(--w-black);
 }
 
-.panel-menu-lista form {
-  margin-top: 10px;
-  padding-top: 12px;
+.panel-menu-pozycja span {
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.panel-menu-pozycja[aria-current="page"] {
+  border-color: var(--zloto);
+}
+
+.panel-menu-pozycja[aria-current="page"] strong {
+  color: var(--zloto);
+}
+
+/* wylogowanie na dole panelu, z dala od reszty */
+.panel-menu-wyloguj {
+  margin-top: auto;
+  padding-top: 20px;
   border-top: 1px solid var(--kamien2);
 }
 
-.panel-menu-lista form .przycisk,
-.panel-menu-lista > .przycisk {
+.panel-menu-wyloguj .przycisk {
   width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-menu-przycisk span,
+  .panel-menu-tlo,
+  .panel-menu-szuflada {
+    transition: none;
+  }
 }
 
 .panel-nawigacja {
