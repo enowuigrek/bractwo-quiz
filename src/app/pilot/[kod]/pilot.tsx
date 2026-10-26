@@ -27,8 +27,9 @@ import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
-import { ProgiPilota } from "./progi";
 import { UdostepnijPilota } from "./udostepnij";
+import { MenuPanelu, type GraWMenu } from "@/app/admin/(panel)/_komponenty/menu";
+import { wylogujAdmina } from "@/app/admin/akcje";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
@@ -120,13 +121,13 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
   if (!zamontowany) {
-    return <Naglowek kod={kod} />;
+    return <Naglowek />;
   }
 
   if (!token || (bladDostepu && !stan)) {
     return (
       <>
-        <Naglowek kod={kod} />
+        <Naglowek />
         <h1>Brak dostępu do pilota</h1>
         <p className="pomocniczy">
           Ten link pilota jest nieprawidłowy albo niepełny. Zeskanuj kod QR pilota z ekranu gry w panelu admina.
@@ -138,7 +139,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   if (!stan) {
     return (
       <>
-        <Naglowek kod={kod} />
+        <Naglowek />
         <p className="pomocniczy">{bladSieci ?? "Łączę z grą…"}</p>
       </>
     );
@@ -236,12 +237,26 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   return (
     <>
-      <Naglowek kod={kod} />
+      <Naglowek
+        gra={{
+          href: `/pilot/${kod}`,
+          tytul: stan.quiz?.tytul ?? "Quiz",
+          kod,
+          status: NAZWY[faza],
+          lokal: stan.lokal ?? null,
+        }}
+      />
       {/* na komputerze dwie kolumny: sterowanie po lewej (zawsze pod ręką), podgląd pytania i graczy po prawej */}
       <div className="pilot">
         <div className="pilot-sterowanie">
           {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
-          <h1 style={{ marginBottom: 4 }}>{stan.quiz?.tytul ?? "Quiz"}</h1>
+          {/* kod gry na wierzchu, przy tytule: do podania komuś do wpisania (26.10, w nagłówku jest teraz menu) */}
+          <div className="pilot-tytul">
+            <h1 style={{ marginBottom: 4 }}>{stan.quiz?.tytul ?? "Quiz"}</h1>
+            <span className="gra-kod" aria-label={`Kod gry ${kod}`}>
+              {kod}
+            </span>
+          </div>
           <p className="pomocniczy" style={{ marginTop: 0 }}>
             {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
           </p>
@@ -541,33 +556,8 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             )}
           </section>
 
-          {faza === "poczekalnia" && <ProgiPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
+          {/* odpadanie przed finałem ustalone na sztywno (26.10), progi zmienia się już tylko w bazie */}
           {faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
-          {/* awaryjne zakończenie na samym dole, z dala od zwykłych przycisków */}
-          {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
-            <button
-              className="przycisk niebezpieczny"
-              style={{ marginTop: 32, width: "100%" }}
-              disabled={wysylam}
-              onClick={() =>
-                akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
-                  tak: "Zakończ grę",
-                  niebezpieczne: true,
-                })
-              }
-            >
-              Zakończ grę
-            </button>
-          )}
-          {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło.
-              Przycisk, nie napis do klikania; po grze złoty, bo to wtedy główna akcja */}
-          <Link
-            href="/admin/gry"
-            className={`przycisk${faza === "koniec" ? " zloty" : ""}`}
-            style={{ marginTop: 32 }}
-          >
-            Panel obsługi
-          </Link>
         </div>
 
         <div className="pilot-podglad">
@@ -761,9 +751,32 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
             </details>
           )}
 
-          {/* dołączanie, przekazanie pilota, ekran i strona gry w panelu: pod ręką, ale niżej */}
+          {/* dołączanie, przekazanie pilota i ekran: pod ręką, ale niżej */}
           <UdostepnijPilota kod={kod} token={token} />
         </div>
+      </div>
+      {/* Na samym dole, pod graczami i dołączaniem (26.10): awaryjne zakończenie z dala od zwykłych przycisków,
+          a po grze powrót do panelu (np. żeby uruchomić następną grę; bez logowania panel poprosi o hasło) */}
+      <div className="pilot-dol">
+        {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
+          <button
+            className="przycisk niebezpieczny"
+            disabled={wysylam}
+            onClick={() =>
+              akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
+                tak: "Zakończ grę",
+                niebezpieczne: true,
+              })
+            }
+          >
+            Zakończ grę
+          </button>
+        )}
+        {faza === "koniec" && (
+          <Link href="/admin/gry" className="przycisk zloty">
+            Panel obsługi
+          </Link>
+        )}
       </div>
       {oknoPotwierdzenia}
     </>
@@ -875,11 +888,12 @@ function PodiumPilota({ gracze }: { gracze: GraczPilota[] }) {
   );
 }
 
-function Naglowek({ kod }: { kod: string }) {
+/** Nagłówek pilota: logo i menu panelu (zawsze, także na komputerze), ze skrótem do tej gry, gdy już wiadomo jakiej. */
+function Naglowek({ gra = null }: { gra?: GraWMenu | null }) {
   return (
     <header className="gra-naglowek">
       <LogoQuiz wysokosc={40} dopisek="pilot" />
-      <span className="gra-kod">{kod}</span>
+      <MenuPanelu wyloguj={wylogujAdmina} gra={gra} />
     </header>
   );
 }

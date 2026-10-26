@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- logo lokalu z bucketu Supabase */
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,10 +8,19 @@ import { useEffect, useState } from "react";
 /**
  * Menu panelu na telefonie (26.10, Łukasz: zakładki, „Uruchom”, ustawienia i „Wyloguj” w jednym rzędzie robiły
  * bałagan). Obok logo trzy kreski (bez kółka), które po kliknięciu zamieniają się w krzyżyk, a z prawej wysuwa się
- * panel na całą wysokość: gra (uruchomienie i rozgrywki), przygotowanie (quizy, lokale) i na dole wylogowanie.
- * Na komputerze zostaje pasek nawigacji (nawigacja.tsx).
+ * panel na całą wysokość: gra (uruchomienie albo skrót do trwającej gry, rozgrywki), przygotowanie (quizy, lokale)
+ * i na dole wylogowanie. W panelu na komputerze zostaje pasek nawigacji (nawigacja.tsx), w pilocie menu jest zawsze.
  */
-export function MenuPanelu({ wyloguj }: { wyloguj: () => Promise<void> }) {
+/** Trwająca gra: w menu skrót do jej pilota zamiast „Uruchom quiz” (kilku naraz zwykle nie prowadzimy). */
+export type GraWMenu = {
+  href: string;
+  tytul: string;
+  kod: string;
+  status: string;
+  lokal: { nazwa: string; logo_url: string | null } | null;
+};
+
+export function MenuPanelu({ wyloguj, gra = null }: { wyloguj: () => Promise<void>; gra?: GraWMenu | null }) {
   const sciezka = usePathname();
   const [otwarte, ustawOtwarte] = useState(false);
   const zamknij = () => ustawOtwarte(false);
@@ -57,9 +67,25 @@ export function MenuPanelu({ wyloguj }: { wyloguj: () => Promise<void> }) {
       <nav id="panel-menu-szuflada" className="panel-menu-szuflada" aria-label="Panel" inert={!otwarte}>
         <section>
           <p className="etykieta">Gra</p>
-          <Link href="/admin/gry/nowa" onClick={zamknij} className="przycisk zloty panel-menu-start">
-            ▶ Uruchom quiz
-          </Link>
+          {gra ? (
+            <Link href={gra.href} onClick={zamknij} className="panel-menu-gra">
+              {gra.lokal?.logo_url ? (
+                <img src={gra.lokal.logo_url} alt="" />
+              ) : (
+                <span className="miniatura-pusta" aria-hidden />
+              )}
+              <span>
+                <strong>{gra.tytul}</strong>
+                <span>
+                  {[gra.kod, gra.lokal?.nazwa, gra.status].filter(Boolean).join(" · ")}
+                </span>
+              </span>
+            </Link>
+          ) : (
+            <Link href="/admin/gry/nowa" onClick={zamknij} className="przycisk zloty panel-menu-start">
+              ▶ Uruchom quiz
+            </Link>
+          )}
           {pozycja("/admin/gry", "Rozgrywki", "trwające gry i historia", sciezka.startsWith("/admin/gry") && !uruchamianie)}
         </section>
         <section>

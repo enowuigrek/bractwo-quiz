@@ -329,7 +329,6 @@ Do zaprojektowania razem:
 - **Po „Uruchom grę” od razu pilot** (`/pilot/<kod>?t=…`, `uruchomGre`), bez strony gry: Łukasz i tak zawsze klikał tam „Prowadź”. Na liście rozgrywek trwająca gra (tytuł i złoty przycisk „Prowadź”) też otwiera pilota, zakończona dalej stronę gry z wynikami.
 - **Dół pilota:** rozwijane „Dołączanie, przekazanie pilota, ekran” (`udostepnij.tsx`): QR i link dla gracza (z kodem do wpisania), QR i link do przekazania pilota (z ostrzeżeniem o tajnym kluczu), adres ekranu TV i „Strona gry w panelu” (usunięcie gry, szczegóły; `/admin/gry/<kod>` przekierowuje na stronę gry). Kod gry stoi w nagłówku pilota, gracze z usuwaniem jak dotąd w „Gracze”. Style QR, linku do kopiowania i dymka przeszły z `panel.css` do `globals.css`.
 - **Panel na telefonie** (do 959 px): w nagłówku samo logo i trzy kreski bez kółka (`_komponenty/menu.tsx`), które po kliknięciu zamieniają się w złoty krzyżyk, a z prawej wysuwa się panel na całą wysokość (przyciemnione tło, Escape i klik obok zamykają, strona pod spodem stoi): Gra („▶ Uruchom quiz”, Rozgrywki), Przygotowanie (Quizy, Lokale) jako karty z krótkim opisem, Wyloguj na dole. Na komputerze pasek jak dotąd.
-- Niesprawdzone kliknięciem: samo przekierowanie z kreatora (narzędzie nie przestawia list w kreatorze); lista rozgrywek → pilot, dół pilota i link do panelu sprawdzone.
 
 ## Ustalenia
 
@@ -464,6 +463,14 @@ Plan Pro (25 $/mies.) ma sens dopiero przy częstych eventach albo gdy będzie p
 
 ## Ustalenia z realizacji
 
+
+### Kreator na kafelkach, pilot uporządkowany, menu zawsze w pilocie (26.10) ✅
+
+- **Kreator gry** (mobile i desktop): kafelki zamiast list. Miasto (pinezka, liczba lokali), lokal (logo), rodzaj („Wyścig po piwo” z kuflem, „Pub quiz” z dymkiem; `IkonaWyscig`, `IkonaPubQuiz`, `IkonaMiasto` w `ikony.tsx`), quiz (tytuł, liczba pytań, tematy). Czas: cztery równe przyciski „∞” (bez limitu), 20, 30, 45 s (10 s wypadło). Nagrody: przełącznik, a po włączeniu „1. miejsce” albo „pierwsza trójka” i pola nagród. „Wydarzenie” (tylko wyścig): przełącznik, po włączeniu browar, Instagram, logo browaru i grafika na poczekalnię. Limit graczy na całą szerokość. Bez tekstów objaśniających pod czasem, nagrodami, pijanym finałem, zapowiedzią i prowadzeniem.
+- **Lokal „Test nagłówka (usuń)” usunięty** (miasto Test zniknęło z kreatora). Gry testowe zakładamy bez lokalu.
+- **Pilot:** w nagłówku logo i menu (to samo co w panelu, zawsze widoczne, także na komputerze), kod gry przy tytule. W menu, gdy trwa gra, zamiast „Uruchom quiz” skrót do niej: logo lokalu, tytuł, kod, lokal i status (w panelu najnowsza trwająca gra widoczna dla roli, w pilocie ta gra). Pozycje menu to sam tekst, bez tła i ramek. Style menu w `globals.css`.
+- **Kolejność w pilocie:** sterowanie, boty (bez opisu), gracze i „Dołączanie, przekazanie pilota, ekran” (rozwijane ze strzałką, która się obraca), a dopiero na samym dole „Zakończ grę”; „Panel obsługi” tylko po zakończeniu gry. Bez „Odpadania przed finałem” (progi ustalone na sztywno, `progi.tsx` usunięty, funkcja `ustaw_progi` zostaje w bazie) i bez linku „Strona gry w panelu”.
+- Sprawdzone na telefonie 375 px: kreator od miasta do „Uruchom grę” (testowy lokal) przekierowuje do pilota, menu pilota ze skrótem do gry.
 ### Dzień 1
 
 - **Next.js 16.4** (Turbopack). `cacheComponents` wyłączone: panel i tak jest dynamiczny, a gra działa po stronie klienta na Realtime. Middleware nazywa się teraz `proxy` (`src/proxy.ts`).

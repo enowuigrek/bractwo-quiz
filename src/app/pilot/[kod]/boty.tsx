@@ -65,10 +65,6 @@ export function BotyPilota({
       <button type="button" className="przycisk" disabled={wysylam} onClick={() => void dodaj(4)}>
         {wysylam ? "Dodaję…" : "Dodaj 4 boty"}
       </button>
-      <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
-        Grają jak ludzie: raz dobrze, raz źle, z różnym czasem odpowiedzi. Odpowiadają w pierwszych sekundach pytania,
-        więc nie trzeba na nie czekać, gdy otwarty jest ten pilot albo (przy automatycznym prowadzeniu) TV.
-      </p>
       {blad && (
         <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>
           {blad}

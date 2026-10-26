@@ -24,8 +24,8 @@ function useQr(url: string | null): string | null {
 
 /**
  * Dół pilota (26.10, Łukasz: po uruchomieniu gry od razu pilot, bez strony gry w panelu, a jej potrzebne rzeczy
- * niżej, na wszelki wypadek): QR dla kogoś, kto chce dołączyć, przekazanie pilota kodem QR, adres ekranu TV i strona
- * gry w panelu (usuwanie gry, wyniki; wymaga logowania). Adresy z adresu bieżącej strony, bez domeny na sztywno.
+ * niżej, na wszelki wypadek): QR dla kogoś, kto chce dołączyć, przekazanie pilota kodem QR i adres ekranu TV. Strona
+ * gry w panelu (usuwanie, wyniki) jest w Rozgrywkach. Adresy z adresu bieżącej strony, bez domeny na sztywno.
  */
 export function UdostepnijPilota({ kod, token }: { kod: string; token: string }) {
   const adres = useSyncExternalStore(
@@ -68,12 +68,6 @@ export function UdostepnijPilota({ kod, token }: { kod: string; token: string })
             Ekran lokalu przełącza się na grę sam. Inny telewizor: otwórz w jego przeglądarce.
           </p>
           <LinkDoSkopiowania url={`${adres}/ekran/${kod}`} />
-
-          <h3>Panel</h3>
-          <p className="pomocniczy">Usunięcie gry, szczegóły i wyniki (po zalogowaniu do panelu).</p>
-          <a href={`/admin/gry/${kod}`} className="przycisk">
-            Strona gry w panelu
-          </a>
         </>
       )}
     </details>
