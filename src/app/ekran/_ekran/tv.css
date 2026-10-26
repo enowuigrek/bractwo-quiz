@@ -3536,9 +3536,9 @@
   }
 }
 
-/* Pijany finał na TV (pijany.tsx): drogi spadają, awatary latają jak wygaszacz DVD, drżą, pulsują i widzą
-   podwójnie, szklanka się kołysze. Wszystko rośnie z --poziom (0..1 przez całą fazę). Same transformacje,
-   bez clip-path (Samsung). */
+/* Pijany finał na TV (pijany.tsx, od 26.10 subtelnie): nagłówek się kołysze, plansza z drogami buja się
+   (transform z pętli klatek), awatary lekko się chwieją. Wszystko rośnie z --poziom (0..1 przez całą fazę).
+   Na koniec wybuch: szklanka pęka, nagłówek, awatary i drogi odlatują. Same transformacje, bez clip-path (Samsung). */
 .tv-pijany {
   --poziom: 0;
   /* bez mrugania ekranu na wejściu (25.10, Łukasz: miganie to bardziej psucie niż pijaństwo) */
@@ -3579,21 +3579,8 @@
   }
 }
 
-/* drogi po kolei spadają w dół ekranu, każda z innym przechyłem (--i, --obrot z drogi.tsx) */
-.drogi-finalu-svg.spadaja .drogi-finalu-pas {
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: translateY(1100px) rotate(var(--obrot));
-  opacity: 0;
-  transition:
-    transform 3s cubic-bezier(0.5, 0, 0.9, 0.4) calc(var(--i) * 0.6s),
-    opacity 0.6s ease-in calc(2.4s + var(--i) * 0.6s);
-}
-
-/* Szklanka stoi nieruchomo i ostro (bez falowania planszy): pod koniec gra nad nią wideo, którego
-   pierwsza klatka to ta sama szklanka w tym samym miejscu sceny (docs/wideo/pekniecie-start.png).
-   Szklanka pęka sama dopiero z wybuchem w klipie (WYBUCH_S), a nie gdy wideo rusza: Samsung zgłasza granie
-   wideo i gra jego dźwięk, ale obrazu nie było widać, więc piwo znikało bez wybuchu (25.10). */
+/* Szklanka pęka z wybuchem: na komputerze w chwili wybuchu w klipie (WYBUCH_S; pierwsza klatka klipu to ta sama
+   szklanka, docs/wideo/pekniecie-start.png), na telewizorze bez wideo razem z rozpryskiem (niżej). */
 .tv-pijany.wybuch .drogi-finalu-szklanka {
   animation: szklanka-peka 0.45s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
 }
@@ -3728,67 +3715,142 @@
   will-change: transform;
 }
 
-.pijany-drzenie {
-  animation: drzenie-pijane 0.13s linear infinite;
-  animation-delay: calc(var(--i) * -0.05s);
+/* plansza buja się wokół środka (rotate z pętli klatek w pijany.tsx) */
+.pijany-plansza {
+  transform-origin: 50% 55%;
+  will-change: transform;
 }
 
-@keyframes drzenie-pijane {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  25% {
-    translate: calc(var(--poziom) * 7px + 1px) calc(var(--poziom) * -5px);
-  }
-  50% {
-    translate: calc(var(--poziom) * -6px - 1px) calc(var(--poziom) * 5px + 1px);
-  }
-  75% {
-    translate: calc(var(--poziom) * 5px) calc(var(--poziom) * 4px - 1px);
-  }
-}
-
+/* awatar lekko się chwieje i pod koniec traci ostrość (bez drżenia i podwójnego widzenia od 26.10) */
 .pijany-awatar {
   position: relative;
   display: grid;
-  /* delikatna utrata ostrości; filtr na małych awatarach, nie na całej planszy (Samsung) */
-  filter: blur(calc(var(--poziom) * 1.5px));
-  animation: pulsowanie-pijane 1.4s ease-in-out infinite alternate;
-  animation-delay: calc(var(--i) * -0.45s);
+  filter: blur(calc(var(--poziom) * 0.7px));
+  animation: chwianie-pijane 2.4s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.8s);
 }
 
-/* właściwy awatar nad bladym drugim */
-.pijany-awatar > .awatar {
+@keyframes chwianie-pijane {
+  from {
+    rotate: calc(var(--poziom) * -7deg - 2deg);
+  }
+  to {
+    rotate: calc(var(--poziom) * 7deg + 2deg);
+  }
+}
+
+/* wybuch: drogi odlatują każda w swoją stronę (--i, --obrot z drogi.tsx) */
+.tv-pijany.wybuch .drogi-finalu-pas {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translate(calc(-640px + var(--i) * 300px), calc((var(--i) - 1.5) * 520px)) rotate(calc(var(--obrot) * 4));
+  opacity: 0;
+  transition:
+    transform 1.2s cubic-bezier(0.2, 0.7, 0.35, 1),
+    opacity 0.9s ease-in 0.25s;
+}
+
+/* Wybuch bez wideo (telewizor albo klip nie ruszył): błysk i rozprysk szkła, kropli piwa i piany ze szklanki */
+.pijany-odlamki {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.pijany-blysk {
+  position: absolute;
+  left: -160px;
+  top: -160px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 250, 230, 0.95) 0%, rgba(243, 210, 122, 0.6) 35%, transparent 70%);
+  animation: blysk-wybuchu 0.7s ease-out forwards;
+}
+
+@keyframes blysk-wybuchu {
+  from {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(5);
+    opacity: 0;
+  }
+}
+
+.pijany-odlamek {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  animation: odlamek-leci 1.5s cubic-bezier(0.12, 0.7, 0.35, 1) forwards;
+}
+
+/* szkło: trójkąt z obramowań (bez clip-path), jasny z odblaskiem */
+.pijany-odlamek.szklo {
+  width: 0;
+  height: 0;
+  border-left: calc(var(--rozmiar) * 0.45) solid transparent;
+  border-right: calc(var(--rozmiar) * 0.45) solid transparent;
+  border-bottom: var(--rozmiar) solid rgba(235, 245, 255, 0.8);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+.pijany-odlamek.kropla {
+  width: var(--rozmiar);
+  height: var(--rozmiar);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffd76a, #c8711d);
+}
+
+.pijany-odlamek.piana {
+  width: var(--rozmiar);
+  height: var(--rozmiar);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fffdf3, #f4ecd8 60%, rgba(244, 236, 216, 0.6));
+}
+
+@keyframes odlamek-leci {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--obrot));
+    opacity: 0;
+  }
+}
+
+/* po wybuchu bez wideo wszystko gaśnie do czerni, jak przed werblami (z wideo robi to sam klip) */
+.tv-pijany {
   position: relative;
 }
 
-@keyframes pulsowanie-pijane {
-  from {
-    scale: 0.96;
-    rotate: calc(var(--poziom) * -16deg - 3deg);
-  }
-  to {
-    scale: calc(1.08 + var(--poziom) * 0.42);
-    rotate: calc(var(--poziom) * 16deg + 3deg);
-  }
-}
-
-/* podwójne widzenie */
-.pijany-duch {
+.tv-pijany.bez-wideo::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  display: grid;
-  opacity: calc(0.2 + var(--poziom) * 0.35);
-  animation: duch-pijany 1.9s ease-in-out infinite alternate;
+  inset: -300px;
+  z-index: 40;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  animation: pijany-gasnie 1.1s ease-in 1.5s forwards;
 }
 
-@keyframes duch-pijany {
-  from {
-    translate: calc(var(--poziom) * -34px - 6px) calc(var(--poziom) * -4px);
-  }
+.tv:has(.tv-pijany.bez-wideo) .tv-tlo {
+  opacity: 0;
+  transition: opacity 1.1s ease-in 1.5s;
+}
+
+@keyframes pijany-gasnie {
   to {
-    translate: calc(var(--poziom) * 34px + 6px) calc(var(--poziom) * 8px);
+    opacity: 1;
   }
 }
 
@@ -3796,14 +3858,12 @@
   .tv-seria.drzy .drogi-finalu-gracz .awatar,
   .tv-pijany,
   .tv-pijany .tv-ranking-gora,
-  .pijany-drzenie,
-  .pijany-awatar,
-  .pijany-duch {
+  .pijany-awatar {
     animation: none;
   }
 
-  /* drogi znikają bez spadania */
-  .drogi-finalu-svg.spadaja .drogi-finalu-pas {
+  /* drogi znikają bez odlotu */
+  .tv-pijany.wybuch .drogi-finalu-pas {
     transform: none;
     transition: opacity 0.8s ease-in;
   }

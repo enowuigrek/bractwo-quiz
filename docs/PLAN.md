@@ -266,6 +266,14 @@ Do zaprojektowania razem:
   - tło pytań: „Very subtle ambient background for concentration, soft felt piano and warm pads, slow gentle pulse without percussion, minimal melody, no tension, no risers, calm and neutral, 70 bpm, instrumental, seamless loop”
   - koniec: „Short warm closing tune for the end of a friendly pub quiz, gentle piano and acoustic guitar, soft and satisfied, no fanfare, no brass, no drums, about 40 seconds, instrumental”
 
+### Pijany finał subtelniej, wybuch bez wideo na TV, muzyka na Web Audio (26.10) ✅
+
+- **Przyczyna braku wybuchu na OLED:** wideo z `mix-blend-mode: screen` na Samsungu gra dźwięk, ale obrazu nie widać (sprzętowa warstwa wideo; komentarz z 25.10). Wczytywanie z wyprzedzeniem nie pomogło. Teraz na telewizorze (`czyTelewizor` w `src/lib/gra/telewizor.ts`: Tizen, webOS, VIDAA…; `?tv` wymusza na komputerze) wybuch jest bez wideo, dokładnie `WYBUCH_PRZED_S` przed końcem: błysk, 34 odłamki (szkło z obramowań, krople piwa, piana; bez clip-path), szklanka pęka, nagłówek, zawodnicy i drogi odlatują, po 1,5 s wszystko gaśnie do czerni. Huk `public/dzwieki/wybuch.mp3` wycięty z klipu (od 1,35 s, szczyt −3 dB), efekt `wybuch` (tylko z pliku). Na komputerze wideo jak dotąd; gdy nie ruszy, 0,8 s później ten sam wybuch bez wideo.
+- **Subtelniej:** zamiast cofania, spadających dróg i latania awatarów: nagłówek się kołysze (jak było), plansza z drogami buja się (0,6° → 2,8°, okres 9 s), zawodnicy zjeżdżają po drogach w stronę przechyłu (do 6% drogi), awatar lekko się chwieje (bez drżenia i podwójnego widzenia).
+- **Nikt nie dojeżdża:** położenia zamrożone z chwili wejścia w pijany finał (ostatni krok serii, który przychodzi razem z przejściem, nie przesuwa już lidera do szklanki).
+- **Muzyka:** utwór finału na czas pijanego finału przechodzi z odtwarzacza na Web Audio (`src/lib/gra/muzyka-pijana.ts`, kontekst efektów): ten sam moment utworu, tempo kołysze się płynnie (oscylator 1/9 Hz na `playbackRate`, głębokość do 5%, średnio do 4% wolniej), bez dziur. Utwór dekoduje się już w finale serią. Gdy przejęcie się nie uda, gra zwykły odtwarzacz bez kołysania.
+- **Sprawdzone lokalnie:** z `?tv` bujanie, zamrożone położenia, wybuch bez wideo w zaplanowanej chwili i do werbli; bez `?tv` wideo jak dotąd. Muzyki na Samsungu nie dało się sprawdzić lokalnie.
+
 ## Ustalenia
 
 | Temat | Decyzja |

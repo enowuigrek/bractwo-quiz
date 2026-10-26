@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { naWybuch, odblokujDzwiek } from "@/lib/gra/dzwiek";
 import { GASNIECIE_S } from "@/lib/pijany";
+import { zagrajMuzykePijana } from "@/lib/gra/muzyka-pijana";
 import type { StanSesji } from "@/lib/gra/typy";
 import { IkonaGlosnik } from "@/components/ikony";
 
@@ -35,8 +36,6 @@ function zapasUtworu(u: Utwor): string | null {
 }
 
 const GLOSNOSC = 0.55;
-/** Pijany finał: tempo muzyki zmienia się najwyżej co tyle ms (każda zmiana to na Samsungu krótka dziura w dźwięku). */
-const ZMIANA_TEMPA_MS = 4000;
 /** Stary utwór cichnie przy zmianie tyle ms. Nowy wchodzi od razu na pełną głośność: utwory mają własne wstępy. */
 const PRZENIKANIE_MS = 1500;
 /**
@@ -146,8 +145,8 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
  * Muzyka na TV, gdy jest włączona (`sesje.muzyka`, domyślnie tak; pilot może wyłączyć). Dwa stałe odtwarzacze
  * na zmianę: zmiana utworu i powrót pętli to przenikanie z jednego na drugi, więc nie ma dziury na końcu pliku.
  * Stałe, bo Safari pozwala grać tylko elementom, które raz zagrały po geście; nowy element zostałby zablokowany.
- * W pijanym finale muzyka subtelnie zwalnia i przyspiesza jak rozciągana taśma (`preservesPitch = false`, rzadkie
- * małe zmiany tempa, bez falowania głośności), a urywa się razem z gaśnięciem telefonów
+ * W pijanym finale utwór finału gra dalej przez Web Audio z płynnym kołysaniem tempa (muzyka-pijana.ts), a urywa się
+ * razem z gaśnięciem telefonów
  * (`GASNIECIE_S` przed końcem), żeby przed wybuchem szklanki była chwila ciszy; `naWybuch` to zapas na wypadek,
  * gdyby zegar TV się spóźniał. Bez przewijania (`currentTime`): telewizor po takim skoku potrafił ucichnąć.
  * Przeglądarka nie zagra bez gestu, więc gdy w poczekalni długo jest cicho, na dole jest prośba o OK na pilocie TV.
@@ -282,7 +281,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       // zawsze wczytanie od nowa (także tego samego pliku), nigdy przewijanie (patrz WYCISZENIE_S)
       a.src = plik;
       a.volume = 0;
-      a.playbackRate = stary?.playbackRate ?? 1;
+      if (a.playbackRate !== 1) a.playbackRate = 1;
       w.aktywny = a;
       w.zatrzymana = false;
       // od teraz liczymy ciszę, aż nowy odtwarzacz naprawdę zagra (`playing`)
@@ -369,11 +368,20 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     return () => window.clearTimeout(id);
   }, [cichoOd]);
 
-  // wybuch szklanki w wideo pijanego finału: muzyka urywa się w tej samej chwili
+  // muzyka pijanego finału na Web Audio (niżej): uciszenie i flaga startu, żeby nie startowała dwa razy
+  const kolysanie = useRef<{ zatrzymaj: (() => void) | null; startuje: boolean }>({ zatrzymaj: null, startuje: false });
+  const zatrzymajKolysanie = () => {
+    kolysanie.current.zatrzymaj?.();
+    kolysanie.current.zatrzymaj = null;
+  };
+
+  // wybuch szklanki pijanego finału: muzyka urywa się w tej samej chwili
   useEffect(
     () =>
       naWybuch(() => {
         const w = strona();
+        kolysanie.current.zatrzymaj?.();
+        kolysanie.current.zatrzymaj = null;
         w.zatrzymana = true;
         for (const a of w.odtwarzacze) {
           clearInterval(w.przenikania.get(a));
@@ -383,39 +391,38 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     [],
   );
 
-  // pijany finał: muzyka subtelnie zwalnia i przyspiesza jak rozciągana taśma. Tempo zmienia się rzadko i małymi
-  // krokami (26.10): Samsung przy każdej zmianie `playbackRate` na chwilę gubi dźwięk, a zmiana co tyknięcie zegara
-  // (4 razy na sekundę) brzmiała jak przerywanie
+  // pijany finał: utwór finału przechodzi z odtwarzacza na Web Audio (muzyka-pijana.ts), gdzie tempo kołysze się
+  // płynnie. Zmiany `playbackRate` odtwarzacza robiły na Samsungu dziury (26.10). Gdy przejęcie się nie uda
+  // (utwór niezdekodowany, brak zgody na dźwięk), gra dalej zwykły odtwarzacz, bez kołysania.
   const pijany = stan.faza === "pijany" && cel === "final";
-  const tempo = useRef({ czas: 0, wartosc: 1 });
   useEffect(() => {
     const w = strona();
     const a = w.aktywny;
-    if (!a) return;
     if (!pijany) {
-      if (a.playbackRate !== 1) a.playbackRate = 1;
-      tempo.current = { czas: 0, wartosc: 1 };
+      zatrzymajKolysanie();
       return;
     }
-    if (w.grany !== "final" || a.paused || w.zatrzymana || !stan.faza_od || !stan.faza_do) return;
-    const od = Date.parse(stan.faza_od);
+    if (!a || w.grany !== "final" || !stan.faza_od || !stan.faza_do) return;
     const do_ = Date.parse(stan.faza_do);
     // telefony gasną: muzyka urywa się razem z nimi, potem cisza i wybuch szklanki
     if (do_ - teraz <= GASNIECIE_S * 1000) {
+      zatrzymajKolysanie();
       w.zatrzymana = true;
       a.pause();
       return;
     }
-    const poziom = Math.min(1, Math.max(0, (teraz - od) / Math.max(1, do_ - od)));
-    // pierwsza połowa dogrywki gra czysto (jak dalsza seria), psucie rośnie dopiero od połowy
-    const psucie = Math.max(0, (poziom - 0.5) / 0.5);
-    // najwyżej ok. 8% wolniej, z lekkim falowaniem w obie strony; nowe tempo co `ZMIANA_TEMPA_MS` i w krokach 0,01
-    const docelowe = 1 - 0.06 * psucie + 0.03 * psucie * Math.sin(teraz / 4000);
-    const nowe = Math.round(docelowe * 100) / 100;
-    if (teraz - tempo.current.czas < ZMIANA_TEMPA_MS || nowe === tempo.current.wartosc) return;
-    tempo.current = { czas: teraz, wartosc: nowe };
-    a.playbackRate = nowe;
+    if (kolysanie.current.zatrzymaj || kolysanie.current.startuje || w.zatrzymana || a.paused) return;
+    kolysanie.current.startuje = true;
+    void zagrajMuzykePijana(() => a.currentTime, GLOSNOSC, (do_ - teraz) / 1000 - GASNIECIE_S).then((zatrzymaj) => {
+      kolysanie.current.startuje = false;
+      if (!zatrzymaj) return;
+      kolysanie.current.zatrzymaj = zatrzymaj;
+      // odtwarzacz milknie celowo (gest go nie wznawia), dalej gra Web Audio
+      w.zatrzymana = true;
+      a.pause();
+    });
   }, [pijany, teraz, stan.faza_od, stan.faza_do]);
+  useEffect(() => () => zatrzymajKolysanie(), []);
 
   if (!cel || stan.faza !== "poczekalnia" || cichoOd === null || !prosba) return null;
   return (

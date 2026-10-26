@@ -35,9 +35,11 @@ export type Efekt =
   | "pudlo"
   /** Werble przed podium (trwają, aż ktoś je zatrzyma) i fanfara z talerzem przy podium. */
   | "werble"
-  | "fanfara";
+  | "fanfara"
+  /** Pijany finał: wybuch szklanki (huk wycięty z dawnego klipu `pekniecie.mp4`), tylko z pliku. */
+  | "wybuch";
 
-const TYLKO_PLIK: ReadonlySet<Efekt> = new Set(["nalewanie"]);
+const TYLKO_PLIK: ReadonlySet<Efekt> = new Set(["nalewanie", "wybuch"]);
 /** Głośność efektów względem pełnej skali (muzyka gra na 0,55). */
 const GLOSNOSC = 0.6;
 /**
@@ -73,6 +75,11 @@ let wyjscie: GainNode | null = null;
 let szum: AudioBuffer | null = null;
 const pliki = new Map<string, Promise<AudioBuffer | null>>();
 const ktoryWariant = new Map<Efekt, number>();
+
+/** Wspólny kontekst Web Audio efektów (też muzyka pijanego finału, src/lib/gra/muzyka-pijana.ts). */
+export function kontekstEfektow(): AudioContext | null {
+  return kontekst();
+}
 
 function kontekst(): AudioContext | null {
   if (ctx) return ctx;
@@ -161,7 +168,7 @@ export function zagraj(nazwa: Efekt): () => void {
       // werble w pętli grałyby w nieskończoność: zatrzymanie wycisza głos i staje źródło
       zatrzymajZrodlo = () => zrodlo.stop(c.currentTime + 0.2);
     } else if (!TYLKO_PLIK.has(nazwa)) {
-      SYNTEZA[nazwa as Exclude<Efekt, "nalewanie">]?.(c, glos, c.currentTime + 0.01);
+      SYNTEZA[nazwa as Exclude<Efekt, "nalewanie" | "wybuch">]?.(c, glos, c.currentTime + 0.01);
     }
   });
   return zatrzymaj;
@@ -230,7 +237,7 @@ function uderzenie(
   z.stop(t + o.dl + 0.05);
 }
 
-const SYNTEZA: Record<Exclude<Efekt, "nalewanie">, Synteza> = {
+const SYNTEZA: Record<Exclude<Efekt, "nalewanie" | "wybuch">, Synteza> = {
   pop: (c, w, t) => {
     ton(c, w, t, { f: 380, f2: 950, dl: 0.12, g: 0.5 });
     uderzenie(c, w, t, { dl: 0.03, g: 0.25, typ: "highpass", f: 4000 });

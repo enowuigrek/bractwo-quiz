@@ -30,6 +30,7 @@ const WSZYSTKIE: Efekt[] = [
   "krok",
   "pudlo",
   "werble",
+  "wybuch",
 ];
 
 /** Co z chwili poprzedniego renderu porównujemy z bieżącą. */

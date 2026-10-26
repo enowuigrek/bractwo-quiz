@@ -4,10 +4,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Awatar } from "@/components/awatar";
 import { ogloszWybuch, useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
+import { zagraj } from "@/lib/gra/efekty";
+import { OKRES_KOLYSANIA_S } from "@/lib/gra/muzyka-pijana";
+import { czyTelewizor } from "@/lib/gra/telewizor";
 import type { StanSesji } from "@/lib/gra/typy";
 import { GASNIECIE_S, WYBUCH_PRZED_S, WYBUCH_S, WYLEWANIE_S, zegarPijany } from "@/lib/pijany";
 import { useWideoWybuchu } from "./wideo-wybuchu";
-import { awatarNaDrogach, drogi, PLANSZA_DROG, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
+import { awatarNaDrogach, drogi, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
 
@@ -17,34 +20,40 @@ import { Szklanka } from "./wyscig";
  */
 export type GraczPijany = { nick: string; zdjecie: string | null; start: number; lider: boolean };
 
-/**
- * Sekundy od wejścia w fazę: chwila bezruchu, powolne cofanie od szklanki, spadające drogi, potem lot.
- * Rozłożone na pierwsze pytania dogrywki, żeby chaos narastał stopniowo, a nie od razu.
- */
-const COFANIE_S = 8;
-const SPADANIE_S = 30;
-const LOT_S = 36;
-/** Z drogi zostaje tyle, ile przejechał gracz, razy to (cofają się w stronę startu). */
-const COFNIECIE = 0.3;
 /** Prędkość odlotu awatarów od wybuchu szklanki w px/s. */
 const ODLOT = 1700;
-/** Prędkość lotu w px/s: na początku powoli, pod koniec fazy szybciej. */
-const PREDKOSC = { od: 80, do: 240 };
-/** Miejsce nad awatarem na podpis z nickiem, żeby przy górnej krawędzi nie wychodził poza planszę. */
-const PODPIS_PX = 50;
+/** Bujanie planszy (stopnie) i zjeżdżanie po drodze (część drogi) na początku i pod koniec fazy. */
+const BUJANIE_DEG = { od: 0.6, do: 2.8 };
+const ZJEZDZANIE = { od: 0.012, do: 0.06 };
 
 type Lot = { x: number; y: number; vx: number; vy: number };
 
 const ograniczone = (x: number) => Math.min(1, Math.max(0, x));
-const lagodnie = (u: number) => 1 - (1 - u) ** 3;
+
+/** Odłamki szkła, krople piwa i piana przy wybuchu bez wideo: stałe, policzone raz (złoty kąt, bez losowania). */
+const ODLAMKI = Array.from({ length: 34 }, (_, i) => {
+  const kat = ((i * 137.5 + (i % 3) * 11) * Math.PI) / 180;
+  const zasieg = 420 + ((i * 97) % 640);
+  const rodzaj = i % 3 === 0 ? "kropla" : i % 5 === 1 ? "piana" : "szklo";
+  return {
+    rodzaj,
+    dx: Math.cos(kat) * zasieg,
+    // grawitacja: wszystko leci trochę w dół
+    dy: Math.sin(kat) * zasieg * 0.8 + 220,
+    obrot: ((i * 211) % 720) - 360,
+    rozmiar: rodzaj === "piana" ? 34 + ((i * 7) % 30) : rodzaj === "kropla" ? 12 + ((i * 5) % 16) : 20 + ((i * 13) % 34),
+    opoznienie: (i % 4) * 0.03,
+  };
+});
 
 /**
- * Pijany finał na TV (faza `pijany`): wynik już jest, a gracze odpowiadają na telefonach na pytania, które
- * nic nie liczą. Tryb jest ukryty przed graczami: nagłówek ten sam co w serii (finał trwa, zegar liczy czas
- * dogrywki), tylko plansza się psuje. Awatary najpierw cofają się od szklanki, drogi spadają w dół ekranu,
- * a potem awatary latają i odbijają się od krawędzi jak stary wygaszacz DVD: drżą, pulsują i widzą
- * podwójnie, coraz mocniej aż do końca fazy (`--poziom` 0..1; TV nie wie, na którym pytaniu jest który
- * telefon). Szklanka zostaje. Położenia liczy pętla klatek, nie React, więc odświeżanie stanu niczego nie zrywa.
+ * Pijany finał na TV (faza `pijany`): wynik już jest, a gracze odpowiadają na telefonach na pytania, które nic
+ * nie liczą. Tryb jest ukryty przed graczami: nagłówek ten sam co w serii (finał trwa, zegar liczy czas
+ * dogrywki). Od 26.10 subtelnie, żeby wybuch zaskoczył: nagłówek się kołysze, plansza z drogami buja się w rytm
+ * muzyki (ten sam okres co kołysanie tempa, muzyka-pijana.ts), a zawodnicy zjeżdżają po drogach w stronę
+ * przechyłu, coraz mocniej (`--poziom` 0..1). Położenia są zamrożone z chwili wejścia: nikt nie dojeżdża do
+ * szklanki, nawet gdy ostatni krok serii dotrze później. Na koniec szklanka wybucha, a nagłówek, zawodnicy
+ * i drogi odlatują. Położenia liczy pętla klatek, nie React, więc odświeżanie stanu niczego nie zrywa.
  */
 export function PijanyTv({
   stan,
@@ -62,12 +71,16 @@ export function PijanyTv({
   const poziom = ograniczone((teraz - od) / Math.max(1, do_ - od));
   const lista = drogi(gracze.length);
   const awatar = awatarNaDrogach(lista);
+  const [telewizor] = useState(czyTelewizor);
 
-  // wybuch w wideo pękającej szklanki: interfejs się rozpada (niżej przy wideo)
+  // Wybuch: na komputerze w wideo pękającej szklanki (`WYBUCH_S` klipu), na telewizorze bez wideo dokładnie
+  // `WYBUCH_PRZED_S` przed końcem fazy; na komputerze też bez wideo, gdy klip nie ruszył (sieć, odmowa)
   const [wybuchKlipu, ustawWybuchKlipu] = useState(false);
-  // zapas: gdy klip nie ruszył (sieć, odmowa), szklanka i tak pęka chwilę po zaplanowanym wybuchu
   const czasWybuchu = do_ - WYBUCH_PRZED_S * 1000;
-  const wybuch = wybuchKlipu || (teraz >= czasWybuchu + 800 && teraz < do_);
+  // bez górnej granicy: po końcu fazy wybuch trwa, aż przyjdą werble (inaczej nagłówek i drogi wracały na chwilę)
+  const bezWideo = !wybuchKlipu && teraz >= czasWybuchu + (telewizor ? 0 : 800);
+  const wybuch = wybuchKlipu || bezWideo;
+
 
   // pętla klatek czyta zawsze najnowsze dane, a nie startuje od nowa przy każdym odświeżeniu stanu
   const dane = useRef({ gracze, od, do_, przesuniecie, wybuch });
@@ -75,10 +88,12 @@ export function PijanyTv({
     dane.current = { gracze, od, do_, przesuniecie, wybuch };
   });
   const elementy = useRef(new Map<string, HTMLDivElement>());
+  const plansza = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const ruch = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const loty = new Map<string, Lot>();
+    // położenia z chwili wejścia, zamrożone (nowy gracz dostaje swoje przy pierwszym pojawieniu się)
+    const poczatki = new Map<string, number>();
     // wybuch: każdy odlatuje od szklanki z miejsca, w którym był w tej chwili
     const ostatnie = new Map<string, { x: number; y: number }>();
     const odloty = new Map<string, Lot>();
@@ -92,28 +107,26 @@ export function PijanyTv({
       const dt = Math.min(0.1, (chwila - poprzednia) / 1000);
       poprzednia = chwila;
       const teraz = Date.now() + przesuniecie;
-      const t = (teraz - od) / 1000;
-      const v = PREDKOSC.od + (PREDKOSC.do - PREDKOSC.od) * ograniczone((teraz - od) / Math.max(1, do_ - od));
+      const poziom = ograniczone((teraz - od) / Math.max(1, do_ - od));
       const lista = drogi(gracze.length);
-      const brzeg = {
-        x0: awatar / 2,
-        x1: PLANSZA_DROG.szer - awatar / 2,
-        y0: awatar / 2 + PODPIS_PX,
-        y1: PLANSZA_DROG.wys - awatar / 2,
-      };
+      // bujanie w rytm kołysania muzyki: przechył w prawo, zawodnicy zjeżdżają w prawo (i na odwrót)
+      const fala = ruch ? Math.sin((2 * Math.PI * (teraz - od)) / (OKRES_KOLYSANIA_S * 1000)) : 0;
+      const przechyl = (BUJANIE_DEG.od + (BUJANIE_DEG.do - BUJANIE_DEG.od) * poziom) * fala;
+      const zjazd = (ZJEZDZANIE.od + (ZJEZDZANIE.do - ZJEZDZANIE.od) * poziom) * fala;
+      if (plansza.current && !wybuch) {
+        plansza.current.style.transform = `rotate(${przechyl}deg) translateY(${Math.abs(fala) * 6 * poziom}px)`;
+      }
 
       gracze.forEach((g, i) => {
         const el = elementy.current.get(g.nick);
         if (!el) return;
-        const cel = g.start * COFNIECIE;
+        if (!poczatki.has(g.nick)) poczatki.set(g.nick, g.start);
+        const start = poczatki.get(g.nick) ?? g.start;
         let p: { x: number; y: number };
-        if (!ruch) {
-          // ograniczony ruch: od razu cofnięci, bez lotu
-          p = punktNaDrodze(lista[i], cel);
-        } else if (wybuch) {
+        if (ruch && wybuch) {
           let o = odloty.get(g.nick);
           if (!o) {
-            const s = ostatnie.get(g.nick) ?? punktNaDrodze(lista[i], cel);
+            const s = ostatnie.get(g.nick) ?? punktNaDrodze(lista[i], start);
             const dx = s.x - SZKLANKA_FINALU.x;
             const dy = s.y - SZKLANKA_FINALU.y;
             const d = Math.hypot(dx, dy) || 1;
@@ -124,41 +137,13 @@ export function PijanyTv({
           o.x += o.vx * ODLOT * dt;
           o.y += o.vy * ODLOT * dt;
           p = o;
-        } else if (t < LOT_S) {
-          const u = lagodnie(ograniczone((t - COFANIE_S) / (LOT_S - COFANIE_S)));
-          p = punktNaDrodze(lista[i], g.start + (cel - g.start) * u);
         } else {
-          let l = loty.get(g.nick);
-          if (!l) {
-            // każdy w inną stronę (co złoty kąt), z miejsca, w którym skończył cofanie
-            const s = punktNaDrodze(lista[i], cel);
-            const kat = ((200 + i * 137.5) * Math.PI) / 180;
-            l = {
-              x: Math.min(brzeg.x1, Math.max(brzeg.x0, s.x)),
-              y: Math.min(brzeg.y1, Math.max(brzeg.y0, s.y)),
-              vx: Math.cos(kat),
-              vy: Math.sin(kat),
-            };
-            loty.set(g.nick, l);
-          }
-          l.x += l.vx * v * dt;
-          l.y += l.vy * v * dt;
-          if (l.x < brzeg.x0 || l.x > brzeg.x1) {
-            l.vx = l.x < brzeg.x0 ? Math.abs(l.vx) : -Math.abs(l.vx);
-            l.x = Math.min(brzeg.x1, Math.max(brzeg.x0, l.x));
-          }
-          if (l.y < brzeg.y0 || l.y > brzeg.y1) {
-            l.vy = l.y < brzeg.y0 ? Math.abs(l.vy) : -Math.abs(l.vy);
-            l.y = Math.min(brzeg.y1, Math.max(brzeg.y0, l.y));
-          }
-          p = l;
+          p = punktNaDrodze(lista[i], ograniczone(start + zjazd));
         }
         ostatnie.set(g.nick, { x: p.x, y: p.y });
         el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
       });
     };
-
-    // przy ograniczonym ruchu pętla też chodzi (nic nie lata), żeby dopisani później gracze dostali miejsce
     ustaw();
     const krok = () => {
       ustaw();
@@ -168,36 +153,36 @@ export function PijanyTv({
     return () => cancelAnimationFrame(klatka);
   }, [awatar]);
 
-  const minelo = (teraz - od) / 1000;
+  // wybuch (z klipu albo bez wideo) urywa muzykę TV (muzyka.tsx); bez wideo huk z pliku (efekty.ts)
+  const dzwiek = useDzwiekOdblokowany() && stan.muzyka;
+  useEffect(() => {
+    if (wybuch) ogloszWybuch();
+  }, [wybuch]);
+  useEffect(() => {
+    if (bezWideo && stan.muzyka) zagraj("wybuch");
+  }, [bezWideo, stan.muzyka]);
 
-  // Koniec dogrywki: ostatnie sekundy to wideo pękającej szklanki (pierwsza klatka = ta szklanka w tym samym
-  // miejscu sceny). Wideo leży na całej scenie 1920×1080 (portal do `.scena`, bo tu wszystko się przesuwa),
-  // czeka zatrzymane na pierwszej klatce i rusza tak, żeby skończyć się z werblami (src/lib/pijany.ts). Nasza szklanka
-  // pęka sama z wybuchem w klipie (tv.css), a gdy klip nie ruszy, chwilę później i tak (zapas niżej). Plik jest
-  // pobierany z wyprzedzeniem (wideo-wybuchu.ts).
+  // Wideo pękającej szklanki (tylko komputer): leży na całej scenie 1920×1080 (portal do `.scena`, bo plansza się
+  // buja), czeka zatrzymane na pierwszej klatce i rusza tak, żeby wybuch w klipie wypadł `WYBUCH_PRZED_S` przed
+  // końcem fazy. Plik jest pobierany z wyprzedzeniem (wideo-wybuchu.ts).
   const [scena, ustawScene] = useState<Element | null>(null);
   const wideo = useRef<HTMLVideoElement>(null);
   // `widac`: wideo już gra (pokazujemy je), `gra`: klip przewinął pierwsze klatki, więc chowamy drogi i tło pod nim
-  // (telewizor zgłasza „gra” chwilę przed pierwszą klatką)
   const [widac, ustawWidac] = useState(false);
   const [gra, ustawGra] = useState(false);
   // koniec klipu: piana zostaje na ostatniej klatce, więc zsuwamy obraz w dół, jakby spłynęła z ekranu
   const [splywa, ustawSplywa] = useState(false);
-  // wybuch (`WYBUCH_S` klipu) wypada `WYBUCH_PRZED_S` przed końcem fazy, po chwili ciszy od zgaszenia telefonów
   const przedKoncem = Math.min(WYLEWANIE_S, WYBUCH_PRZED_S + WYBUCH_S);
   const czasWylewania = teraz >= od && do_ - teraz <= przedKoncem * 1000;
-  // wideo wchodzi na scenę (i zaczyna się wczytywać) dopiero, gdy muzyka i tak się urywa (`GASNIECIE_S`): Samsung
-  // gra jeden element multimedialny naraz i wczytywane od początku dogrywki wideo uciszało muzykę (25.10)
-  const wideoNaScenie = teraz >= od && do_ - teraz <= Math.max(GASNIECIE_S, przedKoncem + 2) * 1000;
-  // dźwięk wybuchu tylko przy włączonej muzyce i gdy przeglądarka już pozwoliła grać (muzyka.tsx)
-  const dzwiek = useDzwiekOdblokowany() && stan.muzyka;
+  // wideo wchodzi na scenę dopiero, gdy muzyka i tak się urywa (`GASNIECIE_S`): wcześniej uciszało muzykę (25.10)
+  const wideoNaScenie = !telewizor && teraz >= od && do_ - teraz <= Math.max(GASNIECIE_S, przedKoncem + 2) * 1000;
   useEffect(() => {
     if (wideo.current) wideo.current.muted = !dzwiek;
   }, [dzwiek, scena, wideoNaScenie]);
   // start klipu; gdy przeglądarka nie pozwoli grać z dźwiękiem, druga próba bez dźwięku (obraz jest ważniejszy)
   useEffect(() => {
     const v = wideo.current;
-    if (!czasWylewania || !v) return;
+    if (!czasWylewania || !v || bezWideo) return;
     void v
       .play()
       .catch(() => {
@@ -205,16 +190,14 @@ export function PijanyTv({
         return v.play();
       })
       .catch(() => undefined);
-  }, [czasWylewania, scena, wideoNaScenie]);
-  // wybuch (z klipu albo zapasowy) urywa muzykę TV (muzyka.tsx)
-  useEffect(() => {
-    if (wybuch) ogloszWybuch();
-  }, [wybuch]);
+  }, [czasWylewania, scena, wideoNaScenie, bezWideo]);
   const adresWideo = useWideoWybuchu();
 
   return (
     <div
-      className={`tv-wyscig tv-seria tv-pijany${gra ? " wylewa" : ""}${wybuch ? " wybuch" : ""}`}
+      className={`tv-wyscig tv-seria tv-pijany${gra && !bezWideo ? " wylewa" : ""}${wybuch ? " wybuch" : ""}${
+        bezWideo ? " bez-wideo" : ""
+      }`}
       style={{ "--poziom": poziom } as React.CSSProperties}
       ref={(el) => {
         if (el && !scena) ustawScene(el.closest(".scena"));
@@ -222,6 +205,7 @@ export function PijanyTv({
     >
       {scena &&
         wideoNaScenie &&
+        !bezWideo &&
         createPortal(
           <video
             ref={wideo}
@@ -243,12 +227,29 @@ export function PijanyTv({
       {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
       <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000)} />
 
-      <div className="drogi-finalu">
-        <PlanszaDrog
-          lista={lista}
-          spadaja={minelo >= SPADANIE_S}
-          szklanka={<Szklanka przed={1} teraz={1} doKonca={0} />}
-        />
+      <div className="drogi-finalu pijany-plansza" ref={plansza}>
+        <PlanszaDrog lista={lista} szklanka={<Szklanka przed={1} teraz={1} doKonca={0} />} />
+        {/* wybuch bez wideo: błysk i rozprysk szkła, piwa i piany z miejsca szklanki */}
+        {bezWideo && (
+          <div className="pijany-odlamki" style={{ left: SZKLANKA_FINALU.x, top: SZKLANKA_FINALU.y }} aria-hidden>
+            <span className="pijany-blysk" />
+            {ODLAMKI.map((o, i) => (
+              <span
+                key={i}
+                className={`pijany-odlamek ${o.rodzaj}`}
+                style={
+                  {
+                    "--dx": `${o.dx}px`,
+                    "--dy": `${o.dy}px`,
+                    "--obrot": `${o.obrot}deg`,
+                    "--rozmiar": `${o.rozmiar}px`,
+                    animationDelay: `${o.opoznienie}s`,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
+        )}
         {gracze.map((g, i) => (
           <div
             key={g.nick}
@@ -261,10 +262,6 @@ export function PijanyTv({
           >
             <div className="pijany-drzenie">
               <div className="pijany-awatar">
-                {/* podwójne widzenie: blady drugi awatar obok */}
-                <span className="pijany-duch" aria-hidden>
-                  <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
-                </span>
                 <Awatar nick={g.nick} zdjecie={g.zdjecie} rozmiar={awatar} />
               </div>
               <span className="drogi-finalu-podpis">

@@ -105,21 +105,12 @@ export function DrogiFinalu({
 }
 
 /**
- * Same drogi i szklanka, bez graczy. `spadaja`: drogi po kolei spadają w dół ekranu (pijany finał),
- * a szklanka zostaje.
+ * Same drogi i szklanka, bez graczy (pijany finał rysuje graczy sam, pijany.tsx).
  */
-export function PlanszaDrog({
-  lista,
-  szklanka,
-  spadaja = false,
-}: {
-  lista: Droga[];
-  szklanka: React.ReactNode;
-  spadaja?: boolean;
-}) {
+export function PlanszaDrog({ lista, szklanka }: { lista: Droga[]; szklanka: React.ReactNode }) {
   return (
     <>
-      <svg className={`drogi-finalu-svg${spadaja ? " spadaja" : ""}`} viewBox={`0 0 ${SZER} ${WYS}`} aria-hidden>
+      <svg className="drogi-finalu-svg" viewBox={`0 0 ${SZER} ${WYS}`} aria-hidden>
         <defs>
           {/* jedna grafika lady na całą planszę: drobne kafelki dawały widoczne szwy */}
           <pattern id="lada-drogi" patternUnits="userSpaceOnUse" width={SZER} height={1173}>
@@ -132,7 +123,7 @@ export function PlanszaDrog({
         </defs>
         <ellipse cx={SZKLANKA_FINALU.x} cy={SZKLANKA_FINALU.y + 150} rx={230} ry={70} fill="url(#poswiata-drogi)" />
         {lista.map((d, i) => (
-          // --i i --obrot: kolejność i przechył przy spadaniu
+          // --i i --obrot: kolejność i przechył przy odlocie po wybuchu (pijany finał, tv.css)
           <g
             key={i}
             className="drogi-finalu-pas"
