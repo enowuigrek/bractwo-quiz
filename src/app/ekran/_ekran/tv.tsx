@@ -35,7 +35,8 @@ import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { Plansze } from "./plansze";
 import { TloTv } from "./tlo";
 import { WyscigTv } from "./wyscig";
-import { rankingJakoWyscig } from "@/lib/gra/wyscig";
+import { quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
+import { StartTv } from "./start";
 import { PodiumTv, RankingTv } from "./ranking";
 import { LogoNaglowka } from "./logo";
 import { NickiPoczekalni } from "./nicki";
@@ -212,7 +213,12 @@ export function Tv({ kod, qr, host }: Props) {
               }}
             />
           ) : stan.faza === "wstep" ? (
-            <WstepTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
+            // klasyczny pub quiz: plansza startowa z odliczaniem 10 s; wyścig: cała droga etapów
+            quizKlasyczny(stan) ? (
+              <StartTv stan={stan} teraz={teraz} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
+            ) : (
+              <WstepTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
+            )
           ) : stan.faza === "poczekalnia" ? (
             <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
           ) : stan.faza === "seria" ? (
@@ -260,7 +266,8 @@ export function Tv({ kod, qr, host }: Props) {
 function GotowiTv({ stan }: { stan: StanSesji }) {
   const plansza =
     stan.faza === "wstep" || stan.faza === "etap" || (stan.faza === "wynik" && stan.zadanie?.typ === "ciekawostka");
-  if (!stan.auto || !plansza) return null;
+  // plansza startowa klasycznego quizu nie czeka na „Gotowy”, tylko odlicza
+  if (!stan.auto || !plansza || quizKlasyczny(stan)) return null;
   return (
     <p className={`tv-gotowi${stan.gotowi >= stan.w_grze ? " wszyscy" : ""}`}>
       Gotowi <strong>{stan.gotowi}</strong>/{stan.w_grze}

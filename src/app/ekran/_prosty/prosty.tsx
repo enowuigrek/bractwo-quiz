@@ -7,6 +7,7 @@ import { META_FINALU, krokiFinalu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
+import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { LITERY, PRAWDA_FALSZ, liczbaZJednostka } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -120,7 +121,7 @@ export function ProstyTv({ stan, blad, gracze, ranking, odpowiedzi, qr, host, te
         />
       );
     case "wstep":
-      return <Wstep stan={stan} />;
+      return quizKlasyczny(stan) ? <StartKlasycznego stan={stan} teraz={teraz} /> : <Wstep stan={stan} />;
     case "etap":
       return <Etap stan={stan} />;
     case "przygotuj":
@@ -198,6 +199,26 @@ function Poczekalnia({
         </ul>
         {gracze.length === 0 && <p className="pr-opis">Zeskanuj kod telefonem i wpisz imię albo nick.</p>}
       </section>
+    </div>
+  );
+}
+
+/** Plansza startowa klasycznego pub quizu (10 s): napis i sekundy, bez animacji. */
+function StartKlasycznego({ stan, teraz }: { stan: StanSesji; teraz: number }) {
+  const ile = stan.faza_do ? Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000)) : 0;
+  return (
+    <div className="pr-srodek">
+      <p className="pr-nadtytul">{stan.quiz?.tytul}</p>
+      <h1 className="pr-tytul">Zaczynamy!</h1>
+      <p className="pr-start">
+        {ile > 0 ? (
+          <>
+            Pierwsze pytanie za <strong>{ile}</strong> s
+          </>
+        ) : (
+          "Telefony w dłoń!"
+        )}
+      </p>
     </div>
   );
 }

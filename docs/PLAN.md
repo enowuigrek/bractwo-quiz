@@ -223,6 +223,13 @@ Do zaprojektowania razem:
 - **Kreator gry:** wybór klasycznego od razu włącza prowadzenie automatyczne (wyścig domyślnie bez); przełącznik dalej działa.
 - **Klasyczny bez nalewania:** ranking w klasycznym nie gra dźwięku nalewania (nie ma szklanki). Za to tabela rankingu gra „zamianę” (`fiuu`) w chwili przetasowania, gdy ktoś zmienia miejsce (od 2. pytania, nie w finale), jak zamiana torów w wyścigu.
 
+### Plansza startowa klasycznego pub quizu (26.10) ✅
+
+- **Po co:** klasyczny leci z automatu, a z poczekalni od razu wpadało pierwsze pytanie. Teraz `nastepne` z poczekalni klasycznego (bez etapów) daje fazę `wstep` z `faza_do` = +10 s (migracja `start_klasycznego`, gałąź w `pilot_akcja`). Po czasie pierwsze pytanie startuje samo przez `dokoncz_pytanie` (blokada wiersza, przechodzi tylko pierwsze wołanie), z automatem i bez. `wstep` jest w `zZegarem` (zegar tyka; w wyścigu `faza_do` jest puste, więc nic się nie zmienia), zapas po końcu 0,2 s zamiast 1,1 s.
+- **TV** (`ekran/_ekran/start.tsx`): okazja i tytuł quizu, wielkie „Zaczynamy!”, „Pierwsze pytanie za N s” i rząd 10 kresek gasnących po kolei, celowo inaczej niż złote koło 3-2-1 przed pytaniem; podpis z liczbą graczy. Bez plakietki „Gotowi”. Prosty ekran: napis i sekundy. Muzyka poczekalni gra dalej.
+- **Telefon:** „Zaczynamy! Pierwsze pytanie za N s”, bez przycisku „Gotowy”. **Pilot:** „Pierwsze pytanie od razu” i ile sekund zostało.
+- **Sprawdzone lokalnie:** gra z quizu „Dinozaury” z botami, bez automatu: plansza odliczała, po 10 s samo odliczanie 3-2-1 i pytanie 1. Wyścig dalej wchodzi we wstęp bez zegara.
+
 ## Ustalenia
 
 | Temat | Decyzja |

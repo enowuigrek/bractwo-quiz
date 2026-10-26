@@ -118,7 +118,8 @@ export async function pobierzStan(kod: string): Promise<{ stan: StanSesji; przes
  * Nowa faza z czasem trafia tylko tutaj.
  */
 export function zZegarem(faza: FazaWidoczna | null | undefined): boolean {
-  return faza === "przygotuj" || faza === "pytanie" || faza === "seria" || faza === "pijany";
+  // `wstep` z zegarem tylko w klasycznym pub quizie (plansza startowa, 10 s); wstęp wyścigu nie ma `faza_do`
+  return faza === "przygotuj" || faza === "pytanie" || faza === "seria" || faza === "pijany" || faza === "wstep";
 }
 
 /** Odliczanie przed pytaniem (`faza_od` = start + 3 s w `pilot_akcja`). */
@@ -175,7 +176,9 @@ export function useKoniecPytania(kod: string, stan: Pick<StanSesji, "faza" | "fa
   const faza = stan ? fazaTeraz(stan, teraz).faza : null;
   // sekunda zapasu w bazie na opóźnione odpowiedzi
   // seria i pijany finał kończą się tak samo: po czasie całej fazy (`przygotuj` jest wtedy już `pytaniem`)
-  const poKoncu = zZegarem(faza) && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > 1100 : false;
+  // plansza startowa klasycznego (`wstep`) nie czeka na spóźnione odpowiedzi: pierwsze pytanie od razu po odliczaniu
+  const zapas = faza === "wstep" ? 200 : 1100;
+  const poKoncu = zZegarem(faza) && stan?.faza_do ? teraz - Date.parse(stan.faza_do) > zapas : false;
   const [tik, ustawTik] = useState(0);
   useEffect(() => {
     if (!poKoncu) return;

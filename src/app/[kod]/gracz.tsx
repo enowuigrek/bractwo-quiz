@@ -20,7 +20,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
 import { kiedyStart } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
-import { rankingJakoWyscig } from "@/lib/gra/wyscig";
+import { quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { Gotowy } from "./gotowy";
 import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "@/components/ikony";
@@ -406,6 +406,26 @@ function WGrze({
             {gracze.length > NICKI_W_POCZEKALNI && <li>+{gracze.length - NICKI_W_POCZEKALNI}</li>}
           </ul>
         </section>
+      </>
+    );
+  }
+
+  // klasyczny pub quiz: plansza startowa z odliczaniem (10 s), potem samo 1. pytanie
+  if (stan.faza === "wstep" && quizKlasyczny(stan)) {
+    const ile = stan.faza_do ? Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000)) : 0;
+    return (
+      <>
+        <p className="nadtytul">{ja.nick}</p>
+        <h1>Zaczynamy!</h1>
+        <p>
+          {ile > 0 ? (
+            <>
+              Pierwsze pytanie za <strong className="gra-kod">{ile}</strong> s. Kto szybciej, ten więcej punktów.
+            </>
+          ) : (
+            "Pierwsze pytanie już leci!"
+          )}
+        </p>
       </>
     );
   }

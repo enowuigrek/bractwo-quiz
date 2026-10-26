@@ -42,6 +42,8 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
       return teraz >= Date.parse(stan.planowany_start!) && stan.w_grze > 0 ? "nastepne" : null;
     }
     case "wstep":
+      // plansza startowa klasycznego quizu kończy się sama po odliczaniu (`dokoncz_pytanie`)
+      if (stan.faza_do) return null;
       return plansza(PLANSZA.wstep) ? "nastepne" : null;
     case "etap":
       return plansza(PLANSZA.etap) ? "nastepne" : null;

@@ -24,6 +24,7 @@ import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { useAutoProwadzenie } from "./auto";
 import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
+import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaAutomat, IkonaGlosnik, IkonaWyciszony } from "@/components/ikony";
 import { BotyPilota, useBoty } from "./boty";
 import { ProgiPilota } from "./progi";
@@ -178,6 +179,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
 
   // `przygotuj` przechodzi w `pytanie` sam, gdy minie `faza_od`; nie czekamy na odpytanie bazy
   const { faza, doStartu, doKonca, bezLimitu } = fazaTeraz(stan, teraz);
+  const klasyczny = quizKlasyczny(stan);
   // w finale trójki odpowiadają tylko finaliści, wcześniej wszyscy, którzy nie odpadli
   const grajacy = stan.finalisci?.length ?? stan.w_grze;
   const wszyscy = grajacy > 0 && stan.liczba_odpowiedzi >= grajacy;
@@ -222,7 +224,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           {stan.auto ? "Wyłącz" : "Włącz"}
         </button>
       </p>
-      {stan.auto && (faza === "wstep" || faza === "etap" || (faza === "wynik" && stan.zadanie?.typ === "ciekawostka")) && (
+      {stan.auto && ((faza === "wstep" && !klasyczny) || faza === "etap" || (faza === "wynik" && stan.zadanie?.typ === "ciekawostka")) && (
         <p className="pomocniczy" style={{ margin: "0 0 4px" }}>
           Gotowi: <strong>{stan.gotowi}/{stan.w_grze}</strong>, dalej, gdy klikną wszyscy (albo po czasie).
         </p>
@@ -303,8 +305,21 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
           </>
         )}
 
+        {/* klasyczny pub quiz: plansza startowa odlicza 10 s i sama startuje 1. pytanie; można szybciej */}
+        {faza === "wstep" && klasyczny && (
+          <>
+            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
+              Pierwsze pytanie od razu
+            </button>
+            <p className="pilot-zapowiedz" role="status">
+              Na TV plansza „Zaczynamy!” z odliczaniem. Pierwsze pytanie ruszy samo
+              {stan.faza_do ? ` za ${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}.
+            </p>
+          </>
+        )}
+
         {/* wstęp: TV pokazuje całą drogę, prowadzący opowiada i przechodzi do planszy 1. etapu */}
-        {faza === "wstep" && (
+        {faza === "wstep" && !klasyczny && (
           <>
             <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
               {nastepne.napis}

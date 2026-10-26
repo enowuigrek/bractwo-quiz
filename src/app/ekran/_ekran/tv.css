@@ -3861,3 +3861,69 @@
 .demo-kolo.wybrany {
   transform: scale(0.92);
 }
+
+/* Plansza startowa klasycznego pub quizu (start.tsx): inna niż odliczanie 3-2-1 przed pytaniem (złote koło),
+   czyli wielkie „Zaczynamy!”, sekundy w zdaniu i rząd kresek gasnących po kolei. Stare TV mają własny prosty ekran. */
+.tv-start-quizu {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tv-start-srodek {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.tv .tv-start-tytul {
+  margin: 8px 0 28px;
+  font-size: 180px;
+  line-height: 1;
+  color: var(--zloto);
+}
+
+.tv-start-za {
+  margin: 0 0 36px;
+  font-size: 56px;
+  font-weight: var(--w-bold);
+}
+
+.tv-start-za strong {
+  display: inline-block;
+  min-width: 1.4ch;
+  color: var(--zloto);
+  font-variant-numeric: tabular-nums;
+}
+
+.tv-start-kreski {
+  display: flex;
+  gap: 18px;
+  margin: 0 0 44px;
+  padding: 0;
+  list-style: none;
+}
+
+.tv-start-kreski li {
+  width: 64px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--kamien2);
+  transition:
+    background-color 0.35s ease-out,
+    box-shadow 0.35s ease-out;
+}
+
+.tv-start-kreski li.swieci {
+  background: var(--zloto);
+  box-shadow: var(--glow-sm);
+}
+
+.tv-start-podpis {
+  margin: 0;
+  font-size: 34px;
+  color: var(--szary);
+}
