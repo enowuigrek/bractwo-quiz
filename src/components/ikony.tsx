@@ -157,24 +157,6 @@ export function IkonaMegafon() {
   );
 }
 
-/** Kufel z flagą mety: rodzaj „Wyścig po piwo” (kreator gry). */
-export function IkonaWyscig() {
-  return (
-    <svg {...wspolne}>
-      <path d="M5 9h9v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9zM14 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2M5 9a2.5 2.5 0 0 1 2.5-3 3 3 0 0 1 5 0A2.5 2.5 0 0 1 14 9M8 12v6M11 12v6M17 2v5M17 2h4l-1.2 1.5L21 5h-4" />
-    </svg>
-  );
-}
-
-/** Dymek z pytajnikiem: rodzaj „Klasyczny pub quiz” (kreator gry). */
-export function IkonaPubQuiz() {
-  return (
-    <svg {...wspolne}>
-      <path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.4v.3M12 15.5v.01" />
-    </svg>
-  );
-}
-
 /** Pinezka: miasto (kreator gry). */
 export function IkonaMiasto() {
   return (

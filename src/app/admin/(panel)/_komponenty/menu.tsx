@@ -139,8 +139,8 @@ export function MenuPanelu({
           )}
           {pozycja("/admin/gry", "Rozgrywki", "trwające gry i historia", sciezka.startsWith("/admin/gry") && !uruchamianie)}
         </section>
-        <section>
-          <p className="etykieta">Przygotowanie</p>
+        {/* quizy i lokale bez nagłówka „Przygotowanie” (26.10: wisiał bez sensu), tylko oddzielone kreską od gry */}
+        <section className="panel-menu-oddzielona">
           {pozycja("/admin/quizy", "Quizy", "pytania, etapy, kosz")}
           {!lokal && pozycja("/admin/lokale", "Lokale", "logo, hasła, ekrany lokali")}
         </section>

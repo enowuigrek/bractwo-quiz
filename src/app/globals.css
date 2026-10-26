@@ -3416,6 +3416,11 @@ html:has(.kolumna) {
   margin: 0 0 2px;
 }
 
+.panel-menu-oddzielona {
+  padding-top: 16px;
+  border-top: 1px solid var(--kamien2);
+}
+
 .panel-menu-start {
   width: 100%;
 }

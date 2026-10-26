@@ -11,7 +11,7 @@ import { LIMITY, liczbaPytan } from "../../quizy/limity";
 import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
-import { IkonaMiasto, IkonaPodium1, IkonaPodium3, IkonaPubQuiz, IkonaWyscig } from "@/components/ikony";
+import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
 
 export type QuizDoWyboru = {
   id: string;
@@ -33,14 +33,6 @@ function liczbaLokali(n: number): string {
   const r10 = n % 10;
   const r100 = n % 100;
   return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "lokale" : "lokali"}`;
-}
-
-/** „1 quiz”, „3 quizy”, „5 quizów”. */
-function liczbaQuizow(n: number): string {
-  if (n === 1) return "1 quiz";
-  const r10 = n % 10;
-  const r100 = n % 100;
-  return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "quizy" : "quizów"}`;
 }
 
 /** Godzina od teraz, zaokrąglona do 5 minut w górę: domyślny start zapowiedzi. */
@@ -159,9 +151,10 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
           <legend className="krok">
             <span className="krok-nr">{krok(3)}</span> Rodzaj
           </legend>
-          <div className="kafelki kafelki-dwa">
+          {/* dwa przyciski jak zakładki rodzajów w Quizach (26.10, Łukasz: kafelki z ikonami nie pasowały) */}
+          <div className="wybor-czasu quizy-rodzaje">
             {(["wyscig", "klasyczny"] as const).map((r) => (
-              <label key={r} className="kafelek">
+              <label key={r} className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}>
                 <input
                   type="radio"
                   name="rodzaj_quizu"
@@ -174,9 +167,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                     setAuto(r === "klasyczny");
                   }}
                 />
-                <span className="kafelek-ikona duza">{r === "wyscig" ? <IkonaWyscig /> : <IkonaPubQuiz />}</span>
-                <strong>{r === "wyscig" ? NAZWY_RODZAJOW[r] : "Pub quiz"}</strong>
-                <span className="kafelek-opis">{liczbaQuizow(quizy.filter((q) => q.rodzaj === r).length)}</span>
+                {NAZWY_RODZAJOW[r]}
               </label>
             ))}
           </div>

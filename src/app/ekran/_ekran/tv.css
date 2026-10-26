@@ -423,6 +423,13 @@
 }
 
 /* 25.10: nad tytułem mniej, a więcej między opisem a drogą etapów z ikonami (ikony prawie dotykały tekstu) */
+/* nagłówek wstępu zawsze wysokości logo lokalu (26.10: gra bez lokalu miała pusty nagłówek i tytuł podjeżdżał pod
+   licznik „Gotowi”, który stoi na wysokości środka logo) */
+.tv-wstep > .tv-naglowek,
+.tv-etap > .tv-naglowek {
+  min-height: 150px;
+}
+
 .tv-wstep > .tv-okazja {
   /* odstęp od logo lokalu w nagłówku (26.10: logo prawie dotykało tytułu quizu) */
   margin-top: 28px;

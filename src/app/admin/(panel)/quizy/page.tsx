@@ -7,7 +7,6 @@ import { IkonaEdytuj, IkonaKlodka, IkonaKosz, IkonaOko } from "@/components/ikon
 import { BRACTWO, FiltrLokali, wybranyLokal, ZnaczekLokalu, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz } from "./akcje";
-import { liczbaPytan } from "./limity";
 import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
@@ -120,19 +119,13 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
                   {/* autor: u głównego zawsze, u lokalu tylko przy quizach Bractwa */}
                   {(glowny || tylkoPodglad(q)) && <ZnaczekLokalu lokal={q.lokale} />}
                   <Link href={`/admin/quizy/${q.id}`}>{q.tytul}</Link>
-                </div>
-                <div className="lista-opis">
-                  {/* lokale takich nie widzą, więc znacznik ma sens tylko u głównego */}
+                  {/* na liście same tytuły (26.10): liczba pytań, tematy i opis dopiero po wejściu w quiz */}
                   {glowny && q.tylko_glowny && (
-                    <>
-                      <IkonaKlodka /> tylko dla mnie ·{" "}
-                    </>
+                    <span className="lista-klodka" title="Tylko dla mnie" aria-label="Tylko dla mnie">
+                      {" "}
+                      <IkonaKlodka />
+                    </span>
                   )}
-                  {tylkoPodglad(q) && "quiz Bractwa, tylko do grania · "}
-                  {liczbaPytan(q.zadania[0]?.count ?? 0)}
-                  {q.tagi.length > 0 && ` · ${q.tagi.join(", ")}`}
-                  {/* opis to notatka autora, lokal nie widzi jej przy quizach Bractwa */}
-                  {q.opis && !tylkoPodglad(q) && ` · ${q.opis}`}
                 </div>
               </div>
               <div className="lista-akcje">
