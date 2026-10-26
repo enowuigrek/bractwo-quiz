@@ -6,6 +6,11 @@
   overflow: hidden;
   background: var(--bg);
   cursor: none;
+  /* Powierzchnie na TV prawie czarne, ciepłe, z jaśniejszym brązowym obrysem (26.10, Łukasz: granatowe tła ramek
+     pytań, odpowiedzi i rankingu odstawały od baru). Na telefonach i w panelu zostają tokeny z tokens.css. */
+  --kamien: #17130f;
+  --kamien2: #493a2a;
+  --kamien3: #5e4b36;
 }
 
 /* werble: czarny ekran */
@@ -356,14 +361,15 @@
   border: 2px solid var(--kamien2);
   border-radius: var(--r-pill);
   background: rgba(0, 0, 0, 0.55);
-  color: var(--szary);
+  /* napis zielony, liczba gotowych szara, a gdy gotowi są wszyscy, też zielona (26.10) */
+  color: var(--chmiel);
   font-size: 26px;
   font-weight: var(--w-black);
   font-variant-numeric: tabular-nums;
 }
 
 .tv-gotowi strong {
-  color: var(--zloto);
+  color: var(--szary);
 }
 
 .tv-gotowi.wszyscy {
@@ -570,10 +576,16 @@
   font-size: 52px;
 }
 
+/* Zegar w prawym górnym rogu mniejszy (26.10: przy 84 px „Wynik” na kolejnej planszy był niższy i nagłówek
+   skakał); stała wysokość dla liczby i napisów. */
 .tv-zegar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 72px;
   margin: 0;
   min-width: 150px;
-  font-size: 84px;
+  font-size: 64px;
   font-weight: var(--w-black);
   line-height: 1;
   text-align: right;
@@ -827,7 +839,8 @@
   align-items: center;
   gap: 28px;
   height: 80px;
-  margin-top: 24px;
+  /* dalej od nagłówka (26.10: stał za blisko) */
+  margin-top: 48px;
   padding: 0 48px;
   box-sizing: border-box;
   border: 3px solid var(--zloto);
@@ -920,13 +933,6 @@
 .tv-ranking-punkty {
   text-align: right;
   font-variant-numeric: tabular-nums;
-}
-
-.tv-ranking-reszta {
-  margin: 20px 0 0;
-  font-size: 30px;
-  color: var(--szary);
-  text-align: center;
 }
 
 /* Podium i koniec gry */
@@ -1191,6 +1197,11 @@
   font-size: 32px;
   font-weight: var(--w-black);
   border-bottom: 1px solid var(--kamien2);
+}
+
+/* pod ostatnim graczem bez kreski: niczego już nie oddziela (26.10) */
+.tv-odpowiedzi-lista > :last-child {
+  border-bottom: 0;
 }
 
 /* dobre odpowiedzi: bez kolumny odpowiedzi (wszystkie takie same) */
@@ -3042,12 +3053,12 @@
   transform-origin: 0 100%;
 }
 
+/* nick kibica nad tekstem okrzyku, mniejszy */
 .okrzyk-kibic {
+  display: block;
   color: var(--bursztyn);
-}
-
-.okrzyk-dymek .awatar {
-  border: 3px solid var(--na-zlocie);
+  font-size: 22px;
+  line-height: 1.1;
 }
 
 @keyframes okrzyk-lot {
@@ -3122,19 +3133,6 @@
   color: var(--piana);
   font-size: 32px;
   font-weight: var(--w-black);
-}
-
-.tv-stopien-zdjecie {
-  width: 150px;
-  height: 150px;
-  margin: 6px 0 0;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.8));
-}
-
-/* nazwa nagrody pod jej zdjęciem, z odstępem (ujemny margines nachodził na zdjęcie) */
-.tv-stopien-zdjecie + .tv-stopien-nagroda {
-  margin-top: 12px;
 }
 
 .tv-etap-nagroda {
@@ -3405,50 +3403,6 @@
   box-shadow: inset 0 0 0 3px var(--chmiel);
 }
 
-/* duża grupa: kto nie ma toru, stoi w pasku pod torami (wysokość z odstępem = RESZTA_PX w wyscig.tsx) */
-.wyscig-reszta {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  height: 64px;
-  margin-top: 8px;
-  padding: 0 20px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid color-mix(in srgb, var(--zloto) 35%, transparent);
-}
-
-.wyscig-reszta-opis {
-  flex: none;
-  color: var(--szary);
-  font-size: 24px;
-  font-weight: var(--w-black);
-  white-space: nowrap;
-}
-
-.wyscig-reszta-awatary {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.wyscig-reszta-kreska {
-  flex: none;
-  align-self: stretch;
-  margin: 6px 6px;
-  border-left: 3px dashed var(--zloto);
-}
-
-.wyscig-reszta-wiecej {
-  flex: none;
-  color: var(--piana);
-  font-size: 24px;
-  font-weight: var(--w-black);
-}
-
 /* kreska odpadania z oddechem (26.10, Łukasz: było za ciasno): odstęp od toru nad nią, kreska, a pod nią napis,
    razem STREFA_PX (wyscig.tsx) */
 .wyscig-strefa-finalu {
@@ -3586,6 +3540,12 @@
     opacity: 0;
     filter: brightness(3);
   }
+}
+
+/* poświata pod szklanką gaśnie z wybuchem (26.10: po wybuchu zostawała pod pustym miejscem) */
+.tv-pijany.wybuch .drogi-finalu-poswiata {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
 }
 
 /* Wybuch w wideo (WYBUCH_S): interfejs się rozpada. Nagłówek wylatuje w górę, awatary odlatują od szklanki

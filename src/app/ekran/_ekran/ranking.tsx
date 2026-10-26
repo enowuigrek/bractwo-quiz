@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- zdjęcia nagród z bucketu Supabase */
 
 import { animate, AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -9,9 +8,22 @@ import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { zagraj } from "@/lib/gra/efekty";
+import { NA_STRONIE_RANKINGU, STRONA_RANKINGU_S, stronyRankingu } from "@/lib/gra/wyscig";
 
-/** Ile wierszy mieści ranking na scenie 1920×1080. */
-const W_RANKINGU = 10;
+/**
+ * Która strona rankingu stoi teraz na TV (po `NA_STRONIE_RANKINGU` graczy): co `STRONA_RANKINGU_S` następna, na
+ * ostatniej zostaje. Liczone od wejścia ekranu rankingu.
+ */
+export function useStronaRankingu(graczy: number): number {
+  const strony = stronyRankingu(graczy);
+  const [strona, ustawStrone] = useState(0);
+  useEffect(() => {
+    if (strony <= 1) return;
+    const id = window.setInterval(() => ustawStrone((s) => Math.min(s + 1, strony - 1)), STRONA_RANKINGU_S * 1000);
+    return () => window.clearInterval(id);
+  }, [strony]);
+  return Math.min(strona, strony - 1);
+}
 /** Po ilu ms ranking przetasowuje się ze stanu sprzed pytania do bieżącego. */
 const PRZETASOWANIE_MS = 1600;
 
@@ -36,7 +48,7 @@ export function Licznik({ wartosc }: { wartosc: number }) {
  * przetasowują się na nowe miejsca, punkty doliczają się, a przy nickach pojawia się „+zdobyte”.
  */
 /** Wysokość paska „Koniec etapu” z odstępem (wyścig odejmuje ją od miejsca na tory). */
-export const KONIEC_ETAPU_PX = 104;
+export const KONIEC_ETAPU_PX = 128;
 
 /**
  * Ranking po ostatnim pytaniu etapu: duży pasek pod nagłówkiem, wjeżdża po chwili, żeby było widać, że etap się
@@ -64,14 +76,15 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
     return () => clearTimeout(zegar);
   }, []);
 
+  // po 10 graczy na stronę, przy większej grupie strony się zmieniają (26.10)
+  const strona = useStronaRankingu(ranking.length);
   const wiersze = [...ranking]
     .sort((a, b) =>
       po
         ? a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl")
         : a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
     )
-    .slice(0, W_RANKINGU);
-  const reszta = ranking.length - wiersze.length;
+    .slice(strona * NA_STRONIE_RANKINGU, (strona + 1) * NA_STRONIE_RANKINGU);
   const z = stan.zadanie;
   // „fiuu” przy przetasowaniu, gdy ktoś zmienia miejsce (jak zamiana torów w wyścigu; w klasycznym pub quizie
   // tabela zastępuje wyścig, 26.10). Po pierwszym pytaniu i w finale bez dźwięku, jak w wyścigu.
@@ -152,9 +165,6 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
             </AnimatePresence>
           </ol>
         )}
-        {reszta > 0 && (
-          <p className="tv-ranking-reszta">…i jeszcze {reszta} w grze. Swoje miejsce masz na telefonie.</p>
-        )}
       </div>
     </MotionConfig>
   );
@@ -232,8 +242,7 @@ export function PodiumTv({
               {i === 0 && <span className="tv-stopien-korona">Zwycięzca</span>}
               <span className="tv-stopien-nick">{w.nick}</span>
               <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
-              {/* zdjęcie nagrody między punktami a jej nazwą */}
-              {nagroda?.zdjecie && <img src={nagroda.zdjecie} alt="" className="tv-stopien-zdjecie" />}
+              {/* bez zdjęcia nagrody (26.10): wypychało zwycięzcę za górną krawędź ekranu; zdjęcie jest na telefonie */}
               {nagroda && <span className="tv-stopien-nagroda">{nagroda.nagroda}</span>}
               <div className="tv-stopien-blok">
                 <span className="tv-stopien-nr">{w.miejsce}</span>

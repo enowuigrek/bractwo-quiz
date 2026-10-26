@@ -2,6 +2,7 @@
 // (src/app/pilot/[kod]/auto.tsx) i trasy /api/auto, którą co chwilę woła TV (karta pilota w tle prawie stoi).
 
 import type { AkcjaPilota, PilotStan } from "./typy";
+import { STRONA_RANKINGU_S, stronyRankingu } from "./wyscig";
 
 /** Plansza (wstęp, etap, ciekawostka): dalej, gdy wszyscy kliknęli „Gotowy” (nie wcześniej niż `min` s), albo po `max` s. */
 const PLANSZA = { wstep: [5, 40], etap: [6, 45], ciekawostka: [6, 40] } as const;
@@ -31,7 +32,7 @@ export function otwarcieAutomatu(stan: { auto: boolean; planowany_start: string 
  */
 export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null {
   const s = stan.faza_od ? (teraz - Date.parse(stan.faza_od)) / 1000 : 0;
-  const plansza = ([min, max]: readonly [number, number]) => s >= max || (stan.gotowi >= stan.w_grze && s >= min);
+  const plansza = ([min, max]: readonly [number, number]) => s >= max || (stan.gotowi >= stan.gotowi_z && s >= min);
   switch (stan.faza) {
     case "poczekalnia": {
       // zapowiedź na godzinę: poczekalnia (QR na TV) chwilę przed, a o tej godzinie start, jeśli ktoś dołączył
@@ -52,7 +53,13 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
     case "odpowiedzi":
       return s >= PO_PYTANIU.odpowiedzi ? "ranking" : null;
     case "ranking":
-      if (s < (stan.ostatnie_w_etapie ? PO_PYTANIU.rankingKoniecEtapu : PO_PYTANIU.ranking)) return null;
+      // każda kolejna strona rankingu (po 10 graczy) to dłuższe czekanie
+      if (
+        s <
+        (stan.ostatnie_w_etapie ? PO_PYTANIU.rankingKoniecEtapu : PO_PYTANIU.ranking) +
+          (stronyRankingu(stan.liczba_graczy) - 1) * STRONA_RANKINGU_S
+      )
+        return null;
       return stan.ostatnie_zadanie ? "podium" : "nastepne";
     // w bazie zostaje `przygotuj`, choć pytanie już trwa (odsłania je zegar), więc oba
     case "przygotuj":

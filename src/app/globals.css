@@ -250,7 +250,9 @@ input.pole[type="time"] {
 }
 
 .gra-napis-quiz {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
+  text-align: center;
+  white-space: nowrap;
 }
 
 /* Czas odpowiedzi na telefonie: sam czas w akcencie, reszta zdania szara */
@@ -1003,22 +1005,28 @@ html:has(.kolumna) {
 }
 
 /* Awatar gracza: selfie w kółku albo pierwsza litera nicku */
+/* Awatar jako kapsel (awatar.tsx): ząbkowany złoty brzeg w tle, zdjęcie albo litera w środku (dopełnienie ustawia
+   komponent). Brzeg kapsla zastępuje obwódki: `border` z innych reguł (TV) nie rysuje się wokół ząbków. */
 .awatar {
   flex: none;
+  box-sizing: border-box;
   display: inline-grid;
   place-items: center;
   border-radius: var(--r-round);
   object-fit: cover;
-  background: var(--kamien2);
-  border: 2px solid var(--kamien2);
+  background: url("/grafiki/kapsel.svg") center / 100% 100% no-repeat;
+  border: 0 !important;
   color: var(--na-zlocie);
   font-weight: var(--w-black);
   line-height: 1;
   vertical-align: middle;
 }
 
+/* litera na kolorowym kółku w środku kapsla */
 .awatar-litera {
-  border-color: transparent;
+  background:
+    radial-gradient(circle closest-side, var(--tlo) 97%, transparent 100%) content-box,
+    url("/grafiki/kapsel.svg") center / 100% 100% no-repeat border-box;
 }
 
 /* Selfie przy nicku na telefonie */
@@ -1114,14 +1122,21 @@ html:has(.kolumna) {
   text-align: center;
 }
 
+/* stopka na samym dole ekranu (26.10): kolumna telefonu ma co najmniej wysokość ekranu, a stopka odpycha się od treści */
+.kolumna:has(> .autor) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
 .autor {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  margin: var(--section-gap) auto 0;
+  margin: auto auto 0;
   padding-top: 14px;
-  width: 160px;
+  width: 200px;
   border-top: 1px solid var(--kamien2);
   text-align: center;
 }
@@ -1854,9 +1869,70 @@ html:has(.kolumna) {
   line-height: 1.5;
 }
 
-.haslo-kibica-awatar {
-  vertical-align: middle;
-  margin: 0 3px;
+/* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
+.moj-ranking {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.moj-ranking li {
+  display: grid;
+  grid-template-columns: 2.2em 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: var(--r-btn-sm);
+  background: var(--kamien);
+  font-weight: var(--w-bold);
+}
+
+.moj-ranking li.ja {
+  background: color-mix(in srgb, var(--zloto) 18%, var(--kamien));
+  outline: 2px solid var(--zloto);
+}
+
+.moj-ranking-miejsce {
+  color: var(--zloto);
+  font-variant-numeric: tabular-nums;
+}
+
+.moj-ranking-nick {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moj-ranking-punkty {
+  color: var(--szary);
+  font-variant-numeric: tabular-nums;
+}
+
+.haslo-kibica-nick {
+  font-weight: var(--w-black);
+}
+
+/* kibic w pijanym finale: ekran lekko faluje (słabiej niż u finalistów) */
+.kibic-faluje {
+  animation: kibic-faluje 5s ease-in-out infinite alternate;
+}
+
+@keyframes kibic-faluje {
+  from {
+    transform: rotate(-0.8deg) translateX(-4px);
+  }
+  to {
+    transform: rotate(0.8deg) translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kibic-faluje {
+    animation: none;
+  }
 }
 
 .kibic-odstep {

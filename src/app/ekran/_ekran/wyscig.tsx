@@ -6,10 +6,10 @@ import { Awatar } from "@/components/awatar";
 import { zagraj } from "@/lib/gra/efekty";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
-import { MAX_W_WYSCIGU, NA_TORACH_W_TLOKU, naTrasie, naTrasieFinalu, nalanieSzklanki } from "@/lib/gra/wyscig";
+import { NA_STRONIE_RANKINGU, naTrasie, naTrasieFinalu, nalanieSzklanki } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
-import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
+import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik, useStronaRankingu } from "./ranking";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
 const START_S = 0.8;
@@ -31,9 +31,10 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const n = stan.quiz?.liczba_zadan ?? 0;
   const lp = z?.lp ?? 0;
   const wszyscy = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
-  // przy dużej grupie tory ma czołówka, a reszta stoi w pasku małych awatarów pod torami
-  const wiersze = wszyscy.length > MAX_W_WYSCIGU ? wszyscy.slice(0, NA_TORACH_W_TLOKU) : wszyscy;
-  const reszta = wszyscy.slice(wiersze.length);
+  // po 10 torów na stronę: przy większej grupie najpierw 1.–10., potem dalsi (26.10, zamiast paska reszty)
+  const strona = useStronaRankingu(wszyscy.length);
+  const odMiejsca = strona * NA_STRONIE_RANKINGU;
+  const wiersze = wszyscy.slice(odMiejsca, odMiejsca + NA_STRONIE_RANKINGU);
   const maks = stan.quiz?.max_przed_finalem ?? 0;
   // dźwięk (src/lib/gra/efekty.ts): tylko „fiuu” przy zamianie torów; szumu jazdy razem z awatarami nie ma od 25.10
   // (Łukasz: nie brzmiał jak przesuwanie). W finale każdy ma swoją drogę: tory się nie zamieniają, więc i bez dźwięku
@@ -45,11 +46,16 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
     return () => window.clearTimeout(minutnik);
   }, [dzwieki, zamiana]);
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
-  const odstep = wiersze.length > 8 ? 6 : 12;
+  // tory tej samej wysokości na każdej stronie (na drugiej, krótszej stronie nie rosną)
+  const torow = Math.min(NA_STRONIE_RANKINGU, wszyscy.length);
+  const odstep = torow > 8 ? 6 : 12;
   // odcięcie po etapie: kreska pod ostatnim, kto gra dalej (walka o finał: pod 3. miejscem, inaczej próg
   // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów. Gdy kreska wypada w pasku reszty, stoi tam.
   const odciecie = odciecieEtapu(stan);
-  const strefaFinalu = odciecie !== null && wszyscy.length > odciecie && odciecie <= wiersze.length;
+  // kreska na tej stronie: pod jej `naStronie`-tym torem
+  const naStronie = odciecie === null ? null : odciecie - odMiejsca;
+  const strefaFinalu =
+    odciecie !== null && naStronie !== null && wszyscy.length > odciecie && naStronie >= 1 && naStronie <= wiersze.length;
   const koniecEtapu = !!stan.etap && stan.ostatnie_w_etapie && !stan.etap.finalowy;
   const tor = Math.min(
     92,
@@ -57,9 +63,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
       (700 -
         (strefaFinalu ? STREFA_PX + odstep : 0) -
         (koniecEtapu ? KONIEC_ETAPU_PX : 0) -
-        (reszta.length ? RESZTA_PX : 0) -
-        (wiersze.length - 1) * odstep) /
-        Math.max(1, wiersze.length),
+        (torow - 1) * odstep) /
+        Math.max(1, torow),
     ),
   );
   // awans i spadek: każdy tor startuje tam, gdzie stał w rankingu przed pytaniem, i pod koniec jazdy
@@ -68,7 +73,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
     (a, b) => a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
   );
   const pozycja = (idx: number) =>
-    idx * (tor + odstep) + (strefaFinalu && idx >= (odciecie ?? 0) ? STREFA_PX + odstep : 0);
+    Math.max(0, idx) * (tor + odstep) + (strefaFinalu && idx >= (naStronie ?? 0) ? STREFA_PX + odstep : 0);
   const ruch = (i: number) => ({ delay: START_S + i * 0.08, duration: RUCH_S, ease: [0.22, 1, 0.36, 1] as const });
   const etap = stan.etap;
   // zdjęcie nagrody za 1. miejsce stoi przy szklance na mecie: „gracie o to”
@@ -87,8 +92,9 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
 
   // finał trójki: trzy drogi schodzą się pod szklanką na środku
   if (etap?.finalowy) {
-    const nicki = stan.finalisci?.map((f) => f.nick) ?? wiersze.slice(0, 3).map((w) => w.nick);
-    const finalisci = wiersze.filter((w) => nicki.includes(w.nick)).slice(0, 3);
+    // z całej listy, nie ze strony rankingu
+    const nicki = stan.finalisci?.map((f) => f.nick) ?? wszyscy.slice(0, 3).map((w) => w.nick);
+    const finalisci = wszyscy.filter((w) => nicki.includes(w.nick)).slice(0, 3);
     return (
       <MotionConfig reducedMotion="user">
         <div className="tv-wyscig">
@@ -106,7 +112,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         <KoniecEtapu stan={stan} />
 
         <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
-          <div className="wyscig-tory" style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}>
+          {/* nowa strona: tory wjeżdżają od nowa (klucz) */}
+          <div key={strona} className="wyscig-tory" style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}>
             {wiersze.map((w, i) => {
               const przed = naTrasie(w.punkty - w.zdobyte, maks) * 100;
               const teraz = naTrasie(w.punkty, maks) * 100;
@@ -175,7 +182,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                 </motion.div>
               );
               // pod ostatnim, kto przechodzi: kto jest wyżej, gra dalej
-              return strefaFinalu && i === (odciecie ?? 0) - 1 ? (
+              return strefaFinalu && i === (naStronie ?? 0) - 1 ? (
                 <Fragment key={w.nick}>
                   {wiersz}
                   <p className="wyscig-strefa-finalu">
@@ -188,9 +195,6 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                 wiersz
               );
             })}
-            {reszta.length > 0 && (
-              <Reszta reszta={reszta} odciecie={odciecie !== null && !strefaFinalu ? odciecie : null} />
-            )}
           </div>
 
           <Szklanka
@@ -202,46 +206,6 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         </div>
       </div>
     </MotionConfig>
-  );
-}
-
-/** Wysokość paska reszty graczy z odstępem (odejmowana od miejsca na tory). */
-const RESZTA_PX = 78;
-/** Ile małych awatarów mieści pasek; dalsi tylko w liczbie. */
-const W_PASKU = 26;
-
-/**
- * Pasek pod torami przy dużej grupie: kto nie ma toru, stoi tu małym awatarem w kolejności miejsc. Gdy kreska
- * odpadania wypada wśród nich, między awatarami jest przerywana kreska.
- */
-function Reszta({ reszta, odciecie }: { reszta: WierszRankingu[]; odciecie: number | null }) {
-  const widoczni = reszta.slice(0, W_PASKU);
-  const od = reszta[0].miejsce;
-  return (
-    <motion.div
-      className="wyscig-reszta"
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: START_S, duration: 0.5 }}
-    >
-      <span className="wyscig-reszta-opis">
-        {od}.–{reszta[reszta.length - 1].miejsce}.
-      </span>
-      <div className="wyscig-reszta-awatary">
-        {widoczni.map((w, i) => (
-          <Fragment key={w.nick}>
-            {odciecie !== null && i > 0 && reszta[i - 1].miejsce <= odciecie && w.miejsce > odciecie && (
-              <span className="wyscig-reszta-kreska" aria-hidden />
-            )}
-            <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={44} />
-          </Fragment>
-        ))}
-        {reszta.length > widoczni.length && (
-          <span className="wyscig-reszta-wiecej">+{reszta.length - widoczni.length}</span>
-        )}
-      </div>
-      <span className="wyscig-reszta-opis">jeszcze {reszta.length} w grze</span>
-    </motion.div>
   );
 }
 

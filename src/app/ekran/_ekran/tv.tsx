@@ -20,7 +20,6 @@ import { nastrojFazy, type Nastroj } from "@/lib/gra/nastroj";
 import type { GraczNaLiscie, SeriaGracz, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor } from "@/lib/zadania";
-import { napisMnoznika } from "@/lib/etapy";
 import { rozmycie, useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { Werble } from "@/components/werble";
 import { EtapTv } from "./etap";
@@ -315,8 +314,8 @@ function GotowiTv({ stan }: { stan: StanSesji }) {
   // plansza startowa klasycznego quizu nie czeka na „Gotowy”, tylko odlicza
   if (!stan.auto || !plansza || quizKlasyczny(stan)) return null;
   return (
-    <p className={`tv-gotowi${stan.gotowi >= stan.w_grze ? " wszyscy" : ""}`}>
-      Gotowi <strong>{stan.gotowi}</strong>/{stan.w_grze}
+    <p className={`tv-gotowi${stan.gotowi >= stan.gotowi_z ? " wszyscy" : ""}`}>
+      Gotowi <strong>{stan.gotowi}</strong>/{stan.gotowi_z}
     </p>
   );
 }
@@ -484,7 +483,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   }
   const etap = stan.etap;
   const grajacy = stan.finalisci?.length ?? stan.liczba_graczy;
-  const opisEtapu = etap ? ` · ${etap.nazwa}${etap.mnoznik !== 1 ? ` ${napisMnoznika(etap.mnoznik)}` : ""}` : "";
+  // bez mnożnika (×1,5) w nagłówku: wyglądał dziwnie nad pytaniem i odliczaniem (26.10); mówi o nim plansza etapu
+  const opisEtapu = etap ? ` · ${etap.nazwa}` : "";
   const zEtapami = (stan.quiz?.liczba_etapow ?? 0) > 0;
 
   if (faza === "przygotuj") {

@@ -25,6 +25,8 @@ const UTWORY = {
 type Utwor = keyof typeof UTWORY;
 
 const GLOSNOSC = 0.55;
+/** Muzyka pijanego finału (Web Audio) gra z tą częścią `GLOSNOSC`. */
+const PIJANA_CISZEJ = 0.7;
 /** Stary utwór cichnie przy zmianie tyle ms. Nowy wchodzi od razu na pełną głośność: utwory mają własne wstępy. */
 const PRZENIKANIE_MS = 1500;
 /**
@@ -393,7 +395,8 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     }
     if (kolysanie.current.zatrzymaj || kolysanie.current.startuje || w.zatrzymana || a.paused) return;
     kolysanie.current.startuje = true;
-    void zagrajMuzykePijana(() => a.currentTime, GLOSNOSC, (do_ - teraz) / 1000 - GASNIECIE_S).then((zatrzymaj) => {
+    // ciszej niż odtwarzacz: przez Web Audio ta sama głośność brzmiała na TV wyraźnie głośniej (26.10)
+    void zagrajMuzykePijana(() => a.currentTime, GLOSNOSC * PIJANA_CISZEJ, (do_ - teraz) / 1000 - GASNIECIE_S).then((zatrzymaj) => {
       kolysanie.current.startuje = false;
       if (!zatrzymaj) return;
       kolysanie.current.zatrzymaj = zatrzymaj;

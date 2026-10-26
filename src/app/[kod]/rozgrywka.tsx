@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { sekundy } from "@/lib/czas";
-import { napisMnoznika } from "@/lib/etapy";
 import { rozmycie } from "@/lib/gra/dodatki";
 import { fazaTeraz, komunikatBledu, sekundaOdliczania } from "@/lib/gra/nasluch";
 import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
@@ -66,7 +65,6 @@ export function Rozgrywka({
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
   const kibic = czyKibic(stan, ja.nick);
-  const etap = stan.etap;
   // plansza etapu pokazała już, jak odpowiadać, więc bez podpowiedzi rodzaju pytania
   const zEtapami = (stan.quiz?.liczba_etapow ?? 0) > 0;
 
@@ -99,7 +97,6 @@ export function Rozgrywka({
     <p className="etykieta gra-pasek">
       <span>
         Pytanie {z.lp}
-        {etap && etap.mnoznik !== 1 && <span className="gra-mnoznik"> · punkty {napisMnoznika(etap.mnoznik)}</span>}
       </span>
       {faza === "pytanie" && (
         <span className="gra-kod">

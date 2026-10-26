@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { HasloKibica } from "@/components/haslo-kibica";
-import type { Okrzyk, SeriaGracz } from "@/lib/gra/typy";
+import type { Okrzyk } from "@/lib/gra/typy";
 import { awatarNaDrogach, drogi, punktNaDrodze } from "./drogi";
 
 /** Jak długo dymek wisi na TV (unosi się i znika, animacja `.okrzyk` w tv.css). */
@@ -24,7 +24,7 @@ export function OkrzykiNaDrogach({
   teraz,
 }: {
   okrzyki: Okrzyk[];
-  gracze: SeriaGracz[];
+  gracze: { nick: string; zdjecie: string | null }[];
   /** Położenie 0..1 finalisty na drodze, w kolejności `gracze`. */
   polozenie: number[];
   teraz: number;
@@ -62,8 +62,9 @@ export function OkrzykiNaDrogach({
             }}
           >
             <div className="okrzyk-dymek">
-              <span className="okrzyk-kibic">{o.kibic}</span>{" "}
-              <HasloKibica haslo={o.haslo} nick={g.nick} zdjecie={g.zdjecie} rozmiar={46} />
+              {/* kto krzyczy: nick kibica nad tekstem, bez dwukropka (26.10) */}
+              <span className="okrzyk-kibic">{o.kibic}</span>
+              <HasloKibica haslo={o.haslo} nick={g.nick} />
             </div>
           </div>
         ));

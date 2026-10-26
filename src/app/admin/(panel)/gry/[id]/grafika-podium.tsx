@@ -5,7 +5,7 @@ import { grafikaPodium, udostepnij, type DanePodium } from "@/lib/grafika-wyniku
 import { BRACTWO_INSTAGRAM } from "@/lib/konta";
 
 /**
- * Grafika z podium dla lokalu (post 1080×1350): loga, tytuł, pierwsza trójka. Na komputerze pobiera plik,
+ * Grafika z podium dla lokalu (relacja 1080×1920 jak grafika gracza): loga, tytuł, trójka na podium. Na komputerze pobiera plik,
  * na telefonie otwiera „Udostępnij” (stamtąd „Zapisz obraz” do Zdjęć). Obok konta do oznaczenia w opisie posta.
  */
 export function GrafikaPodium({ dane, konta }: { dane: DanePodium; konta: (string | null)[] }) {

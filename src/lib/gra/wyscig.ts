@@ -2,15 +2,32 @@
 // do zdobycia przed finałem), więc zła odpowiedź = stoisz w miejscu, a szybka dobra = większy krok niż wolna.
 // Do 24.10 skala szła za liderem i przesuwała wszystkich, także tych, którzy odpowiedzieli źle.
 
-/** Ile torów mieści wyścig na TV; przy większej liczbie graczy tory ma czołówka, a reszta stoi w pasku pod nimi. */
-export const MAX_W_WYSCIGU = 12;
+/**
+ * Ranking po pytaniu na TV (wyścig i tabela pub quizu) pokazuje po tylu graczy naraz: przy większej grupie strony
+ * zmieniają się co `STRONA_RANKINGU_S` (26.10, Łukasz: 10, potem 4 przy 14 graczach; wcześniej reszta stała w pasku
+ * małych awatarów). Automat czeka w rankingu dłużej o kolejne strony (auto.ts).
+ */
+export const NA_STRONIE_RANKINGU = 10;
+export const STRONA_RANKINGU_S = 5;
 
-/** Ilu graczy ma tor, gdy wszyscy się nie mieszczą (reszta w pasku małych awatarów). */
-export const NA_TORACH_W_TLOKU = 10;
+/** Ile stron rankingu przy `n` graczach. */
+export const stronyRankingu = (n: number) => Math.max(1, Math.ceil(n / NA_STRONIE_RANKINGU));
+
+/** Domyślny i największy limit graczy w grze (26.10: na razie 20, bo tyle mieści ranking na dwóch stronach). */
+export const MAX_GRACZY = 20;
 
 /** Klasyczny pub quiz: quiz bez etapów (bez finału, szklanki i wyścigu, src/lib/tagi.ts). */
 export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }): boolean {
   return (stan.quiz?.liczba_etapow ?? 0) === 0;
+}
+
+/**
+ * Nazwa rodzaju gry dla graczy (nagłówek telefonu, grafika na pamiątkę), zamiast samego „Quiz” (26.10). Bez wczytanego
+ * quizu: „Quiz”.
+ */
+export function nazwaRodzaju(stan: { quiz: { liczba_etapow: number } | null } | null | undefined): string {
+  if (!stan?.quiz) return "Quiz";
+  return quizKlasyczny(stan) ? "Pub quiz" : "Wyścig po piwo";
 }
 
 /**

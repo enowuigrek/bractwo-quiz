@@ -12,6 +12,7 @@ import { DROGA_PRZED_META, KROK_FINALU } from "@/lib/gra/final";
 import { useWideoWybuchu } from "./wideo-wybuchu";
 import { FPS, OD_S, useKlatkiWybuchu } from "./klatki-wybuchu";
 import { awatarNaDrogach, drogi, type Droga, PlanszaDrog, punktNaDrodze, SZKLANKA_FINALU } from "./drogi";
+import { OkrzykiNaDrogach } from "./okrzyki";
 import { NaglowekSerii } from "./seria";
 import { Szklanka } from "./wyscig";
 
@@ -148,9 +149,9 @@ export function PijanyTv({
 
 
   // pętla klatek czyta zawsze najnowsze dane, a nie startuje od nowa przy każdym odświeżeniu stanu
-  const dane = useRef({ gracze, od, do_, przesuniecie, wybuch });
+  const dane = useRef({ gracze, od, do_, przesuniecie, wybuch, dzwieki: stan.muzyka });
   useEffect(() => {
-    dane.current = { gracze, od, do_, przesuniecie, wybuch };
+    dane.current = { gracze, od, do_, przesuniecie, wybuch, dzwieki: stan.muzyka };
   });
   const elementy = useRef(new Map<string, HTMLDivElement>());
   const plansza = useRef<HTMLDivElement>(null);
@@ -165,11 +166,14 @@ export function PijanyTv({
     const ostatnie = new Map<string, { x: number; y: number }>();
     const odloty = new Map<string, Lot>();
     let ostatnieKaty: number[] = [];
+    // kroki pozorowanego wyścigu słychać jak w finale (26.10): naprzód „krok”, w tył „pudło”, najwyżej co 250 ms
+    const cele = new Map<string, number>();
+    let ostatniDzwiek = 0;
     let poprzednia = performance.now();
     let klatka = 0;
 
     const ustaw = () => {
-      const { gracze, od, do_, przesuniecie, wybuch } = dane.current;
+      const { gracze, od, do_, przesuniecie, wybuch, dzwieki } = dane.current;
       const chwila = performance.now();
       // po schowanej karcie bez skoku przez pół planszy
       const dt = Math.min(0.1, (chwila - poprzednia) / 1000);
@@ -219,6 +223,12 @@ export function PijanyTv({
         } else {
           const t = (teraz - od) / 1000;
           const cel = polozeniePijane(g.nick, start, t, (do_ - od) / 1000 - GASNIECIE_S);
+          const poprzedni = cele.get(g.nick);
+          cele.set(g.nick, cel);
+          if (dzwieki && poprzedni !== undefined && cel !== poprzedni && chwila - ostatniDzwiek > 250) {
+            ostatniDzwiek = chwila;
+            zagraj(cel > poprzedni ? "krok" : "pudlo");
+          }
           const obecne = widac.get(g.nick) ?? start;
           const nowe = ruch ? obecne + (cel - obecne) * (1 - Math.exp(-DOJAZD * dt)) : cel;
           widac.set(g.nick, nowe);
@@ -356,6 +366,15 @@ export function PijanyTv({
             </div>
           </div>
         ))}
+        {/* kibice dopingują także w dogrywce (26.10); dymki przy miejscach z końca serii, do wybuchu */}
+        {!wybuch && (
+          <OkrzykiNaDrogach
+            okrzyki={stan.okrzyki ?? []}
+            gracze={gracze}
+            polozenie={gracze.map((g) => g.start)}
+            teraz={teraz}
+          />
+        )}
       </div>
     </div>
   );

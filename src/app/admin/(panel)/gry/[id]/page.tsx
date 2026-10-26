@@ -19,7 +19,7 @@ import { TabelaWynikow } from "./tabela-wynikow";
 export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
 
 type GraZDanymi = Sesja & {
-  quizy: { tytul: string } | null;
+  quizy: { tytul: string; etapy: { count: number }[] } | null;
   lokale: {
     nazwa: string;
     miasto: string | null;
@@ -48,7 +48,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
-    db.from("sesje").select("*, quizy(tytul), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram)").eq("id", id).maybeSingle<GraZDanymi>(),
+    db.from("sesje").select("*, quizy(tytul, etapy(count)), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram)").eq("id", id).maybeSingle<GraZDanymi>(),
     db.from("gracze").select("id", { count: "exact", head: true }).eq("sesja_id", id),
   ]);
   if (!gra) notFound();
@@ -266,7 +266,8 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
             <GrafikaPodium
               dane={{
                 tytul: gra.quizy?.tytul ?? "Quiz",
-                okazja: gra.okazja,
+                // bez okazji rodzaj gry, jak na grafice gracza
+                okazja: gra.okazja ?? ((gra.quizy?.etapy[0]?.count ?? 0) > 0 ? "Wyścig po piwo" : "Pub quiz"),
                 lokal: gra.lokale ? { nazwa: gra.lokale.nazwa, logo_url: gra.lokale.logo_url } : null,
                 browar: gra.browar_nazwa ? { nazwa: gra.browar_nazwa, logo_url: gra.browar_logo_url } : null,
                 data: new Date(gra.faza_od ?? gra.utworzono).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw" }),

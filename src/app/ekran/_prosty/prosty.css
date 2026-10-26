@@ -162,7 +162,7 @@
   text-align: center;
   font-size: 28px;
   font-weight: 800;
-  color: var(--szary);
+  color: var(--chmiel);
 }
 
 /* poczekalnia: QR po lewej, tytuł i nicki po prawej */
@@ -429,7 +429,8 @@
   min-width: 0;
   padding: 24px 32px;
   border-radius: 20px;
-  border: 4px solid var(--kamien2);
+  border: 4px solid #493a2a;
+  background: #17130f;
   overflow: hidden;
 }
 
@@ -464,7 +465,7 @@
   display: flex;
   justify-content: space-between;
   padding: 6px 0;
-  border-bottom: 1px solid #2a323b;
+  border-bottom: 1px solid #493a2a;
 }
 
 .pr-ramka li span {
@@ -488,7 +489,7 @@
   display: flex;
   align-items: center;
   padding: 10px 24px;
-  border-bottom: 2px solid #2a323b;
+  border-bottom: 2px solid #493a2a;
   font-size: 40px;
   font-weight: 700;
 }

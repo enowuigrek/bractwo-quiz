@@ -27,7 +27,7 @@ export function Gotowy({ stan, token }: { stan: StanSesji; token: string }) {
         {gotowy ? "✓ Gotowy" : "Gotowy!"}
       </button>
       <p className="pomocniczy">
-        Gotowi: {stan.gotowi}/{stan.w_grze}. {gotowy ? "Czekamy na resztę…" : "Gra ruszy, gdy wszyscy będą gotowi."}
+        Gotowi: {stan.gotowi}/{stan.gotowi_z}. {gotowy ? "Czekamy na resztę…" : "Gra ruszy, gdy wszyscy będą gotowi."}
       </p>
     </div>
   );

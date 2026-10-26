@@ -1321,8 +1321,19 @@ button.kafelek {
 /* Zdjęcie nagrody w kreatorze: przycisk, czekanie na przeróbkę, wybór przeróbka / oryginał */
 .zdjecie-nagrody {
   margin-top: 8px;
-  display: grid;
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* zdjęcie nagrody jak pole pliku z logo browaru: przycisk, miniatura i podpis w jednym wierszu */
+.zdjecie-nagrody-miniatura {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--kamien2);
 }
 
 .zdjecie-nagrody-trwa {
@@ -1334,8 +1345,8 @@ button.kafelek {
 }
 
 .zdjecie-nagrody-trwa img {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
   border-radius: var(--r-btn-sm);
   animation: pulsuj 1.4s ease-in-out infinite;
@@ -1347,37 +1358,43 @@ button.kafelek {
   }
 }
 
-.zdjecie-nagrody-opcja {
+/* Rodzaje pytań w prompcie (wklej.tsx): równe kafelki po dwa w wierszu w kolorach rodzajów (.rodzaj-pytania),
+   wyłączony szary */
+.wybor-rodzajow {
   display: grid;
-  gap: 4px;
-  justify-items: center;
-  padding: 6px;
-  font: inherit;
-  font-size: var(--fs-xs);
-  color: var(--szary);
-  background: var(--kamien);
-  border: 2px solid var(--kamien2);
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.wybor-rodzajow .rodzaj-pytania {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
   border-radius: var(--r-btn-sm);
+  font-size: var(--fs-small);
+  text-align: center;
   cursor: pointer;
 }
 
-.zdjecie-nagrody-opcja img {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  background: repeating-conic-gradient(#1c232b 0% 25%, #141a20 0% 50%) 50% / 16px 16px;
-  border-radius: 6px;
+.wybor-rodzajow .rodzaj-pytania.wylaczony {
+  color: var(--szary);
+  background: transparent;
+  border-color: var(--kamien2);
 }
 
-.zdjecie-nagrody-opcja.wybrana {
-  border-color: var(--zloto);
-  color: var(--zloto);
+.wybor-rodzajow input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.zdjecie-nagrody-akcje {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.wybor-rodzajow .rodzaj-pytania:has(input:focus-visible) {
+  outline: 3px solid var(--zloto);
+  outline-offset: 2px;
 }
 
 /* Wklejanie pytań do klasycznego quizu (quizy/[id]/wklej.tsx): tekst w krój o stałej szerokości, bo liczą się
@@ -1530,8 +1547,4 @@ button.tag:hover:not(.wybrany) {
   flex: none;
 }
 
-/* Kreator gry: zapas pod formularzem. Gdy wybór (np. rodzaj quizu) skraca treść pod spodem, strona nie robi się
-   krótsza od miejsca, w którym stoi ekran, więc telefon nie podjeżdża widoku pod palcem (26.10) */
-.formularz.kreator {
-  padding-bottom: 45vh;
-}
+/* Kreator gry bez zapasu pod formularzem (26.10: 45vh pustego miejsca na końcu wyglądało na błąd) */

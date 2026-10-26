@@ -13,8 +13,8 @@ import { IkonaMegafon } from "@/components/ikony";
 type Wynik = { przyjety: boolean; powod?: string; za_ms?: number; wyslane?: number };
 
 /**
- * Telefon kibica w serii finału: wybiera finalistę (awatary) i stuka hasła z jego awatarem
- * („Dawaj [awatar]!”). Okrzyk wyskakuje na TV dymkiem nad drogą finalisty. Najwyżej jeden na 3 s
+ * Telefon kibica w serii finału i w pijanym finale: wybiera finalistę (awatary) i stuka hasła z jego nickiem
+ * („Dawaj, Nowy!”). Okrzyk wyskakuje na TV dymkiem nad drogą finalisty. Najwyżej jeden na 3 s
  * (pilnuje `kibicuj` w bazie, tu tylko przyciski czekają). `teraz`: zegar serwera.
  */
 export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; teraz: number }) {
@@ -37,17 +37,13 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     </p>
   );
 
-  // pijany finał (ukryta dogrywka finalistów): kibic widzi, że finał trwa, bez przycisków
-  if (stan.faza !== "seria" || teraz < od || teraz >= do_ || !f) {
+  // w pijanym finale (ukryta dogrywka finalistów) kibic dalej dopinguje, a ekran lekko faluje (26.10)
+  if (teraz < od || teraz >= do_ || !f) {
     return (
       <>
         {naglowek}
         <p className="gra-kibic">
-          {stan.faza !== "seria"
-            ? "Finał trwa! Patrz na telewizor."
-            : teraz >= do_
-            ? "Koniec serii! Patrz na telewizor."
-            : "Za chwilę start. Wtedy możesz kibicować!"}
+          {teraz >= do_ ? "Koniec serii! Patrz na telewizor." : "Za chwilę start. Wtedy możesz kibicować!"}
         </p>
       </>
     );
@@ -82,7 +78,7 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   }
 
   return (
-    <>
+    <div className={stan.faza === "pijany" ? "kibic-faluje" : undefined}>
       {naglowek}
       <h2 className="kibic-tytul">Komu kibicujesz?</h2>
       <div className="kibic-finalisci" role="radiogroup" aria-label="Finalista">
@@ -110,7 +106,7 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
             aria-label={`${HASLA[i][0]}${f.nick}${HASLA[i][1]}`}
             onClick={() => void kibicuj(i)}
           >
-            <HasloKibica haslo={i} nick={f.nick} zdjecie={f.zdjecie} rozmiar={30} />
+            <HasloKibica haslo={i} nick={f.nick} />
           </button>
         ))}
       </div>
@@ -127,6 +123,6 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
           {blad}
         </p>
       )}
-    </>
+    </div>
   );
 }

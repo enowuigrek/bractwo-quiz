@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { IkonaGotowe, IkonaKopiuj } from "@/components/ikony";
+import type { TypZadania } from "@/lib/zadania";
 import {
   czytajPytania,
   MAX_PYTAN_PROMPTU,
@@ -23,6 +24,16 @@ import { liczbaPytan } from "../limity";
  * gotowy prompt do skopiowania, a odpowiedź AI wkleja się w pole niżej. Podgląd czyta tekst na bieżąco, a zapis
  * sprawdza każde pytanie jak formularz pytania i dodaje wszystkie na koniec quizu.
  */
+/** Kolor rodzaju w prompcie ten sam co rodzaju pytania w pilocie (`.rodzaj-pytania` w globals.css). */
+const KOLOR_RODZAJU: Record<RodzajPromptu, TypZadania> = {
+  jedna: "wybor",
+  kilka: "wielokrotny",
+  prawda: "prawda_falsz",
+  liczba: "szacowanie",
+  kolejnosc: "kolejnosc",
+  pary: "pary",
+};
+
 export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string; temat: string }) {
   const [tekst, ustawTekst] = useState("");
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(async (poprzedni, dane) => {
@@ -31,6 +42,7 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
     return wynik;
   }, {});
   const [skopiowano, ustawSkopiowano] = useState(false);
+  const [bladSchowka, ustawBladSchowka] = useState<string | null>(null);
   const { pytania, bledy } = czytajPytania(tekst);
 
   // formularz promptu: temat domyślnie z tytułu quizu
@@ -47,6 +59,18 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
         ? l.filter((x) => x !== r)
         : (Object.keys(RODZAJE_PROMPTU) as RodzajPromptu[]).filter((x) => x === r || l.includes(x)),
     );
+
+  // odpowiedź AI zwykle już jest w schowku: jeden przycisk zamiast wklejania w pole (pole zostaje w podglądzie)
+  async function wklejZeSchowka() {
+    ustawBladSchowka(null);
+    try {
+      const z = await navigator.clipboard.readText();
+      if (z.trim()) ustawTekst(z);
+      else ustawBladSchowka("Schowek jest pusty. Skopiuj odpowiedź AI i spróbuj jeszcze raz.");
+    } catch {
+      ustawBladSchowka("Przeglądarka nie dała dostępu do schowka. Wklej odpowiedź w polu w podglądzie pytań.");
+    }
+  }
 
   async function kopiujPrompt() {
     if (await skopiuj(prompt)) {
@@ -89,9 +113,13 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
         </div>
         <fieldset>
           <legend>Rodzaje pytań</legend>
-          <div className="wybor-czasu">
+          {/* w kolorach rodzajów z pilota, równe kafelki po dwa w wierszu (26.10) */}
+          <div className="wybor-rodzajow">
             {(Object.keys(RODZAJE_PROMPTU) as RodzajPromptu[]).map((r) => (
-              <label key={r} className={`wybor-czasu-opcja${rodzaje.includes(r) ? " wybrana" : ""}`}>
+              <label
+                key={r}
+                className={`rodzaj-pytania ${KOLOR_RODZAJU[r]}${rodzaje.includes(r) ? "" : " wylaczony"}`}
+              >
                 <input type="checkbox" checked={rodzaje.includes(r)} onChange={() => przelaczRodzaj(r)} />
                 {RODZAJE_PROMPTU[r].nazwa}
               </label>
@@ -136,8 +164,28 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
         <h3 className="wklej-krok">
           <span className="krok-nr">2</span> Odpowiedź AI
         </h3>
-        <div>
-          <label htmlFor="wklej-tekst">Wklej pytania</label>
+        <button type="button" className="przycisk" onClick={() => void wklejZeSchowka()}>
+          Wklej ze schowka
+        </button>
+        {bladSchowka && (
+          <p className="blad" role="alert" style={{ margin: 0 }}>
+            {bladSchowka}
+          </p>
+        )}
+        {tekst.trim() && (
+          <p className="pomocniczy" style={{ margin: 0 }}>
+            {pytania.length ? `Wklejone: ${liczbaPytan(pytania.length)}.` : "Nie widzę pytań w wklejonym tekście."}
+          </p>
+        )}
+        {bledy.map((b) => (
+          <p key={b} className="blad" role="alert" style={{ margin: 0 }}>
+            {b}
+          </p>
+        ))}
+
+        {/* jak podgląd promptu: tekst do poprawek ręcznych i lista pytań, które wejdą do quizu */}
+        <details className="wklej-podglad-promptu">
+          <summary>Podgląd pytań</summary>
           <textarea
             id="wklej-tekst"
             name="tekst"
@@ -145,17 +193,10 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
             rows={10}
             value={tekst}
             onChange={(e) => ustawTekst(e.target.value)}
+            aria-label="Pytania od AI"
             placeholder={"[jedna] Z jakiego kraju pochodzi styl pils?\n- Niemcy\n+ Czechy\n- Austria\n- Belgia"}
           />
-        </div>
-
-        {tekst.trim() && (
           <div className="wklej-podglad">
-            {bledy.map((b) => (
-              <p key={b} className="blad" role="alert" style={{ margin: 0 }}>
-                {b}
-              </p>
-            ))}
             {pytania.length > 0 && (
               <ol className="lista">
                 {pytania.map((p, i) => (
@@ -171,7 +212,7 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
               </ol>
             )}
           </div>
-        )}
+        </details>
 
         <KomunikatFormularza stan={stan} />
         <button type="submit" className="przycisk zloty" disabled={trwa || !pytania.length || bledy.length > 0}>

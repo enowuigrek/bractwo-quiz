@@ -230,10 +230,13 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
   return naBlob(plotno);
 }
 
-/** Podium gry jako post 1080×1350 (dla lokalu, z panelu). */
+/**
+ * Podium gry jako relacja 1080×1920 (dla lokalu, z panelu): ten sam układ co grafika gracza (26.10, Łukasz: wcześniej
+ * post 1080×1350 wyglądał gorzej), tylko w środku trójka na stopniach podium.
+ */
 export async function grafikaPodium(d: DanePodium): Promise<Blob> {
   const S = 1080;
-  const W = 1350;
+  const W = 1920;
   const plotno = document.createElement("canvas");
   plotno.width = S;
   plotno.height = W;
@@ -242,29 +245,42 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
   await document.fonts.ready;
   tlo(ctx, S, W);
 
-  await rysujLoga(ctx, d, S, 70, 140);
-  tekst(ctx, (d.okazja ?? "Quiz Bractwa Piwnego").toUpperCase(), S / 2, 300, 34, ZLOTO, 700, S - 100);
-  tekst(ctx, d.tytul, S / 2, 360, 50, PIANA, 800, S - 100);
-  tekst(ctx, "Zwycięzcy", S / 2, 450, 44, SZARY, 700);
+  await rysujLoga(ctx, d, S, 150, 170);
+  tekst(ctx, (d.okazja ?? "Quiz Bractwa Piwnego").toUpperCase(), S / 2, 450, 38, ZLOTO, 700, S - 120);
+  tekst(ctx, d.tytul, S / 2, 520, 56, PIANA, 800, S - 120);
 
-  // 2. z lewej, 1. w środku i wyżej, 3. z prawej
-  const pozycje = [
-    { i: 1, x: S * 0.2, y: 760, r: 120 },
-    { i: 0, x: S * 0.5, y: 680, r: 160 },
-    { i: 2, x: S * 0.8, y: 780, r: 110 },
+  // 2. z lewej, 1. w środku i najwyżej, 3. z prawej; pod awatarem nick i punkty, pod nimi stopień z numerem
+  const DNO = 1500;
+  const stopnie = [
+    { i: 1, x: S * 0.2, wys: 230, r: 115 },
+    { i: 0, x: S * 0.5, wys: 330, r: 150 },
+    { i: 2, x: S * 0.8, wys: 170, r: 105 },
   ];
-  for (const p of pozycje) {
+  const SZER_STOPNIA = 300;
+  for (const p of stopnie) {
     const g = d.podium[p.i];
     if (!g) continue;
-    await rysujAwatar(ctx, g, p.x, p.y, p.r);
-    const metal = METALE[g.miejsce]?.[1] ?? PIANA;
-    tekst(ctx, g.nick, p.x, p.y + p.r + 110, p.i === 0 ? 52 : 42, metal, 800, S * 0.3);
-    tekst(ctx, `${g.punkty.toLocaleString("pl-PL")} pkt`, p.x, p.y + p.r + 160, 32, SZARY, 600);
-  }
+    const [jasny, metal, ciemny] = METALE[g.miejsce] ?? ["#3a4552", "#27313b", "#11161b"];
+    const gora = DNO - p.wys;
+    const blok = ctx.createLinearGradient(0, gora, 0, DNO);
+    blok.addColorStop(0, jasny);
+    blok.addColorStop(0.35, metal);
+    blok.addColorStop(1, ciemny);
+    ctx.fillStyle = blok;
+    ctx.fillRect(p.x - SZER_STOPNIA / 2, gora, SZER_STOPNIA, p.wys);
+    tekst(ctx, String(g.miejsce), p.x, gora + Math.min(p.wys - 30, 130), 110, "rgba(0, 0, 0, 0.55)", 800);
 
-  if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1170, 30, SZARY, 600, S - 100);
-  tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1230, 34, PIANA, 600, S - 100);
-  tekst(ctx, "Piwu Cześć!", S / 2, 1295, 40, ZLOTO, 800);
+    tekst(ctx, `${g.punkty.toLocaleString("pl-PL")} pkt`, p.x, gora - 30, 32, SZARY, 600);
+    tekst(ctx, g.nick, p.x, gora - 76, p.i === 0 ? 52 : 42, metal, 800, SZER_STOPNIA + 20);
+    await rysujAwatar(ctx, g, p.x, gora - 160 - p.r, p.r);
+  }
+  // linia podłogi pod stopniami
+  ctx.fillStyle = ZLOTO;
+  ctx.fillRect(S * 0.05, DNO, S * 0.9, 4);
+
+  if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, SZARY, 600, S - 120);
+  tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, PIANA, 600, S - 120);
+  tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
   return naBlob(plotno);
 }
 

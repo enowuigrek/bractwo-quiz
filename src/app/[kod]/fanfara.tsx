@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { Werble } from "@/components/werble";
 import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
-import { quizKlasyczny } from "@/lib/gra/wyscig";
+import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
 import { IkonaMegafon } from "@/components/ikony";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
@@ -71,7 +71,8 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
     <UdostepnijWynik
       wynik={{
         tytul: stan.quiz?.tytul ?? "Quiz",
-        okazja: stan.okazja,
+        // nad tytułem okazja, a bez niej rodzaj gry (26.10: zamiast „Quiz Bractwa Piwnego”)
+        okazja: stan.okazja ?? nazwaRodzaju(stan),
         lokal: stan.lokal,
         browar: stan.browar,
         data: new Date().toLocaleDateString("pl-PL"),
@@ -96,7 +97,7 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
         Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
       </p>
       <p className="autor">
-        <span className="autor-etykieta">Aplikacja</span>
+        <span className="autor-etykieta">Aplikację zrobił</span>
         <a href="https://lukasznowak.dev" target="_blank" rel="noopener">
           lukasznowak.dev
         </a>

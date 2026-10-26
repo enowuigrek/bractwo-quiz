@@ -209,7 +209,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
   const poPytaniu = z && z.typ !== "ciekawostka" && ["przygotuj", "pytanie", "wynik", "odpowiedzi", "ranking"].includes(faza);
   const [napisLicznika, wartoscLicznika, komplet]: [string, string, boolean] =
     stan.auto && planszaGotowych
-      ? ["Gotowi do dalszej gry", `${stan.gotowi}/${stan.w_grze}`, stan.gotowi >= stan.w_grze]
+      ? ["Gotowi do dalszej gry", `${stan.gotowi}/${stan.gotowi_z}`, stan.gotowi >= stan.gotowi_z]
       : poPytaniu
         ? [
             wszyscy ? "Wszyscy odpowiedzieli" : "Odpowiedziało",

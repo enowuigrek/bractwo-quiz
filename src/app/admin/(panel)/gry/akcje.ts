@@ -8,6 +8,7 @@ import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/
 import { kontoInstagram } from "@/lib/instagram";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Nagroda, StanFormularza } from "@/lib/typy";
+import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { LIMITY } from "../quizy/limity";
 
 const MAX_OKAZJA = 80;
@@ -28,7 +29,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const czasPole = String(dane.get("czas_s") ?? "");
   const czas_s = czasPole === "bez" ? null : Number(czasPole);
   const bonus_czas = true;
-  const max_graczy = Number(dane.get("max_graczy") || 30);
+  // na razie najwyżej 20 graczy (MAX_GRACZY: tyle mieści ranking na TV na dwóch stronach)
+  const max_graczy = Number(dane.get("max_graczy") || MAX_GRACZY);
 
   if (!lokal_id) return { blad: "Wybierz lokal." };
   if (!quiz_id) return { blad: "Wybierz quiz." };
@@ -39,8 +41,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     return { blad: "Wybierz czas na odpowiedź." };
   }
   if (okazja.length > MAX_OKAZJA) return { blad: `Okazja może mieć najwyżej ${MAX_OKAZJA} znaków.` };
-  if (!Number.isInteger(max_graczy) || max_graczy < 1 || max_graczy > 500) {
-    return { blad: "Limit graczy musi być liczbą od 1 do 500." };
+  if (!Number.isInteger(max_graczy) || max_graczy < 1 || max_graczy > MAX_GRACZY) {
+    return { blad: `Limit graczy musi być liczbą od 1 do ${MAX_GRACZY}.` };
   }
 
   // nagrody: tylko 1. miejsce albo pierwsza trójka, każde miejsce z własną instrukcją odbioru
@@ -127,18 +129,14 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   const browar_instagram = kontoInstagram(dane.get("browar_instagram"));
   if (browar_instagram === false) return { blad: "Instagram browaru: sama nazwa konta, np. @browar." };
 
-  const grafika = klasyczny ? null : plikZFormularza(dane, "grafika");
-  for (const plik of [grafika, browarLogo]) {
-    const blad = plik && bladGrafiki(plik);
-    if (blad) return { blad };
-  }
-  let grafika_url: string | null = null;
+  // grafiki na poczekalnię już nie ma (26.10, Łukasz: przy wspólnym tle wyglądała źle); `grafika_url` zostaje
+  // w bazie dla starszych gier
+  const bladLogo = browarLogo && bladGrafiki(browarLogo);
+  if (bladLogo) return { blad: bladLogo };
   let browar_logo_url: string | null = null;
   try {
-    if (grafika) grafika_url = await wyslijGrafike(grafika, "sesje");
     if (browarLogo) browar_logo_url = await wyslijGrafike(browarLogo, "sesje");
   } catch (e) {
-    await usunGrafike(grafika_url);
     return { blad: (e as Error).message };
   }
 
@@ -152,7 +150,6 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       czas_s,
       bonus_czas,
       max_graczy,
-      grafika_url,
       nagrody: nagrody.length ? nagrody : null,
       browar_nazwa,
       browar_logo_url,
@@ -167,7 +164,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     .select("kod, host_token")
     .single<{ kod: string; host_token: string }>();
   if (error) {
-    await Promise.all([usunGrafike(grafika_url), usunGrafike(browar_logo_url)]);
+    await usunGrafike(browar_logo_url);
     return { blad: `Nie udało się uruchomić gry: ${error.message}` };
   }
   // od razu pilot (26.10, Łukasz: na stronie gry i tak zawsze klikał „Prowadź”); rzeczy ze strony gry są na dole

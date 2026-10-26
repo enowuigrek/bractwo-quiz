@@ -67,32 +67,31 @@ export function ZdjecieNagrody({ miejsce }: { miejsce: number }) {
         }}
       />
 
-      {stan.etap === "pusty" && (
-        <button type="button" className="przycisk-maly" onClick={() => pole.current?.click()}>
-          <IkonaAparat /> Zdjęcie nagrody
-        </button>
-      )}
-
+      {/* jak pole pliku z logo browaru: przycisk, miniatura i podpis w jednym wierszu (26.10) */}
+      <button
+        type="button"
+        className="przycisk-maly"
+        disabled={stan.etap === "wysylam"}
+        onClick={() => pole.current?.click()}
+      >
+        <IkonaAparat /> {stan.etap === "gotowe" ? "Inne zdjęcie" : "Zdjęcie nagrody"}
+      </button>
       {stan.etap === "wysylam" && (
-        <div className="zdjecie-nagrody-trwa" role="status">
+        <span className="zdjecie-nagrody-trwa" role="status">
           <img src={stan.podglad} alt="" />
-          <span>Wysyłam zdjęcie…</span>
-        </div>
+          Wysyłam…
+        </span>
       )}
-
       {stan.etap === "gotowe" && (
         <>
-          <div className="zdjecie-nagrody-opcja wybrana">
-            <img src={stan.url} alt={`Zdjęcie nagrody za ${miejsce}. miejsce`} />
-          </div>
-          <div className="zdjecie-nagrody-akcje">
-            <button type="button" className="przycisk-maly" onClick={() => pole.current?.click()}>
-              Inne zdjęcie
-            </button>
-            <button type="button" className="przycisk-maly niebezpieczny" onClick={() => ustaw({ etap: "pusty" })}>
-              Bez zdjęcia
-            </button>
-          </div>
+          <img
+            src={stan.url}
+            alt={`Zdjęcie nagrody za ${miejsce}. miejsce`}
+            className="zdjecie-nagrody-miniatura"
+          />
+          <button type="button" className="przycisk-maly niebezpieczny" onClick={() => ustaw({ etap: "pusty" })}>
+            Bez zdjęcia
+          </button>
         </>
       )}
     </div>

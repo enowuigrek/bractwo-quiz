@@ -6,19 +6,19 @@ import { wymagajQuizu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { Miniatura } from "../../_komponenty/grafika";
-import { IkonaKlodka, IkonaKosz } from "@/components/ikony";
+import { IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import {
   przesunEtap,
   przesunZadanie,
   przywrocQuiz,
-  ustawWidocznoscQuizu,
   usunEtap,
   usunZadanie,
   zmienPlanEtapu,
 } from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { WklejPytania } from "./wklej";
+import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
 
@@ -152,18 +152,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       <NaglowekQuizu quiz={quiz} />
       {/* tylko główny decyduje, czy lokale widzą jego quiz (do grania); quizów lokali to nie dotyczy */}
       {widziWszystko(rola) && !quiz.lokal_id && (
-        <form action={ustawWidocznoscQuizu.bind(null, quiz.id, !quiz.tylko_glowny)} className="pomocniczy">
-          {quiz.tylko_glowny ? (
-            <>
-              <IkonaKlodka /> Tylko dla mnie: lokale nie widzą tego quizu.
-            </>
-          ) : (
-            "Lokale widzą ten quiz i mogą nim grać (bez zmian)."
-          )}{" "}
-          <button type="submit" className="przycisk-maly">
-            {quiz.tylko_glowny ? "Pokaż lokalom" : "Ukryj przed lokalami"}
-          </button>
-        </form>
+        <UdostepnijLokalom quizId={quiz.id} udostepniony={!quiz.tylko_glowny} />
       )}
       {quiz.usunieto && (
         <form action={przywrocQuiz.bind(null, quiz.id)} className="blad" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>

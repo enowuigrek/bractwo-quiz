@@ -1,23 +1,15 @@
 import { HASLA } from "@/lib/gra/okrzyki";
-import { Awatar } from "./awatar";
 
-/** Hasło kibica z awatarem finalisty w miejscu kropek: „Dawaj [awatar]!”. */
-export function HasloKibica({
-  haslo,
-  nick,
-  zdjecie,
-  rozmiar,
-}: {
-  haslo: number;
-  nick: string;
-  zdjecie: string | null;
-  rozmiar: number;
-}) {
+/**
+ * Hasło kibica z nickiem finalisty: „Jedziesz, Nowy!”. Od 26.10 sam tekst, bez awatara w środku (Łukasz: kibic
+ * krzyczy imię).
+ */
+export function HasloKibica({ haslo, nick }: { haslo: number; nick: string }) {
   const [przed, po] = HASLA[haslo] ?? HASLA[0];
   return (
     <span className="haslo-kibica">
       {przed}
-      <Awatar nick={nick} zdjecie={zdjecie} rozmiar={rozmiar} className="haslo-kibica-awatar" />
+      <strong className="haslo-kibica-nick">{nick}</strong>
       {po}
     </span>
   );

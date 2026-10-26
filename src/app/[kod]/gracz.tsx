@@ -20,10 +20,11 @@ import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie } from "@/lib/zdjecie";
 import { kiedyStart } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
-import { nalanieSzklanki, quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
+import { nalanieSzklanki, nazwaRodzaju, quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { Gotowy } from "./gotowy";
 import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "@/components/ikony";
+import { MojRanking } from "./moj-ranking";
 import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
 import { zapamietajKoniecSerii } from "@/lib/pijany";
@@ -31,6 +32,7 @@ import { SeriaGracza } from "./seria";
 import { KoniecGracza } from "./fanfara";
 import { Kibicowanie } from "./kibic";
 import { czyKibic, Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
+import { UdostepnijWynik } from "./udostepnij";
 import { ZdjecieGracza } from "./zdjecie-gracza";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
@@ -57,6 +59,8 @@ export function Gracz({ kod }: { kod: string }) {
   const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
   // punkty grających od najwyższych: w etapie z odcięciem telefon mówi, ile brakuje do miejsca, które przechodzi
   const [punktyWGrze, ustawPunktyWGrze] = useState<number[] | null>(null);
+  // cały ranking: na telefonie wycinek tabeli wokół gracza (moj-ranking.tsx)
+  const [ranking, ustawRanking] = useState<WierszRankingu[] | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
   const [usuniety, ustawUsuniety] = useState(false);
   // token w refie, żeby `pobierz` od razu po dołączeniu albo powrocie wiedział, czyj wynik pobrać
@@ -99,6 +103,7 @@ export function Gracz({ kod }: { kod: string }) {
             const r = await supabase().rpc("ranking", { p_kod: kod });
             if (r.data) {
               const wiersze = r.data as WierszRankingu[];
+              ustawRanking(wiersze);
               ustawMojWiersz(wiersze.find((w) => w.nick === nowy.nick) ?? null);
               ustawPunktyWGrze(
                 wiersze
@@ -164,7 +169,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!stan || sprawdzamToken) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} browar={stan?.browar} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan)} />
         <p className="pomocniczy">Łączę z grą…</p>
       </>
     );
@@ -173,7 +178,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!ja) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} browar={stan?.browar} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan)} />
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
@@ -216,7 +221,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   return (
     <>
-      <Naglowek lokal={stan?.lokal} browar={stan?.browar} />
+      <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan)} />
       <WGrze
         stan={stan}
         ja={ja}
@@ -224,6 +229,7 @@ export function Gracz({ kod }: { kod: string }) {
         moj={moj}
         mojWiersz={mojWiersz}
         punktyWGrze={punktyWGrze}
+        ranking={ranking}
         przesuniecie={przesuniecie}
         odswiez={pobierz}
       />
@@ -232,15 +238,18 @@ export function Gracz({ kod }: { kod: string }) {
 }
 
 /**
- * Nagłówek telefonu: jak na TV (26.10) lokal z lewej (obok gościnny browar), „Quiz” na środku, Bractwo z prawej.
+ * Nagłówek telefonu: jak na TV (26.10) lokal z lewej (obok gościnny browar), rodzaj gry na środku, Bractwo z prawej.
  * Wszystkie loga tej samej wysokości. Kod gry jest wewnętrzny (gracz wchodzi z QR), więc go nie pokazujemy.
  */
 function Naglowek({
   lokal,
   browar,
+  napis = "Quiz",
 }: {
   lokal?: { nazwa: string; logo_url: string | null } | null;
   browar?: { nazwa: string; logo_url: string | null } | null;
+  /** Rodzaj gry: „Wyścig po piwo” albo „Pub quiz” (`nazwaRodzaju`). */
+  napis?: string;
 }) {
   return (
     <header className="gra-naglowek trzy">
@@ -248,7 +257,7 @@ function Naglowek({
         {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="gra-logo" />}
         {browar?.logo_url && <img src={browar.logo_url} alt={browar.nazwa} className="gra-logo" />}
       </span>
-      <span className="logo-quiz-napis gra-napis-quiz">Quiz</span>
+      <span className="logo-quiz-napis gra-napis-quiz">{napis}</span>
       <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo gra-logo" />
     </header>
   );
@@ -350,6 +359,7 @@ function WGrze({
   moj,
   mojWiersz,
   punktyWGrze,
+  ranking,
   przesuniecie,
   odswiez,
 }: {
@@ -359,6 +369,7 @@ function WGrze({
   moj: MojWynik | null;
   mojWiersz: WierszRankingu | null;
   punktyWGrze: number[] | null;
+  ranking: WierszRankingu[] | null;
   przesuniecie: number;
   odswiez: () => Promise<void>;
 }) {
@@ -458,7 +469,7 @@ function WGrze({
   }
 
   if (stan.faza === "pijany") {
-    // kibic nie gra dogrywki (25.10): dalej patrzy na finał na TV, ale okrzyków już nie wysyła (seria się skończyła)
+    // kibic nie gra dogrywki (25.10), tylko dalej dopinguje finalistów (od 26.10 także w dogrywce)
     if (czyKibic(stan, ja.nick)) return <Kibicowanie stan={stan} ja={ja} teraz={teraz} />;
     return <PijanyFinal stan={stan} teraz={teraz} />;
   }
@@ -474,7 +485,25 @@ function WGrze({
     !stan.etap?.finalowy &&
     ["etap", "przygotuj", "pytanie", "wynik", "odpowiedzi", "ranking"].includes(stan.faza)
   ) {
-    return <Odpadl nick={ja.nick} moj={moj} />;
+    return <Odpadl nick={ja.nick} moj={moj} stan={stan} />;
+  }
+
+  // plansza finału u kogoś spoza trójki (odpadł w walce o finał albo wcześniej): bez „Gotowy”, za chwilę kibicuje
+  if (stan.faza === "etap" && stan.etap?.finalowy && czyKibic(stan, ja.nick)) {
+    return (
+      <>
+        <p className="nadtytul gra-ja">
+          <Awatar nick={ja.nick} zdjecie={moj?.zdjecie ?? null} rozmiar={40} />
+          {ja.nick}
+        </p>
+        <h1>Finał bez Ciebie</h1>
+        {moj && <Miejsce moj={moj} />}
+        <p className="etap-uwaga">
+          Niestety nie wchodzisz do finału. Za chwilę zacznie się wyścig trójki, a Ty stąd, z telefonu, będziesz
+          kibicować finalistom: Twoje okrzyki pojawią się na telewizorze.
+        </p>
+      </>
+    );
   }
 
   if (stan.faza === "etap") {
@@ -530,6 +559,8 @@ function WGrze({
             )}
           </p>
         )}
+        {/* wycinek tabeli z Tobą w środku (26.10) */}
+        {ranking && <MojRanking key={`ranking-${stan.zadanie?.nr ?? 0}`} wiersze={ranking} nick={ja.nick} />}
         {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV (w klasycznym nie ma) */}
         {mojWiersz && rankingJakoWyscig(stan, stan.w_grze) && (
           <MojWyscig
@@ -547,8 +578,11 @@ function WGrze({
   return <Rozgrywka stan={stan} ja={ja} moj={moj} teraz={teraz} odswiez={odswiez} />;
 }
 
-/** Gracz, który odpadł w etapie przed finałem: do końca patrzy na TV, a w finale kibicuje finalistom. */
-function Odpadl({ nick, moj }: { nick: string; moj: MojWynik }) {
+/**
+ * Gracz, który odpadł w etapie przed finałem: do finału patrzy na TV, a w finale kibicuje finalistom z telefonu.
+ * Grafikę na pamiątkę może pobrać od razu (26.10), z miejscem z chwili odpadnięcia.
+ */
+function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSesji }) {
   return (
     <>
       <p className="nadtytul gra-ja">
@@ -558,8 +592,24 @@ function Odpadl({ nick, moj }: { nick: string; moj: MojWynik }) {
       <h1>Odpadasz po {moj.odpadl}. etapie</h1>
       <Miejsce moj={moj} />
       <p className="etap-uwaga">
-        Dzięki za walkę! Patrz na telewizor i kibicuj. W finale z telefonu dopingujesz finalistów.
+        Dzięki za walkę! Zostań z nami do finału: wtedy stąd, z telefonu, będziesz kibicować finalistom, a Twoje
+        okrzyki pojawią się na telewizorze.
       </p>
+      <UdostepnijWynik
+        wynik={{
+          tytul: stan.quiz?.tytul ?? "Quiz",
+          okazja: stan.okazja ?? nazwaRodzaju(stan),
+          lokal: stan.lokal,
+          browar: stan.browar,
+          data: new Date().toLocaleDateString("pl-PL"),
+          nick,
+          zdjecie: moj.zdjecie,
+          miejsce: moj.miejsce,
+          liczbaGraczy: moj.liczba_graczy,
+          punkty: moj.punkty,
+        }}
+        konta={[stan.lokal?.instagram, stan.browar?.instagram]}
+      />
     </>
   );
 }

@@ -106,6 +106,8 @@ export type StanSesji = {
   auto: boolean;
   /** Ilu grających kliknęło „Gotowy” na bieżącej planszy (boty zawsze gotowe). */
   gotowi: number;
+  /** Ilu musi być gotowych: grający, a w finale tylko finaliści (kibice nie klikają „Gotowy”, 26.10). */
+  gotowi_z: number;
   max_graczy: number;
   lokal: { nazwa: string; miasto: string | null; logo_url: string | null; instagram?: string | null } | null;
   quiz: {

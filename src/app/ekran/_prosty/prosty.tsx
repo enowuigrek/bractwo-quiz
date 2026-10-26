@@ -327,7 +327,7 @@ function Gotowi({ stan }: { stan: StanSesji }) {
   if (!stan.auto) return null;
   return (
     <p className="pr-gotowi">
-      Gotowi {stan.gotowi}/{stan.w_grze}
+      Gotowi {stan.gotowi}/{stan.gotowi_z}
     </p>
   );
 }

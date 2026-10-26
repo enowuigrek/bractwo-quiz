@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import type { Lokal, StanFormularza } from "@/lib/typy";
 import { bezResetu } from "../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../_komponenty/grafika";
+import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { LIMITY, liczbaPytan } from "../../quizy/limity";
 import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
@@ -404,20 +405,20 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
               type="number"
               inputMode="numeric"
               className="pole"
-              defaultValue={30}
+              defaultValue={MAX_GRACZY}
               min={1}
-              max={500}
+              max={MAX_GRACZY}
               required
             />
           </div>
 
-          {/* wydarzenie (kranoprzejęcie, plakat) tylko w wyścigu: klasyczny pub quiz to mniejsza impreza */}
+          {/* wydarzenie (kranoprzejęcie; grafika na poczekalnię wyłączona 26.10) tylko w wyścigu: klasyczny pub quiz to mniejsza impreza */}
           {!klasyczny && (
             <fieldset>
               <legend>Wydarzenie</legend>
               <label className="przelacznik">
                 <input type="checkbox" checked={wydarzenie} onChange={(e) => setWydarzenie(e.target.checked)} />{" "}
-                kranoprzejęcie albo plakat na poczekalnię
+                kranoprzejęcie (gościnny browar)
               </label>
               {wydarzenie && (
                 <div className="kreator-wydarzenie">
@@ -436,7 +437,6 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                     maxLength={60}
                   />
                   <PoleGrafiki nazwa="browar_logo" etykieta="Logo browaru" />
-                  <PoleGrafiki nazwa="grafika" etykieta="Grafika na poczekalnię" />
                 </div>
               )}
             </fieldset>

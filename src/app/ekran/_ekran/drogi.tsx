@@ -122,7 +122,15 @@ export function PlanszaDrog({ lista, szklanka }: { lista: Droga[]; szklanka: Rea
             <stop offset="1" stopColor="#e3ac3f" stopOpacity="0" />
           </radialGradient>
         </defs>
-        <ellipse cx={SZKLANKA_FINALU.x} cy={SZKLANKA_FINALU.y + 150} rx={230} ry={70} fill="url(#poswiata-drogi)" />
+        {/* poświata pod szklanką; w pijanym finale gaśnie z wybuchem (tv.css) */}
+        <ellipse
+          className="drogi-finalu-poswiata"
+          cx={SZKLANKA_FINALU.x}
+          cy={SZKLANKA_FINALU.y + 150}
+          rx={230}
+          ry={70}
+          fill="url(#poswiata-drogi)"
+        />
         {lista.map((d, i) => (
           // --i i --obrot: kolejność i przechył przy odlocie po wybuchu (pijany finał, tv.css)
           <g
