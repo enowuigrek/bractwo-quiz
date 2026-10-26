@@ -2818,3 +2818,94 @@ html:has(.kolumna) {
   vertical-align: -0.18em;
   flex: none;
 }
+
+/* Pilot: licznik odpowiedzi w widocznym miejscu (pilot.tsx, 26.10). Komplet świeci na zielono, jak przycisk,
+   którym prowadzący idzie dalej. */
+.pilot-licznik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 14px 18px;
+  border-radius: var(--r-card);
+  border: 2px solid var(--kamien2);
+  background: var(--kamien);
+  font-weight: var(--w-bold);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.pilot-licznik strong {
+  font-size: 1.6em;
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+  color: var(--zloto);
+}
+
+.pilot-licznik.komplet {
+  border-color: var(--chmiel);
+  background: rgba(143, 182, 58, 0.16);
+  color: var(--chmiel);
+}
+
+.pilot-licznik.komplet strong {
+  color: var(--chmiel);
+}
+
+.pilot-licznik-znak {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--chmiel);
+  color: var(--na-chmielu);
+  font-weight: var(--w-black);
+}
+
+/* Komputer (od 960 px, 26.10, Łukasz: „desktop wygląda jak telefon”): strony z kolumną treści (gracz, start,
+   logowanie, wybór ekranu) stoją na karcie na ciepłym tle zamiast wąskiego paska na czerni, a pilot ma dwie
+   kolumny: sterowanie po lewej (przyklejone przy przewijaniu) i podgląd pytania oraz graczy po prawej. */
+@media (min-width: 960px) {
+  body {
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(227, 172, 63, 0.1) 0%, transparent 70%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+
+  .kolumna:not(.kolumna-pilot) {
+    max-width: 600px;
+    margin: 56px auto;
+    padding: 36px 44px 40px;
+    border: 1px solid var(--kamien2);
+    border-radius: var(--r-card);
+    background: rgba(26, 33, 41, 0.72);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  }
+
+  .kolumna-pilot {
+    max-width: 1180px;
+    padding: 28px 40px 48px;
+  }
+
+  .pilot {
+    display: grid;
+    grid-template-columns: 420px minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+
+  .pilot-sterowanie {
+    position: sticky;
+    top: 24px;
+  }
+
+  /* podgląd zaczyna się równo z górą sterowania */
+  .pilot-podglad > :first-child {
+    margin-top: 0 !important;
+  }
+}

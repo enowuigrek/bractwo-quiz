@@ -18,7 +18,7 @@ export default async function StronaPilota({ params, searchParams }: PageProps<"
   }
 
   return (
-    <main className="kolumna">
+    <main className="kolumna kolumna-pilot">
       <Pilot kod={kod} tokenZAdresu={token} />
     </main>
   );

@@ -110,7 +110,11 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Plakietki stanu na TV (np. „Gotowi x/y”):** na górze pośrodku sceny, nie w dolnych rogach (tam bywają podpisy demo i przyciski etapu).
 
-**Nazwa z ikoną (TV):** tekst zawsze od lewej, w jednej linii z resztą tekstu, ikona za nazwą po prawej (plansza etapu, od 25.10).
+**Nazwa z ikoną (TV):** plansza etapu od 26.10: ikona (120 px) przed blokiem „Etap X z Y” + nazwa, tytuł 96 px, zasady 42 px zwykłą wagą, drobne plakietki; lewa strona ma oddychać obok telefonu z pokazem.
+
+**Komputer (od 960 px):** nic nie wygląda jak rozciągnięty telefon. Strony z kolumną treści stoją na karcie (600 px, `--kamien` 72%, obrys `--kamien2`, cień) na ciepłym tle; pilot ma dwie kolumny (sterowanie 420 px przyklejone, podgląd obok); panel ma swój układ desktopowy.
+
+**Komplet odpowiedzi (pilot):** licznik „Odpowiedziało x/y” w widocznym miejscu, przy komplecie zielony (`--chmiel`, ✓) i główny przycisk zielony (`.pozytywny`).
 
 **Akcje to przyciski, nie napisy do klikania** (Łukasz, 25.10). Przejście do innej strony też dostaje wygląd przycisku (`<Link className="przycisk">`, np. „Panel obsługi” w pilocie, po grze złoty, „Wpisz inny kod” na telefonie). Tekstowe linki zostają tylko tam, gdzie to nawigacja „← wstecz” w panelu albo podpis autora.
 

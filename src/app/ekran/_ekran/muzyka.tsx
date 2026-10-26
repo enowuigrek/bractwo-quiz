@@ -19,11 +19,20 @@ const UTWORY = {
   etap4: { plik: "/muzyka/etap-4.mp3", petla: true },
   final: { plik: "/muzyka/final.mp3", petla: true },
   podium: { plik: "/muzyka/podium.mp3", petla: false },
-  // klasyczny pub quiz (bez etapów): spokojne tło bez emocji przez całe pytania i rankingi (26.10)
+  // klasyczny pub quiz (bez etapów, 26.10): spokojne tło bez perkusji przez pytania i rankingi, poczekalnia bez
+  // napięcia i delikatny koniec bez fanfar. `zapas`: gra zamiast brakującego pliku (do czasu wgrania nowego utworu)
   klasyczny: { plik: "/muzyka/klasyczny.mp3", petla: true },
-} as const;
+  klasycznyPoczekalnia: { plik: "/muzyka/klasyczny-poczekalnia.mp3", petla: true, zapas: "poczekalnia" },
+  klasycznyKoniec: { plik: "/muzyka/klasyczny-koniec.mp3", petla: false, zapas: "podium" },
+} as const satisfies Record<string, { plik: string; petla: boolean; zapas?: string }>;
 
 type Utwor = keyof typeof UTWORY;
+
+/** Plik zapasowy utworu (gdy jego pliku jeszcze nie ma), albo null. */
+function zapasUtworu(u: Utwor): string | null {
+  const z = (UTWORY[u] as { zapas?: Utwor }).zapas;
+  return z ? UTWORY[z].plik : null;
+}
 
 const GLOSNOSC = 0.55;
 /** Pijany finał: tempo muzyki zmienia się najwyżej co tyle ms (każda zmiana to na Samsungu krótka dziura w dźwięku). */
@@ -59,8 +68,9 @@ const PROSBA_PO_MS = 2000;
 
 /** Co z gry jest potrzebne muzyce (ekran lokalu przy zapowiedzi podaje samą poczekalnię). */
 type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza_do" | "ostatnie_w_etapie"> & {
-  /** Klasyczny pub quiz (bez etapów) ma własne tło; ekran lokalu przy zapowiedzi go nie zna (gra poczekalnia). */
+  /** Klasyczny pub quiz (bez etapów) ma własną muzykę (z `quiz` gry albo `klasyczny` z zapowiedzi lokalu). */
   quiz?: StanSesji["quiz"];
+  klasyczny?: boolean;
 };
 
 /**
@@ -102,10 +112,11 @@ function strona(): Wspolne {
 
 /** Który utwór pasuje do fazy: seria i pijany finał to jeden utwór, więc gra dalej bez przerwy. */
 function utworFazy(stan: StanMuzyki): Utwor | null {
+  const klasyczny = stan.klasyczny ?? (!!stan.quiz && stan.quiz.liczba_etapow === 0);
   switch (stan.faza) {
     case "poczekalnia":
     case "wstep":
-      return "poczekalnia";
+      return klasyczny ? "klasycznyPoczekalnia" : "poczekalnia";
     case "seria":
     case "pijany":
       return "final";
@@ -115,10 +126,10 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
     case "podium":
     case "tabela":
     case "koniec":
-      return "podium";
+      return klasyczny ? "klasycznyKoniec" : "podium";
     default:
       // klasyczny pub quiz: jedno spokojne tło od pierwszego pytania do ostatniego rankingu
-      if (stan.quiz && stan.quiz.liczba_etapow === 0) return "klasyczny";
+      if (klasyczny) return "klasyczny";
       // ranking po ostatnim pytaniu etapu: cisza (urywa się z dzwonkiem), następny etap wejdzie ze swoją muzyką od nowa
       if (stan.faza === "ranking" && stan.ostatnie_w_etapie && !stan.etap?.finalowy) return null;
       // plansza etapu, pytania, wyniki i ranking: według etapu (na planszy to etap, który się zaczyna).
@@ -176,12 +187,23 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
           ustawProsbe(false);
         },
       ]);
-      // brak pliku (np. jeszcze nie ma utworu) to zwykła cisza, bez prośby
+      // brak pliku (np. jeszcze nie ma utworu): zapasowy utwór, jeśli jest (`zapas`), inaczej zwykła cisza bez prośby
       sluchacze.push([
         a,
         "error",
         () => {
           if (a !== w.aktywny) return;
+          const zapas = w.grany ? zapasUtworu(w.grany) : null;
+          if (zapas && !a.src.endsWith(zapas)) {
+            a.src = zapas;
+            void a
+              .play()
+              .then(() => {
+                if (a === w.aktywny) a.volume = GLOSNOSC;
+              })
+              .catch(() => undefined);
+            return;
+          }
           w.slychac = false;
           ustawCichoOd(null);
         },

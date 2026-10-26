@@ -475,18 +475,18 @@
   filter: drop-shadow(0 0 18px rgba(227, 172, 63, 0.35));
 }
 
-/* ikona etapu przed nazwą na planszy etapu; długa nazwa zawija się obok ikony, nie pod nią */
-.tv .tv-etap-opis h1.z-ikona {
+/* plansza etapu: ikona przed blokiem „Etap X z Y” + nazwa (etap.tsx, 26.10) */
+.tv-etap-glowa {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 32px;
 }
 
 .tv-etap-ikona {
   flex: none;
-  height: 150px;
+  height: 120px;
   width: auto;
-  filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.4));
+  filter: drop-shadow(0 0 20px rgba(227, 172, 63, 0.35));
 }
 
 /* odpadanie po etapie: informacja, nie ostrzeżenie, więc jasne złoto, nie czerwień (25.10) */
@@ -2435,13 +2435,14 @@
 }
 
 .tv-etap-opis .tv-okazja {
-  font-size: 52px;
+  margin: 0 0 6px;
+  font-size: 38px;
 }
 
 .tv .tv-etap-opis h1 {
   margin: 0;
-  font-size: 128px;
-  line-height: 1.02;
+  font-size: 96px;
+  line-height: 1.04;
   font-weight: var(--w-black);
   color: var(--zloto);
   text-shadow: var(--glow-md);
@@ -2450,24 +2451,20 @@
 
 /* plansza ciaśniej, gdy opis z finalistami nie mieści się w wysokości (etap.tsx mierzy) */
 .tv .tv-etap.ciasno-1 .tv-etap-opis h1 {
-  font-size: 104px;
+  font-size: 84px;
 }
 
 .tv-etap.ciasno-1 .tv-etap-ikona {
-  height: 120px;
+  height: 100px;
 }
 
 .tv-etap.ciasno-1 .tv-etap-zasady {
-  margin-top: 18px;
-  font-size: 40px;
+  margin-top: 24px;
+  font-size: 36px;
 }
 
 .tv-etap.ciasno-1 .tv-etap-cechy {
   margin-top: 24px;
-}
-
-.tv-etap.ciasno-1 .tv-etap-cechy li {
-  font-size: 32px;
 }
 
 .tv-etap.ciasno-1 .tv-etap-final {
@@ -2475,16 +2472,16 @@
 }
 
 .tv .tv-etap.ciasno-2 .tv-etap-opis h1 {
-  font-size: 88px;
+  font-size: 72px;
 }
 
 .tv-etap.ciasno-2 .tv-etap-ikona {
-  height: 100px;
+  height: 84px;
 }
 
 .tv-etap.ciasno-2 .tv-etap-zasady {
-  margin-top: 14px;
-  font-size: 34px;
+  margin-top: 18px;
+  font-size: 32px;
 }
 
 .tv-etap.ciasno-2 .tv-etap-cechy {
@@ -2492,7 +2489,7 @@
 }
 
 .tv-etap.ciasno-2 .tv-etap-cechy li {
-  font-size: 28px;
+  font-size: 26px;
 }
 
 .tv-etap.ciasno-2 .tv-etap-final {
@@ -2508,36 +2505,36 @@
   height: 84px !important;
 }
 
+/* zasady jednym spokojnym akapitem: nie krzyczą jak tytuł */
 .tv-etap-zasady {
-  margin: 28px 0 0;
-  font-size: 50px;
-  line-height: 1.3;
-  font-weight: var(--w-semibold);
-  max-width: 1150px;
+  margin: 36px 0 0;
+  font-size: 42px;
+  line-height: 1.35;
+  font-weight: var(--w-regular);
+  max-width: 1050px;
 }
 
 .tv-etap-cechy {
   list-style: none;
-  margin: 40px 0 0;
+  margin: 36px 0 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
+  gap: 14px;
 }
 
 .tv-etap-cechy li {
-  padding: 14px 30px;
+  padding: 10px 24px;
   border-radius: var(--r-pill);
   background: var(--kamien);
-  border: 3px solid var(--kamien2);
-  font-size: 38px;
-  font-weight: var(--w-black);
+  border: 2px solid var(--kamien2);
+  font-size: 30px;
+  font-weight: var(--w-bold);
 }
 
 .tv-etap-cechy li.zloty {
   border-color: var(--zloto);
   color: var(--zloto);
-  box-shadow: var(--glow-md);
 }
 
 .tv-etap-final {
@@ -3336,22 +3333,21 @@
 /* Zapowiedź finału: na planszy etapu przed finałem i kreska pod 3. torem w wyścigu */
 .tv-etap-walka {
   margin: 32px 0 0;
-  padding: 18px 28px;
+  padding: 14px 24px;
   border-radius: var(--r-card);
-  border: 3px solid var(--zloto);
-  background: rgba(227, 172, 63, 0.1);
-  box-shadow: var(--glow-md);
-  font-size: 40px;
-  font-weight: var(--w-black);
-  max-width: 1150px;
+  border: 2px solid var(--zloto);
+  background: rgba(227, 172, 63, 0.08);
+  font-size: 32px;
+  font-weight: var(--w-bold);
+  max-width: 1050px;
 }
 
 /* etap bez odcięcia, ale dalej się odpada: spokojniej niż walka o finał */
 .tv-etap-plan {
   margin: 28px 0 0;
-  max-width: 1150px;
-  color: var(--piana);
-  font-size: 36px;
+  max-width: 1050px;
+  color: var(--szary);
+  font-size: 30px;
   font-weight: var(--w-semibold);
 }
 
@@ -3929,6 +3925,29 @@
   animation: logo-tla 48s ease-in-out infinite alternate;
 }
 
+/* ciepły reflektor z góry na środek sceny (tam stoi logo albo treść) i ciemne brzegi jak w barze wieczorem */
+.tv-tlo-reflektor {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 45% 60% at 50% 42%, rgba(255, 196, 110, 0.13) 0%, rgba(227, 150, 63, 0.05) 45%, transparent 75%);
+  animation: reflektor-oddech 9s ease-in-out infinite alternate;
+}
+
+.tv-tlo-ciemne-brzegi {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 75% at 50% 45%, transparent 50%, rgba(0, 0, 0, 0.65) 100%);
+}
+
+@keyframes reflektor-oddech {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* bez logo: nazwa lokalu jako znak wodny */
 .tv-tlo-nazwa {
   display: grid;
@@ -3967,13 +3986,13 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 640px;
-  height: 640px;
+  width: 780px;
+  height: 780px;
 }
 
 .ekran-logo.z-zapowiedzia .ekran-logo-znak {
-  width: 460px;
-  height: 460px;
+  width: 540px;
+  height: 540px;
 }
 
 .ekran-logo-blask {

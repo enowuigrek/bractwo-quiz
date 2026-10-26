@@ -106,6 +106,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
             faza_od: null,
             faza_do: null,
             ostatnie_w_etapie: false,
+            klasyczny: !!zapowiedz.klasyczny,
           }}
           teraz={0}
         />

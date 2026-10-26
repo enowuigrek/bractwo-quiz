@@ -12,7 +12,8 @@ import { IkonaPuchar } from "@/components/ikony";
 
 /**
  * Plansza etapu na TV (faza `etap`): który to etap, nazwa i zasady, mnożnik i czas, a obok telefon,
- * na którym animacja pokazuje, jak odpowiadać. W finale trójki duże awatary finalistów.
+ * na którym animacja pokazuje, jak odpowiadać. Od 26.10 spokojniej: ikona z nazwą w jednym bloku, mniejszy tytuł,
+ * jedno zdanie zasad i drobne plakietki, żeby lewa strona nie przytłaczała. W finale trójki duże awatary finalistów.
  * Prowadzący tłumaczy i startuje etap z pilota, więc plansza czeka bez limitu.
  */
 export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
@@ -78,15 +79,17 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
 
         <div ref={tresc} className="tv-etap-tresc">
           <section className="tv-etap-opis">
-            <motion.p className="tv-okazja" {...wejscie(0)}>
-              Etap {e.nr} z {e.liczba}
-              {e.finalowy ? " · finał" : ""}
-            </motion.p>
-            <motion.h1 className={e.ikona ? "z-ikona" : undefined} {...wejscie(1)}>
-              {/* nazwa od lewej, w jednej linii z „Etap X z Y” i opisem; ikona za nią (25.10) */}
-              <span>{e.nazwa}</span>
+            {/* ikona przed nazwą etapu, razem z „Etap X z Y” (26.10, Łukasz: tytuł z dużą ikoną obok był za ciężki) */}
+            <motion.div className="tv-etap-glowa" {...wejscie(0)}>
               {e.ikona && <img src={e.ikona} alt="" className="tv-etap-ikona" />}
-            </motion.h1>
+              <div>
+                <p className="tv-okazja">
+                  Etap {e.nr} z {e.liczba}
+                  {e.finalowy ? " · finał" : ""}
+                </p>
+                <h1>{e.nazwa}</h1>
+              </div>
+            </motion.div>
             {e.opis && (
               <motion.p className="tv-etap-zasady" {...wejscie(2)}>
                 {e.opis}
@@ -100,7 +103,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               )}
               {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
               {/* w finale bez liczby pytań: seria prawda/fałsz leci szybko, a liczba tylko straszy */}
-              {!e.finalowy && <li>{e.liczba_pytan === 1 ? "1 pytanie" : `Pytań: ${e.liczba_pytan}`}</li>}
+              {!e.finalowy && <li>{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} ${e.liczba_pytan % 10 >= 2 && e.liczba_pytan % 10 <= 4 && (e.liczba_pytan % 100 < 12 || e.liczba_pytan % 100 > 14) ? "pytania" : "pytań"}`}</li>}
             </motion.ul>
             {/* odpadanie: walka o finał (trójka) albo próg po etapie z `etap.przechodzi` (src/app/pilot/[kod]/progi.tsx) */}
             {e.final_po_etapie ? (

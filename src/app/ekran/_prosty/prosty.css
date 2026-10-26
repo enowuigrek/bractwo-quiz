@@ -640,12 +640,12 @@
 
 /* ekran lokalu: duże logo na środku */
 .pr-logo-ekranu {
-  width: 620px;
-  height: 620px;
+  width: 760px;
+  height: 760px;
   object-fit: contain;
 }
 
 .pr-logo-ekranu-male {
-  width: 420px;
-  height: 420px;
+  width: 520px;
+  height: 520px;
 }

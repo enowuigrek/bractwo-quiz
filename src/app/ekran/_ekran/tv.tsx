@@ -638,11 +638,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
               <span className="tv-podpowiedz">
                 Finał: odpowiadają <strong className="tv-zloto">{stan.finalisci.map((f) => f.nick).join(", ")}</strong>
               </span>
-            ) : (
-              <span className="tv-podpowiedz">
-                Odpowiadaj na telefonie · kod gry <strong className="tv-zloto">{stan.kod}</strong>
-              </span>
-            )}
+            ) : null
+            /* bez „Odpowiadaj na telefonie · kod gry” (26.10, Łukasz: niepotrzebne w trakcie quizu) */}
           </>
         )}
       </footer>

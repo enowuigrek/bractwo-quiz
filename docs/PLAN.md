@@ -253,6 +253,19 @@ Do zaprojektowania razem:
 - **Sprawdzone lokalnie:** klip pobrany w finale serią, w pijanym finale grał z pamięci z dźwiękiem, wybuch w zaplanowanej chwili. Muzyki na Samsungu nie dało się sprawdzić lokalnie.
 - **OLED / wygaszacz:** bez zmian (Łukasz klika OK na pilocie TV, klik niczego nie zmienia na ekranie).
 
+### Pilot i strony na komputerze, spokojniejsze plansze etapów, muzyka pub quizu (26.10) ✅
+
+- **Pilot:** licznik „Odpowiedziało 4/5” u góry sterowania (`.pilot-licznik`), przy komplecie zielony z „✓ Wszyscy odpowiedzieli”; zostaje też przy wyniku, bo pytanie kończy się samo w chwili ostatniej odpowiedzi. Główny przycisk („Pokaż wynik”, „Pokaż odpowiedzi graczy”, „Pokaż podium”) świeci wtedy na zielono (`.pozytywny`), a „Pokaż wynik” bez limitu nie pyta o potwierdzenie.
+- **Komputer (od 960 px):** pilot w dwóch kolumnach (`.pilot`: sterowanie 420 px przyklejone przy przewijaniu, obok podgląd pytania, etapu, serii i graczy), strona szersza (1180 px). Strony z `.kolumna` (gracz, start, logowanie, wybór ekranu) stoją na karcie (600 px) na ciepłym tle zamiast wąskiego paska na czerni. Telefon bez zmian.
+- **TV w trakcie pytania:** bez stopki „Odpowiadaj na telefonie · kod gry”.
+- **Plansza etapu wyścigu:** ikona (120 px) przed blokiem „Etap X z Y” + nazwa, tytuł 96 px (było 128 px z ikoną 150 px za nazwą), zasady 42 px zwykłą wagą, mniejsze plakietki („10 pytań”), spokojniejsza informacja o odpadaniu.
+- **Ekran lokalu:** logo 780 px (z zapowiedzią 540 px), w tle ciepłe smugi z góry, reflektor na środku i ciemne brzegi (`TloLokalu`, także pod klasycznym quizem).
+- **Muzyka pub quizu:** trzy utwory do wgrania: `public/muzyka/klasyczny-poczekalnia.mp3` (poczekalnia i plansza startowa, także zapowiedź na ekranie lokalu), `klasyczny.mp3` (pytania i rankingi) i `klasyczny-koniec.mp3` (podium i tabela, raz). Do czasu wgrania poczekalnia i koniec grają obecne utwory (`zapas` w `muzyka.tsx`), tło pytań jest ciche. Prompty do Suno niżej.
+- **Prompty do Suno (instrumental):**
+  - poczekalnia: „Warm laid-back lounge for a cozy pub before a quiz night, mellow electric piano, soft upright bass, light acoustic guitar, no drums, no build-ups, steady and friendly, 85 bpm, instrumental, seamless loop”
+  - tło pytań: „Very subtle ambient background for concentration, soft felt piano and warm pads, slow gentle pulse without percussion, minimal melody, no tension, no risers, calm and neutral, 70 bpm, instrumental, seamless loop”
+  - koniec: „Short warm closing tune for the end of a friendly pub quiz, gentle piano and acoustic guitar, soft and satisfied, no fanfare, no brass, no drums, about 40 seconds, instrumental”
+
 ## Ustalenia
 
 | Temat | Decyzja |

@@ -200,547 +200,584 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
       };
   const etap = stan.etap;
 
+  // licznik odpowiedzi w widocznym miejscu (26.10): w pytaniu rośnie, a komplet świeci na zielono; przy wyniku
+  // zostaje, bo pytanie kończy się samo w chwili, gdy odpowie ostatni gracz
+  const licznik =
+    z && z.typ !== "ciekawostka" && (faza === "przygotuj" || faza === "pytanie" || faza === "wynik") ? (
+      <p className={`pilot-licznik${wszyscy ? " komplet" : ""}`} role="status">
+        {wszyscy ? (
+          <>
+            <span className="pilot-licznik-znak" aria-hidden>
+              ✓
+            </span>{" "}
+            Wszyscy odpowiedzieli
+          </>
+        ) : (
+          "Odpowiedziało"
+        )}
+        <strong>
+          {stan.liczba_odpowiedzi}/{grajacy}
+        </strong>
+      </p>
+    ) : null;
+
   return (
     <>
       <Naglowek kod={kod} />
-      {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
-      <h1 style={{ marginBottom: 4 }}>{stan.quiz?.tytul ?? "Quiz"}</h1>
-      <p className="pomocniczy" style={{ marginTop: 0 }}>
-        {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
-      </p>
-      {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
-      <p className="pilot-przelacznik">
-        {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
-        <span>{stan.muzyka ? "Muzyka i dźwięki na TV grają" : "Muzyka i dźwięki na TV wyłączone"}</span>
-        <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
-          {stan.muzyka ? "Wyłącz" : "Włącz"}
-        </button>
-      </p>
-      {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
-      <p className={`pilot-przelacznik${stan.auto ? " wlaczony" : ""}`}>
-        <IkonaAutomat />
-        <span>{stan.auto ? "Gra prowadzi się sama" : "Prowadzenie automatyczne"}</span>
-        <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => void przelaczAuto()}>
-          {stan.auto ? "Wyłącz" : "Włącz"}
-        </button>
-      </p>
-      {stan.auto && ((faza === "wstep" && !klasyczny) || faza === "etap" || (faza === "wynik" && stan.zadanie?.typ === "ciekawostka")) && (
-        <p className="pomocniczy" style={{ margin: "0 0 4px" }}>
-          Gotowi: <strong>{stan.gotowi}/{stan.w_grze}</strong>, dalej, gdy klikną wszyscy (albo po czasie).
-        </p>
-      )}
-
-      {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy */}
-      {bladAkcji && (
-        <p className="blad" role="alert">
-          {bladAkcji}
-        </p>
-      )}
-      {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
-
-      {/* rodzaj następnego pytania zawsze: rodzaje się mieszają, prowadzący uprzedza graczy przed startem */}
-      {/* przy etapach niepotrzebne: plansza etapu na TV sama pokazuje, jak odpowiadać */}
-      {stan.nastepne_typ &&
-        !stan.quiz?.liczba_etapow &&
-        (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
-          <p className="pilot-zapowiedz" role="status">
-            <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed
-            startem: „{PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”.
+      {/* na komputerze dwie kolumny: sterowanie po lewej (zawsze pod ręką), podgląd pytania i graczy po prawej */}
+      <div className="pilot">
+        <div className="pilot-sterowanie">
+          {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
+          <h1 style={{ marginBottom: 4 }}>{stan.quiz?.tytul ?? "Quiz"}</h1>
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            {[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}
           </p>
-        )}
-
-      {/* zapowiedź: godzina i odliczanie jak na TV; start i tak klika prowadzący */}
-      {faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null && (
-        <p className="pilot-start">
-          <span>
-            Start <strong>{kiedyStart(startZapowiedzi)}</strong> ·{" "}
-            <span className="gra-kod">{opisOdliczania(doZapowiedzi)}</span>
-          </span>
-          {!stan.poczekalnia_otwarta && (
-            <span className="pomocniczy">
-              Na ekranie lokalu jest zapowiedź z odliczaniem.{" "}
-              {stan.auto
-                ? `Poczekalnia otworzy się sama ${NA_ZAPISY_MIN} minut przed tą godziną, a quiz ruszy o czasie.`
-                : "Gracze dołączą po otwarciu poczekalni."}
-            </span>
-          )}
-          {stan.poczekalnia_otwarta && stan.auto && (
-            <span className="pomocniczy">
-              Automat wystartuje quiz o tej godzinie, jeśli ktoś dołączy. Możesz też kliknąć start wcześniej.
-            </span>
-          )}
-        </p>
-      )}
-
-      <section style={{ marginTop: 18, display: "grid", gap: 12 }}>
-        {faza === "poczekalnia" && !stan.poczekalnia_otwarta && (
-          <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("otworz")}>
-            Otwórz poczekalnię (QR na TV)
-          </button>
-        )}
-        {faza === "seria" && (
-          <button
-            className="przycisk"
-            disabled={wysylam}
-            onClick={() =>
-              akcja("wynik", "Zakończyć serię teraz? Kto nie skończył, dostaje punkty tylko za to, co zdążył.", {
-                tak: "Zakończ serię",
-              })
-            }
-          >
-            Zakończ serię wcześniej
-          </button>
-        )}
-
-        {faza === "etap" && (
-          <>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
-              {etap?.seria ? "Start serii" : "Start etapu (pierwsze pytanie)"}
+          {/* muzyka i efekty grają tylko na TV; telewizor może raz poprosić o OK na swoim pilocie (zgoda przeglądarki) */}
+          <p className="pilot-przelacznik">
+            {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
+            <span>{stan.muzyka ? "Muzyka i dźwięki na TV grają" : "Muzyka i dźwięki na TV wyłączone"}</span>
+            <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => akcja("muzyka")}>
+              {stan.muzyka ? "Wyłącz" : "Włącz"}
             </button>
-            {z && (
-              <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
-                Wróć do rankingu
-              </button>
-            )}
-          </>
-        )}
-
-        {/* klasyczny pub quiz: plansza startowa odlicza 10 s i sama startuje 1. pytanie; można szybciej */}
-        {faza === "wstep" && klasyczny && (
-          <>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
-              Pierwsze pytanie od razu
+          </p>
+          {/* automat klika kolejne kroki sam (auto.tsx); na planszach czeka, aż gracze klikną „Gotowy” */}
+          <p className={`pilot-przelacznik${stan.auto ? " wlaczony" : ""}`}>
+            <IkonaAutomat />
+            <span>{stan.auto ? "Gra prowadzi się sama" : "Prowadzenie automatyczne"}</span>
+            <button type="button" className="przycisk-zdjecie" disabled={wysylam} onClick={() => void przelaczAuto()}>
+              {stan.auto ? "Wyłącz" : "Włącz"}
             </button>
-            <p className="pilot-zapowiedz" role="status">
-              Na TV plansza „Zaczynamy!” z odliczaniem. Pierwsze pytanie ruszy samo
-              {stan.faza_do ? ` za ${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}.
+          </p>
+          {stan.auto && ((faza === "wstep" && !klasyczny) || faza === "etap" || (faza === "wynik" && stan.zadanie?.typ === "ciekawostka")) && (
+            <p className="pomocniczy" style={{ margin: "0 0 4px" }}>
+              Gotowi: <strong>{stan.gotowi}/{stan.w_grze}</strong>, dalej, gdy klikną wszyscy (albo po czasie).
             </p>
-          </>
-        )}
+          )}
 
-        {/* wstęp: TV pokazuje całą drogę, prowadzący opowiada i przechodzi do planszy 1. etapu */}
-        {faza === "wstep" && !klasyczny && (
-          <>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-              {nastepne.napis}
-            </button>
-            <p className="pilot-zapowiedz" role="status">
-              <strong>Opowiedz graczom:</strong> przed nami {stan.plan_etapow.length} etapów, z każdym pytaniem
-              nalewa się piwo, a oni ścigają się do niego; po drodze odpadają najsłabsi, a o piwo walczy finałowa
-              trójka.
+          {licznik}
+
+          {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy */}
+          {bladAkcji && (
+            <p className="blad" role="alert">
+              {bladAkcji}
             </p>
-          </>
-        )}
+          )}
+          {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
 
-        {faza === "poczekalnia" && (
-          <button
-            className={`przycisk${stan.poczekalnia_otwarta ? " zloty" : ""}`}
-            disabled={wysylam || liczba === 0}
-            onClick={() =>
-              akcja(
-                "nastepne",
-                stan.liczba_graczy === 0 ? "Nikt jeszcze nie dołączył. Wystartować mimo to?" : undefined,
-                { tak: "Wystartuj" },
-              )
-            }
-          >
-            {liczba === 0 ? "Quiz nie ma pytań" : "Start quizu"}
-          </button>
-        )}
-
-        {/* wynik pokazuje się sam po czasie albo gdy wszyscy odpowiedzą; ręcznie tylko wcześniej */}
-        {(faza === "przygotuj" || faza === "pytanie") &&
-          (bezLimitu ? (
-            <button
-              className="przycisk zloty"
-              disabled={wysylam}
-              onClick={() =>
-                akcja("wynik", "Nie wszyscy odpowiedzieli. Zakończyć pytanie teraz i pokazać wynik?", {
-                  tak: "Pokaż wynik",
-                })
-              }
-            >
-              Zakończ pytanie i pokaż wynik
-            </button>
-          ) : (
-            <>
-              <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
-                Wynik pokaże się sam, gdy minie czas albo odpowiedzą wszyscy.
+          {/* rodzaj następnego pytania zawsze: rodzaje się mieszają, prowadzący uprzedza graczy przed startem */}
+          {/* przy etapach niepotrzebne: plansza etapu na TV sama pokazuje, jak odpowiadać */}
+          {stan.nastepne_typ &&
+            !stan.quiz?.liczba_etapow &&
+            (faza === "poczekalnia" || faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
+              <p className="pilot-zapowiedz" role="status">
+                <strong>Następne pytanie: {NAZWY_TYPOW[stan.nastepne_typ].toLowerCase()}.</strong> Powiedz graczom przed
+                startem: „{PODPOWIEDZI_TYPOW[stan.nastepne_typ]}”.
               </p>
-              {doKonca > 0 && (
-                <button
-                  className="przycisk"
-                  disabled={wysylam}
-                  onClick={() =>
-                    akcja("wynik", "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?", {
-                      tak: "Pokaż wynik",
-                    })
-                  }
-                >
-                  Zakończ pytanie wcześniej
-                </button>
-              )}
-            </>
-          ))}
-
-        {/* po pytaniu: wynik → odpowiedzi → ranking → następne; każdy krok można pominąć */}
-        {/* po ostatnim pytaniu bez rankingu: od razu podium (odpowiedzi graczy można jeszcze pokazać) */}
-        {/* ciekawostka: plansza bez odpowiedzi, więc od razu dalej */}
-        {faza === "wynik" && z?.typ === "ciekawostka" && (
-          <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-            {nastepne.napis}
-          </button>
-        )}
-        {faza === "wynik" &&
-          z?.typ !== "ciekawostka" &&
-          (stan.ostatnie_zadanie ? (
-            <>
-              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
-                Pokaż podium
-              </button>
-              <button className="przycisk" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
-                Pokaż odpowiedzi graczy
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
-                Pokaż odpowiedzi graczy
-              </button>
-              <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
-                Pokaż ranking
-              </button>
-              <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-                {nastepne.napis}
-              </button>
-            </>
-          ))}
-
-        {faza === "odpowiedzi" &&
-          (stan.ostatnie_zadanie ? (
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
-              Pokaż podium
-            </button>
-          ) : (
-            <>
-              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("ranking")}>
-                Pokaż ranking
-              </button>
-              <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-                {nastepne.napis}
-              </button>
-            </>
-          ))}
-
-        {faza === "ranking" && (
-          <>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
-              {nastepne.napis}
-            </button>
-            <button className="przycisk" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
-              Wróć do odpowiedzi graczy
-            </button>
-          </>
-        )}
-
-        {/* po ostatnim pytaniu obok podium jest pełna tabela */}
-        {stan.ostatnie_zadanie && (faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
-          <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
-            Pokaż pełną tabelę
-          </button>
-        )}
-
-        {/* pijany finał kończy się sam po czasie; wcześniej tylko po potwierdzeniu, żeby nie uciąć zabawy */}
-        {faza === "pijany" && (
-          <button
-            className="przycisk zloty"
-            disabled={wysylam}
-            onClick={() =>
-              akcja("werble", "Gracze jeszcze odpowiadają. Zakończyć pijany finał i pokazać werble?", {
-                tak: "Pokaż werble",
-              })
-            }
-          >
-            Zakończ i pokaż werble
-          </button>
-        )}
-
-        {/* po finale serią TV i telefony czekają w ciemności, aż prowadzący odsłoni podium */}
-        {faza === "werble" && (
-          <>
-            <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
-              Finał skończony. TV i telefony zgasły i grają werble. Zbuduj napięcie i odsłoń wynik.
-            </p>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
-              Pokaż podium
-            </button>
-          </>
-        )}
-
-        {faza === "podium" && (
-          <>
-            <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
-              Pokaż pełną tabelę
-            </button>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
-              Zakończ grę
-            </button>
-          </>
-        )}
-
-        {faza === "tabela" && (
-          <>
-            <button className="przycisk" disabled={wysylam} onClick={() => akcja("podium")}>
-              Pokaż podium
-            </button>
-            <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
-              Zakończ grę
-            </button>
-          </>
-        )}
-
-        {faza === "koniec" && (
-          <>
-            <p className="pomocniczy">Gra zakończona. Piwu Cześć!</p>
-            {stan.lokal && (
-              <>
-                <button
-                  className="przycisk"
-                  disabled={wysylam || ekranOddany}
-                  onClick={async () => {
-                    await akcja("plansze");
-                    ustawEkranOddany(true);
-                  }}
-                >
-                  {ekranOddany ? "Ekran lokalu pokazuje plansze" : "Pokaż plansze na ekranie lokalu"}
-                </button>
-                <p className="pomocniczy" style={{ margin: 0 }}>
-                  Bez tego ekran lokalu wróci do plansz sam po 10 minutach. Podium tego quizu będzie wracać na planszach
-                  jeszcze przez kilka godzin.
-                </p>
-              </>
             )}
-          </>
-        )}
-      </section>
 
-      {faza === "poczekalnia" && <ProgiPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
-      {faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
-
-      {faza === "poczekalnia" && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0 }}>
-            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
-          </p>
-          <GraczePilota kod={kod} token={token} gracze={gracze} pytanie={false} koniec={false} odswiez={pobierz} />
-        </section>
-      )}
-
-      {faza === "etap" && etap && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0 }}>
-            Etap {etap.nr} z {etap.liczba} · {etap.liczba_pytan} pyt.
-          </p>
-          <p
-            style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 6px", color: "var(--zloto)" }}
-          >
-            {etap.nazwa}
-          </p>
-          {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
-          <p className="pomocniczy" style={{ margin: 0 }}>
-            {[
-              `Punkty ${napisMnoznika(etap.mnoznik)}`,
-              etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
-              etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", "),
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-          {stan.finalisci && (
-            <p style={{ margin: "10px 0 0" }}>
-              <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
-            </p>
-          )}
-          {!etap.finalowy && (etap.przechodzi !== null || etap.final_po_etapie) && (
-            <p style={{ margin: "10px 0 0" }}>
-              <strong>Odpadanie:</strong> po tym etapie gra dalej{" "}
-              {etap.final_po_etapie ? "trójka (finał)" : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
-            </p>
-          )}
-          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-            TV pokazuje planszę z zasadami i animacją. Wytłumacz etap i wystartuj, kiedy wszyscy będą gotowi.
-          </p>
-        </section>
-      )}
-
-      {/* seria: postęp każdego grającego na żywo (TV pokazuje go na drogach do szklanki) */}
-      {faza === "seria" && etap && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
-            <span>
-              {etap.nazwa} · {etap.finalowy ? `wyścig do ${META_FINALU} kroków` : `seria ${etap.liczba_pytan} pyt.`}
-            </span>
-            <span className="gra-kod">
-              {stan.faza_od && teraz < Date.parse(stan.faza_od)
-                ? `start za ${Math.max(0, Math.ceil((Date.parse(stan.faza_od) - teraz) / 1000))} s`
-                : stan.faza_do
-                  ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s`
-                  : ""}
-            </span>
-          </p>
-          <ol className="pilot-odpowiedzi">
-            {(stan.seria ?? []).map((g) =>
-              // finał: kroki do szklanki (przewaga, +1 za dobrą, −1 za złą), zwykła seria: odpowiedzi z liczby pytań
-              etap.finalowy ? (
-                <li key={g.nick} className={krokiFinalu(g) >= META_FINALU ? "poprawna" : undefined}>
-                  {g.nick}: {Math.round(krokiFinalu(g) * 10) / 10}/{META_FINALU} kroków (przewaga {g.start ?? 0}),{" "}
-                  {g.odpowiedzi} odpowiedzi
-                </li>
-              ) : (
-                <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
-                  {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
-                </li>
-              ),
-            )}
-          </ol>
-          {stan.pijany_final && (
-            <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-              Po serii zamiast werbli przyjdzie pijany finał (nic nie liczy), a po nim werble. Zwycięzcę zobaczysz tutaj
-              od razu.
-            </p>
-          )}
-        </section>
-      )}
-
-      {/* pijany finał: wynik jest już ustalony i widzi go tylko prowadzący */}
-      {faza === "pijany" && (
-        <section className="karta" style={{ marginTop: 18 }}>
-          <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
-            <span>Pijany finał · nic się nie liczy</span>
-            <span className="gra-kod">
-              {stan.faza_do ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}
-            </span>
-          </p>
-          <PodiumPilota gracze={gracze} />
-          <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
-            Widzisz to tylko Ty. Gracze odpowiadają na pytania, które nic nie liczą, a TV i telefony wariują coraz
-            bardziej. Po czasie same przyjdą werble, a potem odsłaniasz podium.
-          </p>
-        </section>
-      )}
-
-      {z &&
-        faza !== "poczekalnia" &&
-        faza !== "etap" &&
-        faza !== "seria" &&
-        faza !== "pijany" &&
-        faza !== "werble" &&
-        faza !== "koniec" &&
-        faza !== "podium" &&
-        faza !== "tabela" && (
-          <section className="karta" style={{ marginTop: 18 }}>
-            <p
-              className="etykieta"
-              style={{
-                marginTop: 0,
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
+          {/* zapowiedź: godzina i odliczanie jak na TV; start i tak klika prowadzący */}
+          {faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null && (
+            <p className="pilot-start">
               <span>
-                Pytanie {z.lp}/{liczba}
+                Start <strong>{kiedyStart(startZapowiedzi)}</strong> ·{" "}
+                <span className="gra-kod">{opisOdliczania(doZapowiedzi)}</span>
               </span>
-              {faza === "przygotuj" && (
-                <span className="gra-kod">start za {sekundaOdliczania(doStartu)} s</span>
+              {!stan.poczekalnia_otwarta && (
+                <span className="pomocniczy">
+                  Na ekranie lokalu jest zapowiedź z odliczaniem.{" "}
+                  {stan.auto
+                    ? `Poczekalnia otworzy się sama ${NA_ZAPISY_MIN} minut przed tą godziną, a quiz ruszy o czasie.`
+                    : "Gracze dołączą po otwarciu poczekalni."}
+                </span>
               )}
-              {faza === "pytanie" && (
-                <span className="gra-kod">
-                  {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
-                  {bezLimitu
-                    ? ""
-                    : doKonca > 0
-                      ? `${Math.ceil(doKonca / 1000)} s`
-                      : wszyscy
-                        ? "wszyscy odpowiedzieli"
-                        : "czas minął"}
+              {stan.poczekalnia_otwarta && stan.auto && (
+                <span className="pomocniczy">
+                  Automat wystartuje quiz o tej godzinie, jeśli ktoś dołączy. Możesz też kliknąć start wcześniej.
                 </span>
               )}
             </p>
-            {etap && (
-              <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
-                {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
-                {stan.finalisci ? " · finał trójki" : ""}
-              </p>
+          )}
+
+          <section style={{ marginTop: 18, display: "grid", gap: 12 }}>
+            {faza === "poczekalnia" && !stan.poczekalnia_otwarta && (
+              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("otworz")}>
+                Otwórz poczekalnię (QR na TV)
+              </button>
             )}
-            <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
-            <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
-            {stan.wszystkie_podpowiedzi.length > 0 && (
-              <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
-                {stan.wszystkie_podpowiedzi.map((p, i) => (
-                  <li key={i} className={i < z.podpowiedzi.length ? "poprawna" : undefined}>
-                    <span className="pilot-litera">P{i + 1}</span>
-                    {p}
-                  </li>
-                ))}
-              </ol>
+            {faza === "seria" && (
+              <button
+                className="przycisk"
+                disabled={wysylam}
+                onClick={() =>
+                  akcja("wynik", "Zakończyć serię teraz? Kto nie skończył, dostaje punkty tylko za to, co zdążył.", {
+                    tak: "Zakończ serię",
+                  })
+                }
+              >
+                Zakończ serię wcześniej
+              </button>
             )}
-            <p style={{ margin: "14px 0 0" }}>
-              Odpowiedziało{" "}
-              <strong className="gra-kod">
-                {stan.liczba_odpowiedzi}/{grajacy}
-              </strong>
-              {z.liczba_poprawnych !== undefined && (
+
+            {faza === "etap" && (
+              <>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
+                  {etap?.seria ? "Start serii" : "Start etapu (pierwsze pytanie)"}
+                </button>
+                {z && (
+                  <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
+                    Wróć do rankingu
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* klasyczny pub quiz: plansza startowa odlicza 10 s i sama startuje 1. pytanie; można szybciej */}
+            {faza === "wstep" && klasyczny && (
+              <>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("nastepne")}>
+                  Pierwsze pytanie od razu
+                </button>
+                <p className="pilot-zapowiedz" role="status">
+                  Na TV plansza „Zaczynamy!” z odliczaniem. Pierwsze pytanie ruszy samo
+                  {stan.faza_do ? ` za ${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}.
+                </p>
+              </>
+            )}
+
+            {/* wstęp: TV pokazuje całą drogę, prowadzący opowiada i przechodzi do planszy 1. etapu */}
+            {faza === "wstep" && !klasyczny && (
+              <>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                  {nastepne.napis}
+                </button>
+                <p className="pilot-zapowiedz" role="status">
+                  <strong>Opowiedz graczom:</strong> przed nami {stan.plan_etapow.length} etapów, z każdym pytaniem
+                  nalewa się piwo, a oni ścigają się do niego; po drodze odpadają najsłabsi, a o piwo walczy finałowa
+                  trójka.
+                </p>
+              </>
+            )}
+
+            {faza === "poczekalnia" && (
+              <button
+                className={`przycisk${stan.poczekalnia_otwarta ? " zloty" : ""}`}
+                disabled={wysylam || liczba === 0}
+                onClick={() =>
+                  akcja(
+                    "nastepne",
+                    stan.liczba_graczy === 0 ? "Nikt jeszcze nie dołączył. Wystartować mimo to?" : undefined,
+                    { tak: "Wystartuj" },
+                  )
+                }
+              >
+                {liczba === 0 ? "Quiz nie ma pytań" : "Start quizu"}
+              </button>
+            )}
+
+            {/* wynik pokazuje się sam po czasie albo gdy wszyscy odpowiedzą; ręcznie tylko wcześniej */}
+            {(faza === "przygotuj" || faza === "pytanie") &&
+              (bezLimitu ? (
+                <button
+                  className={`przycisk ${wszyscy ? "pozytywny" : "zloty"}`}
+                  disabled={wysylam}
+                  onClick={() =>
+                    akcja(
+                      "wynik",
+                      wszyscy ? undefined : "Nie wszyscy odpowiedzieli. Zakończyć pytanie teraz i pokazać wynik?",
+                      { tak: "Pokaż wynik" },
+                    )
+                  }
+                >
+                  {wszyscy ? "Pokaż wynik" : "Zakończ pytanie i pokaż wynik"}
+                </button>
+              ) : (
                 <>
-                  {" · "}
-                  {jedenWybor(z.typ) ? "dobrze" : z.typ === "szacowanie" ? "w punkt" : "w pełni dobrze"}{" "}
-                  <strong className="ok">{z.liczba_poprawnych}</strong>
+                  <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
+                    Wynik pokaże się sam, gdy minie czas albo odpowiedzą wszyscy.
+                  </p>
+                  {doKonca > 0 && (
+                    <button
+                      className={`przycisk${wszyscy ? " pozytywny" : ""}`}
+                      disabled={wysylam}
+                      onClick={() =>
+                        akcja("wynik", "Czas jeszcze leci. Zakończyć pytanie teraz i pokazać wynik?", {
+                          tak: "Pokaż wynik",
+                        })
+                      }
+                    >
+                      Zakończ pytanie wcześniej
+                    </button>
+                  )}
                 </>
-              )}
-            </p>
+              ))}
+
+            {/* po pytaniu: wynik → odpowiedzi → ranking → następne; każdy krok można pominąć */}
+            {/* po ostatnim pytaniu bez rankingu: od razu podium (odpowiedzi graczy można jeszcze pokazać) */}
+            {/* ciekawostka: plansza bez odpowiedzi, więc od razu dalej */}
+            {faza === "wynik" && z?.typ === "ciekawostka" && (
+              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                {nastepne.napis}
+              </button>
+            )}
+            {faza === "wynik" &&
+              z?.typ !== "ciekawostka" &&
+              (stan.ostatnie_zadanie ? (
+                <>
+                  <button className={`przycisk ${wszyscy ? "pozytywny" : "zloty"}`} disabled={wysylam} onClick={() => akcja("podium")}>
+                    Pokaż podium
+                  </button>
+                  <button className="przycisk" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
+                    Pokaż odpowiedzi graczy
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className={`przycisk ${wszyscy ? "pozytywny" : "zloty"}`}
+                    disabled={wysylam}
+                    onClick={() => akcja("odpowiedzi")}
+                  >
+                    Pokaż odpowiedzi graczy
+                  </button>
+                  <button className="przycisk" disabled={wysylam} onClick={() => akcja("ranking")}>
+                    Pokaż ranking
+                  </button>
+                  <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                    {nastepne.napis}
+                  </button>
+                </>
+              ))}
+
+            {faza === "odpowiedzi" &&
+              (stan.ostatnie_zadanie ? (
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
+                  Pokaż podium
+                </button>
+              ) : (
+                <>
+                  <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("ranking")}>
+                    Pokaż ranking
+                  </button>
+                  <button className="przycisk" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                    {nastepne.napis}
+                  </button>
+                </>
+              ))}
+
+            {faza === "ranking" && (
+              <>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                  {nastepne.napis}
+                </button>
+                <button className="przycisk" disabled={wysylam} onClick={() => akcja("odpowiedzi")}>
+                  Wróć do odpowiedzi graczy
+                </button>
+              </>
+            )}
+
+            {/* po ostatnim pytaniu obok podium jest pełna tabela */}
+            {stan.ostatnie_zadanie && (faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
+              <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
+                Pokaż pełną tabelę
+              </button>
+            )}
+
+            {/* pijany finał kończy się sam po czasie; wcześniej tylko po potwierdzeniu, żeby nie uciąć zabawy */}
+            {faza === "pijany" && (
+              <button
+                className="przycisk zloty"
+                disabled={wysylam}
+                onClick={() =>
+                  akcja("werble", "Gracze jeszcze odpowiadają. Zakończyć pijany finał i pokazać werble?", {
+                    tak: "Pokaż werble",
+                  })
+                }
+              >
+                Zakończ i pokaż werble
+              </button>
+            )}
+
+            {/* po finale serią TV i telefony czekają w ciemności, aż prowadzący odsłoni podium */}
+            {faza === "werble" && (
+              <>
+                <p className="pomocniczy" style={{ margin: 0, textAlign: "center" }}>
+                  Finał skończony. TV i telefony zgasły i grają werble. Zbuduj napięcie i odsłoń wynik.
+                </p>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("podium")}>
+                  Pokaż podium
+                </button>
+              </>
+            )}
+
+            {faza === "podium" && (
+              <>
+                <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
+                  Pokaż pełną tabelę
+                </button>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
+                  Zakończ grę
+                </button>
+              </>
+            )}
+
+            {faza === "tabela" && (
+              <>
+                <button className="przycisk" disabled={wysylam} onClick={() => akcja("podium")}>
+                  Pokaż podium
+                </button>
+                <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("koniec")}>
+                  Zakończ grę
+                </button>
+              </>
+            )}
+
+            {faza === "koniec" && (
+              <>
+                <p className="pomocniczy">Gra zakończona. Piwu Cześć!</p>
+                {stan.lokal && (
+                  <>
+                    <button
+                      className="przycisk"
+                      disabled={wysylam || ekranOddany}
+                      onClick={async () => {
+                        await akcja("plansze");
+                        ustawEkranOddany(true);
+                      }}
+                    >
+                      {ekranOddany ? "Ekran lokalu pokazuje plansze" : "Pokaż plansze na ekranie lokalu"}
+                    </button>
+                    <p className="pomocniczy" style={{ margin: 0 }}>
+                      Bez tego ekran lokalu wróci do plansz sam po 10 minutach. Podium tego quizu będzie wracać na planszach
+                      jeszcze przez kilka godzin.
+                    </p>
+                  </>
+                )}
+              </>
+            )}
           </section>
-        )}
 
-      {faza !== "poczekalnia" && (
-        <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
-          <summary className="etykieta">
-            {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
-          </summary>
-          <GraczePilota
-            kod={kod}
-            token={token}
-            gracze={gracze}
-            pytanie={faza === "pytanie"}
-            koniec={faza === "koniec"}
-            odswiez={pobierz}
-          />
-        </details>
-      )}
+          {faza === "poczekalnia" && <ProgiPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
+          {faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
+          {/* awaryjne zakończenie na samym dole, z dala od zwykłych przycisków */}
+          {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
+            <button
+              className="przycisk niebezpieczny"
+              style={{ marginTop: 32, width: "100%" }}
+              disabled={wysylam}
+              onClick={() =>
+                akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
+                  tak: "Zakończ grę",
+                  niebezpieczne: true,
+                })
+              }
+            >
+              Zakończ grę
+            </button>
+          )}
+          {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło.
+              Przycisk, nie napis do klikania; po grze złoty, bo to wtedy główna akcja */}
+          <Link
+            href="/admin/gry"
+            className={`przycisk${faza === "koniec" ? " zloty" : ""}`}
+            style={{ marginTop: 32 }}
+          >
+            Panel obsługi
+          </Link>
+        </div>
 
-      {/* awaryjne zakończenie na samym dole, z dala od zwykłych przycisków */}
-      {faza !== "koniec" && faza !== "podium" && faza !== "tabela" && (
-        <button
-          className="przycisk niebezpieczny"
-          style={{ marginTop: 32, width: "100%" }}
-          disabled={wysylam}
-          onClick={() =>
-            akcja("koniec", "Zakończyć grę teraz? Tego nie da się cofnąć.", {
-              tak: "Zakończ grę",
-              niebezpieczne: true,
-            })
-          }
-        >
-          Zakończ grę
-        </button>
-      )}
-      {/* powrót do panelu (np. żeby uruchomić następną grę); bez logowania panel poprosi o hasło.
-          Przycisk, nie napis do klikania; po grze złoty, bo to wtedy główna akcja */}
-      <Link
-        href="/admin/gry"
-        className={`przycisk${faza === "koniec" ? " zloty" : ""}`}
-        style={{ marginTop: 32 }}
-      >
-        Panel obsługi
-      </Link>
+        <div className="pilot-podglad">
+
+          {faza === "poczekalnia" && (
+            <section className="karta" style={{ marginTop: 18 }}>
+              <p className="etykieta" style={{ marginTop: 0 }}>
+                {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
+              </p>
+              <GraczePilota kod={kod} token={token} gracze={gracze} pytanie={false} koniec={false} odswiez={pobierz} />
+            </section>
+          )}
+
+          {faza === "etap" && etap && (
+            <section className="karta" style={{ marginTop: 18 }}>
+              <p className="etykieta" style={{ marginTop: 0 }}>
+                Etap {etap.nr} z {etap.liczba} · {etap.liczba_pytan} pyt.
+              </p>
+              <p
+                style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 6px", color: "var(--zloto)" }}
+              >
+                {etap.nazwa}
+              </p>
+              {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
+              <p className="pomocniczy" style={{ margin: 0 }}>
+                {[
+                  `Punkty ${napisMnoznika(etap.mnoznik)}`,
+                  etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
+                  etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", "),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+              {stan.finalisci && (
+                <p style={{ margin: "10px 0 0" }}>
+                  <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
+                </p>
+              )}
+              {!etap.finalowy && (etap.przechodzi !== null || etap.final_po_etapie) && (
+                <p style={{ margin: "10px 0 0" }}>
+                  <strong>Odpadanie:</strong> po tym etapie gra dalej{" "}
+                  {etap.final_po_etapie ? "trójka (finał)" : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
+                </p>
+              )}
+              <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+                TV pokazuje planszę z zasadami i animacją. Wytłumacz etap i wystartuj, kiedy wszyscy będą gotowi.
+              </p>
+            </section>
+          )}
+
+          {/* seria: postęp każdego grającego na żywo (TV pokazuje go na drogach do szklanki) */}
+          {faza === "seria" && etap && (
+            <section className="karta" style={{ marginTop: 18 }}>
+              <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+                <span>
+                  {etap.nazwa} · {etap.finalowy ? `wyścig do ${META_FINALU} kroków` : `seria ${etap.liczba_pytan} pyt.`}
+                </span>
+                <span className="gra-kod">
+                  {stan.faza_od && teraz < Date.parse(stan.faza_od)
+                    ? `start za ${Math.max(0, Math.ceil((Date.parse(stan.faza_od) - teraz) / 1000))} s`
+                    : stan.faza_do
+                      ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s`
+                      : ""}
+                </span>
+              </p>
+              <ol className="pilot-odpowiedzi">
+                {(stan.seria ?? []).map((g) =>
+                  // finał: kroki do szklanki (przewaga, +1 za dobrą, −1 za złą), zwykła seria: odpowiedzi z liczby pytań
+                  etap.finalowy ? (
+                    <li key={g.nick} className={krokiFinalu(g) >= META_FINALU ? "poprawna" : undefined}>
+                      {g.nick}: {Math.round(krokiFinalu(g) * 10) / 10}/{META_FINALU} kroków (przewaga {g.start ?? 0}),{" "}
+                      {g.odpowiedzi} odpowiedzi
+                    </li>
+                  ) : (
+                    <li key={g.nick} className={g.odpowiedzi >= etap.liczba_pytan ? "poprawna" : undefined}>
+                      {g.nick}: {g.odpowiedzi}/{etap.liczba_pytan} odpowiedzi, dobrze {Math.round(g.dobre * 10) / 10}
+                    </li>
+                  ),
+                )}
+              </ol>
+              {stan.pijany_final && (
+                <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+                  Po serii zamiast werbli przyjdzie pijany finał (nic nie liczy), a po nim werble. Zwycięzcę zobaczysz tutaj
+                  od razu.
+                </p>
+              )}
+            </section>
+          )}
+
+          {/* pijany finał: wynik jest już ustalony i widzi go tylko prowadzący */}
+          {faza === "pijany" && (
+            <section className="karta" style={{ marginTop: 18 }}>
+              <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+                <span>Pijany finał · nic się nie liczy</span>
+                <span className="gra-kod">
+                  {stan.faza_do ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}
+                </span>
+              </p>
+              <PodiumPilota gracze={gracze} />
+              <p className="pomocniczy" style={{ margin: "10px 0 0" }}>
+                Widzisz to tylko Ty. Gracze odpowiadają na pytania, które nic nie liczą, a TV i telefony wariują coraz
+                bardziej. Po czasie same przyjdą werble, a potem odsłaniasz podium.
+              </p>
+            </section>
+          )}
+
+          {z &&
+            faza !== "poczekalnia" &&
+            faza !== "etap" &&
+            faza !== "seria" &&
+            faza !== "pijany" &&
+            faza !== "werble" &&
+            faza !== "koniec" &&
+            faza !== "podium" &&
+            faza !== "tabela" && (
+              <section className="karta" style={{ marginTop: 18 }}>
+                <p
+                  className="etykieta"
+                  style={{
+                    marginTop: 0,
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span>
+                    Pytanie {z.lp}/{liczba}
+                  </span>
+                  {faza === "przygotuj" && (
+                    <span className="gra-kod">start za {sekundaOdliczania(doStartu)} s</span>
+                  )}
+                  {faza === "pytanie" && (
+                    <span className="gra-kod">
+                      {/* bez limitu czasu nic nie piszemy: napis „bez limitu” tylko mylił */}
+                      {bezLimitu
+                        ? ""
+                        : doKonca > 0
+                          ? `${Math.ceil(doKonca / 1000)} s`
+                          : wszyscy
+                            ? "wszyscy odpowiedzieli"
+                            : "czas minął"}
+                    </span>
+                  )}
+                </p>
+                {etap && (
+                  <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+                    {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
+                    {stan.finalisci ? " · finał trójki" : ""}
+                  </p>
+                )}
+                <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
+                <RozwiazaniePilota z={z} poprawna={stan.poprawna} />
+                {stan.wszystkie_podpowiedzi.length > 0 && (
+                  <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
+                    {stan.wszystkie_podpowiedzi.map((p, i) => (
+                      <li key={i} className={i < z.podpowiedzi.length ? "poprawna" : undefined}>
+                        <span className="pilot-litera">P{i + 1}</span>
+                        {p}
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                <p style={{ margin: "14px 0 0" }}>
+                  Odpowiedziało{" "}
+                  <strong className="gra-kod">
+                    {stan.liczba_odpowiedzi}/{grajacy}
+                  </strong>
+                  {z.liczba_poprawnych !== undefined && (
+                    <>
+                      {" · "}
+                      {jedenWybor(z.typ) ? "dobrze" : z.typ === "szacowanie" ? "w punkt" : "w pełni dobrze"}{" "}
+                      <strong className="ok">{z.liczba_poprawnych}</strong>
+                    </>
+                  )}
+                </p>
+              </section>
+            )}
+
+          {faza !== "poczekalnia" && (
+            <details className="karta pilot-gracze-karta" style={{ marginTop: 18 }}>
+              <summary className="etykieta">
+                {druzyny ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
+              </summary>
+              <GraczePilota
+                kod={kod}
+                token={token}
+                gracze={gracze}
+                pytanie={faza === "pytanie"}
+                koniec={faza === "koniec"}
+                odswiez={pobierz}
+              />
+            </details>
+          )}
+
+        </div>
+      </div>
       {oknoPotwierdzenia}
     </>
   );
