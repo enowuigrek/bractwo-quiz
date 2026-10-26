@@ -62,7 +62,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     klucz: "ile",
     nazwa: "Ile?",
     opis: "Podaj liczbę. Trafienie to pełne punkty, a im bliżej, tym więcej.",
-    mnoznik: 1.5,
+    mnoznik: 2,
     czas_s: null,
     finalowy: false,
     seria: false,

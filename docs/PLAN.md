@@ -297,7 +297,7 @@ Do zaprojektowania razem:
 - **Koniec gry:** automat zostaje na podium; TV sam pokazuje na zmianę podium i pełną tabelę co 10 s (pierwsze podium dłużej, o wjazd), od drugiej pętli z „Dziękujemy za grę! Piwu Cześć!” (`KoniecNaZmiane` w `tv.tsx`; kolejne podium bez konfetti). W pilocie na podium tylko „Zakończ grę”: muzyka cichnie (`koniec` bez utworu), a ekran lokalu od razu wraca do logo (`ekran_lokalu` bez 10 minut po końcu, migracja `ekran_lokalu_wraca_po_koncu`). Przycisk „Pokaż plansze na ekranie lokalu” zniknął. Prosty ekran (stare TV) bez zmian.
 - **Klasyczny pub quiz bez muzyki** (utwory z promptów nie pasowały, wrócimy innym razem, POMYSLY.md): `utworFazy` zwraca ciszę dla klasycznego (też zapowiedź na ekranie lokalu), w pilocie nie ma przełącznika muzyki. Efekty dźwiękowe grają.
 - **Loga:** zawsze lokal z lewej (obok gościnny browar), Bractwo z prawej, wszystkie tej samej wysokości: poczekalnia TV (Bractwo w prawym rogu), nagłówek telefonu (lokal i browar z lewej, „Quiz” na środku, Bractwo z prawej), prosty ekran.
-- **„Ile?” a inne konkurencje:** punkty mnoży etap: Na jedno ×1, Jednak więcej ×1,5, Ile? ×1,5, Jakoś się ułoży ×2 (Piwny quiz i Muzyka ponadczasowa), więc „Ile?” daje do 1500.
+- **„Ile?” ×2:** punkty mnoży etap: Na jedno ×1, Jednak więcej ×1,5, Ile? ×2 (było ×1,5, migracja `ile_mnoznik_2`), Jakoś się ułoży ×2, w Piwnym quizie, Muzyce ponadczasowej i w szablonie etapu (`src/lib/etapy.ts`). Trafienie w „Ile?” daje do 2000.
 
 ## Ustalenia
 
