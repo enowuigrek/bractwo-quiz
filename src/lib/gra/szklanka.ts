@@ -1,5 +1,5 @@
 // Szklanka wyścigu po piwo (grafika public/grafiki/szklanka.webp): gdzie w obrazku jest piwo, a gdzie piana.
-// Wspólne dla TV (ekran/_ekran/wyscig.tsx) i telefonu ([kod]/moj-wyscig.tsx). Procenty wysokości obrazka od góry.
+// Dla TV (ekran/_ekran/wyscig.tsx). Procenty wysokości obrazka od góry.
 
 /** Szczyt czapy piany w pełnej szklance. */
 export const GORA = 1;

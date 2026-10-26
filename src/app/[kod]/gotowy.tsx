@@ -5,13 +5,13 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 
 /**
- * Przy automatycznym prowadzeniu (`stan.auto`) na planszach (wstęp, etap, ciekawostka): gracz klika „Gotowy”,
- * a gdy gotowi są wszyscy, pilot sam idzie dalej (src/app/pilot/[kod]/auto.tsx). Bez automatu nic nie pokazuje.
+ * Na planszach (wstęp, etap, ciekawostka) gracz klika „Gotowy”. Od 26.10 zawsze, także gdy prowadzi człowiek:
+ * prowadzący widzi w pilocie, kto już jest gotowy, i nie rusza bez nich. Przy automacie (`stan.auto`), gdy gotowi
+ * są wszyscy, gra sama idzie dalej (src/app/pilot/[kod]/auto.tsx).
  */
 export function Gotowy({ stan, token }: { stan: StanSesji; token: string }) {
   // kliknięcie dotyczy tej jednej planszy (nowa plansza ma nowe `faza_od`)
   const [kliknieta, ustawKliknieta] = useState<string | null>(null);
-  if (!stan.auto) return null;
   const plansza = stan.faza_od ?? "";
   const gotowy = kliknieta === plansza;
 
@@ -27,7 +27,7 @@ export function Gotowy({ stan, token }: { stan: StanSesji; token: string }) {
         {gotowy ? "✓ Gotowy" : "Gotowy!"}
       </button>
       <p className="pomocniczy">
-        Gotowi: {stan.gotowi}/{stan.gotowi_z}. {gotowy ? "Czekamy na resztę…" : "Gra ruszy, gdy wszyscy będą gotowi."}
+        Gotowi: {stan.gotowi}/{stan.gotowi_z}. {gotowy ? "Czekamy na resztę…" : "Kliknij, gdy możemy grać dalej."}
       </p>
     </div>
   );

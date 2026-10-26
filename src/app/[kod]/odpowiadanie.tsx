@@ -365,23 +365,18 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   );
 }
 
-/** Rozwiązanie po wyniku: co było dobrze, a co nie (nowe typy). */
+/**
+ * Rozwiązanie po wyniku: co było dobrze, a co nie (nowe typy). Same znaki ✓ ✗ i kolory, bez szarych dopisków w rodzaju
+ * „Twoja kolejność” czy „Ty: …” (26.10, Łukasz: przy szybkim tempie nikt ich nie czyta).
+ */
 export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowiedzi | null }) {
   const p = z.dane.poprawna;
   if (z.typ === "szacowanie" && typeof p === "number") {
-    const twoja = moja?.liczba;
-    const roznica = twoja === undefined ? null : Number(Math.abs(twoja - p).toFixed(6));
     return (
       <div className="odp-liczba-wynik">
         <p>
           Poprawna: <strong className="ok">{liczbaZJednostka(p, z.dane.jednostka)}</strong>
         </p>
-        {twoja !== undefined && (
-          <p className="pomocniczy">
-            Ty: {liczbaZJednostka(twoja, z.dane.jednostka)}
-            {roznica ? ` (o ${liczbaZJednostka(roznica)} ${twoja > p ? "za dużo" : "za mało"})` : " (w punkt!)"}
-          </p>
-        )}
       </div>
     );
   }
@@ -397,7 +392,7 @@ export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowie
               <div className={`odp${klasa}`}>
                 <span className="odp-litera">{LITERY[i]}</span>
                 <span className="odp-tekst">{o}</span>
-                {dobra && <span className="ok">{moja_ ? "✓" : "pominięta"}</span>}
+                {dobra && moja_ && <span className="ok">✓</span>}
               </div>
             </li>
           );
@@ -427,7 +422,6 @@ export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowie
             );
           })}
         </ol>
-        {twoja && <p className="odp-twoja-kolejnosc">Twoja kolejność: {twoja.map((i) => el[i]).join(" → ")}</p>}
       </>
     );
   }
@@ -443,7 +437,6 @@ export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowie
               <div className={`odp${trafiona ? " poprawna" : moja ? " nietrafiona" : ""}`}>
                 <span className="odp-tekst">
                   {l} – <strong>{prawe[p[i]]}</strong>
-                  {moja && !trafiona && twoja !== undefined && <span className="odp-twoja">Ty: {prawe[twoja]}</span>}
                 </span>
                 {moja && <span className={trafiona ? "ok" : "zle"}>{trafiona ? "✓" : "✗"}</span>}
               </div>

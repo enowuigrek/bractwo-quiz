@@ -4,7 +4,7 @@
 // wynik gracza i podium gry dla lokalu (obie relacje 1080×1920).
 // Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru.
 
-import { adresZdjecia, BRZEG_KAPSLA, kolorNicku, kolorZAdresu, OBRYS_KAPSLA, przesun, ZLOTY_KAPSEL } from "./kapsel";
+import { adresZdjecia, kolorNicku, kolorZAdresu, przesun, ZLOTY_KAPSEL } from "./kapsel";
 
 export type LogoNaGrafice = { nazwa: string; logo_url: string | null } | null;
 
@@ -115,8 +115,8 @@ async function rysujLoga(ctx: CanvasRenderingContext2D, d: Wspolne, szer: number
 }
 
 /**
- * Kapsel jak w aplikacji (awatar.tsx, 26.10): z selfie zdjęcie w środku kapsla w kolorze ze zdjęcia, bez selfie
- * cały kapsel w kolorze nicku z literą. Pod kapslem numer miejsca w kółku w kolorze medalu.
+ * Awatar na grafice (26.10): okrągłe zdjęcie w obręczy w kolorze kapsla gracza (bez ząbków), bez zdjęcia kółko w tym
+ * kolorze z literą. Na dole obręczy numer miejsca w kółku w kolorze medalu.
  */
 async function rysujAwatar(
   ctx: CanvasRenderingContext2D,
@@ -128,29 +128,22 @@ async function rysujAwatar(
   const metal = (METALE[d.miejsce] ?? ["#3a4552", "#27313b", "#11161b"])[1];
   const zdjecie = await moze(adresZdjecia(d.zdjecie));
   const kolor = kolorZAdresu(d.zdjecie) ?? (zdjecie ? ZLOTY_KAPSEL : kolorNicku(d.nick));
-  // kapsel ścieżką, nie obrazkiem SVG (Safari potrafi wtedy zablokować zapis grafiki)
+  // obręcz w kolorze kapsla gracza (na grafice bez ząbków kapsla, 26.10): metaliczny gradient tego koloru
+  const obrecz = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  obrecz.addColorStop(0, `#${przesun(kolor, 0.5)}`);
+  obrecz.addColorStop(0.45, `#${kolor}`);
+  obrecz.addColorStop(1, `#${przesun(kolor, -0.45)}`);
   ctx.save();
-  ctx.translate(cx - r, cy - r);
-  ctx.scale(r / 50, r / 50);
-  const obrys = new Path2D(OBRYS_KAPSLA);
-  const metalKapsla = ctx.createLinearGradient(0, 0, 100, 100);
-  metalKapsla.addColorStop(0, `#${przesun(kolor, 0.5)}`);
-  metalKapsla.addColorStop(0.45, `#${kolor}`);
-  metalKapsla.addColorStop(1, `#${przesun(kolor, -0.45)}`);
   ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
   ctx.shadowBlur = 40;
-  ctx.fillStyle = metalKapsla;
-  ctx.fill(obrys);
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
-  ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.arc(50, 50, 40, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = obrecz;
+  ctx.fill();
   ctx.restore();
 
+  const wew = r * 0.9;
   if (zdjecie) {
-    const wew = r * (1 - 2 * BRZEG_KAPSLA);
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, wew, 0, Math.PI * 2);
@@ -159,7 +152,11 @@ async function rysujAwatar(
     ctx.drawImage(zdjecie, (zdjecie.width - bok) / 2, (zdjecie.height - bok) / 2, bok, bok, cx - wew, cy - wew, wew * 2, wew * 2);
     ctx.restore();
   } else {
-    // wygrawerowana litera jak w aplikacji: jasna krawędź pod spodem, ciemna litera
+    // bez zdjęcia: kółko w kolorze kapsla z wygrawerowaną literą, jak w aplikacji
+    ctx.beginPath();
+    ctx.arc(cx, cy, wew, 0, Math.PI * 2);
+    ctx.fillStyle = `#${kolor}`;
+    ctx.fill();
     const litera = d.nick.slice(0, 1).toUpperCase();
     ctx.font = `800 ${r * 1.1}px ${kroj()}`;
     ctx.textAlign = "center";
@@ -170,7 +167,7 @@ async function rysujAwatar(
     ctx.fillText(litera, cx, cy + r * 0.05);
   }
 
-  // numer miejsca w kółku na dole kapsla
+  // numer miejsca w kółku na dole obręczy
   const rn = r * 0.3;
   ctx.beginPath();
   ctx.arc(cx, cy + r * 0.9, rn, 0, Math.PI * 2);

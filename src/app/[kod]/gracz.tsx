@@ -14,19 +14,17 @@ import {
   useNasluch,
   zZegarem,
 } from "@/lib/gra/nasluch";
-import { najblizszeOdciecie, odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
+import { najblizszeOdciecie } from "@/lib/gra/odpadanie";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { usunZdjecie, wyslijZdjecie, ustawKolorKapsla } from "@/lib/zdjecie";
 import { kolorZAdresu } from "@/lib/kapsel";
 import { kiedyStart } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
-import { nalanieSzklanki, nazwaRodzaju, quizKlasyczny, rankingJakoWyscig } from "@/lib/gra/wyscig";
+import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
 import { Gotowy } from "./gotowy";
-import { IkonaDobrze, IkonaPuchar, IkonaUwaga } from "@/components/ikony";
 import { MojRanking } from "./moj-ranking";
-import { MojWyscig } from "./moj-wyscig";
 import { PijanyFinal } from "./pijany";
 import { zapamietajKoniecSerii } from "@/lib/pijany";
 import { SeriaGracza } from "./seria";
@@ -59,7 +57,6 @@ export function Gracz({ kod }: { kod: string }) {
   const [moj, ustawMoj] = useState<MojWynik | null>(null);
   const [mojWiersz, ustawMojWiersz] = useState<WierszRankingu | null>(null);
   // punkty grających od najwyższych: w etapie z odcięciem telefon mówi, ile brakuje do miejsca, które przechodzi
-  const [punktyWGrze, ustawPunktyWGrze] = useState<number[] | null>(null);
   // cały ranking: na telefonie wycinek tabeli wokół gracza (moj-ranking.tsx)
   const [ranking, ustawRanking] = useState<WierszRankingu[] | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
@@ -106,12 +103,6 @@ export function Gracz({ kod }: { kod: string }) {
               const wiersze = r.data as WierszRankingu[];
               ustawRanking(wiersze);
               ustawMojWiersz(wiersze.find((w) => w.nick === nowy.nick) ?? null);
-              ustawPunktyWGrze(
-                wiersze
-                  .filter((w) => w.odpadl === null)
-                  .map((w) => w.punkty)
-                  .sort((a, b) => b - a),
-              );
             }
           }
         }
@@ -229,7 +220,6 @@ export function Gracz({ kod }: { kod: string }) {
         gracze={gracze}
         moj={moj}
         mojWiersz={mojWiersz}
-        punktyWGrze={punktyWGrze}
         ranking={ranking}
         przesuniecie={przesuniecie}
         odswiez={pobierz}
@@ -365,7 +355,6 @@ function WGrze({
   gracze,
   moj,
   mojWiersz,
-  punktyWGrze,
   ranking,
   przesuniecie,
   odswiez,
@@ -375,7 +364,6 @@ function WGrze({
   gracze: GraczNaLiscie[];
   moj: MojWynik | null;
   mojWiersz: WierszRankingu | null;
-  punktyWGrze: number[] | null;
   ranking: WierszRankingu[] | null;
   przesuniecie: number;
   odswiez: () => Promise<void>;
@@ -528,8 +516,6 @@ function WGrze({
   }
 
   if (stan.faza === "ranking") {
-    const odciecie = odciecieEtapu(stan);
-    const kreska = mojWiersz ? wzgledemKreski(mojWiersz, odciecie, stan.w_grze) : null;
     // rozgrzewka (1. etap) bez statusu, chyba że już po niej ktoś odpada: nikogo nie stresujemy na starcie
     const dalsze = najblizszeOdciecie(stan);
     const nastepne = stan.etap?.nr === 1 && dalsze?.poEtapie !== 1 ? null : dalsze;
@@ -541,48 +527,16 @@ function WGrze({
           {ja.nick}
         </p>
         <h1>{stan.etap && stan.ostatnie_w_etapie ? `Koniec etapu ${stan.etap.nr}` : "Ranking"}</h1>
-        {moj && <Miejsce moj={moj} />}
-        {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
-        {/* przeskok przez kreskę po tym pytaniu */}
-        {kreska === "awans" && <p className="kreska-zmiana awans">▲ Wskakujesz nad kreskę!</p>}
-        {kreska === "spadek" && <p className="kreska-zmiana spadek">▼ Spadasz pod kreskę. Odrób to w następnym pytaniu!</p>}
-        {/* najbliższe odcięcie (ten etap albo dalszy): na dobrej drodze czy zagrożony odpadnięciem */}
-        {mojWiersz && nastepne && (
-          <p className={`etap-uwaga ${mojWiersz.miejsce <= nastepne.ile ? "na-drodze" : "zagrozony"}`}>
-            {mojWiersz.miejsce <= nastepne.ile ? (
-              <>
-                {nastepne.final ? <IkonaPuchar /> : <IkonaDobrze />}
-                <strong>Na dobrej drodze:</strong>{" "}
-                {nastepne.final ? "jesteś w trójce, która wejdzie do finału" : `jesteś w najlepszej ${nastepne.ile}`}
-                {nastepne.poEtapie === stan.etap?.nr
-                  ? ". Utrzymaj miejsce do końca etapu!"
-                  : `, która gra dalej po ${nastepne.poEtapie}. etapie.`}
-              </>
-            ) : (
-              <>
-                <IkonaUwaga />
-                <strong>Zagrożony odpadnięciem:</strong>{" "}
-                {nastepne.final
-                  ? `do finału wchodzi 3 najlepszych po ${nastepne.poEtapie}. etapie`
-                  : `po ${nastepne.poEtapie}. etapie gra dalej ${nastepne.ile} najlepszych`}
-                . Do {nastepne.ile}. miejsca brakuje Ci{" "}
-                <strong>{Math.max(1, (punktyWGrze?.[nastepne.ile - 1] ?? 0) - mojWiersz.punkty + 1)} pkt</strong>.
-              </>
-            )}
-          </p>
-        )}
-        {/* wycinek tabeli z Tobą w środku (26.10) */}
-        {ranking && <MojRanking key={`ranking-${stan.zadanie?.nr ?? 0}`} wiersze={ranking} nick={ja.nick} />}
-        {/* TV pokazuje wyścig: na telefonie szklanka, która nalewa się tak jak na TV (w klasycznym nie ma) */}
-        {mojWiersz && rankingJakoWyscig(stan, stan.w_grze) && (
-          <MojWyscig
-            key={stan.zadanie?.nr ?? 0}
-            lp={stan.zadanie?.lp ?? 0}
-            n={stan.quiz?.liczba_zadan ?? 0}
-            przed={nalanieSzklanki(stan.quiz, (stan.zadanie?.lp ?? 0) - 1)}
-            teraz={nalanieSzklanki(stan.quiz, stan.zadanie?.lp ?? 0)}
+        {/* miejsce zielone albo czerwone względem najbliższego odcięcia zamiast opisu (26.10) */}
+        {moj && (
+          <Miejsce
+            moj={moj}
+            status={mojWiersz && nastepne ? (mojWiersz.miejsce <= nastepne.ile ? "na-drodze" : "zagrozony") : null}
           />
         )}
+        {mojWiersz && <ZmianaMiejsca w={mojWiersz} />}
+        {/* wycinek tabeli z Tobą w środku (26.10); bez szklanki na telefonie (wyścig jest na TV) */}
+        {ranking && <MojRanking key={`ranking-${stan.zadanie?.nr ?? 0}`} wiersze={ranking} nick={ja.nick} />}
       </>
     );
   }

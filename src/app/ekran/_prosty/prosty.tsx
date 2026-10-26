@@ -323,8 +323,8 @@ function Etap({ stan }: { stan: StanSesji }) {
   );
 }
 
+// „Gotowy” klikają gracze zawsze (26.10), nie tylko przy automacie
 function Gotowi({ stan }: { stan: StanSesji }) {
-  if (!stan.auto) return null;
   return (
     <p className="pr-gotowi">
       Gotowi {stan.gotowi}/{stan.gotowi_z}

@@ -1317,16 +1317,6 @@ html:has(.kolumna) {
   border-color: var(--czerwien);
 }
 
-.odp-twoja {
-  display: block;
-  margin-top: 2px;
-  font-size: var(--fs-xs);
-  font-weight: var(--w-semibold);
-  color: var(--szary);
-  text-decoration: line-through;
-  text-decoration-color: var(--czerwien);
-}
-
 .odp .zle {
   color: var(--czerwien);
   font-weight: var(--w-black);
@@ -1428,6 +1418,21 @@ html:has(.kolumna) {
   border-bottom: 1px solid var(--kamien2);
   font-size: var(--fs-small);
   font-weight: var(--w-semibold);
+}
+
+/* plansza z „Gotowy”: pasek z lewej i znak przy nicku, zielony gotowy, czerwony czekamy (gracze.tsx) */
+.pilot-gracze li.gotowy,
+.pilot-gracze li.niegotowy {
+  padding-left: 10px;
+  border-left: 4px solid var(--chmiel);
+}
+
+.pilot-gracze li.niegotowy {
+  border-left-color: var(--czerwien);
+}
+
+.pilot-gracze .zle {
+  color: var(--czerwien);
 }
 
 .pilot-gracz-nick {
@@ -1639,13 +1644,6 @@ html:has(.kolumna) {
   text-transform: uppercase;
   color: var(--zloto);
   text-align: center;
-}
-
-/* Po wyniku pytania o kolejność: ułożenie gracza jednym wierszem pod właściwą kolejnością */
-.odp-twoja-kolejnosc {
-  margin: 8px 0 0;
-  font-size: var(--fs-xs);
-  color: var(--szary);
 }
 
 /* Pilot: godzina zapowiedzianego startu i odliczanie */
@@ -1930,6 +1928,15 @@ html:has(.kolumna) {
   font-variant-numeric: tabular-nums;
 }
 
+/* miejsce w rankingu: zielone nad najbliższą kreską, czerwone pod nią (gracz.tsx) */
+.miejsce.na-drodze .miejsce-nr {
+  color: var(--chmiel);
+}
+
+.miejsce.zagrozony .miejsce-nr {
+  color: var(--czerwien);
+}
+
 .haslo-kibica-nick {
   font-weight: var(--w-black);
 }
@@ -2144,38 +2151,6 @@ html:has(.kolumna) {
   height: 96px;
   object-fit: contain;
   margin: 0 auto 4px;
-}
-
-/* Wyścig po piwo w rankingu na telefonie: awatar przy nicku, duża szklanka na środku */
-.gra-ja {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.moj-wyscig {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  /* niżej, z dala od miejsca i statusu nad nią (25.10) */
-  margin-top: 36px;
-}
-
-.moj-wyscig-szklanka {
-  position: relative;
-  width: 112px;
-  filter: drop-shadow(0 0 24px rgba(227, 172, 63, 0.35));
-}
-
-.moj-wyscig-opis {
-  margin: 0;
-  color: var(--szary);
-  font-weight: var(--w-semibold);
-  text-align: center;
-}
-
-.moj-wyscig-opis strong {
-  color: var(--zloto);
 }
 
 /* Szklanka nalewana piwem (components/szklanka-piwa.tsx), wspólna dla TV i telefonu. Bez clip-path:

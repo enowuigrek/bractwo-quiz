@@ -43,6 +43,7 @@ import { wczytajMuzykePijana } from "@/lib/gra/muzyka-pijana";
 import { czyTelewizor } from "@/lib/gra/telewizor";
 import { EkranLogo } from "./ekran-logo";
 import { PodiumTv, RankingTv } from "./ranking";
+import { GrafikaOdslaniana } from "./grafika-odslaniana";
 import { RESZTA_PODIUM_S } from "@/lib/gra/podium";
 import { NickiPoczekalni } from "./nicki";
 import { WstepTv } from "./wstep";
@@ -305,17 +306,18 @@ export function Tv({ kod, qr, host }: Props) {
 }
 
 /**
- * Automatyczne prowadzenie (`stan.auto`): na planszach, na których gracze klikają „Gotowy” (wstęp, etap,
- * ciekawostka), w rogu ile osób już kliknęło. Gra rusza, gdy klikną wszyscy (src/app/pilot/[kod]/auto.tsx).
+ * Na planszach, na których gracze klikają „Gotowy” (wstęp, etap, ciekawostka), ile osób już kliknęło (od 26.10 także
+ * bez automatu). Przy automacie gra rusza, gdy klikną wszyscy (src/app/pilot/[kod]/auto.tsx).
  */
 function GotowiTv({ stan }: { stan: StanSesji }) {
   const plansza =
     stan.faza === "wstep" || stan.faza === "etap" || (stan.faza === "wynik" && stan.zadanie?.typ === "ciekawostka");
   // plansza startowa klasycznego quizu nie czeka na „Gotowy”, tylko odlicza
-  if (!stan.auto || !plansza || quizKlasyczny(stan)) return null;
+  if (!plansza || (stan.faza === "wstep" && quizKlasyczny(stan))) return null;
   return (
     <p className={`tv-gotowi${stan.gotowi >= stan.gotowi_z ? " wszyscy" : ""}`}>
-      Gotowi <strong>{stan.gotowi}</strong>/{stan.gotowi_z}
+      Gotowi <strong>{stan.gotowi}</strong>
+      <span className="tv-gotowi-z">/{stan.gotowi_z}</span>
     </p>
   );
 }
@@ -555,11 +557,10 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 
       <div className={`tv-pytanie-srodek${z.grafika_url ? " z-grafika" : ""}`}>
         {z.grafika_url && (
-          <img
+          <GrafikaOdslaniana
             src={z.grafika_url}
-            alt=""
+            rozmycie={rozmyta}
             className={`tv-pytanie-grafika${z.dane.odslaniaj ? " odslaniana" : ""}`}
-            style={rozmyta ? { filter: `blur(${rozmyta}px)` } : undefined}
           />
         )}
         {z.typ === "szacowanie" ? (

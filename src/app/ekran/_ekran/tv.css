@@ -358,26 +358,44 @@
   translate: -50% -50%;
   z-index: 30;
   margin: 0;
-  padding: 6px 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 24px;
   border: 2px solid var(--kamien2);
   border-radius: var(--r-pill);
-  background: rgba(0, 0, 0, 0.55);
-  /* napis zielony, liczba gotowych szara, a gdy gotowi są wszyscy, też zielona (26.10) */
+  background: rgba(0, 0, 0, 0.6);
+  /* Napis „Gotowi” zielony i mniejszy, liczba gotowych duża i jasna (kremowa), „/z ilu” przygaszone. Gdy gotowi są
+     wszyscy, cała pastylka zielona z poświatą (26.10: szara liczba wyglądała na nieaktywną). */
   color: var(--chmiel);
-  font-size: 26px;
+  font-size: 24px;
   font-weight: var(--w-black);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   font-variant-numeric: tabular-nums;
 }
 
 .tv-gotowi strong {
-  color: var(--szary);
+  color: var(--piana);
+  font-size: 34px;
+  letter-spacing: 0;
+}
+
+.tv-gotowi-z {
+  margin-left: -10px;
+  color: rgba(244, 236, 216, 0.55);
+  font-size: 26px;
+  letter-spacing: 0;
 }
 
 .tv-gotowi.wszyscy {
   border-color: var(--chmiel);
+  background: color-mix(in srgb, var(--chmiel) 22%, rgba(0, 0, 0, 0.6));
+  box-shadow: 0 0 28px rgba(143, 182, 58, 0.45);
 }
 
-.tv-gotowi.wszyscy strong {
+.tv-gotowi.wszyscy strong,
+.tv-gotowi.wszyscy .tv-gotowi-z {
   color: var(--chmiel);
 }
 
@@ -635,6 +653,7 @@
 }
 
 .tv-pytanie-srodek {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -2813,8 +2832,11 @@
   color: var(--szary);
 }
 
-.tv-pytanie-grafika.odslaniana {
-  transition: filter 0.3s linear;
+/* rozmyta grafika (grafika-odslaniana.tsx): płótno nad niewidocznym obrazkiem, w jego miejscu i rozmiarze */
+.tv-grafika-plotno {
+  position: absolute;
+  border-radius: var(--r-card);
+  pointer-events: none;
 }
 
 /* Szacowanie: oś z kropkami odpowiedzi i złotą kreską poprawnej liczby */

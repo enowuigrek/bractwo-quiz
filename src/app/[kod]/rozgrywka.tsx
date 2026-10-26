@@ -80,7 +80,7 @@ export function Rozgrywka({
         <h2 className="gra-pytanie">{z.tresc}</h2>
         {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
         {z.dane.tekst && <p>{z.dane.tekst}</p>}
-        {stan.auto ? <Gotowy stan={stan} token={ja.token} /> : <p className="pomocniczy">Prowadzący zaraz pójdzie dalej.</p>}
+        <Gotowy stan={stan} token={ja.token} />
       </>
     );
   }
@@ -299,9 +299,6 @@ export function Rozgrywka({
         <div className="werdykt dobrze">
           <span className="werdykt-tytul">✓ Dobrze!</span>
           <span className="werdykt-punkty">+{ocena.punkty} pkt</span>
-          <span className="pomocniczy">
-            w <span className="czas-odp">{sekundy(ocena.czas_ms)}</span>
-          </span>
         </div>
       ) : czesciowa ? (
         <div className="werdykt czesciowo">
@@ -309,9 +306,6 @@ export function Rozgrywka({
             {z.typ === "szacowanie" ? "Blisko!" : `Częściowo: ${ulamek(ocena.ocena ?? 0, liczbaCzesci(z.typ, z.dane))}`}
           </span>
           <span className="werdykt-punkty">+{ocena.punkty} pkt</span>
-          <span className="pomocniczy">
-            w <span className="czas-odp">{sekundy(ocena.czas_ms)}</span>
-          </span>
         </div>
       ) : ocena ? (
         <div className="werdykt zle">
@@ -386,10 +380,14 @@ function Pytanie({ stan, bezGrafiki = false, teraz }: { stan: StanSesji; bezGraf
   );
 }
 
-export function Miejsce({ moj }: { moj: MojWynik }) {
+/**
+ * Miejsce gracza. `status`: kolor numeru względem najbliższego odcięcia (zielony: przechodzi dalej, czerwony: odpada),
+ * zamiast opisu „Na dobrej drodze” / „Zagrożony odpadnięciem” (26.10, Łukasz: mniej czytania, więcej symboli).
+ */
+export function Miejsce({ moj, status = null }: { moj: MojWynik; status?: "na-drodze" | "zagrozony" | null }) {
   if (moj.miejsce == null) return null;
   return (
-    <div className="miejsce">
+    <div className={`miejsce${status ? ` ${status}` : ""}`}>
       <span className="miejsce-nr">{moj.miejsce}.</span>
       <span>
         miejsce z {moj.liczba_graczy}

@@ -208,7 +208,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
     (faza === "wstep" && !klasyczny) || faza === "etap" || (faza === "wynik" && z?.typ === "ciekawostka");
   const poPytaniu = z && z.typ !== "ciekawostka" && ["przygotuj", "pytanie", "wynik", "odpowiedzi", "ranking"].includes(faza);
   const [napisLicznika, wartoscLicznika, komplet]: [string, string, boolean] =
-    stan.auto && planszaGotowych
+    planszaGotowych
       ? ["Gotowi do dalszej gry", `${stan.gotowi}/${stan.gotowi_z}`, stan.gotowi >= stan.gotowi_z]
       : poPytaniu
         ? [
@@ -708,6 +708,7 @@ export function Pilot({ kod, tokenZAdresu }: Props) {
                 token={token}
                 gracze={gracze}
                 pytanie={faza === "pytanie"}
+                gotowosc={planszaGotowych}
                 koniec={faza === "koniec"}
                 odswiez={pobierz}
               />

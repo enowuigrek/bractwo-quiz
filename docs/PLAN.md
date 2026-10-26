@@ -48,7 +48,11 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Dziś (26.10) zmienione, na produkcji, ale niesprawdzone na prawdziwym TV/telefonach w lokalu:** wybuch szklanki na TV z klatek klipu (zamiast konfetti; na komputerze dalej wideo), równoległe drogi finału blisko siebie, scena TV na cały ekran (nagłówek od góry, stopka od dołu), podium i tabela na zmianę na końcu gry, ekran lokalu wraca do logo po „Zakończ grę”, nowy pilot (ramka stanu, ikony muzyki i automatu, menu), kreator na kafelkach. Łukasz testuje na OLED i iPhonie na bieżąco.
 - Muzyka klasycznego pub quizu wyłączona (POMYSLY.md), a „Ile?” ma mnożnik ×2.
 
-**Następny krok:** hasła na start dla PPR i Piwiarni (Łukasz w panelu, strona lokalu), potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
+**Do zrobienia razem z Łukaszem (26.10 wieczorem):**
+1. Test paneli lokali (PPR, Piwiarnia): hasło na start, logowanie pod `/admin/ppr`, co lokal widzi (lista w rozmowie z 26.10).
+2. Hasła kibiców do ustalenia razem: na zwykły finał (dziś „Dawaj”, „Jedziesz” itd., `HASLA` w `src/lib/gra/okrzyki.ts`, numer hasła w bazie 0..7) i osobne na pijany finał, gdzie kibicowanie zamienia się w troskę: „Wszystko ok?”, „Żyjesz?” itp. (pomysł Łukasza). W pijanym kibic dziś wysyła te same hasła.
+
+**Następny krok:** powyższe dwa punkty, potem odsłuch dźwięków na TV w lokalu i przegląd pytań pijanego finału, liczenie pytań w wynikach gry, potem test na żywo na spotkaniu Kręgu 28.10.
 
 ### Lista poprawek Łukasza po teście 26.10 ✅
 
@@ -63,6 +67,9 @@ Ta sekcja to skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte
 - **Telefon gracza:** te same prawie czarne powierzchnie co TV (`.ekran-gracza` nadpisuje `--kamien*` i `--pole`). Brązowe (#17130f) robiły całość za brązową, więc od 26.10 wieczorem #121212, z obrysem w ciemnym wyblakłym beżu #3b352c (szary #353535 był za zimny, #4d4538 za jasny); kreski między graczami w odpowiedziach w połowie odstępu na TV, telefonie i prostym ekranie.
 - **Kolor kapsla do wyboru** (26.10 wieczorem): przy dołączaniu i w poczekalni osiem kolorów pod podglądem kapsla (pusty, z literą po wpisaniu nicku albo ze zdjęciem, w dowolnej kolejności). Kolor siedzi w `gracze.zdjecie_url` jako `#kapsel=rrggbb`, także bez zdjęcia (sam fragment), więc dociera do TV, rankingów i grafik bez zmian w bazie; prawdziwy adres obrazka daje `adresZdjecia`. Bez wyboru: przy zdjęciu kolor ze zdjęcia, bez zdjęcia po nicku. Usunięcie zdjęcia zostawia kolor. Litera większa i wygrawerowana (ciemna, półprzezroczysta, z jasną krawędzią), też na grafikach.
 - **Werble na telefonie:** same skaczące kropki, bez napisu „Werble… Wynik za chwilę”.
+- **Telefon prościej (26.10 wieczorem):** po wyniku bez szarych dopisków („Twoja kolejność”, „Ty: …”, „pominięta”, czas odpowiedzi), w rankingu bez szklanki i bez opisów „Na dobrej drodze / Zagrożony”: numer miejsca jest zielony nad najbliższą kreską i czerwony pod nią. Grafika na pamiątkę: okrągłe zdjęcie w obręczy w kolorze kapsla (bez ząbków).
+- **Odsłaniana grafika na TV** (`ekran/_ekran/grafika-odslaniana.tsx`): rozmycie przez płótno (obraz w małej rozdzielczości rozciągnięty na wymiar obrazka), bo Samsung nie stosował `filter: blur` i chmiel na TV był od razu ostry, gdy na telefonie się wyostrzał.
+- **„Gotowy” zawsze** (nie tylko przy automacie): gracze klikają go na planszach etapu, wstępu i przy ciekawostkach, TV i pilot pokazują „Gotowi x/y”, a w pilocie na liście graczy pasek zielony (gotowy) albo czerwony (czekamy; zaginionego prowadzący usuwa ✕). Baza: `pilot_gracze` podaje `gotowy` i `musi_gotowy` (migracja `20261026175303`). Licznik na TV: „Gotowi” zielone, liczba kremowa i większa, „/z ilu” przygaszone, przy komplecie cała pastylka zielona z poświatą.
 - **Telefon bez instrukcji pod pytaniem:** bez „Wybierz odpowiedź”, „Połącz w pary” i podpowiedzi przy łączeniu (zasady są na planszach etapów, a tekst przesuwał „Zatwierdź”).
 - **Ranking na dwóch stronach:** druga strona wjeżdża cała z dołu ekranu, bez zamiany torów (wcześniej przesunięte tory czekały widoczne pod listą).
 - **Podium:** bez górnej ścianki-trapezu na `clip-path` (Samsung jej nie rysował, a gdzie indziej wyglądała jak „niby 3D”), wszędzie płaskie jak na TV w wyścigu.

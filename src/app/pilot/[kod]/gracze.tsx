@@ -16,6 +16,8 @@ type Props = {
   gracze: GraczPilota[];
   /** Trwa pytanie: przy nicku znaczek, czy gracz już odpowiedział. */
   pytanie: boolean;
+  /** Plansza z „Gotowy” (wstęp, etap, ciekawostka): gracze w kolorach, kto gotowy, a na kogo czekamy. */
+  gotowosc?: boolean;
   /** Po końcu gry lista jest tylko do wglądu. */
   koniec: boolean;
   odswiez: () => Promise<void>;
@@ -25,7 +27,7 @@ type Props = {
  * Gracze na pilocie. Przy każdym: QR powrotu (gracz zamknął stronę albo zmienia telefon;
  * skanuje go i gra dalej z tymi samymi punktami), usunięcie gracza i usunięcie zdjęcia.
  */
-export function GraczePilota({ kod, token, gracze, pytanie, koniec, odswiez }: Props) {
+export function GraczePilota({ kod, token, gracze, pytanie, gotowosc = false, koniec, odswiez }: Props) {
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
   const [blad, ustawBlad] = useState<string | null>(null);
   const [qr, ustawQr] = useState<{ nick: string; svg: string } | null>(null);
@@ -105,7 +107,11 @@ export function GraczePilota({ kod, token, gracze, pytanie, koniec, odswiez }: P
     <>
       <ul className="pilot-gracze">
         {gracze.map((g) => (
-          <li key={g.nick}>
+          <li
+            key={g.nick}
+            // na planszy zielony gotowy, czerwony czekamy (zaginiony gracz: prowadzący może go usunąć ✕)
+            className={gotowosc && g.musi_gotowy ? (g.gotowy ? "gotowy" : "niegotowy") : undefined}
+          >
             {adresZdjecia(g.zdjecie) && !koniec ? (
               // zdjęcie trafia na TV: prowadzący może je zdjąć, gdy się nie nadaje
               <button
@@ -122,6 +128,9 @@ export function GraczePilota({ kod, token, gracze, pytanie, koniec, odswiez }: P
             <span className="pilot-gracz-nick">
               {g.nick}
               {pytanie && <span className={g.odpowiedzial ? "ok" : "pomocniczy"}>{g.odpowiedzial ? " ✓" : " …"}</span>}
+              {gotowosc && g.musi_gotowy && (
+                <span className={g.gotowy ? "ok" : "zle"}>{g.gotowy ? " ✓ gotowy" : " czekamy"}</span>
+              )}
             </span>
             <span className="pilot-gracz-punkty">{g.punkty.toLocaleString("pl-PL")}</span>
             {!koniec && (

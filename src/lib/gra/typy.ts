@@ -171,6 +171,10 @@ export type GraczPilota = {
   token: string;
   punkty: number;
   odpowiedzial: boolean;
+  /** Kliknął „Gotowy” na bieżącej planszy (boty zawsze). */
+  gotowy: boolean;
+  /** Musi kliknąć „Gotowy”: gra dalej (nie odpadł, w finale jest w trójce). */
+  musi_gotowy: boolean;
 };
 
 export type AkcjaPilota =
