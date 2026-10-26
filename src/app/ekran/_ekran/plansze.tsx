@@ -125,8 +125,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
           Quiz <strong>{kiedyStart(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}
         </p>
       )}
-      {/* plansze 1 i 3 nie mają dużego logo Bractwa, więc dostają małe w rogu */}
-      {(nr === 1 || nr === 3) && <img src="/loga/bractwo.svg" alt="" className="logo-bractwo tv-bractwo-rog" />}
+      {/* bez małego logo Bractwa w rogu (26.10, jak na ekranach gry): Bractwo ma duże logo na swojej planszy */}
       <ol className="plansze-kropki" aria-hidden>
         {Array.from({ length: liczbaPlansz }, (_, i) => (
           <li key={i} className={i === nr ? "teraz" : undefined} />

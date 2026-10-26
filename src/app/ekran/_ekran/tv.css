@@ -35,17 +35,6 @@
   flex-direction: column;
 }
 
-/* Logo Bractwa Piwnego: stale w prawym dolnym rogu, góra zostaje dla lokalu i browaru */
-.tv-bractwo-rog {
-  position: absolute;
-  right: 36px;
-  bottom: 18px;
-  height: 72px;
-  width: auto;
-  opacity: 0.85;
-  pointer-events: none;
-}
-
 .tv-pytanie-gora {
   gap: 40px;
 }
@@ -1821,12 +1810,6 @@
 
 .tv-koniec .metal-3 .tv-stopien-awatar {
   border-color: #c9804a;
-}
-
-/* logo w rogu na planszach: .plansze ma position: relative, więc wracamy do rogu sceny */
-.plansze > .tv-bractwo-rog {
-  right: -44px;
-  bottom: -78px;
 }
 
 /* Rodzaj pytania w odliczaniu na TV */
