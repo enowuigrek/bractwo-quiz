@@ -39,11 +39,9 @@ export function naDrodzeFinalu(g: PostepFinalisty, bezMety = false): number {
 
 /**
  * Po finale pierwsze miejsca (tylu, ilu było finalistów) ustala wyścig, a nie punkty: finał nie daje punktów
- * (27.10), więc zwycięzca wyścigu może mieć ich mniej. Przy tych miejscach pokazujemy miejsce w wyścigu
- * (`napisWyscigu`) zamiast punktów: podium na TV, telefon na końcu, grafiki wyniku i podium.
+ * (27.10), więc zwycięzca wyścigu może mieć ich mniej. Przy tych miejscach nie pokazujemy punktów (podium na TV,
+ * telefon na końcu, grafiki wyniku i podium); miejsce mówi numer stopnia.
  */
 export function miejsceZWyscigu(miejsce: number, finalistow: number | null | undefined): boolean {
   return !!finalistow && miejsce <= finalistow;
 }
-
-export const napisWyscigu = (miejsce: number) => `${miejsce}. w wyścigu do piwa`;

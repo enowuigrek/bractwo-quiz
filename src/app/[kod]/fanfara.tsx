@@ -121,12 +121,13 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
           </div>
           <h1 className="fanfara-tytul">{TYTULY[miejsce]}</h1>
           <p className="fanfara-opis">
-            {miejsce}. miejsce z {moj.liczba_graczy} ·{" "}
-            <strong>
-              {miejsceZWyscigu(miejsce, stan.finalisci?.length)
-                ? "w wyścigu do piwa"
-                : `${moj.punkty.toLocaleString("pl-PL")} pkt`}
-            </strong>
+            {miejsce}. miejsce z {moj.liczba_graczy}
+            {!miejsceZWyscigu(miejsce, stan.finalisci?.length) && (
+              <>
+                {" · "}
+                <strong>{moj.punkty.toLocaleString("pl-PL")} pkt</strong>
+              </>
+            )}
           </p>
         </div>
         {nagroda && (
