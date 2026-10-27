@@ -28,7 +28,7 @@ function siatka(n: number, k = kolumny(n)): CSSProperties {
 }
 
 /**
- * Czy gracz `j` z `n` stoi na dole swojej kolumny (siatka układa się kolumnami po `ceil(n / k)` wierszy): tam bez kreski
+ * Czy gracz `j` z `n` stoi na dole swojej kolumny (siatka idzie kolumnami po `ceil(n / k)` wierszy): tam bez kreski
  * pod spodem, bo niczego już nie oddziela (27.10: w dwóch kolumnach kreska zostawała pod ostatnim z pierwszej).
  */
 const naDoleKolumny = (j: number, n: number, k: number) => (j + 1) % Math.ceil(n / k) === 0 || j === n - 1;
@@ -71,10 +71,12 @@ function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null })
     );
   }
   const wybrane = z.typ === "wielokrotny" ? (o.dane.odpowiedzi ?? []) : null;
+  const dobre = Array.isArray(z.dane.poprawna) ? z.dane.poprawna : [];
   return (
     <>
+      {/* kilka dobrych: trafione litery na zielono, błędne na czerwono (27.10: inaczej nie było widać, co było źle) */}
       {wybrane?.map((j) => (
-        <span key={j} className="tv-odpowiedzi-litera">
+        <span key={j} className={`tv-odpowiedzi-litera ${dobre.includes(j) ? "trafiona" : "bledna"}`}>
           {LITERY[j]}
         </span>
       ))}
@@ -83,6 +85,46 @@ function Odpowiedz({ o, z }: { o: WierszOdpowiedzi; z: ZadanieWidoczne | null })
       )}
       {o.punkty ? <span className="tv-odpowiedzi-tekst">+{o.punkty}</span> : null}
     </>
+  );
+}
+
+/**
+ * Dobra odpowiedź nad ramkami przy kilku dobrych, kolejności i parach (27.10, Łukasz: prowadzący szybko przeklikuje
+ * wynik, a na liście graczy nie było widać, co było dobrze). Przy jednej dobrej niepotrzebna: jest w ramce „Dobrze”.
+ */
+function DobraOdpowiedz({ z }: { z: ZadanieWidoczne }) {
+  const p = z.dane.poprawna;
+  if (!Array.isArray(p) || jedenWybor(z.typ)) return null;
+  const czesci =
+    z.typ === "wielokrotny"
+      ? p.map((i) => (
+          <span key={i} className="tv-odpowiedzi-dobra-czesc">
+            <span className="tv-odpowiedzi-litera trafiona">{LITERY[i]}</span>
+            {z.dane.odpowiedzi?.[i]}
+          </span>
+        ))
+      : z.typ === "kolejnosc"
+        ? p.map((i, k) => (
+            <span key={i} className="tv-odpowiedzi-dobra-czesc">
+              <span className="tv-odpowiedzi-litera trafiona">{k + 1}</span>
+              {z.dane.elementy?.[i]}
+            </span>
+          ))
+        : z.typ === "pary"
+          ? (z.dane.lewe ?? []).map((l, i) => (
+              <span key={i} className="tv-odpowiedzi-dobra-czesc">
+                {l} – {z.dane.prawe?.[p[i]]}
+              </span>
+            ))
+          : null;
+  if (!czesci) return null;
+  return (
+    <p className="tv-odpowiedzi-dobra">
+      <span className="tv-odpowiedzi-dobra-etykieta">
+        {z.typ === "wielokrotny" ? "Dobre" : z.typ === "kolejnosc" ? "Kolejność" : "Pary"}
+      </span>
+      {czesci}
+    </p>
   );
 }
 
@@ -154,6 +196,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           <h1>{z?.tresc ?? "Odpowiedzi"}</h1>
           {z && <p className="tv-okazja">Pytanie {z.lp}</p>}
         </header>
+        {z && <DobraOdpowiedz z={z} />}
 
         <section className="tv-odpowiedzi-ramka dobrze">
           <p className="tv-odpowiedzi-etykieta">
