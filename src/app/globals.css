@@ -3237,6 +3237,18 @@ html:has(.kolumna) {
   font-weight: var(--w-regular);
 }
 
+/* godzina startu przed quizem (pilot.tsx): złota i pogrubiona, odliczanie obok */
+.pilot-licznik-start b {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
+.pilot-licznik-start + .pilot-licznik-info {
+  color: var(--piana);
+  font-weight: var(--w-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
 .pilot-licznik strong {
   line-height: 1;
   font-size: 1.6em;

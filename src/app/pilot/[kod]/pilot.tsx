@@ -225,15 +225,18 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
         : faza === "seria"
           ? ["Odpowiedzi w serii", String((stan.seria ?? []).reduce((s, g) => s + g.odpowiedzi, 0)), false]
           : faza === "poczekalnia"
-            ? ["Graczy w poczekalni", String(stan.liczba_graczy), false]
+            ? // co teraz widać na TV: zapowiedź z godziną czy już poczekalnia z QR (27.10)
+              [
+                stan.poczekalnia_otwarta ? "Poczekalnia z QR · graczy" : "Na TV zapowiedź · graczy",
+                String(stan.liczba_graczy),
+                false,
+              ]
             : ["Graczy w grze", String(stan.w_grze), false];
   // po prawej w drugim wierszu ramki krótko, co się dzieje z czasem (26.10, Łukasz: zamiast osobnych ramek
   // z informacjami, przez które skakały przyciski); rodzaj następnego pytania ma pierwszeństwo
   const sekundDo = (iso: string | null) => (iso ? Math.max(0, Math.ceil((Date.parse(iso) - teraz) / 1000)) : null);
   const infoStanu =
-    faza === "poczekalnia" && startZapowiedzi && doZapowiedzi !== null
-      ? `Start ${kiedyStart(startZapowiedzi)} · ${opisOdliczania(doZapowiedzi)}`
-      : faza === "wstep" && klasyczny && stan.faza_do
+    faza === "wstep" && klasyczny && stan.faza_do
         ? `Start za ${sekundDo(stan.faza_do)} s`
         : faza === "przygotuj"
           ? `Start za ${sekundaOdliczania(doStartu)} s`
@@ -274,16 +277,26 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
         </span>
         <strong>{wartoscLicznika}</strong>
       </p>
-      <p className="pilot-licznik-postep">
-        <span>{postep}</span>
-        {nastepnyRodzaj ? (
-          <span className={`rodzaj-pytania ${nastepnyRodzaj}`} title="Następne pytanie">
-            {NAZWY_TYPOW[nastepnyRodzaj]}
+      {/* przed startem z godziną: wyraźnie, kiedy start i ile zostało, zamiast liczby pytań i rodzaju (27.10) */}
+      {startZapowiedzi && doZapowiedzi !== null ? (
+        <p className="pilot-licznik-postep">
+          <span className="pilot-licznik-start">
+            Start <b>{kiedyStart(startZapowiedzi)}</b>
           </span>
-        ) : (
-          infoStanu && <span className="pilot-licznik-info">{infoStanu}</span>
-        )}
-      </p>
+          <span className="pilot-licznik-info">{opisOdliczania(doZapowiedzi)}</span>
+        </p>
+      ) : (
+        <p className="pilot-licznik-postep">
+          <span>{postep}</span>
+          {nastepnyRodzaj ? (
+            <span className={`rodzaj-pytania ${nastepnyRodzaj}`} title="Następne pytanie">
+              {NAZWY_TYPOW[nastepnyRodzaj]}
+            </span>
+          ) : (
+            infoStanu && <span className="pilot-licznik-info">{infoStanu}</span>
+          )}
+        </p>
+      )}
     </div>
   );
 

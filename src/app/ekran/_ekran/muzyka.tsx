@@ -110,8 +110,10 @@ function utworFazy(stan: StanMuzyki): Utwor | null {
   if (klasyczny) return null;
   switch (stan.faza) {
     case "poczekalnia":
-    case "wstep":
       return "poczekalnia";
+    // plansza wstępu (droga etapów): cisza na tłumaczenie zasad (27.10, Łukasz), muzyka wraca z 1. etapem
+    case "wstep":
+      return null;
     case "seria":
     case "pijany":
       return "final";
