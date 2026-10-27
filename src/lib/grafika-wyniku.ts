@@ -5,6 +5,7 @@
 // Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru.
 
 import { adresZdjecia, kolorNicku, kolorZAdresu, przesun, ZLOTY_KAPSEL } from "./kapsel";
+import { napisWyscigu } from "./gra/final";
 
 export type LogoNaGrafice = { nazwa: string; logo_url: string | null } | null;
 
@@ -24,11 +25,13 @@ export type DaneWyniku = Wspolne & {
   zdjecie: string | null;
   miejsce: number;
   liczbaGraczy: number;
-  punkty: number;
+  /** null: miejsce z wyścigu finału (finał bez punktów), zamiast punktów „w wyścigu do piwa”. */
+  punkty: number | null;
 };
 
 export type DanePodium = Wspolne & {
-  podium: { nick: string; zdjecie: string | null; miejsce: number; punkty: number }[];
+  /** `punkty` null: miejsce z wyścigu finału, zamiast punktów „1. w wyścigu do piwa”. */
+  podium: { nick: string; zdjecie: string | null; miejsce: number; punkty: number | null }[];
 };
 
 const ZLOTO = "#e3ac3f";
@@ -228,9 +231,10 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
   const podium = d.miejsce <= 3;
   tekst(ctx, podium ? TYTULY[d.miejsce] : `${d.miejsce}. miejsce`, S / 2, 1270, 110, podium ? (METALE[d.miejsce]?.[1] ?? ZLOTO) : PIANA);
   tekst(ctx, d.nick, S / 2, 1380, 72, PIANA, 800, S - 120);
+  const wynik = d.punkty === null ? "w wyścigu do piwa" : `${d.punkty.toLocaleString("pl-PL")} pkt`;
   tekst(
     ctx,
-    `${d.miejsce}. miejsce z ${d.liczbaGraczy} · ${d.punkty.toLocaleString("pl-PL")} pkt`,
+    `${d.miejsce}. miejsce z ${d.liczbaGraczy} · ${wynik}`,
     S / 2,
     1460,
     42,
@@ -284,7 +288,8 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
     ctx.fillRect(p.x - SZER_STOPNIA / 2, gora, SZER_STOPNIA, p.wys);
     tekst(ctx, String(g.miejsce), p.x, gora + Math.min(p.wys - 30, 130), 110, "rgba(0, 0, 0, 0.55)", 800);
 
-    tekst(ctx, `${g.punkty.toLocaleString("pl-PL")} pkt`, p.x, gora - 30, 32, SZARY, 600);
+    const wynik = g.punkty === null ? napisWyscigu(g.miejsce) : `${g.punkty.toLocaleString("pl-PL")} pkt`;
+    tekst(ctx, wynik, p.x, gora - 30, 32, SZARY, 600);
     tekst(ctx, g.nick, p.x, gora - 76, p.i === 0 ? 52 : 42, metal, 800, SZER_STOPNIA + 20);
     await rysujAwatar(ctx, g, p.x, gora - 160 - p.r, p.r);
   }

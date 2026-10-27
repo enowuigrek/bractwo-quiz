@@ -83,6 +83,8 @@ export type Sesja = {
   browar_instagram: string | null;
   /** Zapowiedź: planowana godzina startu i czy poczekalnia (QR, dołączanie) jest już otwarta. */
   planowany_start: string | null;
+  /** Finaliści (id graczy), od wyboru trójki do końca gry; null bez finału. */
+  finalisci: string[] | null;
   poczekalnia_otwarta: boolean;
   /** Automatyczne prowadzenie (kreator albo pilot, src/lib/gra/auto.ts). */
   auto: boolean;

@@ -94,7 +94,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     klucz: "jeszcze-zdaze",
     nazwa: "Jeszcze zdążę",
     opis:
-      "Trzej najlepsi ścigają się do piwa: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Lider ma kilka kroków przewagi. Kto pierwszy dobiegnie, wygrywa.",
+      "Punkty z etapów zamieniły się na pozycję startową: lider ma kilka kroków przewagi. Teraz liczy się już tylko wyścig do piwa: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Kto pierwszy dobiegnie, wygrywa.",
     mnoznik: 2,
     czas_s: 180,
     finalowy: true,

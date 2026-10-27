@@ -9,6 +9,7 @@ import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { zagraj } from "@/lib/gra/efekty";
 import { NA_STRONIE_RANKINGU, STRONA_RANKINGU_S, stronyRankingu } from "@/lib/gra/wyscig";
+import { miejsceZWyscigu, napisWyscigu } from "@/lib/gra/final";
 
 /**
  * Która strona rankingu stoi teraz na TV (po `NA_STRONIE_RANKINGU` graczy): co `STRONA_RANKINGU_S` następna, na
@@ -183,9 +184,12 @@ export function PodiumTv({
   konfetti = true,
   start,
   nagrody,
+  finalistow,
 }: {
   ranking: WierszRankingu[];
   odRazu: boolean;
+  /** Ilu było finalistów: ich miejsca ustalił wyścig, więc zamiast punktów miejsce w wyścigu. */
+  finalistow?: number | null;
   /** false: bez konfetti (kolejne pokazy podium na zmianę z tabelą na końcu gry) */
   konfetti?: boolean;
   start: number | null;
@@ -241,7 +245,11 @@ export function PodiumTv({
               <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={i === 0 ? 170 : 130} className="tv-stopien-awatar" />
               {i === 0 && <span className="tv-stopien-korona">Zwycięzca</span>}
               <span className="tv-stopien-nick">{w.nick}</span>
-              <span className="tv-stopien-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
+              <span className="tv-stopien-punkty">
+                {miejsceZWyscigu(w.miejsce, finalistow)
+                  ? napisWyscigu(w.miejsce)
+                  : `${w.punkty.toLocaleString("pl-PL")} pkt`}
+              </span>
               {/* bez zdjęcia nagrody (26.10): wypychało zwycięzcę za górną krawędź ekranu; zdjęcie jest na telefonie */}
               {nagroda && <span className="tv-stopien-nagroda">{nagroda.nagroda}</span>}
               <div className="tv-stopien-blok">

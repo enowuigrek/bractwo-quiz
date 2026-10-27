@@ -12,6 +12,7 @@ import { IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { wynikiGry, zadaniaGry } from "../wyniki";
+import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { TabelaWynikow } from "./tabela-wynikow";
@@ -274,7 +275,13 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
                 podium: wyniki
                   .filter((w) => w.miejsce <= 3 && w.punkty > 0)
                   .slice(0, 3)
-                  .map((w) => ({ nick: w.nick, zdjecie: w.zdjecie, miejsce: w.miejsce, punkty: w.punkty })),
+                  .map((w) => ({
+                    nick: w.nick,
+                    zdjecie: w.zdjecie,
+                    miejsce: w.miejsce,
+                    // miejsca finalistów ustalił wyścig, nie punkty (finał bez punktów, 27.10)
+                    punkty: miejsceZWyscigu(w.miejsce, gra.finalisci?.length) ? null : w.punkty,
+                  })),
               }}
               konta={[gra.lokale?.instagram ?? null, gra.browar_instagram]}
             />

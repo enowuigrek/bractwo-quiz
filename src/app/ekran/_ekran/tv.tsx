@@ -778,6 +778,7 @@ function Koniec({
           // początek podium w zegarze tego urządzenia: TV i telefony odsłaniają miejsca razem
           start={stan.faza_od ? Date.parse(stan.faza_od) - przesuniecie : null}
           nagrody={stan.nagrody}
+          finalistow={stan.finalisci?.length}
         />
       ) : (
         <div className="tv-srodek">

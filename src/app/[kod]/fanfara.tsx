@@ -12,6 +12,7 @@ import { Werble } from "@/components/werble";
 import { Miejsce } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
 import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
+import { miejsceZWyscigu } from "@/lib/gra/final";
 import { IkonaMegafon } from "@/components/ikony";
 import { adresZdjecia } from "@/lib/kapsel";
 
@@ -81,7 +82,8 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
         zdjecie,
         miejsce: moj.miejsce,
         liczbaGraczy: moj.liczba_graczy,
-        punkty: moj.punkty,
+        // miejsca finalistów ustalił wyścig, nie punkty (finał bez punktów, 27.10)
+        punkty: miejsceZWyscigu(moj.miejsce, stan.finalisci?.length) ? null : moj.punkty,
       }}
       konta={[stan.lokal?.instagram, stan.browar?.instagram]}
     />
@@ -119,7 +121,12 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
           </div>
           <h1 className="fanfara-tytul">{TYTULY[miejsce]}</h1>
           <p className="fanfara-opis">
-            {miejsce}. miejsce z {moj.liczba_graczy} · <strong>{moj.punkty.toLocaleString("pl-PL")} pkt</strong>
+            {miejsce}. miejsce z {moj.liczba_graczy} ·{" "}
+            <strong>
+              {miejsceZWyscigu(miejsce, stan.finalisci?.length)
+                ? "w wyścigu do piwa"
+                : `${moj.punkty.toLocaleString("pl-PL")} pkt`}
+            </strong>
           </p>
         </div>
         {nagroda && (
