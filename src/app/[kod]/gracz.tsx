@@ -17,9 +17,8 @@ import {
 import { najblizszeOdciecie } from "@/lib/gra/odpadanie";
 import type { Dolaczenie, GraczNaLiscie, MojWynik, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
-import { usunZdjecie, wyslijZdjecie, ustawKolorKapsla } from "@/lib/zdjecie";
-import { kolorZAdresu } from "@/lib/kapsel";
-import { kiedyStart } from "@/lib/gra/zapowiedz";
+import { wyslijZdjecie, ustawKolorKapsla } from "@/lib/zdjecie";
+import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { useKolejnaPodpowiedz } from "@/lib/gra/dodatki";
 import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
 import { EtapGracza } from "./etap";
@@ -395,24 +394,16 @@ function WGrze({
       <>
         <p className="nadtytul">Jesteś w grze</p>
         <h1 style={{ color: "var(--zloto)", overflowWrap: "anywhere" }}>{ja.nick}</h1>
-        <ZdjecieGracza
-          nick={ja.nick}
-          zdjecie={gracze.find((g) => g.nick === ja.nick)?.zdjecie ?? null}
-          onWybrano={async (blob) => {
-            // wybrany wcześniej kolor kapsla zostaje przy nowym zdjęciu
-            await wyslijZdjecie(ja.token, blob, kolorZAdresu(gracze.find((g) => g.nick === ja.nick)?.zdjecie));
-            await odswiez();
-          }}
-          onUsun={async () => {
-            await usunZdjecie({ token: ja.token });
-            await odswiez();
-          }}
-          onKolor={async (k) => {
-            await ustawKolorKapsla(ja.token, k);
-            await odswiez();
-          }}
-        />
-        <p>Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
+        {/* po dołączeniu kapsel jest zatwierdzony (27.10, Łukasz: bez poprawiania koloru i zdjęcia, żeby nie
+            przeciągać), a zamiast tego godzina startu z odliczaniem, np. żeby zdążyć po piwo */}
+        <div className="poczekalnia-kapsel">
+          <Awatar nick={ja.nick} zdjecie={gracze.find((g) => g.nick === ja.nick)?.zdjecie ?? null} rozmiar={88} />
+        </div>
+        {stan.planowany_start ? (
+          <StartWPoczekalni start={stan.planowany_start} przesuniecie={przesuniecie} />
+        ) : (
+          <p>Pytania pojawią się tutaj, gdy prowadzący wystartuje quiz.</p>
+        )}
         <section style={{ marginTop: "var(--section-gap)" }}>
           <p className="etykieta">
             {stan.tryb === "druzyny" ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
@@ -577,5 +568,18 @@ function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSe
         konta={[stan.lokal?.instagram, stan.browar?.instagram]}
       />
     </>
+  );
+}
+
+/** Poczekalnia po dołączeniu: kiedy start i ile zostało (po czasie „Zaraz zaczynamy!”). */
+function StartWPoczekalni({ start, przesuniecie }: { start: string; przesuniecie: number }) {
+  const doStartu = useDoStartu(start, przesuniecie);
+  return (
+    <p className="poczekalnia-start">
+      <span>
+        Start <strong>{kiedyStart(start)}</strong>
+      </span>
+      {doStartu !== null && <span className="poczekalnia-odliczanie">{opisOdliczania(doStartu)}</span>}
+    </p>
   );
 }

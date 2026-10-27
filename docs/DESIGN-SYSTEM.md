@@ -126,6 +126,8 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Boty do testów (pilot).** Karta „Boty do testów” tylko dla głównego admina, w poczekalni (także zamkniętej). Lokale jej nie widzą.
 
+**Poczekalnia na telefonie po dołączeniu (27.10).** Kapsel gracza (88 px) już bez zmiany koloru i zdjęcia: wybiera się je tylko przy dołączaniu. Pod kapslem „Start o 19:00” i duże odliczanie (`opisOdliczania`, po czasie „Zaraz zaczynamy!”), gdy gra ma godzinę startu; bez niej jedno zdanie, że pytania pojawią się po starcie. Niżej lista graczy.
+
 **Nagłówek telefonu (Quiz).** Sam znak Quizu, bez kodu gry (od 24.10): kod jest wewnętrzny, gracz wchodzi z QR. Kod zostaje tam, gdzie jest potrzebny: na TV pod QR („Bez skanowania”), w pilocie, w panelu i na karcie nagrody jako dowód dla obsługi.
 
 **Koniec gry na telefonie (Quiz).** Jeden złoty przycisk „Pobierz grafikę na pamiątkę” na całą szerokość, napis w jednym wierszu (grafika 1080×1920), pod nim konta do oznaczenia z „Kopiuj”. Bez osobnego „Udostępnij wynik” (od 24.10), ale przycisk otwiera systemowe udostępnianie: na iPhonie tylko tak obraz trafia do Zdjęć („Zapisz obraz”), zwykłe pobranie ląduje w Plikach. Na komputerze pobiera plik.

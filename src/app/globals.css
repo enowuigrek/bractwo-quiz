@@ -2011,6 +2011,34 @@ html:has(.kolumna) {
   gap: 12px;
 }
 
+/* Poczekalnia gracza po dołączeniu (gracz.tsx): sam kapsel (już bez zmiany koloru i zdjęcia) i godzina startu
+   z odliczaniem pod nim */
+.poczekalnia-kapsel {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.poczekalnia-start {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-body);
+}
+
+.poczekalnia-start strong {
+  color: var(--zloto);
+}
+
+.poczekalnia-odliczanie {
+  font-size: 2rem;
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+  color: var(--piana);
+}
+
 /* Wycinek rankingu na telefonie (moj-ranking.tsx): pięć wierszy, Twój wyróżniony */
 /* okno wycinka: po pół wiersza sąsiadów nad i pod, wygaszone, gdy lista ciągnie się dalej */
 .moj-ranking-okno {
