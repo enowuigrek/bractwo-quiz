@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 // Zapowiedź quizu: godzina startu i odliczanie (ekran lokalu, TV gry, pilot).
-// O tej godzinie otwiera się poczekalnia, a start klika prowadzący (albo automat 5 minut później,
-// src/lib/gra/auto.ts), więc po czasie odliczanie pokazuje tylko „Zaraz zaczynamy!”.
+// Start klika prowadzący (albo automat 5 minut po otwarciu poczekalni, src/lib/gra/auto.ts), więc po czasie
+// odliczanie pokazuje tylko „Zaraz zaczynamy!”.
 
 /** Zapowiedziana gra w lokalu (z `ekran_lokalu`). */
 export type Zapowiedz = {

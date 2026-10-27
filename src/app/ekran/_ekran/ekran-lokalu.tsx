@@ -7,6 +7,7 @@ import { przesuniecieZegara, useNasluchTematu } from "@/lib/gra/nasluch";
 import { useNowaWersja } from "@/lib/ekran-tv";
 import { wczytajEfekty, wznowEfekty, zagraj } from "@/lib/gra/efekty";
 import type { Zapowiedz } from "@/lib/gra/zapowiedz";
+import { NA_ZAPISY_MIN } from "@/lib/gra/auto";
 import { MuzykaTv } from "./muzyka";
 import { Plansze, type OstatniQuiz } from "./plansze";
 import { Scena, Tv } from "./tv";
@@ -51,7 +52,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   // starsza przeglądarka telewizora: prosta plansza zamiast przewijanych plansz (src/lib/gra/prosty.ts)
   const prosty = useTrybProsty();
 
-  // zapowiedź z automatem: o godzinie z kreatora ekran sam otwiera poczekalnię (baza sprawdza godzinę i automat),
+  // zapowiedź z automatem: chwilę przed godziną startu ekran sam otwiera poczekalnię (baza sprawdza godzinę i automat),
   // a zdarzenie `gra` z bazy przełącza go na grę z QR
   const otwieraSama = !!zapowiedz?.auto && !!zapowiedz.planowany_start;
   const startZapowiedzi = zapowiedz?.planowany_start ? Date.parse(zapowiedz.planowany_start) : 0;
@@ -63,7 +64,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   useEffect(() => {
     if (!otwieraSama) return;
     const zegar = setInterval(() => {
-      if (Date.now() + przesuniecieRef.current < startZapowiedzi) return;
+      if (Date.now() + przesuniecieRef.current < startZapowiedzi - NA_ZAPISY_MIN * 60_000) return;
       void supabase()
         .rpc("otworz_zaplanowane", { p_adres: adres })
         .then(({ data }) => {
