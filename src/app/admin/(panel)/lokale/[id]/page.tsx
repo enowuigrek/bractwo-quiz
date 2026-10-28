@@ -40,42 +40,38 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
     <main>
       <p className="okruchy">{glowny ? <Link href="/admin/lokale">← Lokale</Link> : "Mój lokal"}</p>
       <h1>{lokal.nazwa}</h1>
-      {/* dwie kolumny kart, każda ułożona osobno: hasło stoi zaraz pod ekranem, bez dziury obok długiego formularza
-          (26.10) */}
-      <div className="uklad-dwa">
-        <div className="stos-kart">
-          <section className="karta">
-            <FormularzLokalu lokal={lokal} miasta={miasta} ograniczony={!glowny} />
-          </section>
-          <section className="karta">
-            <h2>Panel lokalu</h2>
-            <p className="pomocniczy" style={{ marginTop: 0 }}>
-              {glowny
-                ? ma
-                  ? "Lokal loguje się do swojego panelu pod tym adresem i swoim hasłem. Widzi tylko swoje gry i quizy, a Twoje quizy bez kłódki może uruchamiać, bez zmieniania."
-                  : "Lokal nie ma jeszcze hasła, więc nie zaloguje się do swojego panelu. Ustaw mu hasło na start; potem sam je zmieni."
-                : "Pod tym adresem logujesz się do panelu. Po zmianie hasła inne urządzenia trzeba zalogować od nowa."}
-            </p>
-            <LinkDoSkopiowania url={panel} />
-          </section>
-        </div>
-        <div className="stos-kart">
-          <section className="karta">
-            <h2>Ekran lokalu</h2>
-            <p className="pomocniczy" style={{ marginTop: 0 }}>
-              Otwórz ten adres na TV w lokalu i zapisz w zakładkach. Gdy nie ma gry, ekran pokazuje plansze Bractwa, a gdy
-              uruchomisz grę w tym lokalu, sam przełączy się na nią. Kod QR pomaga przenieść adres z telefonu na TV.
-            </p>
-            <div className="qr" dangerouslySetInnerHTML={{ __html: qrEkranu }} />
-            <div style={{ marginTop: 14 }}>
-              <LinkDoSkopiowania url={ekran} />
-            </div>
-          </section>
-          <section className="karta">
-            <h2>Hasło panelu</h2>
-            <FormularzHasla lokalId={lokal.id} ma={ma} />
-          </section>
-        </div>
+      {/* dwie kolumny kart w dwóch rzędach: karty w jednym rzędzie mają tę samą wysokość (28.10, Łukasz: dane lokalu
+          i ekran lokalu równe), na telefonie jedna pod drugą */}
+      <div className="uklad-dwa uklad-rzedy">
+        <section className="karta">
+          <FormularzLokalu lokal={lokal} miasta={miasta} ograniczony={!glowny} />
+        </section>
+        <section className="karta">
+          <h2>Ekran lokalu</h2>
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            Otwórz ten adres na TV w lokalu i zapisz w zakładkach. Gdy nie ma gry, ekran pokazuje plansze Bractwa, a gdy
+            uruchomisz grę w tym lokalu, sam przełączy się na nią. Kod QR pomaga przenieść adres z telefonu na TV.
+          </p>
+          <div className="qr" dangerouslySetInnerHTML={{ __html: qrEkranu }} />
+          <div style={{ marginTop: 14 }}>
+            <LinkDoSkopiowania url={ekran} />
+          </div>
+        </section>
+        <section className="karta">
+          <h2>Panel lokalu</h2>
+          <p className="pomocniczy" style={{ marginTop: 0 }}>
+            {glowny
+              ? ma
+                ? "Lokal loguje się do swojego panelu pod tym adresem i swoim hasłem. Widzi tylko swoje gry i quizy, a Twoje quizy bez kłódki może uruchamiać, bez zmieniania."
+                : "Lokal nie ma jeszcze hasła, więc nie zaloguje się do swojego panelu. Ustaw mu hasło na start; potem sam je zmieni."
+              : "Pod tym adresem logujesz się do panelu. Po zmianie hasła inne urządzenia trzeba zalogować od nowa."}
+          </p>
+          <LinkDoSkopiowania url={panel} />
+        </section>
+        <section className="karta">
+          <h2>Hasło panelu</h2>
+          <FormularzHasla lokalId={lokal.id} ma={ma} />
+        </section>
       </div>
       {glowny && (
         <section className="panel-sekcja">

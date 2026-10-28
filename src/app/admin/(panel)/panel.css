@@ -157,6 +157,11 @@ span.panel-logo-lokalu {
     gap: 48px;
   }
 
+  /* karty w rzędach (strona lokalu): w jednym rzędzie ta sama wysokość */
+  .uklad-rzedy {
+    align-items: stretch;
+  }
+
   /* duże przyciski na desktopie nie zajmują całej szerokości */
   .panel .przycisk {
     display: inline-block;
