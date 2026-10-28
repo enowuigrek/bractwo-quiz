@@ -21,6 +21,7 @@ import { WklejPytania } from "./wklej";
 import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
+import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
 
@@ -97,25 +98,35 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     );
   }
 
+  // klasyczny quiz (bez etapów): nowe pytanie ma rodzaj ostatniego pytania
+  const ostatniTyp = lista.filter((z) => z.typ !== "ciekawostka").at(-1)?.typ;
+
+  // pytania edytuje się rozwinięte na liście (28.10), nie na osobnej stronie
   const wiersz = (z: Zadanie) => {
     const i = lista.indexOf(z);
     return (
-      <li key={z.id}>
-        <span className="krok-nr" style={{ minWidth: "1.6em" }}>
-          {i + 1}.
-        </span>
-        {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
-        <div className="lista-glowna">
-          <div className="lista-tytul">
-            <Link href={`/admin/quizy/${quiz.id}/zadania/${z.id}`}>{z.tresc}</Link>
-          </div>
-          <div className="lista-opis">
-            {NAZWY_TYPOW[z.typ]} · {opisRozwiazania(z)}
-            {z.dane.podpowiedzi?.length ? ` · podpowiedzi: ${z.dane.podpowiedzi.length}` : ""}
-            {z.dane.odslaniaj ? " · odsłaniana grafika" : ""}
-          </div>
-        </div>
-        <div className="lista-akcje">
+      <ZadanieNaLiscie
+        key={z.id}
+        id={z.id}
+        edytor={{ quizId: quiz.id, zadanie: z, etapy, domyslnyEtap: z.etap_id }}
+        naglowek={
+          <>
+            <span className="krok-nr" style={{ minWidth: "1.6em" }}>
+              {i + 1}.
+            </span>
+            {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
+            <div className="lista-glowna">
+              <div className="lista-tytul">{z.tresc}</div>
+              <div className="lista-opis">
+                <span className={`rodzaj-pytania ${z.typ}`}>{NAZWY_TYPOW[z.typ]}</span> {opisRozwiazania(z)}
+                {z.dane.podpowiedzi?.length ? ` · podpowiedzi: ${z.dane.podpowiedzi.length}` : ""}
+                {z.dane.odslaniaj ? " · odsłaniana grafika" : ""}
+              </div>
+            </div>
+          </>
+        }
+        akcje={
+          <>
           <form action={przesunZadanie.bind(null, quiz.id, z.id, "gora")}>
             <button className="przycisk-maly ikona" disabled={i === 0} aria-label="Przesuń wyżej" data-podpis="Wyżej">
               ↑
@@ -139,8 +150,9 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
           >
             <IkonaKosz />
           </PrzyciskPotwierdz>
-        </div>
-      </li>
+          </>
+        }
+      />
     );
   };
 
@@ -249,25 +261,37 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
               <ol className="etap-brakujace">
                 {Array.from({ length: Math.max(0, (etap.plan_pytan ?? 0) - wEtapie.length) }, (_, i) => (
                   <li key={i}>
-                    <Link href={`/admin/quizy/${quiz.id}/zadania/nowe?etap=${etap.id}`}>
-                      + pytanie {wEtapie.length + i + 1} z {etap.plan_pytan}
-                    </Link>
+                    <NowePytanie
+                      napis={`+ pytanie ${wEtapie.length + i + 1} z ${etap.plan_pytan}`}
+                      edytor={{ quizId: quiz.id, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
+                    />
                   </li>
                 ))}
                 {(etap.plan_pytan ?? 0) <= wEtapie.length && (
                   <li className="etap-brakujace-dodaj">
-                    <Link href={`/admin/quizy/${quiz.id}/zadania/nowe?etap=${etap.id}`}>+ pytanie w tym etapie</Link>
+                    <NowePytanie
+                      napis="+ pytanie w tym etapie"
+                      edytor={{ quizId: quiz.id, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
+                    />
                   </li>
                 )}
               </ol>
             )}
           </div>
         ))}
-        <p style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 12 }}>
-          <Link href={`/admin/quizy/${quiz.id}/zadania/nowe`} className="przycisk">
-            + Dodaj pytanie
-          </Link>
-        </p>
+        {/* quiz z etapami dodaje pytania w etapach (wyżej), a ten przycisk dopisuje do ostatniego */}
+        <div style={{ marginTop: 16 }}>
+          <NowePytanie
+            napis="+ Dodaj pytanie"
+            className="nowe-pytanie-przycisk"
+            edytor={{
+              quizId: quiz.id,
+              etapy,
+              domyslnyEtap: etapy.at(-1)?.id ?? null,
+              domyslnyTyp: etapy.at(-1)?.typ_domyslny ?? ostatniTyp,
+            }}
+          />
+        </div>
         {/* klasyczny pub quiz (bez etapów) zostaje bez etapów, a turniej ma etapy z szablonu */}
         {etapy.length > 0 && (
           <div style={{ marginTop: 12 }}>

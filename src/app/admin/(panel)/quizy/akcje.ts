@@ -379,6 +379,11 @@ export async function zapiszZadanie(
   // pytanie trafia na swoje miejsce w etapie (nowe na koniec etapu)
   await uporzadkuj(quizId);
 
+  // edytor rozwinięty na liście pytań: zostajemy na liście, a ona się odświeża
+  if (dane.get("na_liscie")) {
+    refresh();
+    return { ok: zadanieId ? "Zapisano." : "Dodano." };
+  }
   // „Zapisz i dodaj następne”: od razu kolejne pytanie w tym samym etapie
   if (dane.get("dalej")) redirect(`/admin/quizy/${quizId}/zadania/nowe${etapId ? `?etap=${etapId}` : ""}`);
   redirect(`/admin/quizy/${quizId}`);

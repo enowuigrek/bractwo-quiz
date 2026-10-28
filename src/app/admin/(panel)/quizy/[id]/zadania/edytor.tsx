@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { napisMnoznika } from "@/lib/etapy";
 import type { Etap, StanFormularza, Zadanie } from "@/lib/typy";
 import { LITERY, NAZWY_TYPOW, PRAWDA_FALSZ, TYPY_ZADAN, liczbaZJednostka, type TypZadania } from "@/lib/zadania";
@@ -18,6 +18,10 @@ type Props = {
   domyslnyEtap: string | null;
   /** Rodzaj nowego pytania (z etapu, do którego jest dodawane). */
   domyslnyTyp?: TypZadania;
+  /** Edytor rozwinięty na liście pytań (28.10): zapis zostaje na liście, bez przejścia na inną stronę. */
+  naLiscie?: boolean;
+  onZapisano?: () => void;
+  onZwin?: () => void;
 };
 
 /** Wiersz edytora: `a` to odpowiedź / element / lewa strona pary, `b` prawa strona pary. */
@@ -92,11 +96,30 @@ function powtorzenia(teksty: string[]): Set<number> {
 }
 
 /** Edytor zadania: typ, pytanie i wiersze zależne od typu, jedna grafika. */
-export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTyp }: Props) {
+export function EdytorZadania({
+  quizId,
+  zadanie,
+  etapy,
+  domyslnyEtap,
+  domyslnyTyp,
+  naLiscie,
+  onZapisano,
+  onZwin,
+}: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(
     zapiszZadanie.bind(null, quizId, zadanie?.id ?? null),
     {},
   );
+  // kilka edytorów naraz na liście pytań: identyfikatory pól muszą się różnić
+  const uid = useId();
+  // na liście udany zapis zwija edytor (każdy zapis daje nowy obiekt stanu)
+  const poZapisie = useRef(onZapisano);
+  useEffect(() => {
+    poZapisie.current = onZapisano;
+  });
+  useEffect(() => {
+    if (stan.ok) poZapisie.current?.();
+  }, [stan]);
 
   const start = poczatek(zadanie);
   const [typ, setTyp] = useState<TypZadania>(zadanie?.typ ?? domyslnyTyp ?? "wybor");
@@ -195,11 +218,12 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
     <form {...bezResetu(akcja)} className="formularz">
       <input type="hidden" name="typ" value={typ} />
       <input type="hidden" name="dane" value={JSON.stringify(dane)} />
+      {naLiscie && <input type="hidden" name="na_liscie" value="1" />}
 
       {etapy.length > 0 && (
         <div>
-          <label htmlFor="etap_id">Etap</label>
-          <select id="etap_id" name="etap_id" className="pole" defaultValue={zadanie?.etap_id ?? domyslnyEtap ?? ""}>
+          <label htmlFor={`${uid}-etap`}>Etap</label>
+          <select id={`${uid}-etap`} name="etap_id" className="pole" defaultValue={zadanie?.etap_id ?? domyslnyEtap ?? ""}>
             {etapy.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.nr}. {e.nazwa} ({napisMnoznika(e.mnoznik)}
@@ -213,10 +237,11 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
 
       <fieldset>
         <legend>Rodzaj pytania</legend>
-        <div className="wybor-czasu">
+        {/* kafelki w kolorach rodzajów (`.rodzaj-pytania`, jak w pilocie i na liście pytań), wybrany wypełniony */}
+        <div className="rodzaje-pytan">
           {/* klasyczny quiz (bez etapów) nie ma ciekawostek; istniejącą starą da się dalej edytować */}
           {TYPY_ZADAN.filter((t) => t !== "ciekawostka" || etapy.length > 0 || zadanie?.typ === "ciekawostka").map((t) => (
-            <label key={t} className={`wybor-czasu-opcja${typ === t ? " wybrana" : ""}`}>
+            <label key={t} className={`rodzaj-pytania ${t}${typ === t ? " wybrana" : ""}`}>
               <input type="radio" name="typ_wybor" value={t} checked={typ === t} onChange={() => zmienTyp(t)} />
               {NAZWY_TYPOW[t]}
             </label>
@@ -225,9 +250,9 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
       </fieldset>
 
       <div>
-        <label htmlFor="tresc">{typ === "ciekawostka" ? "Tytuł ciekawostki" : "Pytanie"}</label>
+        <label htmlFor={`${uid}-tresc`}>{typ === "ciekawostka" ? "Tytuł ciekawostki" : "Pytanie"}</label>
         <textarea
-          id="tresc"
+          id={`${uid}-tresc`}
           name="tresc"
           className="pole"
           defaultValue={zadanie?.tresc}
@@ -240,9 +265,9 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
 
       {typ === "ciekawostka" && (
         <div>
-          <label htmlFor="tekst-ciekawostki">{OPISY[typ]}</label>
+          <label htmlFor={`${uid}-ciekawostka`}>{OPISY[typ]}</label>
           <textarea
-            id="tekst-ciekawostki"
+            id={`${uid}-ciekawostka`}
             className="pole"
             value={tekst}
             onChange={(e) => setTekst(e.target.value)}
@@ -291,9 +316,9 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
               ] as const
             ).map(([pole, napis, przyklad]) => (
               <div key={pole}>
-                <label htmlFor={`l-${pole}`}>{napis}</label>
+                <label htmlFor={`${uid}-${pole}`}>{napis}</label>
                 <input
-                  id={`l-${pole}`}
+                  id={`${uid}-${pole}`}
                   className="pole"
                   inputMode={pole === "jednostka" ? "text" : "decimal"}
                   value={liczba[pole]}
@@ -482,10 +507,16 @@ export function EdytorZadania({ quizId, zadanie, etapy, domyslnyEtap, domyslnyTy
         <button type="submit" className="przycisk zloty" disabled={trwa}>
           {trwa ? "Zapisuję…" : zadanie ? "Zapisz pytanie" : "Dodaj pytanie"}
         </button>
-        {/* od razu kolejne pytanie w tym samym etapie, bez wracania do listy */}
-        <button type="submit" name="dalej" value="1" className="przycisk" disabled={trwa}>
-          {zadanie ? "Zapisz i dodaj nowe" : "Dodaj i następne"}
-        </button>
+        {naLiscie ? (
+          <button type="button" className="przycisk" onClick={onZwin} disabled={trwa}>
+            Zwiń
+          </button>
+        ) : (
+          // od razu kolejne pytanie w tym samym etapie, bez wracania do listy
+          <button type="submit" name="dalej" value="1" className="przycisk" disabled={trwa}>
+            {zadanie ? "Zapisz i dodaj nowe" : "Dodaj i następne"}
+          </button>
+        )}
       </div>
     </form>
   );

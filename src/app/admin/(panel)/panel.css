@@ -1073,6 +1073,153 @@ a.przycisk {
   border-bottom: 0 !important;
 }
 
+/* Pytania na liście quizu rozwijane do edycji w miejscu (28.10, quizy/[id]/zadanie-na-liscie.tsx): wiersz to
+   nagłówek `<details>` ze złotą strzałką, akcje (strzałki, kosz) obok niego, edytor pod spodem. Ostatnio zapisane
+   pytanie ma złoty pasek z lewej, żeby było widać, gdzie się skończyło. */
+.lista > li.zadanie-wiersz {
+  align-items: flex-start;
+  padding: 0;
+}
+
+.zadanie-wiersz > .lista-akcje {
+  padding-top: 11px;
+}
+
+.zadanie-wiersz.zapisane {
+  box-shadow: inset 4px 0 0 var(--zloto);
+  background: rgba(227, 172, 63, 0.06);
+}
+
+.zadanie-wiersz.zapisane summary {
+  padding-left: 12px;
+}
+
+.zadanie-rozwijane {
+  flex: 1;
+  min-width: 0;
+}
+
+.zadanie-rozwijane > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.zadanie-rozwijane > summary::-webkit-details-marker {
+  display: none;
+}
+
+.zadanie-rozwijane > summary::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin: 0 6px 0 auto;
+  border-right: 2.5px solid var(--zloto);
+  border-bottom: 2.5px solid var(--zloto);
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform 0.25s var(--ease-std);
+}
+
+.zadanie-rozwijane[open] > summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.zadanie-rozwijane > summary:hover .lista-tytul {
+  color: var(--zloto);
+}
+
+.zadanie-rozwijane .lista-opis .rodzaj-pytania {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 0 8px;
+}
+
+.zadanie-edytor {
+  margin: 0 0 16px;
+  padding: var(--card-pad, 20px);
+  border-radius: var(--r-card);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+}
+
+/* miejsca na nowe pytania w etapie: szary tekst jak link, edytor rozwija się pod nim */
+.nowe-pytanie > summary {
+  padding: 0;
+  color: var(--szary);
+  font-weight: var(--w-semibold);
+}
+
+.nowe-pytanie > summary:hover {
+  color: var(--zloto);
+}
+
+.nowe-pytanie > summary::after {
+  margin-left: 8px;
+}
+
+.etap-brakujace .nowe-pytanie .zadanie-edytor {
+  margin: 10px 0 4px -2.2em;
+}
+
+/* „+ Dodaj pytanie” pod listą wygląda jak przycisk */
+.nowe-pytanie-przycisk > summary {
+  display: inline-flex;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  background: var(--kamien2);
+  color: var(--piana);
+  font-weight: var(--w-black);
+}
+
+.nowe-pytanie-przycisk > summary:hover {
+  background: var(--kamien3);
+  color: var(--piana);
+}
+
+.nowe-pytanie-przycisk[open] > summary {
+  margin-bottom: 12px;
+}
+
+/* Rodzaj pytania w edytorze: kafelki w kolorach rodzajów, wybrany wypełniony swoim kolorem (DESIGN-SYSTEM.md) */
+.rodzaje-pytan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rodzaje-pytan .rodzaj-pytania {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 18px;
+  border-radius: var(--r-btn-sm);
+  font-size: var(--fs-small);
+  cursor: pointer;
+}
+
+.rodzaje-pytan .rodzaj-pytania.wybrana {
+  background: var(--kolor-rodzaju);
+  border-color: var(--kolor-rodzaju);
+  color: var(--na-zlocie);
+}
+
+.rodzaje-pytan input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rodzaje-pytan .rodzaj-pytania:has(input:focus-visible) {
+  outline: 3px solid var(--zloto);
+  outline-offset: 2px;
+}
+
 .edytor-przyciski {
   display: flex;
   flex-wrap: wrap;
