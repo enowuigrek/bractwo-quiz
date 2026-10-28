@@ -4039,3 +4039,16 @@ button.kafelek {
     opacity: 0.4;
   }
 }
+
+/* Liniowe ikony etapów (components/ikony-etapow.tsx): TV (plansze etapów) i panel (zasady wyścigu, 28.10) */
+.ikona-etapu {
+  display: inline-block;
+  aspect-ratio: 1;
+  color: var(--zloto);
+}
+
+.ikona-etapu svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

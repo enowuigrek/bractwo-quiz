@@ -84,26 +84,26 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         </p>
       )}
 
-      <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
-        {(["wyscig", "klasyczny"] as const).map((r) => (
-          <Link
-            key={r}
-            href={adres(r)}
-            className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
-            aria-current={rodzaj === r ? "page" : undefined}
-          >
-            {NAZWY_RODZAJOW[r]}
+      {/* zakładki rodzajów, a w tym samym rzędzie z prawej link do zasad wyścigu (28.10) */}
+      <div className="quizy-pasek">
+        <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
+          {(["wyscig", "klasyczny"] as const).map((r) => (
+            <Link
+              key={r}
+              href={adres(r)}
+              className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
+              aria-current={rodzaj === r ? "page" : undefined}
+            >
+              {NAZWY_RODZAJOW[r]}
+            </Link>
+          ))}
+        </nav>
+        {rodzaj === "wyscig" && (
+          <Link href="/admin/quizy/zasady" className="quizy-zasady">
+            Zasady i punktacja →
           </Link>
-        ))}
-      </nav>
-      {/* zasady i punktacja wyścigu w jednym miejscu (28.10) */}
-      {rodzaj === "wyscig" && (
-        <p className="quizy-zasady">
-          <Link href="/admin/quizy/zasady" className="przycisk-maly">
-            Zasady i punktacja
-          </Link>
-        </p>
-      )}
+        )}
+      </div>
       <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
       {tagi.length > 0 && (
         <p className="tagi quizy-tagi">

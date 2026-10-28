@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element -- małe ikony etapów z public/, bez optymalizacji next/image */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
@@ -8,6 +7,7 @@ import { oknoMs, przedzial } from "@/lib/gra/punktacja";
 import { CIEKAWOSTKA_PIJANA, CZAS_PIJANEGO_S } from "@/lib/pijany";
 import { NAZWY_TYPOW, type TypZadania } from "@/lib/zadania";
 import { IkonaPuchar } from "@/components/ikony";
+import { IkonaEtapu } from "@/components/ikony-etapow";
 
 export const metadata: Metadata = { title: "Zasady wyścigu po piwo · Bractwo Quiz" };
 
@@ -101,7 +101,11 @@ export default async function ZasadyWyscigu() {
           </li>
           {etapy.map((e, i) => (
             <li key={e.klucz} className={bezPunktow(e) ? "final" : undefined}>
-              {e.ikona ? <img src={e.ikona} alt="" /> : <span className="zasady-droga-nr">{i + 1}</span>}
+              {e.ikona ? (
+                <IkonaEtapu ikona={e.ikona} className="zasady-droga-ikona" />
+              ) : (
+                <span className="zasady-droga-nr">{i + 1}</span>
+              )}
               <strong>{e.nazwa}</strong>
               <span>
                 {bezPunktow(e) ? "finał trójki, wyścig" : `${e.pytania} pytań · ${napisMnoznika(e.mnoznik)}`}
@@ -166,7 +170,7 @@ export default async function ZasadyWyscigu() {
             return (
               <article key={e.klucz} className="zasady-etap">
                 <header>
-                  {e.ikona && <img src={e.ikona} alt="" />}
+                  {e.ikona && <IkonaEtapu ikona={e.ikona} className="zasady-etap-ikona" />}
                   <div>
                     <p className="zasady-etap-nr">Etap {i + 1}</p>
                     <h3>{e.nazwa}</h3>
@@ -383,7 +387,7 @@ function TorFinalu() {
               </span>
             ))}
           </div>
-          <img className="zasady-tor-piwo" src="/grafiki/etapy/jeszcze-zdaze.webp" alt="" />
+          <IkonaEtapu ikona="/grafiki/etapy/na-jedno.webp" className="zasady-tor-piwo" />
         </div>
       ))}
       <figcaption>Przykład startu: przewaga 2, 1 i 0 kroków, do piwa {META_FINALU}</figcaption>

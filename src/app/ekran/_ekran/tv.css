@@ -485,18 +485,6 @@
   object-fit: contain;
 }
 
-.ikona-etapu {
-  display: inline-block;
-  aspect-ratio: 1;
-  color: var(--zloto);
-}
-
-.ikona-etapu svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 /* plansza etapu: ikona przed blokiem „Etap X z Y” + nazwa (etap.tsx, 26.10) */
 .tv-etap-glowa {
   display: flex;

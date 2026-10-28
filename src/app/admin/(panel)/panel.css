@@ -1479,8 +1479,28 @@ button.tag:hover:not(.wybrany) {
 
 /* Zasady wyścigu po piwo (quizy/zasady, 28.10): przebieg jako droga z ikonami etapów, karty konkurencji z tabelami
    punktów, wykres szybkości, pasek udziału etapów i tor finału */
+/* rząd zakładek rodzajów z linkiem do zasad z prawej (na wąskim ekranie link schodzi pod zakładki) */
+.quizy-pasek {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 14px;
+}
+
+.quizy-pasek .quizy-rodzaje {
+  margin-bottom: 0;
+}
+
 .quizy-zasady {
-  margin: 12px 0 0;
+  color: var(--zloto);
+  font-weight: var(--w-semibold);
+  text-decoration: none;
+}
+
+.quizy-zasady:hover {
+  text-decoration: underline;
 }
 
 .zasady-wstep {
@@ -1526,7 +1546,7 @@ button.tag:hover:not(.wybrany) {
   border: 1.5px dashed #e88ac0;
 }
 
-.zasady-droga img,
+.zasady-droga-ikona,
 .zasady-droga-nr {
   width: 52px;
   height: 52px;
@@ -1646,11 +1666,10 @@ button.tag:hover:not(.wybrany) {
   align-items: center;
 }
 
-.zasady-etap header img {
+.zasady-etap-ikona {
   flex: none;
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
+  width: 64px;
+  height: 64px;
 }
 
 .zasady-etap h3 {
@@ -1671,6 +1690,17 @@ button.tag:hover:not(.wybrany) {
   flex-wrap: wrap;
   gap: 6px;
   margin: 0;
+}
+
+/* rodzaj pytania i znaczki w jednym rzędzie: ta sama wysokość, tekst na środku (28.10: znaczki stały krzywo) */
+.zasady-znaczki > * {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  margin: 0;
+  padding: 0 12px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
 .zasady-opis {
@@ -1794,7 +1824,6 @@ button.tag:hover:not(.wybrany) {
 }
 
 .zasady-tor-piwo {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
+  width: 26px;
+  height: 26px;
 }
