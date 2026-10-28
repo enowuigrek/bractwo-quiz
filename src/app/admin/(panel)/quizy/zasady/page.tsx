@@ -34,6 +34,12 @@ export default async function ZasadyWyscigu() {
   }));
   const punktowane = etapy.filter((e) => !bezPunktow(e));
   const final = etapy.find((e) => bezPunktow(e));
+  // odpadanie po etapach (jak `wewn.progi_domyslne`): 2 etapy przed finałem od 9 graczy, 3 przed finałem od 16
+  const iFinalu = etapy.findIndex((e) => bezPunktow(e));
+  const odpadanie: Record<number, string> = {
+    [iFinalu - 2]: "Odpadanie: od 9 graczy po tym etapie gra dalej 6 najlepszych.",
+    [iFinalu - 3]: "Odpadanie: od 16 graczy po tym etapie gra dalej połowa (co najmniej 8).",
+  };
   // za cały etap przy samych dobrych odpowiedziach: najwolniej i najszybciej
   const sumy = punktowane.map((e) => {
     const [od, do_] = przedzial(e.typy[0], 1, e.mnoznik);
@@ -159,6 +165,11 @@ export default async function ZasadyWyscigu() {
                   {(DODATKI[e.klucz] ?? []).map((z) => (
                     <li key={z}>{z}</li>
                   ))}
+                  {odpadanie[i] && (
+                    <li>
+                      <strong>{odpadanie[i]}</strong>
+                    </li>
+                  )}
                 </ul>
                 <table className="zasady-tabela">
                   <thead>

@@ -38,6 +38,17 @@ const BUJANIE_DROGI_DEG = { od: 0, do: 2.8 };
 const PIERWSZY_KROK_S = 4;
 /** Szansa na krok naprzód (reszta to krok w tył), w procentach. */
 const NAPRZOD_PROC = 58;
+/**
+ * Pozorowany wyścig nie przetasowuje stawki (28.10, Łukasz: ktoś mega ostatni tuż przed wybuchem, a potem wygrywa,
+ * raziło): każdy chodzi najwyżej o tyle kroków od miejsca z końca serii.
+ */
+const KROKOW_OD_STARTU = 1;
+/**
+ * Tyle sekund przed końcem fazy zawodnicy zbiegają się w jedną grupkę i pływają wokół siebie, żeby przed wybuchem
+ * nie było widać, kto prowadzi (wybuch `WYBUCH_PRZED_S` przed końcem). `ZBIEGANIE_S`: ile trwa zbieganie.
+ */
+const PLYWANIE_PRZED_KONCEM_S = 11;
+const ZBIEGANIE_S = 3;
 /** Jak szybko awatar dojeżdża do nowego położenia (na sekundę): płynnie, bez skoków. */
 const DOJAZD = 3;
 
@@ -56,11 +67,13 @@ function skrot(t: string): number {
 /**
  * Położenie gracza w pijanym finale (0..1): pijany finał udaje dalszy wyścig (26.10, Łukasz). Odpowiedzi dogrywki nie
  * trafiają do bazy, więc kroki są pseudolosowe z nicku i czasu, każdy w swoim rytmie; nikt nie dobiega do szklanki.
+ * Każdy chodzi najwyżej `KROKOW_OD_STARTU` kroków od miejsca z końca serii, więc kolejność prawie się nie zmienia.
  * `t`: sekundy od początku fazy, `koniecKrokow`: od tej sekundy (telefony gasną) nikt się już nie rusza.
  */
 function polozeniePijane(nick: string, start: number, t: number, koniecKrokow: number): number {
-  const min = 0.04;
-  const max = DROGA_PRZED_META;
+  // najwyżej `KROKOW_OD_STARTU` od miejsca z końca serii, i nigdy przy samej szklance ani za linią startu
+  const min = Math.max(0.04, start - KROKOW_OD_STARTU * KROK_FINALU);
+  const max = Math.min(DROGA_PRZED_META, start + KROKOW_OD_STARTU * KROK_FINALU);
   let p = start;
   const h = skrot(nick);
   const okres = 3 + (h % 21) / 10;
@@ -199,6 +212,13 @@ export function PijanyTv({
       });
       if (!wybuch) ostatnieKaty = katy;
       const zjazd = (i: number) => (ZJEZDZANIE.od + (ZJEZDZANIE.do - ZJEZDZANIE.od) * poziom) * (fale[i] ?? 0);
+      // przed wybuchem wszyscy zbiegają się do średniej i pływają wokół niej (każdy w swoim rytmie), żeby nie było
+      // widać, kto prowadzi; `zbieg` 0..1 przez `ZBIEGANIE_S`
+      const tFazy = (teraz - od) / 1000;
+      const zbieg = ograniczone((tFazy - ((do_ - od) / 1000 - PLYWANIE_PRZED_KONCEM_S)) / ZBIEGANIE_S);
+      const srodek = gracze.length
+        ? gracze.reduce((s, g) => s + (cele.get(g.nick) ?? poczatki.get(g.nick) ?? g.start), 0) / gracze.length
+        : 0;
 
       gracze.forEach((g, i) => {
         const el = elementy.current.get(g.nick);
@@ -239,8 +259,11 @@ export function PijanyTv({
             ostatniDzwiek = chwila;
             zagraj(cel > poprzedni ? "krok" : "pudlo");
           }
+          const h = skrot(g.nick);
+          const plywanie = Math.sin((2 * Math.PI * t) / (2.2 + (h % 13) / 10) + (h % 628) / 100) * 0.8 * KROK_FINALU;
+          const docelowe = cel + (srodek + plywanie - cel) * zbieg;
           const obecne = widac.get(g.nick) ?? start;
-          const nowe = ruch ? obecne + (cel - obecne) * (1 - Math.exp(-DOJAZD * dt)) : cel;
+          const nowe = ruch ? obecne + (docelowe - obecne) * (1 - Math.exp(-DOJAZD * dt)) : docelowe;
           widac.set(g.nick, nowe);
           p = naBujajacejDrodze(
             lista[i],
