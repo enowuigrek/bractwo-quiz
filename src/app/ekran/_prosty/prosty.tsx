@@ -3,7 +3,7 @@
 
 import { useSyncExternalStore } from "react";
 import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
-import { META_FINALU, krokiFinalu } from "@/lib/gra/final";
+import { META_FINALU, krokiFinalu, miejsceZWyscigu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
@@ -192,7 +192,13 @@ export function ProstyTv({ stan, blad, gracze, ranking, odpowiedzi, qr, host, te
     case "pijany":
       return <Seria stan={stan} teraz={teraz} />;
     case "werble":
-      return null;
+      // na głównym ekranie animacja werbli; tu sam napis, żeby ekran nie był czarny
+      return (
+        <div className="pr-srodek">
+          <p className="pr-tytul">Werble…</p>
+          <p className="pr-opis pr-opis-duzy">Wynik za chwilę.</p>
+        </div>
+      );
     case "podium":
       return <Podium stan={stan} ranking={ranking} />;
     case "tabela":
@@ -379,7 +385,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         }
       />
       <div className="pr-pytanie-tresc">
-        {z.grafika_url && <img src={z.grafika_url} alt="" className="pr-grafika" />}
+        {/* odsłaniana grafika (zgadnij po zdjęciu) bez rozmycia zdradzałaby odpowiedź: tu dopiero przy wyniku (28.10) */}
+        {z.grafika_url && !(z.dane.odslaniaj && !wynik) && <img src={z.grafika_url} alt="" className="pr-grafika" />}
         <OdpowiedziPytania stan={stan} wynik={wynik} />
       </div>
       {!wynik && (
@@ -484,15 +491,20 @@ function OdpowiedziPytania({ stan, wynik }: { stan: StanSesji; wynik: boolean })
   );
 }
 
+/** Dobrze, częściowo (w szacowaniu „Blisko”) i źle, jak na głównym ekranie (28.10: częściowe stały w „Źle”). */
 function Odpowiedzi({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi: WierszOdpowiedzi[] }) {
   const dobre = odpowiedzi.filter((o) => o.poprawna === true);
-  const reszta = odpowiedzi.filter((o) => o.poprawna !== true);
+  const czesciowo = odpowiedzi.filter((o) => o.poprawna === false && (o.ocena ?? 0) > 0);
+  const reszta = odpowiedzi.filter((o) => o.poprawna !== true && !czesciowo.includes(o));
+  const szacowanie = stan.zadanie?.typ === "szacowanie";
   return (
     <div className="pr-pytanie">
       <Naglowek lewy={stan.zadanie?.tresc ?? "Odpowiedzi"} prawy={stan.zadanie ? `Pytanie ${stan.zadanie.lp}` : null} />
       <div className="pr-kolumny">
         <section className="pr-ramka pr-ramka-dobrze">
-          <h2>Dobrze {dobre.length}</h2>
+          <h2>
+            {szacowanie ? "W punkt" : "Dobrze"} {dobre.length}
+          </h2>
           {dobre.length ? (
             <ol>
               {dobre.map((o) => (
@@ -506,13 +518,28 @@ function Odpowiedzi({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi: WierszO
             <p>Nikt nie odpowiedział dobrze.</p>
           )}
         </section>
+        {czesciowo.length > 0 && (
+          <section className="pr-ramka pr-ramka-czesciowo">
+            <h2>
+              {szacowanie ? "Blisko" : "Częściowo"} {czesciowo.length}
+            </h2>
+            <ul>
+              {czesciowo.map((o) => (
+                <li key={o.nick}>
+                  {o.nick}
+                  <span>+{o.punkty ?? 0}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <section className="pr-ramka pr-ramka-zle">
           <h2>Źle {reszta.length}</h2>
           <ul>
             {reszta.map((o) => (
               <li key={o.nick}>
                 {o.nick}
-                {o.punkty ? <span>+{o.punkty}</span> : o.dane ? null : <span>brak</span>}
+                {o.dane ? null : <span>brak</span>}
               </li>
             ))}
           </ul>
@@ -588,6 +615,8 @@ function Seria({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 
 function Podium({ stan, ranking, koniec = false }: { stan: StanSesji; ranking: WierszRankingu[]; koniec?: boolean }) {
   const trojka = ranking.slice(0, 3);
+  // po finale miejsce trójki dał wyścig: bez punktów, jak na głównym ekranie
+  const finalistow = stan.finalisci?.length;
   return (
     <div className="pr-srodek">
       <Loga lokal={stan.lokal} />
@@ -599,7 +628,9 @@ function Podium({ stan, ranking, koniec = false }: { stan: StanSesji; ranking: W
             <li key={w.nick} className={`pr-miejsce-${w.miejsce}`}>
               <span className="pr-nr">{w.miejsce}.</span>
               <span className="pr-nick">{w.nick}</span>
-              <span className="pr-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
+              {!miejsceZWyscigu(w.miejsce, finalistow) && (
+                <span className="pr-punkty">{w.punkty.toLocaleString("pl-PL")} pkt</span>
+              )}
               {nagroda && <span className="pr-nagroda">{nagroda}</span>}
             </li>
           );
@@ -622,6 +653,13 @@ function Tabela({ stan, ranking, tytul }: { stan: StanSesji; ranking: WierszRank
           <li key={w.nick}>
             <span className="pr-nr">{w.miejsce}.</span>
             <span className="pr-nick">{w.nick}</span>
+            {/* finalista: przebieg finału zamiast samych punktów, bo o miejscu zdecydował wyścig */}
+            {w.final && (
+              <span className="pr-final-wynik">
+                <span className="pr-dobre">✓ {w.final.dobre}</span> <span className="pr-zle">✗ {w.final.zle}</span>{" "}
+                {Math.min(META_FINALU, Math.round(w.final.kroki))}/{META_FINALU}
+              </span>
+            )}
             <span className="pr-punkty">{w.punkty.toLocaleString("pl-PL")}</span>
           </li>
         ))}

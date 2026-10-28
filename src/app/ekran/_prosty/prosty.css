@@ -652,3 +652,24 @@
   width: 520px;
   height: 520px;
 }
+
+/* odpowiedzi: częściowo dobre (w szacowaniu „Blisko”) w złotej ramce, jak na głównym ekranie (28.10) */
+.pr-ramka-czesciowo {
+  border-color: var(--zloto);
+}
+
+/* tabela po finale: przebieg finału przy finalistach (bez gap, Chrome 69) */
+.pr-final-wynik {
+  margin-left: 24px;
+  white-space: nowrap;
+  font-size: 0.8em;
+  color: var(--zloto);
+}
+
+.pr-final-wynik .pr-dobre {
+  color: var(--chmiel);
+}
+
+.pr-final-wynik .pr-zle {
+  color: #c0573f;
+}
