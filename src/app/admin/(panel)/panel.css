@@ -1666,6 +1666,11 @@ button.tag:hover:not(.wybrany) {
   align-items: center;
 }
 
+/* pub quiz: „do 2000 pkt” z prawej w nagłówku karty rodzaju */
+.zasady-etap header > .znaczek {
+  margin-left: auto;
+}
+
 .zasady-etap-ikona {
   flex: none;
   width: 64px;

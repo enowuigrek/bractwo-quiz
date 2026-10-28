@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
 import { IkonaPuchar } from "@/components/ikony";
-import { oknoMs, przedzial } from "@/lib/gra/punktacja";
+import { WAGA_TYPU, oknoMs, przedzial } from "@/lib/gra/punktacja";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { RODZAJE, TabelaCzesciowych, WykresSzybkosci, pkt } from "../wspolne";
 
@@ -12,8 +12,9 @@ export const metadata: Metadata = { title: "Zasady pub quizu · Bractwo Quiz" };
 const KOLEJNOSC = ["wybor", "prawda_falsz", "wielokrotny", "szacowanie", "kolejnosc", "pary"] as const;
 
 /**
- * Zasady „Pub quizu” (klasycznego, bez etapów, 28.10): przebieg i punktacja każdego rodzaju pytań. Bez mnożników,
- * odpadania i finału: każde pytanie waży tyle samo. Liczby z `src/lib/gra/punktacja.ts` (kopia punktacji z bazy).
+ * Zasady „Pub quizu” (klasycznego, bez etapów, 28.10): przebieg i punktacja każdego rodzaju pytań; trudniejsze rodzaje
+ * dają więcej punktów (`WAGA_TYPU`, jak mnożniki etapów w wyścigu, ale tu nie mówimy o mnożnikach). Bez odpadania
+ * i finału. Liczby z `src/lib/gra/punktacja.ts` (kopia punktacji z bazy).
  */
 export default async function ZasadyPubQuizu() {
   await wymagajAdmina();
@@ -24,8 +25,9 @@ export default async function ZasadyPubQuizu() {
       </p>
       <h1>Pub quiz: zasady i punktacja</h1>
       <p className="zasady-wstep">
-        Klasyczny pub quiz: pytania po kolei, bez etapów, odpadania i finału. Każde pytanie waży tyle samo, a wygrywa
-        ten, kto zbierze najwięcej punktów. Liczby na tej stronie liczą się z tych samych ustawień co gra.
+        Klasyczny pub quiz: pytania po kolei, bez etapów, odpadania i finału. Trudniejsze rodzaje pytań dają więcej
+        punktów, a wygrywa ten, kto zbierze ich najwięcej. Liczby na tej stronie liczą się z tych samych ustawień co
+        gra.
       </p>
 
       <section className="panel-sekcja">
@@ -66,27 +68,32 @@ export default async function ZasadyPubQuizu() {
           <div>
             <p>
               Każda odpowiedź dostaje <strong>ocenę od 0 do 1</strong> (jaka część jest dobrze), a punkty to ocena ×
-              punkty za szybkość. <strong>Bez mnożników</strong>: każde pytanie waży tyle samo.
+              punkty za szybkość. <strong>Trudniejsze rodzaje są warte więcej</strong>: jedna odpowiedź i prawda/fałsz
+              do {pkt(przedzial("wybor", 1, WAGA_TYPU.wybor)[1])} pkt, kilka dobrych do{" "}
+              {pkt(przedzial("wielokrotny", 1, WAGA_TYPU.wielokrotny)[1])}, szacowanie, kolejność i pary do{" "}
+              {pkt(przedzial("pary", 1, WAGA_TYPU.pary)[1])}.
             </p>
             <ul className="zasady-punkty">
               <li>
-                <strong>Szybkość:</strong> od razu 1000 pkt, potem liniowo w dół do 200 pkt. Okno spadku to{" "}
+                <strong>Szybkość:</strong> od razu pełne punkty, potem liniowo w dół do jednej piątej. Okno spadku to{" "}
                 {oknoMs("wybor") / 1000} s przy jednej odpowiedzi, prawdzie/fałszu i szacowaniu, {oknoMs("pary") / 1000}{" "}
                 s przy kilku dobrych, parach i kolejności. Później zostaje stałe 200 pkt.
               </li>
               <li>
-                <strong>Z limitem czasu</strong> (ustawionym przy uruchamianiu gry) punkty spadają przez cały limit, a po
-                nim nie da się już odpowiedzieć.
+                <strong>Z limitem czasu</strong> (ustawionym przy uruchamianiu gry) punkty spadają przez cały limit, a
+                po nim nie da się już odpowiedzieć.
               </li>
               <li>
                 <strong>Szacowanie</strong> jest wyjątkiem: szybkość waży tylko 10%, liczy się precyzja.
               </li>
               <li>
-                <strong>Cały quiz:</strong> najwyżej 1000 pkt za pytanie, więc np. 20 pytań to do {pkt(20000)} pkt.
+                <strong>Cały quiz:</strong> suma za wszystkie pytania; np. 20 pytań z jedną odpowiedzią to do{" "}
+                {pkt(20 * przedzial("wybor", 1, 1)[1])} pkt, a z kilkoma dobrymi do{" "}
+                {pkt(20 * przedzial("wielokrotny", 1, WAGA_TYPU.wielokrotny)[1])}.
               </li>
             </ul>
           </div>
-          <WykresSzybkosci />
+          <WykresSzybkosci podpis="Jedna odpowiedź (do 1000 pkt) przy oknie 30 s" />
         </div>
       </section>
 
@@ -94,13 +101,14 @@ export default async function ZasadyPubQuizu() {
         <h2>Rodzaje pytań</h2>
         <div className="zasady-etapy">
           {KOLEJNOSC.map((t) => {
-            const [od, do_] = przedzial(t, 1, 1);
+            const [od, do_] = przedzial(t, 1, WAGA_TYPU[t]);
             return (
               <article key={t} className="zasady-etap">
                 <header>
                   <h3>
                     <span className={`rodzaj-pytania ${t}`}>{NAZWY_TYPOW[t]}</span>
                   </h3>
+                  <span className="znaczek aktywny">do {pkt(do_)} pkt</span>
                 </header>
                 <ul className="zasady-lista">
                   {RODZAJE[t].zasady.map((z) => (
@@ -123,7 +131,7 @@ export default async function ZasadyPubQuizu() {
                     </tr>
                   </tbody>
                 </table>
-                <TabelaCzesciowych typ={t} mnoznik={1} />
+                <TabelaCzesciowych typ={t} mnoznik={WAGA_TYPU[t]} />
               </article>
             );
           })}

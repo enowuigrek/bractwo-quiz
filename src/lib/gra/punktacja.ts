@@ -4,6 +4,19 @@
 
 import type { TypZadania } from "../zadania";
 
+/**
+ * Pub quiz (pytania bez etapu): trudniejsze rodzaje dają więcej punktów, jak mnożniki etapów w wyścigu
+ * (`wewn.waga_typu`, gdy etap nie podaje mnożnika).
+ */
+export const WAGA_TYPU: Record<Exclude<TypZadania, "ciekawostka">, number> = {
+  wybor: 1,
+  prawda_falsz: 1,
+  wielokrotny: 1.5,
+  szacowanie: 2,
+  kolejnosc: 2,
+  pary: 2,
+};
+
 /** Okno spadku punktów bez limitu czasu: 60 s przy kilku dobrych, kolejności i parach, 30 s przy reszcie. */
 export function oknoMs(typ: TypZadania): number {
   return typ === "wielokrotny" || typ === "kolejnosc" || typ === "pary" ? 60000 : 30000;

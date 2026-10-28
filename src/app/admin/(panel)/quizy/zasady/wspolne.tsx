@@ -53,9 +53,7 @@ export const RODZAJE: Record<
     ],
   },
   kolejnosc: {
-    zasady: [
-      "Punkty za każdą dobrze ułożoną parę sąsiadów (A→B, B→C…), więc jedno przesunięcie nie zeruje całości.",
-    ],
+    zasady: ["Punkty za każdą dobrze ułożoną parę sąsiadów (A→B, B→C…), więc jedno przesunięcie nie zeruje całości."],
     czesciowe: [
       { opis: "4 elementy: 2 z 3 par sąsiadów", ocena: 2 / 3 },
       { opis: "4 elementy: 1 z 3 par sąsiadów", ocena: 1 / 3 },
@@ -64,7 +62,15 @@ export const RODZAJE: Record<
 };
 
 /** Tabelka częściowych odpowiedzi jednego rodzaju przy danym mnożniku. */
-export function TabelaCzesciowych({ typ, mnoznik, zNazwa }: { typ: keyof typeof RODZAJE; mnoznik: number; zNazwa?: boolean }) {
+export function TabelaCzesciowych({
+  typ,
+  mnoznik,
+  zNazwa,
+}: {
+  typ: keyof typeof RODZAJE;
+  mnoznik: number;
+  zNazwa?: boolean;
+}) {
   const r = RODZAJE[typ];
   return (
     <table className="zasady-tabela czesciowe">
@@ -87,7 +93,7 @@ export function TabelaCzesciowych({ typ, mnoznik, zNazwa }: { typ: keyof typeof 
 }
 
 /** Wykres punktów za dobrą odpowiedź w czasie (×1, okno 30 s): 1000 od razu, liniowo do 200, potem płasko. */
-export function WykresSzybkosci() {
+export function WykresSzybkosci({ podpis = "Dobra odpowiedź przy mnożniku ×1 i oknie 30 s" }: { podpis?: string }) {
   // współrzędne: x 0..40 s → 40..300, y 0..1000 pkt → 170..20
   const x = (s: number) => 40 + (s / 40) * 260;
   const y = (p: number) => 170 - (p / 1000) * 150;
@@ -113,8 +119,7 @@ export function WykresSzybkosci() {
         <circle cx={x(0)} cy={y(1000)} r={4} className="kropka" />
         <circle cx={x(30)} cy={y(200)} r={4} className="kropka" />
       </svg>
-      <figcaption>Dobra odpowiedź przy mnożniku ×1 i oknie 30 s</figcaption>
+      <figcaption>{podpis}</figcaption>
     </figure>
   );
 }
-
