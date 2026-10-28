@@ -1888,3 +1888,52 @@ button.tag:hover:not(.wybrany) {
     justify-content: flex-end;
   }
 }
+
+/* Edytor quizu na telefonie (28.10: przyciski ↑ ↓ kosz obok pytania i nagłówka etapu ściskały treść i edytor do
+   wąskiego paska): przyciski w osobnym rzędzie pod spodem, z prawej; przy rozwiniętym pytaniu chowają się, a edytor
+   ma całą szerokość */
+@media (max-width: 559px) {
+  .lista > li.zadanie-wiersz,
+  .etap-naglowek {
+    flex-wrap: wrap;
+  }
+
+  .zadanie-wiersz > .zadanie-rozwijane,
+  .etap-naglowek > .lista-glowna {
+    flex: 1 1 100%;
+  }
+
+  .zadanie-wiersz > .lista-akcje,
+  .etap-naglowek > .lista-akcje {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 0;
+    padding-bottom: 10px;
+  }
+
+  .zadanie-wiersz:has(> .zadanie-rozwijane[open]) > .lista-akcje {
+    display: none;
+  }
+
+  /* pytania pijanego finału: pola na całą szerokość, przyciski pod nimi */
+  .lista.pijane-pytania > li {
+    flex-wrap: wrap;
+  }
+
+  .pijane-pytania .pijane-pytanie {
+    flex: 1 1 100%;
+  }
+
+  .pijane-pytania > li > .lista-akcje {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .zadanie-edytor {
+    padding: 16px 14px;
+  }
+
+  .etap-brakujace .nowe-pytanie .zadanie-edytor {
+    margin-left: -2.2em;
+  }
+}
