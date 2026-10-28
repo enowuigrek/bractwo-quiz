@@ -18,6 +18,11 @@ type Props = {
   domyslnyEtap: string | null;
   /** Rodzaj nowego pytania (z etapu, do którego jest dodawane). */
   domyslnyTyp?: TypZadania;
+  /**
+   * Rodzaje pytań etapów (28.10): etap ma swoje rodzaje (np. „Ile?” tylko szacowanie, „Jakoś się ułoży” kolejność i
+   * pary), więc edytor nie podsuwa innych. Brak etapu na liście: wszystkie rodzaje.
+   */
+  typyEtapow?: Record<string, TypZadania[]>;
   /** Edytor rozwinięty na liście pytań (28.10): zapis zostaje na liście, bez przejścia na inną stronę. */
   naLiscie?: boolean;
   onZapisano?: () => void;
@@ -102,6 +107,7 @@ export function EdytorZadania({
   etapy,
   domyslnyEtap,
   domyslnyTyp,
+  typyEtapow,
   naLiscie,
   onZapisano,
   onZwin,
@@ -122,7 +128,20 @@ export function EdytorZadania({
   }, [stan]);
 
   const start = poczatek(zadanie);
-  const [typ, setTyp] = useState<TypZadania>(zadanie?.typ ?? domyslnyTyp ?? "wybor");
+  const [etapId, setEtapId] = useState(zadanie?.etap_id ?? domyslnyEtap ?? "");
+  // rodzaje do wyboru: te z etapu (plus ciekawostka poza serią finału), w quizie bez etapów wszystkie bez ciekawostki;
+  // rodzaj edytowanego pytania zostaje zawsze, żeby dało się poprawić stare pytanie
+  const etap = etapy.find((e) => e.id === etapId);
+  const dozwolone = TYPY_ZADAN.filter(
+    (t) =>
+      t === zadanie?.typ ||
+      (t === "ciekawostka"
+        ? !!etap && !etap.seria
+        : !etap || !typyEtapow?.[etap.id]?.length || typyEtapow[etap.id].includes(t)),
+  );
+  const [typ, setTyp] = useState<TypZadania>(
+    zadanie?.typ ?? (domyslnyTyp && dozwolone.includes(domyslnyTyp) ? domyslnyTyp : dozwolone[0]),
+  );
   // klucze, żeby React nie mieszał pól przy usuwaniu wierszy ze środka
   const [wiersze, setWiersze] = useState<Wiersz[]>(() => start.wiersze.map(([a, b = ""], klucz) => ({ klucz, a, b })));
   const [nastepnyKlucz, setNastepnyKlucz] = useState(start.wiersze.length);
@@ -223,7 +242,18 @@ export function EdytorZadania({
       {etapy.length > 0 && (
         <div>
           <label htmlFor={`${uid}-etap`}>Etap</label>
-          <select id={`${uid}-etap`} name="etap_id" className="pole" defaultValue={zadanie?.etap_id ?? domyslnyEtap ?? ""}>
+          <select
+            id={`${uid}-etap`}
+            name="etap_id"
+            className="pole"
+            value={etapId}
+            onChange={(e) => {
+              setEtapId(e.target.value);
+              // inny etap ma inne rodzaje: rodzaj spoza nowego etapu przechodzi na jego pierwszy
+              const typy = typyEtapow?.[e.target.value];
+              if (typy?.length && !typy.includes(typ) && typ !== zadanie?.typ) zmienTyp(typy[0]);
+            }}
+          >
             {etapy.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.nr}. {e.nazwa} ({bezPunktow(e) ? "wyścig" : napisMnoznika(e.mnoznik)}
@@ -240,7 +270,7 @@ export function EdytorZadania({
         {/* kafelki w kolorach rodzajów (`.rodzaj-pytania`, jak w pilocie i na liście pytań), wybrany wypełniony */}
         <div className="rodzaje-pytan">
           {/* klasyczny quiz (bez etapów) nie ma ciekawostek; istniejącą starą da się dalej edytować */}
-          {TYPY_ZADAN.filter((t) => t !== "ciekawostka" || etapy.length > 0 || zadanie?.typ === "ciekawostka").map((t) => (
+          {dozwolone.map((t) => (
             <label key={t} className={`rodzaj-pytania ${t}${typ === t ? " wybrana" : ""}`}>
               <input type="radio" name="typ_wybor" value={t} checked={typ === t} onChange={() => zmienTyp(t)} />
               {NAZWY_TYPOW[t]}

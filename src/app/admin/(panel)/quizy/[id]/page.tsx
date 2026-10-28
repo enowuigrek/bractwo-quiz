@@ -20,7 +20,7 @@ import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { WklejPytania } from "./wklej";
 import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
-import { NAZWY_TYPOW, opisRozwiazania } from "@/lib/zadania";
+import { NAZWY_TYPOW, opisRozwiazania, type TypZadania } from "@/lib/zadania";
 import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
@@ -100,6 +100,18 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
 
   // klasyczny quiz (bez etapów): nowe pytanie ma rodzaj ostatniego pytania
   const ostatniTyp = lista.filter((z) => z.typ !== "ciekawostka").at(-1)?.typ;
+  // rodzaje pytań każdego etapu (rodzaj domyślny i te, które już w nim są): edytor podsuwa tylko je
+  const typyEtapow: Record<string, TypZadania[]> = Object.fromEntries(
+    etapy.map((e) => [
+      e.id,
+      [
+        ...new Set([
+          ...(e.typ_domyslny ? [e.typ_domyslny] : []),
+          ...lista.filter((z) => z.etap_id === e.id && z.typ !== "ciekawostka").map((z) => z.typ),
+        ]),
+      ],
+    ]),
+  );
 
   // pytania edytuje się rozwinięte na liście (28.10), nie na osobnej stronie
   const wiersz = (z: Zadanie) => {
@@ -108,7 +120,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       <ZadanieNaLiscie
         key={z.id}
         id={z.id}
-        edytor={{ quizId: quiz.id, zadanie: z, etapy, domyslnyEtap: z.etap_id }}
+        edytor={{ quizId: quiz.id, typyEtapow, zadanie: z, etapy, domyslnyEtap: z.etap_id }}
         naglowek={
           <>
             <span className="krok-nr" style={{ minWidth: "1.6em" }}>
@@ -263,7 +275,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                   <li key={i}>
                     <NowePytanie
                       napis={`+ pytanie ${wEtapie.length + i + 1} z ${etap.plan_pytan}`}
-                      edytor={{ quizId: quiz.id, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
+                      edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
                     />
                   </li>
                 ))}
@@ -271,7 +283,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                   <li className="etap-brakujace-dodaj">
                     <NowePytanie
                       napis="+ pytanie w tym etapie"
-                      edytor={{ quizId: quiz.id, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
+                      edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
                     />
                   </li>
                 )}
@@ -284,7 +296,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         {etapy.length === 0 && (
           <ol className="etap-brakujace">
             <li className="etap-brakujace-dodaj">
-              <NowePytanie napis="+ pytanie" edytor={{ quizId: quiz.id, etapy, domyslnyEtap: null, domyslnyTyp: ostatniTyp }} />
+              <NowePytanie napis="+ pytanie" edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: null, domyslnyTyp: ostatniTyp }} />
             </li>
           </ol>
         )}
