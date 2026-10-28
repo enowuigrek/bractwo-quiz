@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Gracz · Bractwo Quiz" };
 export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[id]/gracze/[gracz]">) {
   const rola = await wymagajAdmina();
   const { id, gracz: graczId } = await params;
-  await wymagajGry(rola, id);
+  await wymagajGry(rola, id, true);
   const db = supabaseAdmin();
 
   const { data: gra } = await db

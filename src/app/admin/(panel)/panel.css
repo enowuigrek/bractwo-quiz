@@ -72,6 +72,12 @@ span.panel-logo-lokalu {
 }
 
 @media (min-width: 960px) {
+  /* na komputerze logo lokalu stoi już w nawigacji (zamiast zębatki), więc z lewej przy Bractwie go nie dublujemy
+     (28.10); na telefonie zostaje, bo nawigacja jest schowana w menu */
+  .panel-naglowek .panel-logo-lokalu {
+    display: none;
+  }
+
   .panel-naglowek .panel-menu {
     display: none;
   }

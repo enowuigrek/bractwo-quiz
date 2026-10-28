@@ -49,15 +49,21 @@ export async function wymagajQuizu(rola: Rola, quizId: string, podglad = false):
   notFound();
 }
 
-export async function wymagajGry(rola: Rola, sesjaId: string): Promise<void> {
+export async function wymagajGry(rola: Rola, sesjaId: string, podglad = false): Promise<{ gosc: boolean }> {
   const lokal = lokalRoli(rola);
-  if (!lokal) return;
+  if (!lokal) return { gosc: false };
   const { data } = await supabaseAdmin()
     .from("sesje")
-    .select("lokal_id, tylko_glowny")
+    .select("lokal_id, tylko_glowny, faza")
     .eq("id", sesjaId)
-    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean }>();
-  if (!data || data.lokal_id !== lokal || data.tylko_glowny) notFound();
+    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean; faza: string }>();
+  if (!data || data.lokal_id !== lokal) notFound();
+  // zakończona gra Bractwa w swoim lokalu: lokal ogląda wyniki i pobiera grafiki, ale nic nie zmienia (28.10)
+  if (data.tylko_glowny) {
+    if (podglad && data.faza === "koniec") return { gosc: true };
+    notFound();
+  }
+  return { gosc: false };
 }
 
 /** Ustawienia lokalu: główny każdego, lokal tylko swojego. */

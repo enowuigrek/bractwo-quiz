@@ -45,7 +45,8 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
     if (!zKodem) notFound();
     redirect(`/admin/gry/${zKodem.id}`);
   }
-  await wymagajGry(rola, id);
+  // lokal ogląda też zakończone gry Bractwa u siebie (`gosc`: bez usuwania i oznaczania nagród)
+  const { gosc } = await wymagajGry(rola, id, true);
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
@@ -111,6 +112,9 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               .join(" · ")}
           </p>
 
+          {gosc ? (
+            <p className="pomocniczy">Grę ustawiło Bractwo Piwne: możesz oglądać wyniki i pobrać grafiki.</p>
+          ) : (
           <section className="panel-sekcja akcje-gry">
             {trwa && (
               <PrzyciskPotwierdz
@@ -133,6 +137,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               <IkonaKosz /> Usuń grę
             </PrzyciskPotwierdz>
           </section>
+          )}
         </div>
 
         {trwa && qrPilota ? (
@@ -238,6 +243,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
                         })}`
                       : "jeszcze nieodebrana"}
                   </span>
+                  {!gosc && (
                   <PrzyciskPotwierdz
                     akcja={ustawOdbiorNagrody.bind(null, gra.id, w.id, !w.nagrodaOdebrana)}
                     pytanie={
@@ -250,6 +256,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
                   >
                     {w.nagrodaOdebrana ? "Cofnij" : "Oznacz odbiór"}
                   </PrzyciskPotwierdz>
+                  )}
                 </li>
               ));
             })}

@@ -92,7 +92,7 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
 }
 
 /**
- * Gra Bractwa w panelu lokalu: bez pilota, wyników i usuwania (host_token nie trafia do strony). „Podgląd” otwiera
+ * Gra Bractwa w panelu lokalu: bez pilota i usuwania, zakończona otwiera wyniki do podglądu (host_token nie trafia do strony). „Podgląd” otwiera
  * ekran gry (`/tv/<kod>`, ten sam co na telewizorze, bez sterowania) w nowej karcie. W zapowiedzi i poczekalni
  * „Zwolnij ekran” kończy ją po potwierdzeniu, a Bractwo dostaje powiadomienie; w trakcie gry nie.
  */
@@ -103,7 +103,11 @@ function GraBractwa({ g }: { g: GraNaLiscie }) {
       <Miniatura src="/loga/bractwo-biale.svg" alt="" />
       <div className="lista-glowna">
         <div className="lista-tytul">
-          {g.quizy?.tytul ?? "Quiz"}{" "}
+          {g.faza === "koniec" ? (
+            <Link href={`/admin/gry/${g.id}`}>{g.quizy?.tytul ?? "Quiz"}</Link>
+          ) : (
+            (g.quizy?.tytul ?? "Quiz")
+          )}{" "}
           <span className={`znaczek${g.faza === "koniec" ? "" : " aktywny"}`}>{NAZWY_FAZ[g.faza]}</span>
         </div>
         <div className="lista-opis">
@@ -130,7 +134,12 @@ function GraBractwa({ g }: { g: GraNaLiscie }) {
           </PrzyciskPotwierdz>
         ) : g.faza !== "koniec" ? (
           <span className="pomocniczy">prowadzi Bractwo</span>
-        ) : null}
+        ) : (
+          // zakończona: wyniki i grafiki do pobrania (28.10)
+          <Link href={`/admin/gry/${g.id}`} className="przycisk-maly">
+            Otwórz
+          </Link>
+        )}
       </div>
     </li>
   );
