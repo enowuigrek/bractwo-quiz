@@ -62,7 +62,13 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
               </div>
             </div>
             <div className="lista-akcje">
-              <Link href={adresGry(g)} className={`przycisk-maly${g.faza === "koniec" ? "" : " zloty"}`}>
+              {/* podgląd ekranu gry bez sterowania (28.10), jak u lokalu przy grach Bractwa */}
+            {g.faza !== "koniec" && (
+              <a href={`/tv/${g.kod}`} target="_blank" rel="noopener" className="przycisk-maly">
+                Podgląd
+              </a>
+            )}
+            <Link href={adresGry(g)} className={`przycisk-maly${g.faza === "koniec" ? "" : " zloty"}`}>
                 {g.faza === "koniec" ? "Otwórz" : "Prowadź"}
               </Link>
               <PrzyciskPotwierdz
