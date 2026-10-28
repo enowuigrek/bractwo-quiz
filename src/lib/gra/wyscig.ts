@@ -13,6 +13,12 @@ export const STRONA_RANKINGU_S = 5;
 /** Ile stron rankingu przy `n` graczach. */
 export const stronyRankingu = (n: number) => Math.max(1, Math.ceil(n / NA_STRONIE_RANKINGU));
 
+/**
+ * Ilu graczy na stronie: po równo na wszystkie strony (28.10, Łukasz: przy 12 graczach 6 + 6, a nie 10 + 2),
+ * najwyżej `NA_STRONIE_RANKINGU`.
+ */
+export const naStronieRankingu = (n: number) => Math.max(1, Math.ceil(n / stronyRankingu(n)));
+
 /** Domyślny i największy limit graczy w grze (26.10: na razie 20, bo tyle mieści ranking na dwóch stronach). */
 export const MAX_GRACZY = 20;
 

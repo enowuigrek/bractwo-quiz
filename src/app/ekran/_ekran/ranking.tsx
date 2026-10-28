@@ -8,23 +8,10 @@ import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { zagraj } from "@/lib/gra/efekty";
-import { NA_STRONIE_RANKINGU, STRONA_RANKINGU_S, stronyRankingu } from "@/lib/gra/wyscig";
+import { naStronieRankingu } from "@/lib/gra/wyscig";
+import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 
-/**
- * Która strona rankingu stoi teraz na TV (po `NA_STRONIE_RANKINGU` graczy): co `STRONA_RANKINGU_S` następna, na
- * ostatniej zostaje. Liczone od wejścia ekranu rankingu.
- */
-export function useStronaRankingu(graczy: number): number {
-  const strony = stronyRankingu(graczy);
-  const [strona, ustawStrone] = useState(0);
-  useEffect(() => {
-    if (strony <= 1) return;
-    const id = window.setInterval(() => ustawStrone((s) => Math.min(s + 1, strony - 1)), STRONA_RANKINGU_S * 1000);
-    return () => window.clearInterval(id);
-  }, [strony]);
-  return Math.min(strona, strony - 1);
-}
 /** Po ilu ms ranking przetasowuje się ze stanu sprzed pytania do bieżącego. */
 const PRZETASOWANIE_MS = 1600;
 
@@ -85,7 +72,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
         ? a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl")
         : a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
     )
-    .slice(strona * NA_STRONIE_RANKINGU, (strona + 1) * NA_STRONIE_RANKINGU);
+    .slice(strona * naStronieRankingu(ranking.length), (strona + 1) * naStronieRankingu(ranking.length));
   const z = stan.zadanie;
   // „fiuu” przy przetasowaniu, gdy ktoś zmienia miejsce (jak zamiana torów w wyścigu; w klasycznym pub quizie
   // tabela zastępuje wyścig, 26.10). Po pierwszym pytaniu i w finale bez dźwięku, jak w wyścigu.

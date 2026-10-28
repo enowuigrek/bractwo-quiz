@@ -6,10 +6,11 @@ import { Awatar } from "@/components/awatar";
 import { zagraj } from "@/lib/gra/efekty";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
-import { NA_STRONIE_RANKINGU, naTrasie, naTrasieFinalu, nalanieSzklanki } from "@/lib/gra/wyscig";
+import { naStronieRankingu, naTrasie, naTrasieFinalu, nalanieSzklanki } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
-import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik, useStronaRankingu } from "./ranking";
+import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
+import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
 const START_S = 0.8;
@@ -33,8 +34,10 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const wszyscy = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
   // po 10 torów na stronę: przy większej grupie najpierw 1.–10., potem dalsi (26.10, zamiast paska reszty)
   const strona = useStronaRankingu(wszyscy.length);
-  const odMiejsca = strona * NA_STRONIE_RANKINGU;
-  const wiersze = wszyscy.slice(odMiejsca, odMiejsca + NA_STRONIE_RANKINGU);
+  // po równo na strony (12 graczy: 6 + 6)
+  const naStronieGraczy = naStronieRankingu(wszyscy.length);
+  const odMiejsca = strona * naStronieGraczy;
+  const wiersze = wszyscy.slice(odMiejsca, odMiejsca + naStronieGraczy);
   const maks = stan.quiz?.max_przed_finalem ?? 0;
   // dźwięk (src/lib/gra/efekty.ts): tylko „fiuu” przy zamianie torów; szumu jazdy razem z awatarami nie ma od 25.10
   // (Łukasz: nie brzmiał jak przesuwanie). W finale każdy ma swoją drogę: tory się nie zamieniają, więc i bez dźwięku
@@ -47,7 +50,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   }, [dzwieki, zamiana]);
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   // tory tej samej wysokości na każdej stronie (na drugiej, krótszej stronie nie rosną)
-  const torow = Math.min(NA_STRONIE_RANKINGU, wszyscy.length);
+  const torow = Math.min(naStronieGraczy, wszyscy.length);
   const odstep = torow > 8 ? 6 : 12;
   // odcięcie po etapie: kreska pod ostatnim, kto gra dalej (walka o finał: pod 3. miejscem, inaczej próg
   // odpadania z `etap.przechodzi`); zabiera trochę wysokości torów. Gdy kreska wypada w pasku reszty, stoi tam.

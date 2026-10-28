@@ -7,9 +7,10 @@ import { META_FINALU, krokiFinalu, miejsceZWyscigu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
-import { quizKlasyczny } from "@/lib/gra/wyscig";
+import { naStronieRankingu, quizKlasyczny, stronyRankingu } from "@/lib/gra/wyscig";
 import { bezPunktow } from "@/lib/etapy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
+import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -374,7 +375,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const wynik = faza === "wynik";
   const zegar = faza === "pytanie" && !bezLimitu ? Math.max(0, Math.ceil(doKonca / 1000)) : null;
   return (
-    <div className="pr-pytanie">
+    <div className="pr-pytanie pr-pytanie-srodek">
       <Naglowek
         lewy={z.tresc}
         prawy={
@@ -549,10 +550,15 @@ function Odpowiedzi({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi: WierszO
   );
 }
 
+/** Ranking po pytaniu: strony po równo jak na głównym ekranie (12 graczy: 6 + 6), co kilka sekund następna (28.10). */
 function Ranking({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
   const odciecie = odciecieEtapu(stan);
   const koniecEtapu = !!stan.etap && stan.ostatnie_w_etapie && !stan.etap.finalowy;
-  const widoczni = ranking.slice(0, 12);
+  const strona = useStronaRankingu(ranking.length);
+  const naStronie = naStronieRankingu(ranking.length);
+  const stron = stronyRankingu(ranking.length);
+  const od = strona * naStronie;
+  const widoczni = ranking.slice(od, od + naStronie);
   return (
     <div className="pr-pytanie">
       <Naglowek
@@ -561,7 +567,14 @@ function Ranking({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[]
       />
       <ol className="pr-tabela">
         {widoczni.map((w, i) => (
-          <li key={w.nick} className={odciecie !== null && i === odciecie - 1 ? "pr-kreska" : undefined}>
+          <li
+            key={w.nick}
+            className={
+              [w.miejsce === 1 && "pr-lider", odciecie !== null && od + i === odciecie - 1 && "pr-kreska"]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
+          >
             <span className="pr-nr">{w.miejsce}.</span>
             <span className="pr-nick">{w.nick}</span>
             <span className="pr-punkty">
@@ -571,8 +584,10 @@ function Ranking({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[]
           </li>
         ))}
       </ol>
-      {ranking.length > widoczni.length && (
-        <p className="pr-stopka">i jeszcze {ranking.length - widoczni.length} w grze</p>
+      {stron > 1 && (
+        <p className="pr-stopka">
+          Strona {strona + 1} z {stron}
+        </p>
       )}
     </div>
   );
@@ -650,7 +665,7 @@ function Tabela({ stan, ranking, tytul }: { stan: StanSesji; ranking: WierszRank
       <Naglowek lewy={tytul} prawy={stan.quiz?.tytul} />
       <ol className="pr-tabela pr-tabela-dwie">
         {ranking.slice(0, 30).map((w) => (
-          <li key={w.nick}>
+          <li key={w.nick} className={w.miejsce === 1 ? "pr-lider" : undefined}>
             <span className="pr-nr">{w.miejsce}.</span>
             <span className="pr-nick">{w.nick}</span>
             {/* finalista: przebieg finału zamiast samych punktów, bo o miejscu zdecydował wyścig */}

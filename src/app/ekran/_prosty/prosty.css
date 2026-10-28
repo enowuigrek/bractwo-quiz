@@ -494,7 +494,8 @@
   font-weight: 700;
 }
 
-.pr-tabela li:first-child {
+/* lider na złoto (po miejscu, nie po pierwszym wierszu: na drugiej stronie rankingu pierwszy nie jest liderem) */
+.pr-tabela .pr-lider {
   color: var(--zloto);
 }
 
@@ -672,4 +673,15 @@
 
 .pr-final-wynik .pr-zle {
   color: #c0573f;
+}
+
+/* pytanie wyśrodkowane w pionie (28.10, Łukasz): nagłówek z pytaniem, grafika i odpowiedzi jako jeden blok na
+   środku ekranu, grafika na wysokości odpowiedzi */
+.pr-pytanie-srodek {
+  justify-content: center;
+}
+
+.pr-pytanie-srodek .pr-pytanie-tresc {
+  flex: none;
+  align-items: center;
 }
