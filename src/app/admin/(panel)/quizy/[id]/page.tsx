@@ -265,30 +265,30 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                     </PrzyciskPotwierdz>
                   </>
                 }
-              />
+              >
+                {wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
+                {/* miejsca na brakujące pytania z planu etapu, każde rozwija nowe pytanie w tym etapie */}
+                <ol className="etap-brakujace">
+                  {Array.from({ length: Math.max(0, (etap.plan_pytan ?? 0) - wEtapie.length) }, (_, i) => (
+                    <li key={i}>
+                      <NowePytanie
+                        napis={`+ pytanie ${wEtapie.length + i + 1} z ${etap.plan_pytan}`}
+                        edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
+                      />
+                    </li>
+                  ))}
+                  {(etap.plan_pytan ?? 0) <= wEtapie.length && (
+                    <li className="etap-brakujace-dodaj">
+                      <NowePytanie
+                        napis="+ pytanie w tym etapie"
+                        edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
+                      />
+                    </li>
+                  )}
+                </ol>
+              </NaglowekEtapu>
             )}
-            {wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
-            {etap && (
-              // miejsca na brakujące pytania z planu etapu, każde prowadzi do nowego pytania w tym etapie
-              <ol className="etap-brakujace">
-                {Array.from({ length: Math.max(0, (etap.plan_pytan ?? 0) - wEtapie.length) }, (_, i) => (
-                  <li key={i}>
-                    <NowePytanie
-                      napis={`+ pytanie ${wEtapie.length + i + 1} z ${etap.plan_pytan}`}
-                      edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
-                    />
-                  </li>
-                ))}
-                {(etap.plan_pytan ?? 0) <= wEtapie.length && (
-                  <li className="etap-brakujace-dodaj">
-                    <NowePytanie
-                      napis="+ pytanie w tym etapie"
-                      edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
-                    />
-                  </li>
-                )}
-              </ol>
-            )}
+            {!etap && wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
           </div>
         ))}
         {/* quiz z etapami dodaje pytania w swoich etapach (wyżej), a klasyczny wierszem pod listą, rozwijanym jak

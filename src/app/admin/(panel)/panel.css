@@ -936,6 +936,51 @@ a.przycisk {
   overflow-wrap: anywhere;
 }
 
+/* nazwa etapu zwija i rozwija jego pytania (etapy.tsx, 28.10): przycisk bez wyglądu przycisku, złota strzałka jak
+   przy pytaniach (.zadanie-rozwijane), zwinięty etap nie ma odstępu pod nagłówkiem */
+.etap-zwin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.etap-zwin::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-left: 6px;
+  border-right: 2.5px solid var(--zloto);
+  border-bottom: 2.5px solid var(--zloto);
+  transform: translateY(2px) rotate(-135deg);
+  transition: transform 0.25s var(--ease-std);
+}
+
+.etap-zwin[aria-expanded="false"]::after {
+  transform: translateY(-3px) rotate(45deg);
+}
+
+.etap-zwin:hover {
+  color: var(--zloto);
+}
+
+.etap-zwin:focus-visible {
+  outline: 3px solid var(--zloto);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.etap-naglowek.zwiniety {
+  margin-bottom: 0;
+}
+
 .etap-nr {
   color: var(--zloto);
   margin-right: 4px;

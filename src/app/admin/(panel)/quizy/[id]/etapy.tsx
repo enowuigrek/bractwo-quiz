@@ -215,13 +215,17 @@ export function NowyEtap({ quizId }: { quizId: string }) {
   return <FormularzEtapu quizId={quizId} onGotowe={() => ustawOtwarty(false)} onAnuluj={() => ustawOtwarty(false)} />;
 }
 
-/** Nagłówek etapu nad jego pytaniami: nazwa, mnożnik, czas, finał; ołówek otwiera edycję w miejscu. */
+/**
+ * Nagłówek etapu nad jego pytaniami: nazwa, mnożnik, czas, finał; ołówek otwiera edycję w miejscu. Kliknięcie nazwy
+ * zwija i rozwija pytania etapu (`children`, 28.10), żeby w długim quizie widzieć tylko etap, nad którym się pracuje.
+ */
 export function NaglowekEtapu({
   quizId,
   etap,
   akcje,
   pytan,
   plan,
+  children,
 }: {
   quizId: string;
   etap: Etap;
@@ -230,23 +234,30 @@ export function NaglowekEtapu({
   pytan: number;
   /** −/+ planowanej liczby pytań (formularze z akcjami serwera). */
   plan: React.ReactNode;
+  /** Pytania etapu i miejsca na nowe: chowają się po zwinięciu. */
+  children?: React.ReactNode;
 }) {
   const [edycja, ustawEdycje] = useState(false);
-  if (edycja) {
-    return (
-      <FormularzEtapu
-        quizId={quizId}
-        etap={etap}
-        onGotowe={() => ustawEdycje(false)}
-        onAnuluj={() => ustawEdycje(false)}
-      />
-    );
-  }
-  return (
-    <div className="etap-naglowek">
+  const [zwiniety, ustawZwiniety] = useState(false);
+  const naglowek = edycja ? (
+    <FormularzEtapu
+      quizId={quizId}
+      etap={etap}
+      onGotowe={() => ustawEdycje(false)}
+      onAnuluj={() => ustawEdycje(false)}
+    />
+  ) : (
+    <div className={`etap-naglowek${zwiniety ? " zwiniety" : ""}`}>
       <div className="lista-glowna">
         <h3 className="etap-tytul">
-          <span className="etap-nr">Etap {etap.nr}</span> {etap.nazwa}
+          <button
+            type="button"
+            className="etap-zwin"
+            aria-expanded={!zwiniety}
+            onClick={() => ustawZwiniety((z) => !z)}
+          >
+            <span className="etap-nr">Etap {etap.nr}</span> {etap.nazwa}
+          </button>
         </h3>
         <p className="etap-znaczki">
           {!bezPunktow(etap) && <span className="znaczek aktywny">punkty {napisMnoznika(etap.mnoznik)}</span>}
@@ -276,5 +287,11 @@ export function NaglowekEtapu({
         {akcje}
       </div>
     </div>
+  );
+  return (
+    <>
+      {naglowek}
+      {!zwiniety && children}
+    </>
   );
 }
