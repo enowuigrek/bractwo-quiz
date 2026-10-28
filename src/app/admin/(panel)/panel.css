@@ -1165,25 +1165,6 @@ a.przycisk {
   margin: 10px 0 4px -2.2em;
 }
 
-/* „+ Dodaj pytanie” pod listą wygląda jak przycisk */
-.nowe-pytanie-przycisk > summary {
-  display: inline-flex;
-  padding: 10px 20px;
-  border-radius: var(--r-pill);
-  background: var(--kamien2);
-  color: var(--piana);
-  font-weight: var(--w-black);
-}
-
-.nowe-pytanie-przycisk > summary:hover {
-  background: var(--kamien3);
-  color: var(--piana);
-}
-
-.nowe-pytanie-przycisk[open] > summary {
-  margin-bottom: 12px;
-}
-
 /* Rodzaj pytania w edytorze: kafelki w kolorach rodzajów, wybrany wypełniony swoim kolorem (DESIGN-SYSTEM.md) */
 .rodzaje-pytan {
   display: flex;

@@ -279,19 +279,15 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
             )}
           </div>
         ))}
-        {/* quiz z etapami dodaje pytania w etapach (wyżej), a ten przycisk dopisuje do ostatniego */}
-        <div style={{ marginTop: 16 }}>
-          <NowePytanie
-            napis="+ Dodaj pytanie"
-            className="nowe-pytanie-przycisk"
-            edytor={{
-              quizId: quiz.id,
-              etapy,
-              domyslnyEtap: etapy.at(-1)?.id ?? null,
-              domyslnyTyp: etapy.at(-1)?.typ_domyslny ?? ostatniTyp,
-            }}
-          />
-        </div>
+        {/* quiz z etapami dodaje pytania w swoich etapach (wyżej), a klasyczny wierszem pod listą, rozwijanym jak
+            pytania (28.10: przycisk, który się rozwija, wyglądał źle) */}
+        {etapy.length === 0 && (
+          <ol className="etap-brakujace">
+            <li className="etap-brakujace-dodaj">
+              <NowePytanie napis="+ pytanie" edytor={{ quizId: quiz.id, etapy, domyslnyEtap: null, domyslnyTyp: ostatniTyp }} />
+            </li>
+          </ol>
+        )}
         {/* klasyczny pub quiz (bez etapów) zostaje bez etapów, a turniej ma etapy z szablonu */}
         {etapy.length > 0 && (
           <div style={{ marginTop: 12 }}>
