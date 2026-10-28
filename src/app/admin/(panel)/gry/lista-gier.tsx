@@ -86,8 +86,9 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
 }
 
 /**
- * Gra Bractwa w panelu lokalu: bez pilota, wyników i usuwania (host_token nie trafia do strony). W zapowiedzi
- * i poczekalni „Zwolnij ekran” kończy ją po potwierdzeniu, a Bractwo dostaje powiadomienie; w trakcie gry nie.
+ * Gra Bractwa w panelu lokalu: bez pilota, wyników i usuwania (host_token nie trafia do strony). „Podgląd” otwiera
+ * ekran gry (`/tv/<kod>`, ten sam co na telewizorze, bez sterowania) w nowej karcie. W zapowiedzi i poczekalni
+ * „Zwolnij ekran” kończy ją po potwierdzeniu, a Bractwo dostaje powiadomienie; w trakcie gry nie.
  */
 function GraBractwa({ g }: { g: GraNaLiscie }) {
   const start = g.planowany_start ? godzina.format(new Date(g.planowany_start)) : null;
@@ -106,6 +107,11 @@ function GraBractwa({ g }: { g: GraNaLiscie }) {
         </div>
       </div>
       <div className="lista-akcje">
+        {g.faza !== "koniec" && (
+          <a href={`/tv/${g.kod}`} target="_blank" rel="noopener" className="przycisk-maly">
+            Podgląd
+          </a>
+        )}
         {g.faza === "poczekalnia" ? (
           <PrzyciskPotwierdz
             akcja={zwolnijEkran.bind(null, g.id)}
