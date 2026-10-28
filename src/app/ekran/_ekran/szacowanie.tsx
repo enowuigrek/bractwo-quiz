@@ -139,13 +139,19 @@ export function OdpowiedziSzacowania({
     rzedy.set(s.nick, rzad);
   }
   const ulozone = strzaly.map((s) => ({ ...s, srodek: x(s.liczba), rzad: rzedy.get(s.nick) ?? -1 }));
+  // ile rzędów podpisów stoi nad osią: plakietka poprawnej tuż nad nimi (28.10, Łukasz: przy kilku graczach wisiała
+  // wysoko pod nagłówkiem), a przy wielu najwyżej jak dawniej, pod nagłówkiem (CSS: max z góry pola)
+  const rzedyPodpisow = Math.max(0, ...ulozone.map((s) => s.rzad + 1));
 
   return (
     <div className="tv-os-odp">
       <div className="tv-os-odp-pole" style={{ width: SZEROKOSC_OSI }}>
         <div className="tv-os-odp-linia" />
         {do_ > od && <span className="tv-os-przedzial" style={{ left: x(od), width: x(do_) - x(od) }} />}
-        <span className="tv-os-odp-poprawna" style={{ left: x(p) }}>
+        <span
+          className="tv-os-odp-poprawna"
+          style={{ left: x(p), ["--rzedy" as string]: rzedyPodpisow }}
+        >
           <span>{poprawnaSzacowania(od, do_, jednostka)}</span>
         </span>
         {ulozone.map((s, i) => (

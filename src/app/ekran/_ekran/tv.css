@@ -3348,10 +3348,12 @@
   background: linear-gradient(90deg, transparent, var(--kamien3) 8%, var(--kamien3) 92%, transparent);
 }
 
-/* kreska poprawnej od plakietki u góry pola (plakietka nad kreską, 76 px) w dół, kawałek za oś */
+/* kreska poprawnej od plakietki w dół, kawałek za oś; plakietka stoi tuż nad najwyższym rzędem podpisów
+   (`--rzedy` z szacowanie.tsx: od osi pół awatara z obwódką i odstęp, potem rzędy co 82 px), ale nie wyżej niż
+   76 px od góry pola, żeby nie weszła na nagłówek (28.10) */
 .tv-os-odp-poprawna {
   position: absolute;
-  top: 76px;
+  top: max(76px, calc(100% - var(--os) - 76px - var(--rzedy, 0) * 82px));
   bottom: calc(var(--os) - 20px);
   width: 6px;
   margin-left: -3px;
