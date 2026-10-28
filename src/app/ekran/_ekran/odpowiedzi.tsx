@@ -6,6 +6,7 @@ import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
 import { OdpowiedziSzacowania } from "./szacowanie";
+import { META_FINALU } from "@/lib/gra/final";
 import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/lib/zadania";
 
 /**
@@ -280,12 +281,27 @@ export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
             aria-label={druzyny ? "Drużyny" : "Gracze"}
           >
             {wiersze.map((w, i) => (
-              <motion.li key={w.nick} className={`tv-tabela-wiersz${w.miejsce === 1 ? " lider" : ""}`} {...wjazd(i)}>
+              <motion.li
+                key={w.nick}
+                className={`tv-tabela-wiersz${w.miejsce === 1 ? " lider" : ""}${w.final ? " finalista" : ""}`}
+                {...wjazd(i)}
+              >
                 <span className="tv-ranking-miejsce">{w.miejsce}.</span>
                 <span className="tv-ranking-nick">
                   <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={44} />
                   <span>{w.nick}</span>
                 </span>
+                {/* finalista: przebieg finału przed punktami, bo o miejscu zdecydował wyścig (28.10) */}
+                {w.final && (
+                  <span className="tv-tabela-final" aria-label="Finał">
+                    {w.final.start > 0 && <span className="start">start +{w.final.start}</span>}
+                    <span className="dobre">✓ {w.final.dobre}</span>
+                    <span className="zle">✗ {w.final.zle}</span>
+                    <span className="kroki">
+                      {Math.min(META_FINALU, Math.round(w.final.kroki))}/{META_FINALU}
+                    </span>
+                  </span>
+                )}
                 <span className="tv-ranking-punkty">{w.punkty.toLocaleString("pl-PL")}</span>
               </motion.li>
             ))}

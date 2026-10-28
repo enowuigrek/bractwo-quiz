@@ -1449,6 +1449,53 @@
   box-shadow: var(--glow-md);
 }
 
+/* finalista w tabeli: przebieg finału (start, dobre zielone, złe czerwone, kroki do piwa) przed punktami, które
+   przygasają, bo miejsce dał wyścig (odpowiedzi.tsx, 28.10) */
+.tv-tabela-wiersz.finalista {
+  grid-template-columns: 90px minmax(0, 1fr) auto auto;
+  border-color: rgba(227, 172, 63, 0.55);
+}
+
+.tv-tabela-wiersz.finalista .tv-ranking-punkty {
+  color: var(--szary);
+  font-size: 0.8em;
+}
+
+.tv-tabela-final {
+  display: flex;
+  align-items: center;
+  font-size: 0.8em;
+  font-weight: var(--w-black);
+  white-space: nowrap;
+}
+
+.tv-tabela-final > span + span {
+  margin-left: 14px;
+}
+
+.tv-tabela-final .start {
+  color: var(--zloto);
+}
+
+.tv-tabela-final .dobre {
+  color: var(--chmiel);
+}
+
+.tv-tabela-final .zle {
+  color: var(--czerwien);
+}
+
+.tv-tabela-final .kroki {
+  padding: 2px 12px;
+  border-radius: var(--r-pill);
+  background: rgba(227, 172, 63, 0.18);
+  color: var(--zloto-jasne);
+}
+
+.tv-tabela.gesto .tv-tabela-wiersz.finalista {
+  grid-template-columns: 70px minmax(0, 1fr) auto auto;
+}
+
 .tv-tabela.gesto .tv-tabela-wiersz {
   grid-template-columns: 70px minmax(0, 1fr) auto;
   height: 56px;

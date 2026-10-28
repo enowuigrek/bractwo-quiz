@@ -269,4 +269,9 @@ export type WierszRankingu = {
   zdobyte: number;
   /** Po którym etapie odpadł (null: gra dalej). */
   odpadl: number | null;
+  /**
+   * Finalista: przebieg finału (przewaga na starcie, dobre i złe odpowiedzi, kroki do piwa), bo miejsce po finale
+   * daje wyścig, nie punkty (28.10). Null: nie grał w finale.
+   */
+  final?: { start: number; dobre: number; zle: number; kroki: number } | null;
 };

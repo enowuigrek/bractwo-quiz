@@ -327,10 +327,11 @@ export function PijanyTv({
 
   return (
     <div
-      className={`tv-wyscig tv-seria tv-pijany${(gra && !bezWideo) || klatkiGraja ? " wylewa" : ""}${wybuch ? " wybuch" : ""}${
-        bezWideo ? " bez-wideo" : ""
-      }`}
-      style={{ "--poziom": poziom } as React.CSSProperties}
+      // „drzy” z pełnym --drzenie: awatary trzęsą się dalej tak, jak pod koniec serii, więc nie widać przejścia (28.10)
+      className={`tv-wyscig tv-seria tv-pijany${wybuch ? "" : " drzy"}${(gra && !bezWideo) || klatkiGraja ? " wylewa" : ""}${
+        wybuch ? " wybuch" : ""
+      }${bezWideo ? " bez-wideo" : ""}`}
+      style={{ "--poziom": poziom, "--drzenie": 1 } as React.CSSProperties}
     >
       {/* nagłówek jak w serii, tylko zegar wariuje coraz bardziej */}
       <NaglowekSerii stan={stan} teraz={teraz} zegar={zegarPijany((teraz - od) / 1000, (do_ - od) / 1000, startZegaraPijanego(stan))} />
