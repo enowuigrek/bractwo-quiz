@@ -5,57 +5,19 @@ import { SZABLONY_ETAPOW, SZABLONY_QUIZU, bezPunktow, napisMnoznika, type Szablo
 import { MAX_PRZEWAGI, META_FINALU, PUNKTOW_NA_KROK } from "@/lib/gra/final";
 import { oknoMs, przedzial } from "@/lib/gra/punktacja";
 import { CIEKAWOSTKA_PIJANA, CZAS_PIJANEGO_S } from "@/lib/pijany";
-import { NAZWY_TYPOW, type TypZadania } from "@/lib/zadania";
+import { NAZWY_TYPOW } from "@/lib/zadania";
 import { IkonaPuchar } from "@/components/ikony";
 import { IkonaEtapu } from "@/components/ikony-etapow";
+import { RODZAJE, TabelaCzesciowych, WykresSzybkosci, pkt } from "./wspolne";
 
 export const metadata: Metadata = { title: "Zasady wyścigu po piwo · Bractwo Quiz" };
 
-/** Liczba po polsku z odstępem tysięcy: „12 000”. */
-const pkt = (n: number) => n.toLocaleString("pl-PL", { useGrouping: true });
-const zakres = ([od, do_]: [number, number]) => (od === do_ ? `${pkt(od)}` : `${pkt(od)}–${pkt(do_)}`);
 
 type EtapWyscigu = SzablonEtapu & { pytania: number };
 
-/** Przykłady częściowych odpowiedzi przy każdej konkurencji: opis i ocena 0..1 (jak `wewn.ocena`). */
-const CZESCIOWE: Record<string, { opis: string; ocena: number; typ?: TypZadania }[]> = {
-  "na-jedno": [{ opis: "Zła odpowiedź albo brak", ocena: 0 }],
-  "jednak-wiecej": [
-    { opis: "2 z 3 dobrych, bez złych", ocena: 2 / 3 },
-    { opis: "1 z 3 dobrych, bez złych", ocena: 1 / 3 },
-    { opis: "3 dobre i 1 zła", ocena: 2 / 3 },
-    { opis: "1 dobra i 1 zła (albo więcej złych niż dobrych)", ocena: 0 },
-  ],
-  ile: [
-    { opis: "W połowie drogi do granicy tolerancji", ocena: 0.5 },
-    { opis: "Tuż przy granicy (90% tolerancji)", ocena: 0.1 },
-    { opis: "Dalej niż tolerancja", ocena: 0 },
-  ],
-  "jakos-sie-ulozy": [
-    { opis: "Pary: 3 z 4 dobrze", ocena: 0.75, typ: "pary" },
-    { opis: "Pary: 1 z 4 dobrze", ocena: 0.25, typ: "pary" },
-    { opis: "Kolejność 4 elementów: 2 z 3 par sąsiadów", ocena: 2 / 3, typ: "kolejnosc" },
-    { opis: "Kolejność 4 elementów: 1 z 3 par sąsiadów", ocena: 1 / 3, typ: "kolejnosc" },
-  ],
-};
-
-/** Co trzeba wiedzieć o każdej konkurencji, poza tabelką punktów. */
-const ZASADY: Record<string, string[]> = {
-  "na-jedno": ["Jedna dobra odpowiedź z kilku (A–D, czasem więcej).", "Liczy się tylko trafienie i czas."],
-  "jednak-wiecej": [
-    "Dobrych odpowiedzi jest od 1 do 4, gracz zaznacza wszystkie, które uważa za dobre.",
-    "Ocena: (trafione − złe) / liczba dobrych, nie mniej niż zero. Zła odpowiedź zabiera tyle, ile daje dobra.",
-  ],
-  ile: [
-    "Gracz ustawia liczbę na suwaku. Trafienie (co do pół kroku suwaka albo w widełkach) to pełne punkty.",
-    "Bliżej = więcej: punkty maleją liniowo z odległością, do zera w odległości „tolerancji” ustawionej w pytaniu.",
-    "Szybkość waży tu tylko 10%, bo liczy się precyzja. Przy widełkach odległość liczy się od najbliższego brzegu.",
-  ],
-  "jakos-sie-ulozy": [
-    "Pary: punkty za każdą dobrze połączoną parę.",
-    "Kolejność: punkty za każdą dobrze ułożoną parę sąsiadów (A→B, B→C…), więc jedno przesunięcie nie zeruje całości.",
-    "Po tym etapie trójka z najwyższymi punktami wchodzi do finału (remis: krótszy łączny czas odpowiedzi).",
-  ],
+/** Zasady konkurencji poza tym, co wynika z rodzaju pytań (`RODZAJE`). */
+const DODATKI: Record<string, string[]> = {
+  "jakos-sie-ulozy": ["Po tym etapie trójka z najwyższymi punktami wchodzi do finału (remis: krótszy łączny czas odpowiedzi)."],
 };
 
 /**
@@ -187,7 +149,14 @@ export default async function ZasadyWyscigu() {
                 </header>
                 <p className="zasady-opis">„{e.opis}”</p>
                 <ul className="zasady-lista">
-                  {(ZASADY[e.klucz] ?? []).map((z) => (
+                  {typy.flatMap((t) =>
+                    t === "ciekawostka"
+                      ? []
+                      : RODZAJE[t].zasady.map((z) => (
+                          <li key={t + z}>{typy.length > 1 ? `${NAZWY_TYPOW[t]}: ${z}` : z}</li>
+                        )),
+                  )}
+                  {(DODATKI[e.klucz] ?? []).map((z) => (
                     <li key={z}>{z}</li>
                   ))}
                 </ul>
@@ -212,23 +181,10 @@ export default async function ZasadyWyscigu() {
                     </tr>
                   </tbody>
                 </table>
-                {CZESCIOWE[e.klucz] && (
-                  <table className="zasady-tabela czesciowe">
-                    <thead>
-                      <tr>
-                        <th>{e.klucz === "ile" ? "Blisko, ale nie w punkt" : "Częściowo dobrze"}</th>
-                        <th colSpan={2}>za pytanie</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {CZESCIOWE[e.klucz].map((c) => (
-                        <tr key={c.opis}>
-                          <td>{c.opis}</td>
-                          <td colSpan={2}>{zakres(przedzial(c.typ ?? typy[0], c.ocena, e.mnoznik))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {typy.map((t) =>
+                  t === "ciekawostka" ? null : (
+                    <TabelaCzesciowych key={t} typ={t} mnoznik={e.mnoznik} zNazwa={typy.length > 1} />
+                  ),
                 )}
               </article>
             );
@@ -333,38 +289,6 @@ export default async function ZasadyWyscigu() {
         </ul>
       </section>
     </main>
-  );
-}
-
-/** Wykres punktów za dobrą odpowiedź w czasie (×1, okno 30 s): 1000 od razu, liniowo do 200, potem płasko. */
-function WykresSzybkosci() {
-  // współrzędne: x 0..40 s → 40..300, y 0..1000 pkt → 170..20
-  const x = (s: number) => 40 + (s / 40) * 260;
-  const y = (p: number) => 170 - (p / 1000) * 150;
-  return (
-    <figure className="zasady-wykres">
-      <svg viewBox="0 0 320 200" role="img" aria-label="Punkty za dobrą odpowiedź maleją z czasem od 1000 do 200">
-        <line x1={x(0)} y1={y(0)} x2={x(40)} y2={y(0)} className="os" />
-        <line x1={x(0)} y1={y(0)} x2={x(0)} y2={y(1000)} className="os" />
-        {[200, 600, 1000].map((p) => (
-          <g key={p}>
-            <line x1={x(0)} y1={y(p)} x2={x(40)} y2={y(p)} className="siatka" />
-            <text x={x(0) - 6} y={y(p) + 4} textAnchor="end">
-              {p}
-            </text>
-          </g>
-        ))}
-        {[0, 15, 30, 40].map((s) => (
-          <text key={s} x={x(s)} y={y(0) + 16} textAnchor="middle">
-            {s} s
-          </text>
-        ))}
-        <polyline points={`${x(0)},${y(1000)} ${x(30)},${y(200)} ${x(40)},${y(200)}`} className="linia" />
-        <circle cx={x(0)} cy={y(1000)} r={4} className="kropka" />
-        <circle cx={x(30)} cy={y(200)} r={4} className="kropka" />
-      </svg>
-      <figcaption>Dobra odpowiedź przy mnożniku ×1 i oknie 30 s</figcaption>
-    </figure>
   );
 }
 

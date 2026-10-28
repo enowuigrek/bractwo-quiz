@@ -1676,6 +1676,13 @@ button.tag:hover:not(.wybrany) {
   margin: 0 0 6px;
 }
 
+/* pub quiz: nagłówek karty to sama plakietka rodzaju, większa */
+.zasady-etap h3 .rodzaj-pytania {
+  display: inline-block;
+  padding: 6px 16px;
+  font-size: var(--fs-body);
+}
+
 .zasady-etap-nr {
   margin: 0;
   color: var(--zloto);

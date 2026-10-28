@@ -98,11 +98,12 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
             </Link>
           ))}
         </nav>
-        {rodzaj === "wyscig" && (
-          <Link href="/admin/quizy/zasady" className="quizy-zasady">
-            Zasady i punktacja →
-          </Link>
-        )}
+        <Link
+          href={rodzaj === "wyscig" ? "/admin/quizy/zasady" : "/admin/quizy/zasady/pub-quiz"}
+          className="quizy-zasady"
+        >
+          Zasady i punktacja →
+        </Link>
       </div>
       <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
       {tagi.length > 0 && (
