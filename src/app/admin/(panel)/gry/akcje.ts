@@ -195,6 +195,57 @@ export async function zakonczGre(id: string): Promise<void> {
 }
 
 /**
+ * Lokal zwalnia ekran zajęty przez grę Bractwa (`tylko_glowny`) w swoim lokalu, ale tylko przed startem (zapowiedź
+ * albo poczekalnia; w trakcie ktoś może grać). Gra się kończy, ekran wraca do lokalu, a główny dostaje
+ * powiadomienie w panelu (28.10).
+ */
+export async function zwolnijEkran(id: string): Promise<void> {
+  const rola = await wymagajAdmina();
+  const lokal = lokalRoli(rola);
+  if (!lokal) throw new Error("Ekran zwalnia lokal.");
+  const db = supabaseAdmin();
+  const { data: gra } = await db
+    .from("sesje")
+    .select("kod, faza, tylko_glowny, lokal_id, planowany_start, quizy(tytul), lokale(nazwa)")
+    .eq("id", id)
+    .maybeSingle<{
+      kod: string;
+      faza: string;
+      tylko_glowny: boolean;
+      lokal_id: string | null;
+      planowany_start: string | null;
+      quizy: { tytul: string } | null;
+      lokale: { nazwa: string } | null;
+    }>();
+  if (!gra || gra.lokal_id !== lokal || !gra.tylko_glowny) throw new Error("Nie ma takiej gry w Twoim lokalu.");
+  if (gra.faza !== "poczekalnia") throw new Error("Gra już trwa: ekran zwolni się po jej końcu.");
+  const { data: zakonczona, error } = await db
+    .from("sesje")
+    .update({ faza: "koniec", faza_od: new Date().toISOString(), faza_do: null })
+    .eq("id", id)
+    .eq("faza", "poczekalnia")
+    .select("id");
+  if (error) throw new Error(`Nie udało się zwolnić ekranu: ${error.message}`);
+  if (zakonczona?.length) {
+    const start = gra.planowany_start
+      ? new Intl.DateTimeFormat("pl-PL", {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Europe/Warsaw",
+        }).format(new Date(gra.planowany_start))
+      : null;
+    await db.from("powiadomienia").insert({
+      tresc: `${gra.lokale?.nazwa ?? "Lokal"} zwolnił ekran: zakończył grę ${gra.kod} (${gra.quizy?.tytul ?? "quiz"}${
+        start ? `, start ${start}` : ""
+      }) przed startem.`,
+    });
+  }
+  refresh();
+}
+
+/**
  * Odbiór nagrody ustawiony w panelu, gdy z telefonu się nie udało (albo cofnięcie pomyłki).
  * Telefon gracza pokaże „Odebrana” przy najbliższym odświeżeniu stanu (co kilka sekund).
  */

@@ -7,6 +7,7 @@ import { filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Faza } from "@/lib/typy";
 import { Nawigacja } from "./_komponenty/nawigacja";
+import { Powiadomienia } from "./_komponenty/powiadomienia";
 import "./panel.css";
 
 export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
@@ -73,6 +74,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
         {/* telefon: zamiast paska i „Wyloguj” samo menu obok logo */}
         <MenuPanelu wyloguj={wylogujAdmina} gra={gra} ustawienia={ustawienia} lokal={lokal} />
       </header>
+      <Powiadomienia rola={rola} />
       {children}
     </div>
   );

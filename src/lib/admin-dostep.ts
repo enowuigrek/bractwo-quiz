@@ -6,7 +6,8 @@ import { supabaseAdmin } from "./supabase/serwer";
 // Kto co widzi w panelu (od 26.10). Główny: wszystko. Lokal:
 // - quizy: swoje (`quizy.lokal_id`) do zmian, a quizy Bractwa (`lokal_id` null) bez `tylko_glowny` tylko do grania
 //   i podglądu, bez edycji i usuwania;
-// - gry: rozegrane w swoim lokalu, bez gier „tylko dla mnie” głównego;
+// - gry: rozegrane w swoim lokalu; gry Bractwa (`tylko_glowny`) w swoim lokalu tylko na listach, do podglądu
+//   i zwolnienia ekranu przed startem (28.10), bez pilota i strony gry;
 // - lokale: tylko swój (logo, Instagram, hasło).
 // Strona bez dostępu pokazuje 404, a akcja kończy się błędem. Listy filtrują `filtrQuizow` / `filtrGier`.
 
@@ -21,10 +22,14 @@ export function filtrQuizow<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, wla
   );
 }
 
-/** Gry, które rola widzi na listach. */
-export function filtrGier<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola): Q {
+/**
+ * Gry, które rola widzi na listach. `zBractwa`: lokal widzi też gry Bractwa (`tylko_glowny`) w swoim lokalu, bo
+ * zajmują jego ekran (tylko listy rozgrywek; menu ze skrótem do pilota ich nie bierze).
+ */
+export function filtrGier<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, zBractwa = false): Q {
   const lokal = lokalRoli(rola);
-  return lokal ? zapytanie.or(`and(lokal_id.eq.${lokal},tylko_glowny.is.false)`) : zapytanie;
+  if (!lokal) return zapytanie;
+  return zapytanie.or(zBractwa ? `lokal_id.eq.${lokal}` : `and(lokal_id.eq.${lokal},tylko_glowny.is.false)`);
 }
 
 /**

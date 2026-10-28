@@ -21,6 +21,35 @@ const DODATKI: Record<string, string[]> = {
 };
 
 /**
+ * Ilu gra w kolejnych etapach przy `n` graczach (jak `wewn.progi_domyslne`): po etapie walka-2 80%, po walka-1 połowa,
+ * przed finałem trójka; cięcie tylko, gdy zostaje więcej niż 3. `etapow` z finałem na końcu.
+ */
+function grajacyWEtapach(n: number, etapow: number): number[] {
+  const walka = etapow - 1;
+  const progi: Record<number, number> = {};
+  let teraz = n;
+  for (const [po, czesc] of [
+    [walka - 2, 0.8],
+    [walka - 1, 0.5],
+  ] as const) {
+    if (po < 2) continue;
+    const zostaje = Math.ceil(teraz * czesc);
+    if (zostaje < teraz && zostaje > 3) {
+      progi[po] = zostaje;
+      teraz = zostaje;
+    }
+  }
+  const wynik: number[] = [];
+  let graja = n;
+  for (let nr = 1; nr <= etapow; nr++) {
+    wynik.push(graja);
+    if (progi[nr]) graja = progi[nr];
+    if (nr === walka) graja = Math.min(graja, 3);
+  }
+  return wynik;
+}
+
+/**
  * Zasady „Wyścigu po piwo” w jednym miejscu (28.10, Łukasz): etapy, punktacja z przedziałami, odpadanie, finał
  * i pijany finał. Liczby liczą się z tych samych stałych co gra (szablony etapów, `punktacja.ts`, `final.ts`),
  * więc zmiana zasad w kodzie zmienia też tę stronę; punkty w grze liczy baza.
@@ -34,11 +63,11 @@ export default async function ZasadyWyscigu() {
   }));
   const punktowane = etapy.filter((e) => !bezPunktow(e));
   const final = etapy.find((e) => bezPunktow(e));
-  // odpadanie po etapach (jak `wewn.progi_domyslne`): 2 etapy przed finałem od 9 graczy, 3 przed finałem od 16
+  // odpadanie po etapach (jak `wewn.progi_domyslne`, 28.10): 3 etapy przed finałem 80%, 2 przed finałem połowa
   const iFinalu = etapy.findIndex((e) => bezPunktow(e));
   const odpadanie: Record<number, string> = {
-    [iFinalu - 2]: "Odpadanie: od 9 graczy po tym etapie gra dalej 6 najlepszych.",
-    [iFinalu - 3]: "Odpadanie: od 16 graczy po tym etapie gra dalej połowa (co najmniej 8).",
+    [iFinalu - 3]: "Odpadanie: po tym etapie gra dalej 80% graczy (zaokrąglone w górę).",
+    [iFinalu - 2]: "Odpadanie: po tym etapie gra dalej połowa (zaokrąglone w górę).",
   };
   // za cały etap przy samych dobrych odpowiedziach: najwolniej i najszybciej
   const sumy = punktowane.map((e) => {
@@ -224,20 +253,42 @@ export default async function ZasadyWyscigu() {
         <h2>Odpadanie i finałowa trójka</h2>
         <ul className="zasady-lista">
           <li>
-            <strong>Do 8 graczy</strong> nikt nie odpada przed finałem.
+            Po etapie „{etapy[0]?.nazwa}” <strong>nikt nie odpada</strong> (rozgrzewka, ktoś może jeszcze dołączać).
           </li>
           <li>
-            <strong>Od 9 graczy</strong> po etapie „{etapy[2]?.nazwa}” gra dalej 6 najlepszych.
+            Po etapie „{etapy[1]?.nazwa}” gra dalej <strong>80%</strong> graczy, a po „{etapy[2]?.nazwa}”{" "}
+            <strong>połowa</strong> (zaokrąglone w górę).
           </li>
-          <li>
-            <strong>Od 16 graczy</strong> dodatkowo już po etapie „{etapy[1]?.nazwa}” gra dalej połowa, ale co najmniej
-            8.
-          </li>
+          <li>Cięcie jest tylko wtedy, gdy po nim zostaje więcej niż 3 osoby; przy małej grze nikt nie odpada.</li>
+          <li>Progi ustalają się przy starcie gry z liczby graczy; prowadzący może je zmienić w pilocie.</li>
           <li>
             Po ostatnim etapie przed finałem <strong>trójka z najwyższymi punktami</strong> wchodzi do finału. Remis
             rozstrzyga krótszy łączny czas odpowiedzi. Reszta kibicuje na telefonach.
           </li>
         </ul>
+        <table className="zasady-tabela zasady-odpadanie">
+          <thead>
+            <tr>
+              <th>Graczy</th>
+              {etapy.map((e, i) => (
+                <th key={e.klucz}>
+                  {i + 1}. {e.nazwa}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[5, 8, 12, 17, 20].map((n) => (
+              <tr key={n}>
+                <td>{n}</td>
+                {grajacyWEtapach(n, etapy.length).map((g, i) => (
+                  <td key={i}>{g}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="pomocniczy">W kolumnach: ilu gra w danym etapie.</p>
       </section>
 
       {final && (

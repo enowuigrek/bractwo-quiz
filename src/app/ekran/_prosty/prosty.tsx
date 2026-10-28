@@ -9,7 +9,7 @@ import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from 
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { bezPunktow } from "@/lib/etapy";
-import { liczbyEtapow } from "@/lib/gra/odpadanie";
+import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
 import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -293,8 +293,8 @@ function Wstep({ stan }: { stan: StanSesji }) {
             {e.finalowy && <em> · finał</em>}
             <em>
               {" "}
-              · grają {liczby[i].graja}
-              {liczby[i].dalej !== null ? `, dalej ${liczby[i].dalej}` : ""}
+              · {zLiczba(liczby[i].graja, "gra", "grają")}
+              {liczby[i].dalej !== null ? `, ${zLiczba(liczby[i].dalej!, "przechodzi", "przechodzą")}` : ""}
             </em>
           </li>
         ))}

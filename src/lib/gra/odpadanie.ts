@@ -61,3 +61,9 @@ export function liczbyEtapow(stan: StanSesji): { nr: number; graja: number; dale
     return { nr: e.nr, graja: teraz, dalej };
   });
 }
+
+/** „gra 8”, „grają 4”, „przechodzi 9”, „przechodzą 3”: liczba mnoga przy 2–4 (bez 12–14), inaczej pojedyncza. */
+export function zLiczba(n: number, pojedyncza: string, mnoga: string): string {
+  const mn = n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14);
+  return `${mn ? mnoga : pojedyncza} ${n}`;
+}

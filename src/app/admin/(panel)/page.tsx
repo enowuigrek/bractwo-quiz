@@ -14,7 +14,7 @@ export default async function Panel() {
       ? db.from("lokale").select("id, adres_ekranu").eq("id", lokalId)
       : db.from("lokale").select("id, adres_ekranu", { count: "exact" }),
     filtrQuizow(db.from("quizy").select("*", { count: "exact", head: true }), rola).is("usunieto", null),
-    filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola)
+    filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola, true)
       .neq("faza", "koniec")
       .order("utworzono", { ascending: false })
       .returns<GraNaLiscie[]>(),
@@ -36,7 +36,7 @@ export default async function Panel() {
           </p>
           <section className="panel-sekcja">
             <h2>Trwające rozgrywki</h2>
-            <ListaGier gry={trwajace.data ?? []} pusta="Żadna rozgrywka teraz nie trwa." />
+            <ListaGier gry={trwajace.data ?? []} pusta="Żadna rozgrywka teraz nie trwa." lokal={!!lokalId} />
           </section>
           <p className="pomocniczy panel-sekcja">
             <Link href="/admin/quizy">Quizy: {quizy.count}</Link> ·{" "}

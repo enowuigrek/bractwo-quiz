@@ -4,7 +4,7 @@
 import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
-import { liczbyEtapow } from "@/lib/gra/odpadanie";
+import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
 
 /**
  * Plansza wstępu (faza `wstep`, quiz z etapami): zanim ruszy rozgrzewka, prowadzący opowiada całą drogę.
@@ -14,7 +14,6 @@ import { liczbyEtapow } from "@/lib/gra/odpadanie";
  */
 export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
   const plan = stan.plan_etapow ?? [];
-  const final = plan.find((e) => e.finalowy);
   const wejscie = (i: number) => ({
     initial: { opacity: 0, y: 24 },
     animate: { opacity: 1, y: 0 },
@@ -47,12 +46,12 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
               {e.ikona ? <IkonaEtapu ikona={e.ikona} className="tv-wstep-ikona" /> : null}
               <span className="tv-wstep-nr">{e.nr}</span>
               <span className="tv-wstep-nazwa">{e.nazwa}</span>
-              <span className="tv-wstep-graja">grają {liczby[i].graja}</span>
+              <span className="tv-wstep-graja">{zLiczba(liczby[i].graja, "gra", "grają")}</span>
               {!e.finalowy && (
                 <span className={`tv-wstep-prog${liczby[i].dalej === null ? " wszyscy" : ""}`}>
                   {liczby[i].dalej === null
                     ? "przechodzą wszyscy"
-                    : `${e.nr === (final?.nr ?? 0) - 1 ? "do finału" : "przechodzi"} ${liczby[i].dalej}`}
+                    : zLiczba(liczby[i].dalej!, "przechodzi", "przechodzą")}
                 </span>
               )}
             </motion.li>

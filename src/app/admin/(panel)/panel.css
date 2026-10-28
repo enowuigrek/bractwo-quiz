@@ -1839,3 +1839,29 @@ button.tag:hover:not(.wybrany) {
   width: 26px;
   height: 26px;
 }
+
+/* Powiadomienia głównego pod nagłówkiem panelu (_komponenty/powiadomienia.tsx, 28.10): złoty pasek, aż „OK” */
+.powiadomienia {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 var(--section-gap);
+  padding: 12px 16px;
+  border: 1.5px solid var(--zloto);
+  border-radius: var(--r-pole);
+  background: rgba(227, 172, 63, 0.08);
+}
+
+.powiadomienia ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.powiadomienia-kiedy {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}

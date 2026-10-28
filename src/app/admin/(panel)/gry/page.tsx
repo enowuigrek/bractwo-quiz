@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FiltrLokali, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
@@ -16,7 +16,8 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
     ? await db.from("lokale").select("id, nazwa, logo_url").order("nazwa").returns<LokalAutor[]>()
     : { data: [] as LokalAutor[] };
   const lokal = wybranyLokal((await searchParams).lokal, lokale ?? [], false);
-  let zapytanie = filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola);
+  let zapytanie = filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola, true);
+  const jakoLokal = !!lokalRoli(rola);
   if (lokal) zapytanie = zapytanie.eq("lokal_id", lokal);
   const { data, error } = await zapytanie.order("utworzono", { ascending: false }).limit(100).returns<GraNaLiscie[]>();
 
@@ -34,11 +35,19 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
 
       <section className="panel-sekcja">
         <h2>Trwające</h2>
-        <ListaGier gry={gry.filter((g) => g.faza !== "koniec")} pusta="Żadna rozgrywka teraz nie trwa." />
+        <ListaGier
+          gry={gry.filter((g) => g.faza !== "koniec")}
+          pusta="Żadna rozgrywka teraz nie trwa."
+          lokal={jakoLokal}
+        />
       </section>
       <section className="panel-sekcja">
         <h2>Zakończone</h2>
-        <ListaGier gry={gry.filter((g) => g.faza === "koniec")} pusta="Nie ma jeszcze zakończonych rozgrywek." />
+        <ListaGier
+          gry={gry.filter((g) => g.faza === "koniec")}
+          pusta="Nie ma jeszcze zakończonych rozgrywek."
+          lokal={jakoLokal}
+        />
       </section>
     </main>
   );
