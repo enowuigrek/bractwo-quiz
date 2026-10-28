@@ -1865,3 +1865,20 @@ button.tag:hover:not(.wybrany) {
   color: var(--zloto);
   font-weight: var(--w-black);
 }
+
+/* Lista gier na telefonie (28.10: z „Podgląd” tytuł ściskał się do kilku liter w wierszu): przyciski schodzą do
+   osobnego rzędu pod tytułem, wyrównane do prawej */
+@media (max-width: 559px) {
+  .lista-gier > li {
+    flex-wrap: wrap;
+  }
+
+  .lista-gier .lista-glowna {
+    flex: 1 1 0;
+  }
+
+  .lista-gier .lista-akcje {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -393,6 +393,17 @@
   color: var(--zloto);
 }
 
+/* poprawna liczba w szacowaniu (28.10: wielkością odliczania, 260 px, „7,5–9,5 %” wychodziło poza ekran obok
+   grafiki) */
+.pr-liczba-wynik {
+  margin: 0;
+  font-size: 120px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--zloto);
+}
+
 .pr-stopka {
   margin: 24px 0 0;
   font-size: 32px;

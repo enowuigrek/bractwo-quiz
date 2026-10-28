@@ -41,7 +41,7 @@ const godzina = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-d
 export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; pusta: string; lokal?: boolean }) {
   if (gry.length === 0) return <p className="lista-pusta">{pusta}</p>;
   return (
-    <ul className="lista">
+    <ul className="lista lista-gier">
       {gry.map((g) =>
         lokal && g.tylko_glowny ? (
           <GraBractwa key={g.id} g={g} />

@@ -408,7 +408,7 @@ function OdpowiedziPytania({ stan, wynik }: { stan: StanSesji; wynik: boolean })
       <div className="pr-szacowanie">
         {wynik && typeof poprawna === "number" ? (
           <>
-            <p className="pr-odliczanie">{poprawnaSzacowania(poprawna, d.poprawna_do, d.jednostka)}</p>
+            <p className="pr-liczba-wynik">{poprawnaSzacowania(poprawna, d.poprawna_do, d.jednostka)}</p>
             {z.najblizej?.length ? (
               <p className="pr-opis pr-opis-duzy">
                 Najbliżej: {z.najblizej.map((n) => `${n.nick} (${liczbaZJednostka(n.liczba, d.jednostka)})`).join(", ")}
