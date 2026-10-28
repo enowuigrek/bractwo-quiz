@@ -328,7 +328,7 @@ export function Rozgrywka({
 
       {/* gdy TV pokazuje, kto jak odpowiedział, telefon to samo zamiast rozwiązania (26.10) */}
       {faza === "odpowiedzi" ? (
-        <OdpowiedziGraczy kod={stan.kod} zadanieId={z.id} nick={ja.nick} />
+        <OdpowiedziGraczy kod={stan.kod} zadanieId={z.id} nick={ja.nick} typ={z.typ} />
       ) : (
       // po wyniku bez grafiki i ciaśniej, żeby ekran mieścił się bez przewijania
       <div className="gra-wynik">

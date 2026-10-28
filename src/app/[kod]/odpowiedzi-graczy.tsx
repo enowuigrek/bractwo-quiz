@@ -3,14 +3,25 @@
 import { useEffect, useState } from "react";
 import { Awatar } from "@/components/awatar";
 import type { WierszOdpowiedzi } from "@/lib/gra/typy";
+import type { TypZadania } from "@/lib/zadania";
 import { supabase } from "@/lib/supabase/przegladarka";
 
 /**
  * Po pytaniu, gdy TV pokazuje, kto jak odpowiedział (faza `odpowiedzi`), telefon pokazuje to samo (26.10): trzy
  * grupy w kolorach (dobrze, częściowo, źle i bez odpowiedzi), w każdej kapsle z nickami, Twój wyróżniony.
- * Te same dane co TV (`odpowiedzi_zadania`).
+ * Te same dane co TV (`odpowiedzi_zadania`). W szacowaniu środkowa grupa to „Blisko”, nie „Częściowo” (28.10).
  */
-export function OdpowiedziGraczy({ kod, zadanieId, nick }: { kod: string; zadanieId: string; nick: string }) {
+export function OdpowiedziGraczy({
+  kod,
+  zadanieId,
+  nick,
+  typ,
+}: {
+  kod: string;
+  zadanieId: string;
+  nick: string;
+  typ: TypZadania;
+}) {
   const [odpowiedzi, ustawOdpowiedzi] = useState<WierszOdpowiedzi[] | null>(null);
   useEffect(() => {
     let anuluj = false;
@@ -29,7 +40,7 @@ export function OdpowiedziGraczy({ kod, zadanieId, nick }: { kod: string; zadani
     { klasa: "dobrze", tytul: "Dobrze", lista: odpowiedzi.filter((o) => o.poprawna === true) },
     {
       klasa: "czesciowo",
-      tytul: "Częściowo",
+      tytul: typ === "szacowanie" ? "Blisko" : "Częściowo",
       lista: odpowiedzi.filter((o) => o.poprawna === false && (o.ocena ?? 0) > 0),
     },
     {

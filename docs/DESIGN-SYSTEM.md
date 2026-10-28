@@ -195,6 +195,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Lista pytań w panelu (28.10).** Pytanie rozwija się do edycji w miejscu (złota strzałka jak w `.karta-zwijana`), edytor stoi na karcie `--kamien` pod wierszem, akcje (↑ ↓ kosz) zostają obok. Po zapisie edytor się zwija, a wiersz ma złoty pasek z lewej i lekkie złote tło, żeby było widać, gdzie się skończyło. Nowe pytanie dodaje się wierszem „+ pytanie” pod listą (w quizie z etapami w każdym etapie), rozwijanym tak samo jak pytania, a nie przyciskiem. Etap zwija się i rozwija kliknięciem nazwy w nagłówku (złota strzałka obok nazwy); zwinięty zostawia sam nagłówek. Pijany finał stoi pod finałem jak etap, różowy (`#e88ac0`, `.etap-pijany`) z przerywanym obrysem, bo tryb jest opcjonalny; w środku dwie części: „O piwie” (złota kropka, po kolei, numery i strzałki) i „Odklejone” (szara, losowo).
 
+**Ramki odpowiedzi na telefonie przy szacowaniu (28.10).** Środkowa grupa to „Blisko”, nie „Częściowo” (tak jak werdykt „Blisko!”); TV w szacowaniu zamiast ramek pokazuje oś.
+
 **Cel w szacowaniu (28.10).** Przed wynikiem nad osią na TV (`.tv-os-cel`, 44 px) i nad liczbą na telefonie (`.odp-liczba-cel`) stoi pigułka w obrysie `--zloto`: „Celuj w widełki” (pytanie z `poprawna_do`) albo „Celuj w konkretną liczbę”. Szerokości widełek nie zdradzamy; po wyniku przedział to złoty pas na osi.
 
 **Koniec gry na TV (27.10).** Podium ma 56 px odstępu od nagłówka, a ekran końca schodzi w dolny margines sceny (podium o 48 px, tabela o 24 px), więc „Dziękujemy za grę! Piwu Cześć!” stoi nisko, z zapasem ok. 45–60 px nad krawędzią (overscan telewizora). Szacowanie na TV bez podpowiedzi o suwaku pod osią: tylko zakres.
