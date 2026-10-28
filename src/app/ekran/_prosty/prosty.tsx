@@ -9,6 +9,7 @@ import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from 
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { bezPunktow } from "@/lib/etapy";
+import { liczbyEtapow } from "@/lib/gra/odpadanie";
 import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -279,16 +280,22 @@ function StartKlasycznego({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 }
 
 function Wstep({ stan }: { stan: StanSesji }) {
+  const liczby = liczbyEtapow(stan);
   return (
     <div className="pr-srodek">
       <p className="pr-nadtytul">{stan.quiz?.tytul}</p>
       <h1 className="pr-tytul">Wyścig po piwo</h1>
       <ol className="pr-etapy">
-        {stan.plan_etapow.map((e) => (
+        {stan.plan_etapow.map((e, i) => (
           <li key={e.nr}>
             <span className="pr-nr">{e.nr}</span>
             {e.nazwa}
             {e.finalowy && <em> · finał</em>}
+            <em>
+              {" "}
+              · grają {liczby[i].graja}
+              {liczby[i].dalej !== null ? `, dalej ${liczby[i].dalej}` : ""}
+            </em>
           </li>
         ))}
       </ol>

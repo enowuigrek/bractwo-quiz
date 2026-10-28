@@ -499,10 +499,22 @@
 }
 
 /* odpadanie po etapie: informacja, nie ostrzeżenie, więc jasne złoto, nie czerwień (25.10) */
+/* pod etapem: ilu w nim gra i ilu przechodzi dalej (28.10); bez odpadania przygaszone */
+.tv-wstep-graja {
+  color: var(--piana);
+  font-size: 26px;
+  font-weight: var(--w-semibold);
+}
+
 .tv-wstep-prog {
   color: var(--zloto-jasne);
   font-size: 24px;
   font-weight: var(--w-black);
+}
+
+.tv-wstep-prog.wszyscy {
+  color: var(--szary);
+  font-weight: var(--w-semibold);
 }
 
 .tv-wstep-meta {

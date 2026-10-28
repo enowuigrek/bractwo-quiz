@@ -44,3 +44,20 @@ export function najblizszeOdciecie(stan: StanSesji): { poEtapie: number; ile: nu
   }
   return null;
 }
+
+/**
+ * Ilu gra w każdym etapie i ilu przechodzi dalej (plansza wstępu, 28.10): od wszystkich grających, po etapie z progiem
+ * zostaje próg, przed finałem trójka, w finale grają ci, którzy weszli. `dalej` null: nikt po tym etapie nie odpada.
+ */
+export function liczbyEtapow(stan: StanSesji): { nr: number; graja: number; dalej: number | null }[] {
+  const plan = stan.plan_etapow ?? [];
+  const final = plan.find((e) => e.finalowy);
+  let graja = stan.w_grze;
+  return plan.map((e) => {
+    const teraz = graja;
+    const prog = e.finalowy ? null : final && e.nr === final.nr - 1 ? 3 : e.przechodzi;
+    const dalej = prog !== null && teraz > prog ? prog : null;
+    if (dalej !== null) graja = dalej;
+    return { nr: e.nr, graja: teraz, dalej };
+  });
+}

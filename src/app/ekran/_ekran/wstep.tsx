@@ -4,11 +4,13 @@
 import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
+import { liczbyEtapow } from "@/lib/gra/odpadanie";
 
 /**
  * Plansza wstępu (faza `wstep`, quiz z etapami): zanim ruszy rozgrzewka, prowadzący opowiada całą drogę.
- * Etapy jeden za drugim, pod etapem, po którym się odpada, ilu zostaje (progi z `sesje.progi`), a na końcu
- * szklanka, która nalewa się z każdym pytaniem: kto pierwszy do piwa.
+ * Etapy jeden za drugim, pod każdym ilu w nim gra i ilu przechodzi dalej (progi z `sesje.progi`, przed finałem
+ * trójka; 28.10, Łukasz: od startu ma być jasne, kto odpada), a na końcu szklanka, która nalewa się z każdym
+ * pytaniem: kto pierwszy do piwa.
  */
 export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
   const plan = stan.plan_etapow ?? [];
@@ -18,11 +20,7 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
     animate: { opacity: 1, y: 0 },
     transition: { delay: 0.2 + i * 0.18, duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
   });
-  // ilu zostaje po etapie (tylko gdy przy obecnej liczbie grających ktoś odpada)
-  const zostaje = (nr: number) => {
-    const ile = final && nr === final.nr - 1 ? 3 : (plan.find((e) => e.nr === nr)?.przechodzi ?? null);
-    return ile !== null && stan.w_grze > ile ? ile : null;
-  };
+  const liczby = liczbyEtapow(stan);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -49,9 +47,12 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
               {e.ikona ? <IkonaEtapu ikona={e.ikona} className="tv-wstep-ikona" /> : null}
               <span className="tv-wstep-nr">{e.nr}</span>
               <span className="tv-wstep-nazwa">{e.nazwa}</span>
-              {zostaje(e.nr) !== null && (
-                <span className="tv-wstep-prog">
-                  {e.nr === (final?.nr ?? 0) - 1 ? "do finału 3" : `zostaje ${zostaje(e.nr)}`}
+              <span className="tv-wstep-graja">grają {liczby[i].graja}</span>
+              {!e.finalowy && (
+                <span className={`tv-wstep-prog${liczby[i].dalej === null ? " wszyscy" : ""}`}>
+                  {liczby[i].dalej === null
+                    ? "przechodzą wszyscy"
+                    : `${e.nr === (final?.nr ?? 0) - 1 ? "do finału" : "przechodzi"} ${liczby[i].dalej}`}
                 </span>
               )}
             </motion.li>
