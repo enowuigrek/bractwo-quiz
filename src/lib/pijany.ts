@@ -94,6 +94,8 @@ export function czasReakcjiPijanej(poziom: number): number {
  * końcem szklanka wybucha w wideo na TV, a z końcem fazy przychodzą werble.
  */
 export const GASNIECIE_S = 7.5;
+/** Długość pijanego finału (`wewn.zakoncz_serie`), do opisu zasad. */
+export const CZAS_PIJANEGO_S = 60;
 export const WYBUCH_PRZED_S = 3;
 
 /**

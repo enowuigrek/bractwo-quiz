@@ -1476,3 +1476,325 @@ button.tag:hover:not(.wybrany) {
   height: 26px;
   object-fit: contain;
 }
+
+/* Zasady wyścigu po piwo (quizy/zasady, 28.10): przebieg jako droga z ikonami etapów, karty konkurencji z tabelami
+   punktów, wykres szybkości, pasek udziału etapów i tor finału */
+.quizy-zasady {
+  margin: 12px 0 0;
+}
+
+.zasady-wstep {
+  max-width: 70ch;
+  color: var(--szary);
+}
+
+.zasady h2 {
+  margin-top: 0;
+}
+
+.zasady .zloto {
+  color: var(--zloto);
+}
+
+.zasady-droga {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 10px;
+}
+
+.zasady-droga li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px 12px;
+  border-radius: var(--r-pole);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  text-align: center;
+}
+
+.zasady-droga li.final {
+  border-color: var(--zloto);
+}
+
+.zasady-droga li.pijany {
+  border: 1.5px dashed #e88ac0;
+}
+
+.zasady-droga img,
+.zasady-droga-nr {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.zasady-droga-nr {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--kamien2);
+  color: var(--zloto);
+  font-weight: var(--w-black);
+  font-size: 22px;
+}
+
+.zasady-droga-nr svg {
+  width: 26px;
+  height: 26px;
+}
+
+.zasady-droga span:last-child {
+  color: var(--szary);
+  font-size: var(--fs-xs);
+}
+
+.zasady-dwa {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .zasady-dwa {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+}
+
+.zasady-punkty,
+.zasady-lista {
+  margin: 8px 0 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: 6px;
+}
+
+.zasady-wykres,
+.zasady-tor {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--r-pole);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+}
+
+.zasady-wykres svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.zasady-wykres text {
+  fill: var(--szary);
+  font-size: 11px;
+}
+
+.zasady-wykres .os {
+  stroke: var(--kamien3);
+  stroke-width: 1.5;
+}
+
+.zasady-wykres .siatka {
+  stroke: var(--kamien2);
+  stroke-dasharray: 3 4;
+}
+
+.zasady-wykres .linia {
+  fill: none;
+  stroke: var(--zloto);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.zasady-wykres .kropka {
+  fill: var(--zloto);
+}
+
+.zasady-wykres figcaption,
+.zasady-tor figcaption {
+  margin-top: 6px;
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+
+.zasady-etapy {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 960px) {
+  .zasady-etapy {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.zasady-etap {
+  padding: 16px;
+  border-radius: var(--r-card);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+}
+
+.zasady-etap header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.zasady-etap header img {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.zasady-etap h3 {
+  margin: 0 0 6px;
+}
+
+.zasady-etap-nr {
+  margin: 0;
+  color: var(--zloto);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.zasady-znaczki {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.zasady-opis {
+  margin: 12px 0 0;
+  color: var(--szary);
+  font-style: italic;
+}
+
+.zasady-tabela {
+  width: 100%;
+  margin-top: 14px;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.zasady-tabela th,
+.zasady-tabela td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--kamien2);
+  text-align: right;
+}
+
+.zasady-tabela th:first-child,
+.zasady-tabela td:first-child {
+  text-align: left;
+}
+
+.zasady-tabela th {
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+}
+
+.zasady-tabela td.zloto {
+  font-weight: var(--w-black);
+}
+
+.zasady-tabela.czesciowe td:last-child {
+  color: var(--piana);
+}
+
+.zasady-pasek {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+  border-radius: var(--r-pole);
+  overflow: hidden;
+}
+
+.zasady-pasek > div {
+  min-width: 0;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-xs);
+  color: var(--na-zlocie);
+}
+
+.zasady-pasek strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zasady-pasek-wybor {
+  background: var(--zloto);
+}
+
+.zasady-pasek-wielokrotny {
+  background: #7fb6e6;
+}
+
+.zasady-pasek-szacowanie {
+  background: #c39bea;
+}
+
+.zasady-pasek-pary,
+.zasady-pasek-kolejnosc {
+  background: #5fc8c0;
+}
+
+.zasady-tor {
+  display: grid;
+  gap: 8px;
+}
+
+.zasady-tor-rzad {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 8px;
+}
+
+.zasady-tor-nick {
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+}
+
+.zasady-tor-pola {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
+}
+
+.zasady-tor-pola span {
+  position: relative;
+  height: 18px;
+  border-radius: 3px;
+  background: var(--kamien2);
+}
+
+.zasady-tor-pola span.przewaga {
+  background: rgba(227, 172, 63, 0.35);
+}
+
+.zasady-tor-pola i {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+}
+
+.zasady-tor-piwo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}

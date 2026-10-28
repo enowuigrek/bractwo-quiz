@@ -96,6 +96,14 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
           </Link>
         ))}
       </nav>
+      {/* zasady i punktacja wyścigu w jednym miejscu (28.10) */}
+      {rodzaj === "wyscig" && (
+        <p className="quizy-zasady">
+          <Link href="/admin/quizy/zasady" className="przycisk-maly">
+            Zasady i punktacja
+          </Link>
+        </p>
+      )}
       <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
       {tagi.length > 0 && (
         <p className="tagi quizy-tagi">

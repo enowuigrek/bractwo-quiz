@@ -8,6 +8,11 @@ import type { SeriaGracz } from "./typy";
 /** Musi się zgadzać z `wewn.meta_finalu()` w bazie. */
 export const META_FINALU = 12;
 
+/** Przewaga na starcie: krok za tyle punktów przewagi nad najsłabszym finalistą (`wewn.ustaw_start_finalu`). */
+export const PUNKTOW_NA_KROK = 2500;
+/** Najwięcej kroków przewagi na starcie (`wewn.ustaw_start_finalu`). */
+export const MAX_PRZEWAGI = 4;
+
 type PostepFinalisty = Pick<SeriaGracz, "dobre" | "odpowiedzi" | "start" | "kroki">;
 
 /**
