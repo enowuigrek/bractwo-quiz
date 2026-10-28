@@ -152,7 +152,7 @@ export function startZegaraPijanego(stan: { kod: string; faza_od: string | null 
  * (prompt w `scripts/grafiki.mjs`, `pijany-kalsarikannit`); bez pliku plansza jest bez obrazka.
  */
 export const CIEKAWOSTKA_PIJANA = {
-  po: 3,
+  po: 4,
   tytul: "Kalsarikännit",
   tekst:
     "Finowie mają osobne słowo na picie w domu, w samych gaciach, bez zamiaru wychodzenia gdziekolwiek: kalsarikännit. " +

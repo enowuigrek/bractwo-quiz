@@ -22,7 +22,7 @@ import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania, type TypZadania } from "@/lib/zadania";
 import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
-import { WejsciePijanego } from "./wejscie-pijanego";
+import { BlokPijany } from "./blok-pijany";
 import type { PijanePytanie } from "@/lib/pijany";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
@@ -34,7 +34,14 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
   const { mozeZmieniac } = await wymagajQuizu(rola, id, true);
   const db = supabaseAdmin();
 
-  const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { data: wejscie }] =
+  const [
+    { data: quiz },
+    { data: zadania },
+    { data: etapyZBazy },
+    { count: aktywneGry },
+    { data: wejscie },
+    { data: pulaPijana },
+  ] =
     await Promise.all([
       db
         .from("quizy")
@@ -48,6 +55,11 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         .from("pijane_pytania_quizu")
         .select("nr, tresc, komentarz_prawda, komentarz_falsz")
         .eq("quiz_id", id)
+        .order("nr")
+        .returns<PijanePytanie[]>(),
+      db
+        .from("pijane_pytania")
+        .select("nr, tresc, komentarz_prawda, komentarz_falsz, piwne")
         .order("nr")
         .returns<PijanePytanie[]>(),
     ]);
@@ -298,9 +310,13 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
             {!etap && wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
           </div>
         ))}
-        {/* pytania pijanego finału zmienia tylko główny; wejście jest tylko po finale wyścigu po piwo i stoi jak etap */}
+        {/* pytania pijanego finału zmienia tylko główny; jest tylko po finale wyścigu po piwo i stoi jak etapy:
+            wejście tego quizu, potem wspólna pula wszystkich quizów */}
         {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
-          <WejsciePijanego quizId={quiz.id} pytania={wejscie ?? []} />
+          <>
+            <BlokPijany quizId={quiz.id} pytania={wejscie ?? []} />
+            <BlokPijany pytania={pulaPijana ?? []} />
+          </>
         )}
         {/* quiz z etapami dodaje pytania w swoich etapach (wyżej), a klasyczny wierszem pod listą, rozwijanym jak
             pytania (28.10: przycisk, który się rozwija, wyglądał źle) */}

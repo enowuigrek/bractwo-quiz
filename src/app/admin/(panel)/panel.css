@@ -981,15 +981,21 @@ a.przycisk {
   margin-bottom: 0;
 }
 
-/* Wejście pijanego finału na liście etapów (wejscie-pijanego.tsx, 28.10): jak etap, ale w kolorze pijanego finału
-   (różowym) i z przerywanym obrysem, bo jest opcjonalne */
-.etap-pijany {
+/* Pijany finał na liście etapów (blok-pijany.tsx, 28.10): jak etap, ale z przerywanym obrysem, bo tryb jest
+   opcjonalny; wejście quizu różowe, wspólna pula bursztynowa */
+.etap-pijany.wejscie {
   --pijany: #e88ac0;
+  --pijany-tlo: rgba(232, 138, 192, 0.07);
+}
+
+.etap-pijany.pula {
+  --pijany: #e0913f;
+  --pijany-tlo: rgba(224, 145, 63, 0.07);
 }
 
 .etap-pijany .etap-naglowek {
   border: 1.5px dashed var(--pijany);
-  background: rgba(232, 138, 192, 0.07);
+  background: var(--pijany-tlo);
 }
 
 .etap-pijany .etap-nr,
