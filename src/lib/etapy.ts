@@ -11,6 +11,14 @@ export const MNOZNIKI = [1, 1.5, 2, 3] as const;
 /** Czasy etapu do wyboru; null = jak w ustawieniach gry. */
 export const CZASY_ETAPU: (number | null)[] = [null, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180];
 
+/**
+ * Finał trójki w serii to sam wyścig do piwa, bez punktów (27.10, migracja `final_bez_punktow`): przy nim nigdzie
+ * nie piszemy mnożnika punktów.
+ */
+export function bezPunktow(e: { finalowy: boolean; seria: boolean }): boolean {
+  return e.finalowy && e.seria;
+}
+
 /** „×1,5” */
 export function napisMnoznika(m: number): string {
   return `×${m.toLocaleString("pl-PL")}`;
@@ -95,7 +103,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     nazwa: "Jeszcze zdążę",
     opis:
       "Punkty z etapów zamieniły się na pozycję startową: lider ma kilka kroków przewagi. Teraz liczy się już tylko wyścig do piwa: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Kto pierwszy dobiegnie, wygrywa.",
-    mnoznik: 2,
+    mnoznik: 1,
     czas_s: 180,
     finalowy: true,
     seria: true,

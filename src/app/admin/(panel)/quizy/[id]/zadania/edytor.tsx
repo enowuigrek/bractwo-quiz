@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useId, useRef, useState } from "react";
-import { napisMnoznika } from "@/lib/etapy";
+import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { Etap, StanFormularza, Zadanie } from "@/lib/typy";
 import { LITERY, NAZWY_TYPOW, PRAWDA_FALSZ, TYPY_ZADAN, liczbaZJednostka, type TypZadania } from "@/lib/zadania";
 import { bezResetu } from "../../../_komponenty/bez-resetu";
@@ -226,7 +226,7 @@ export function EdytorZadania({
           <select id={`${uid}-etap`} name="etap_id" className="pole" defaultValue={zadanie?.etap_id ?? domyslnyEtap ?? ""}>
             {etapy.map((e) => (
               <option key={e.id} value={e.id}>
-                {e.nr}. {e.nazwa} ({napisMnoznika(e.mnoznik)}
+                {e.nr}. {e.nazwa} ({bezPunktow(e) ? "wyścig" : napisMnoznika(e.mnoznik)}
                 {e.czas_s ? `, ${e.czas_s} s` : ""}
                 {e.finalowy ? ", finał trójki" : ""})
               </option>

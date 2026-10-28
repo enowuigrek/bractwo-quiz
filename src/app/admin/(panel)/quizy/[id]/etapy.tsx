@@ -6,6 +6,7 @@ import {
   LIMITY_ETAPU,
   MAX_PLAN_PYTAN,
   MNOZNIKI,
+  bezPunktow,
   napisMnoznika,
   SZABLONY_ETAPOW,
   typDomyslny,
@@ -111,23 +112,26 @@ function FormularzEtapu({
           rows={2}
         />
       </div>
-      <fieldset>
-        <legend>Punkty</legend>
-        <div className="wybor-czasu">
-          {MNOZNIKI.map((m) => (
-            <label key={m} className={`wybor-czasu-opcja${pola.mnoznik === m ? " wybrana" : ""}`}>
-              <input
-                type="radio"
-                name="mnoznik"
-                value={m}
-                checked={pola.mnoznik === m}
-                onChange={() => zmien({ mnoznik: m })}
-              />
-              {napisMnoznika(m)}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {/* finał w serii to sam wyścig, bez punktów: mnożnik nic by nie zmienił */}
+      {!bezPunktow(pola) && (
+        <fieldset>
+          <legend>Punkty</legend>
+          <div className="wybor-czasu">
+            {MNOZNIKI.map((m) => (
+              <label key={m} className={`wybor-czasu-opcja${pola.mnoznik === m ? " wybrana" : ""}`}>
+                <input
+                  type="radio"
+                  name="mnoznik"
+                  value={m}
+                  checked={pola.mnoznik === m}
+                  onChange={() => zmien({ mnoznik: m })}
+                />
+                {napisMnoznika(m)}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
       <fieldset>
         <legend>Czas na odpowiedź</legend>
         <div className="wybor-czasu">
@@ -245,7 +249,7 @@ export function NaglowekEtapu({
           <span className="etap-nr">Etap {etap.nr}</span> {etap.nazwa}
         </h3>
         <p className="etap-znaczki">
-          <span className="znaczek aktywny">punkty {napisMnoznika(etap.mnoznik)}</span>
+          {!bezPunktow(etap) && <span className="znaczek aktywny">punkty {napisMnoznika(etap.mnoznik)}</span>}
           <span className="znaczek">
             {etap.seria ? `${etap.czas_s ?? 60} s na serię` : etap.czas_s ? `${etap.czas_s} s` : "czas jak w grze"}
           </span>

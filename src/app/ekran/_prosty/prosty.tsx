@@ -8,6 +8,7 @@ import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
+import { bezPunktow } from "@/lib/etapy";
 import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
@@ -308,7 +309,7 @@ function Etap({ stan }: { stan: StanSesji }) {
       <h1 className="pr-tytul">{e.nazwa}</h1>
       {e.opis && <p className="pr-opis pr-opis-duzy">{e.opis}</p>}
       <p className="pr-cechy">
-        {e.mnoznik !== 1 && <span>Punkty ×{String(e.mnoznik).replace(".", ",")}</span>}
+        {e.mnoznik !== 1 && !bezPunktow(e) && <span>Punkty ×{String(e.mnoznik).replace(".", ",")}</span>}
         {e.seria && <span>{e.czas_s ?? 60} s na całą serię</span>}
         {!e.seria && e.czas_s && <span>{e.czas_s} s na odpowiedź</span>}
         {!e.finalowy && <span>Pytań: {e.liczba_pytan}</span>}

@@ -5,7 +5,7 @@ import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { Awatar } from "@/components/awatar";
-import { napisMnoznika } from "@/lib/etapy";
+import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { IkonaPuchar } from "@/components/ikony";
@@ -95,7 +95,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               </motion.p>
             )}
             <motion.ul className="tv-etap-cechy" {...wejscie(3)}>
-              {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
+              {e.mnoznik !== 1 && !bezPunktow(e) && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
               {/* bez limitu nic: że szybciej = więcej punktów, mówi opis etapu */}
               {(e.seria || e.czas_s) && (
                 <li>{e.seria ? `${e.czas_s ?? 60} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>

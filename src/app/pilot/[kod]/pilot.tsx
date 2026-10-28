@@ -18,7 +18,7 @@ import {
 import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
-import { napisMnoznika } from "@/lib/etapy";
+import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
@@ -619,7 +619,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
               {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
               <p className="pomocniczy" style={{ margin: 0 }}>
                 {[
-                  `Punkty ${napisMnoznika(etap.mnoznik)}`,
+                  bezPunktow(etap) ? null : `Punkty ${napisMnoznika(etap.mnoznik)}`,
                   etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
                   etap.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", "),
                 ]
@@ -703,7 +703,8 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
                 </summary>
                 {etap && (
                   <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
-                    {etap.nazwa} · punkty {napisMnoznika(etap.mnoznik)}
+                    {etap.nazwa}
+                    {bezPunktow(etap) ? "" : ` · punkty ${napisMnoznika(etap.mnoznik)}`}
                     {stan.finalisci ? " · finał trójki" : ""}
                   </p>
                 )}

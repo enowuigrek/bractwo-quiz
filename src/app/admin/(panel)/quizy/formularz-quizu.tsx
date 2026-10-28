@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { SZABLONY_ETAPOW, SZABLONY_QUIZU, napisMnoznika } from "@/lib/etapy";
+import { SZABLONY_ETAPOW, SZABLONY_QUIZU, bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { RodzajQuizu } from "@/lib/tagi";
 import type { StanFormularza } from "@/lib/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
@@ -40,7 +40,8 @@ export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: Ro
                   <div className="lista-glowna">
                     <div className="lista-tytul">{s.nazwa}</div>
                     <div className="lista-opis">
-                      {s.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", ")} · punkty {napisMnoznika(s.mnoznik)}
+                      {s.typy.map((t) => NAZWY_TYPOW[t].toLowerCase()).join(", ")}
+                      {bezPunktow(s) ? " · bez punktów" : ` · punkty ${napisMnoznika(s.mnoznik)}`}
                       {s.czas_s ? ` · ${s.czas_s} s` : ""}
                       {s.finalowy ? " · finał trójki" : ""}
                     </div>

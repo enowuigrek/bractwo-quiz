@@ -1,5 +1,5 @@
 import { Awatar } from "@/components/awatar";
-import { napisMnoznika } from "@/lib/etapy";
+import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { StanSesji } from "@/lib/gra/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { czyKibic } from "./rozgrywka";
@@ -24,7 +24,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
       <h1 className="etap-nazwa">{e.nazwa}</h1>
       {e.opis && <p className="etap-opis">{e.opis}</p>}
       <ul className="etap-cechy">
-        {e.mnoznik !== 1 && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
+        {e.mnoznik !== 1 && !bezPunktow(e) && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
         {/* bez limitu nic: że szybciej = więcej punktów, mówi opis etapu */}
         {e.czas_s && <li>{e.seria ? `${e.czas_s} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>}
         {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
