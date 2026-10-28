@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
-import { LITERY, liczbaZJednostka, poprawnaSzacowania, type DaneOdpowiedzi } from "@/lib/zadania";
+import { LITERY, celSzacowania, liczbaZJednostka, poprawnaSzacowania, type DaneOdpowiedzi } from "@/lib/zadania";
 
 // Odpowiadanie na telefonie w nowych typach pytań. Każdy komponent dostaje `key={zadanie.id}`,
 // więc zaznaczenia czyszczą się przy następnym pytaniu. `wyslana`: odpowiedź już zapisana (blokuje zmiany).
@@ -70,6 +70,7 @@ export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij }: Props) {
   };
   return (
     <div className="odp-liczba">
+      <p className="odp-liczba-cel">{celSzacowania(z.dane)}</p>
       <p className="odp-liczba-wartosc" aria-live="polite">
         {liczbaZJednostka(pokaz, z.dane.jednostka)}
       </p>

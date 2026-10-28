@@ -8,7 +8,7 @@ import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
-import { LITERY, PRAWDA_FALSZ, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
+import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
 
@@ -401,7 +401,8 @@ function OdpowiedziPytania({ stan, wynik }: { stan: StanSesji; wynik: boolean })
           </>
         ) : (
           <p className="pr-opis pr-opis-duzy">
-            Podaj liczbę od {liczbaZJednostka(d.min ?? 0, d.jednostka)} do {liczbaZJednostka(d.max ?? 0, d.jednostka)}
+            Podaj liczbę od {liczbaZJednostka(d.min ?? 0, d.jednostka)} do {liczbaZJednostka(d.max ?? 0, d.jednostka)}.{" "}
+            {celSzacowania(d)}.
           </p>
         )}
       </div>

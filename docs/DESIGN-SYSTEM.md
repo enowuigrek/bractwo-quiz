@@ -191,6 +191,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Kreski między graczami w listach odpowiedzi (TV).** Ramki „Dobrze / Częściowo / Źle” rysują cienką kreskę `--kamien2` pod każdym graczem, ale nie pod ostatnim w kolumnie: przy kilku kolumnach (siatka układana kolumnami) bez kreski jest dół każdej kolumny (`.na-dole`, liczone w `odpowiedzi.tsx`), bo niczego już nie oddziela.
 
+**Cel w szacowaniu (28.10).** Przed wynikiem nad osią na TV (`.tv-os-cel`, 44 px) i nad liczbą na telefonie (`.odp-liczba-cel`) stoi pigułka w obrysie `--zloto`: „Celuj w widełki” (pytanie z `poprawna_do`) albo „Celuj w konkretną liczbę”. Szerokości widełek nie zdradzamy; po wyniku przedział to złoty pas na osi.
+
 **Koniec gry na TV (27.10).** Podium ma 56 px odstępu od nagłówka, a ekran końca schodzi w dolny margines sceny (podium o 48 px, tabela o 24 px), więc „Dziękujemy za grę! Piwu Cześć!” stoi nisko, z zapasem ok. 45–60 px nad krawędzią (overscan telewizora). Szacowanie na TV bez podpowiedzi o suwaku pod osią: tylko zakres.
 
 **Wybór nagród (kreator gry i pilot przed startem).** Zawsze ten sam układ: przełącznik „z nagrodami”, a po włączeniu dwa kafelki z ikoną podium (`IkonaPodium1` „1. miejsce”, `IkonaPodium3` „pierwsza trójka”) i pola nagród (`.nagrody-pola`, `.nagroda-pole`: numer miejsca, nagroda, mniejsze pole „jak odebrać”, zdjęcie). Bez osobnego przycisku „bez nagród”: to wyłączony przełącznik. Przełącznik, kafelki, pola i zdjęcie nagrody oraz `.przycisk-maly` są we wspólnej sekcji na końcu `globals.css` (26–27.10), żeby pilot wyglądał jak panel bez kopii reguł; nowe miejsca z tymi samymi wyborami składamy z tych klas, a nie z własnych przycisków.

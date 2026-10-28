@@ -2932,6 +2932,18 @@
   gap: 18px;
 }
 
+/* przed wynikiem: celujemy w widełki czy w konkretną liczbę */
+.tv-os-cel {
+  align-self: center;
+  margin: 0;
+  padding: 10px 36px;
+  border: 3px solid var(--zloto);
+  border-radius: var(--r-pill);
+  color: var(--zloto);
+  font-size: 44px;
+  font-weight: var(--w-black);
+}
+
 .tv-os-pole {
   position: relative;
   height: 300px;

@@ -2256,7 +2256,18 @@ html:has(.kolumna) {
   cursor: default;
 }
 
-/* Szacowanie: duża liczba, suwak z −/+ i zakres pod spodem */
+/* Szacowanie: plakietka celu (widełki albo konkretna liczba), duża liczba, suwak z −/+ i zakres pod spodem */
+.odp-liczba-cel {
+  width: fit-content;
+  margin: 0 auto 6px;
+  padding: 4px 14px;
+  border: 2px solid var(--zloto);
+  border-radius: var(--r-pill);
+  color: var(--zloto);
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+}
+
 .odp-liczba-wartosc {
   margin: 0 0 8px;
   text-align: center;

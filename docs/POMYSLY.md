@@ -19,6 +19,7 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 ## Mechaniki
 
 - **Pewniak** (odłożony 23.10: bez minusowych punktów na razie): raz na etap (albo tylko w ostatnim) gracz przed odpowiedzią klika „Jestem pewien”. Trafi: ×2, nie trafi: traci tyle, ile mógł zyskać (wynik nie spada poniżej zera). Zwrot akcji pod koniec z wyboru gracza, a nie kara za samo granie.
+- **Widełki gracza w szacowaniu** (28.10): gracz sam ustawia przedział dwoma suwakami; trafiony i węższy daje więcej punktów. Na razie szacowanie ma jedną liczbę i plakietkę „Celuj w widełki / w konkretną liczbę”.
 - **Va banque na ostatnie pytanie:** każdy stawia część swoich punktów (np. 0–50%).
 - **Passa:** bonus za kilka poprawnych odpowiedzi z rzędu, z licznikiem przy nicku. (Nie mylić z etapem „seria”, który już jest.)
 - **Pełne drużyny:** kilka telefonów w jednej drużynie, wynik liczony jako średnia, żeby większa drużyna nie miała przewagi. (W MVP drużyna = jeden telefon.)

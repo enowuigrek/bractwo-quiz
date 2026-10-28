@@ -76,6 +76,8 @@ export type DaneWidoczne = {
   poprawna?: number | number[];
   /** Szacowanie z przedziałem: górny brzeg dobrych odpowiedzi (od fazy `wynik`, jak `poprawna`). */
   poprawna_do?: number;
+  /** Szacowanie z przedziałem przed wynikiem: sam znacznik, bez liczb (28.10, „Celuj w widełki”). */
+  przedzial?: boolean;
   /** Ciekawostka: tekst pod tytułem. */
   tekst?: string;
 };
@@ -133,6 +135,11 @@ export function przedzialSzacowania(poprawna: number, poprawna_do?: number | nul
 export function poprawnaSzacowania(poprawna: number, poprawna_do?: number | null, jednostka?: string | null): string {
   const [od, do_] = przedzialSzacowania(poprawna, poprawna_do);
   return od === do_ ? liczbaZJednostka(od, jednostka) : `${liczbaZJednostka(od)}–${liczbaZJednostka(do_, jednostka)}`;
+}
+
+/** Plakietka nad osią i suwakiem szacowania: czy wystarczy trafić w przedział, czy trzeba w konkretną liczbę. */
+export function celSzacowania(dane: DaneWidoczne): string {
+  return dane.przedzial || typeof dane.poprawna_do === "number" ? "Celuj w widełki" : "Celuj w konkretną liczbę";
 }
 
 export const LITERY = "ABCDEF";

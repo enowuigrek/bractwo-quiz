@@ -2,12 +2,13 @@
 
 import { Awatar } from "@/components/awatar";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
-import { liczbaZJednostka, poprawnaSzacowania, przedzialSzacowania } from "@/lib/zadania";
+import { celSzacowania, liczbaZJednostka, poprawnaSzacowania, przedzialSzacowania } from "@/lib/zadania";
 
 /**
  * Szacowanie na TV: oś od `min` do `max`. W trakcie pytania pusta (z zakresem), po wyniku każda podana
  * liczba to kropka (te same liczby piętrzą się w górę), a złota kreska z napisem to poprawna liczba
- * (przy przedziale kreska na środku, a sam przedział to złoty pas na osi).
+ * (przy przedziale kreska na środku, a sam przedział to złoty pas na osi). Przed wynikiem nad osią plakietka, czy
+ * celujemy w widełki, czy w konkretną liczbę (28.10).
  */
 export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean }) {
   const min = z.dane.min ?? 0;
@@ -31,6 +32,7 @@ export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean })
 
   return (
     <div className="tv-os">
+      {!wynik && <p className="tv-os-cel">{celSzacowania(z.dane)}</p>}
       <div className="tv-os-pole">
         {kropki.map(({ x, i, wysokosc }) => (
           <span
