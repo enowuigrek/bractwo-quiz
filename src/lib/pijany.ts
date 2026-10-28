@@ -1,5 +1,6 @@
 // Tryb „Pijany finał”: dogrywka po finale serią, która nic nie liczy. Pytania są w tabeli `pijane_pytania`
-// (edycja: panel → Quizy → Pijany finał) w dwóch grupach: piwne lecą najpierw, potem reszta, w każdej losowo.
+// (edycja: panel → quiz → Pijany finał albo Quizy → Pijany finał) w dwóch częściach: „O piwie” (`piwne`) po kolei,
+// potem „Odklejone” losowo (28.10: bez osobnego wejścia dla każdego quizu).
 // Każde ma komentarze po ✓ i ✗. Przeszkadzacze nie zależą od pytania: idą zawsze w tej samej, narastającej
 // kolejności według pozycji w dogrywce (`KOLEJNOSC_EFEKTOW`), a cały ekran telefonu faluje coraz mocniej z upływem
 // czasu. Wstawki w treści: {za_barem} (pole w kreatorze gry) i {lokal}.
@@ -60,7 +61,7 @@ export type PijanePytanie = {
 };
 
 /** `pytan`: wspólna pula, `wejscie`: pytania wejścia jednego quizu (lecą przed pulą). */
-export const LIMITY_PIJANE = { pytan: 60, wejscie: 5, tresc: 200, komentarz: 80 } as const;
+export const LIMITY_PIJANE = { pytan: 60, tresc: 200, komentarz: 80 } as const;
 
 /** Komentarze do pytań bez własnego komentarza po danej odpowiedzi (wszystkie z 25.10 mają własne). */
 export const KOMENTARZE_OGOLNE = [

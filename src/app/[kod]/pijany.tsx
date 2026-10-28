@@ -26,7 +26,7 @@ type Reakcja = { dobrze: boolean; wybrana: 0 | 1; komentarz: string | null; ms: 
 /**
  * Telefon w trybie „Pijany finał” (faza `pijany`): dogrywka po finale, która nic nie liczy. Tryb jest ukryty
  * przed graczami: telefon wygląda jak dalsza seria, a numeracja leci dalej (pytanie 15, 16…).
- * Każdy odpowiada we własnym tempie na pytania z `pijane_pytania` (najpierw wejście quizu, potem wspólna pula,
+ * Każdy odpowiada we własnym tempie na pytania z `pijane_pytania` (najpierw „O piwie” po kolei, potem „Odklejone” losowo,
  * bez powtórek: po ostatnim zostaje sam pasek); odpowiedzi nigdzie nie idą. Po każdej odpowiedzi reakcja: błysk w losowym kolorze, drżenie albo puls
  * przycisku i czasem komentarz na środku ekranu („Serio?”), coraz dłużej (1 s → 3,5 s), więc nie da się tego
  * przeklikać. Cały ekran faluje coraz mocniej z upływem czasu (`--poziom` 0..1), a przeszkadzacze idą według

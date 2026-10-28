@@ -39,8 +39,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     { data: zadania },
     { data: etapyZBazy },
     { count: aktywneGry },
-    { data: wejscie },
-    { data: pulaPijana },
+    { data: pijanePytania },
   ] =
     await Promise.all([
       db
@@ -51,12 +50,6 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
-      db
-        .from("pijane_pytania_quizu")
-        .select("nr, tresc, komentarz_prawda, komentarz_falsz")
-        .eq("quiz_id", id)
-        .order("nr")
-        .returns<PijanePytanie[]>(),
       db
         .from("pijane_pytania")
         .select("nr, tresc, komentarz_prawda, komentarz_falsz, piwne")
@@ -310,13 +303,9 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
             {!etap && wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
           </div>
         ))}
-        {/* pytania pijanego finału zmienia tylko główny; jest tylko po finale wyścigu po piwo i stoi jak etapy:
-            wejście tego quizu, potem wspólna pula wszystkich quizów */}
+        {/* pytania pijanego finału (wspólne dla quizów) zmienia tylko główny; jest tylko po finale wyścigu po piwo */}
         {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
-          <>
-            <BlokPijany quizId={quiz.id} pytania={wejscie ?? []} />
-            <BlokPijany pytania={pulaPijana ?? []} />
-          </>
+          <BlokPijany pytania={pijanePytania ?? []} />
         )}
         {/* quiz z etapami dodaje pytania w swoich etapach (wyżej), a klasyczny wierszem pod listą, rozwijanym jak
             pytania (28.10: przycisk, który się rozwija, wyglądał źle) */}

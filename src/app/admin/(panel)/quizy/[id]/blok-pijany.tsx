@@ -1,20 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { LIMITY_PIJANE, type PijanePytanie } from "@/lib/pijany";
+import type { PijanePytanie } from "@/lib/pijany";
 import { FormularzPijany } from "../pijany-final/formularz";
 
 /**
- * Pijany finał na liście etapów quizu (28.10): wejście tego quizu i wspólna pula wyglądają jak etapy (nagłówek,
- * zwijanie nazwą, pytania pod spodem), ale w swoich kolorach, bo tryb jest opcjonalny (włącza się go przy
- * uruchamianiu gry). Pytania edytuje się w miejscu; zapis całej listy naraz (`zapiszPijanePytania`). Bez `quizId`
- * to wspólna pula: zmiany w niej działają we wszystkich quizach.
+ * Pijany finał na liście etapów quizu (28.10): wygląda jak etap (nagłówek, zwijanie nazwą, pytania pod spodem), ale
+ * w swoim kolorze i z przerywanym obrysem, bo tryb jest opcjonalny (włącza się go przy uruchamianiu gry). Pytania są
+ * wspólne dla wszystkich quizów: „O piwie” po kolei, potem „Odklejone” losowo; zapis całej listy naraz.
  */
-export function BlokPijany({ quizId, pytania }: { quizId?: string; pytania: PijanePytanie[] }) {
+export function BlokPijany({ pytania }: { pytania: PijanePytanie[] }) {
   const [zwiniety, ustawZwiniety] = useState(false);
-  const wejscie = !!quizId;
+  const oPiwie = pytania.filter((p) => p.piwne).length;
   return (
-    <div className={`etap-blok etap-pijany ${wejscie ? "wejscie" : "pula"}`}>
+    <div className="etap-blok etap-pijany">
       <div className={`etap-naglowek${zwiniety ? " zwiniety" : ""}`}>
         <div className="lista-glowna">
           <h3 className="etap-tytul">
@@ -24,34 +23,22 @@ export function BlokPijany({ quizId, pytania }: { quizId?: string; pytania: Pija
               aria-expanded={!zwiniety}
               onClick={() => ustawZwiniety((z) => !z)}
             >
-              <span className="etap-nr">Pijany finał</span> {wejscie ? "Wejście" : "Wspólna pula"}
+              <span className="etap-nr">Pijany finał</span> Dogrywka
             </button>
           </h3>
           <p className="etap-znaczki">
             <span className="znaczek aktywny">opcjonalny</span>
-            {wejscie ? (
-              <>
-                <span className="znaczek">po kolei</span>
-                <span className={`znaczek${pytania.length ? " aktywny" : ""}`}>
-                  pytania {pytania.length} z {LIMITY_PIJANE.wejscie}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="znaczek aktywny">wszystkie quizy</span>
-                <span className="znaczek">losowo</span>
-                <span className="znaczek">pytania {pytania.length}</span>
-              </>
-            )}
+            <span className="znaczek aktywny">wszystkie quizy</span>
+            <span className="znaczek">o piwie {oPiwie}</span>
+            <span className="znaczek">odklejone {pytania.length - oPiwie}</span>
           </p>
           <p className="lista-opis">
-            {wejscie
-              ? "Pierwsze pytania dogrywki, jeszcze na temat quizu, z każdym coraz dziwniej. Potem wspólna pula."
-              : "Po wejściu: najpierw złote (jeszcze o piwie), potem szare. Zmiany działają w każdym quizie."}
+            Po finale, gdy przy uruchamianiu gry włączysz pijany finał. Pytania są wspólne: zmiany działają w każdym
+            quizie.
           </p>
         </div>
       </div>
-      {!zwiniety && <FormularzPijany pytania={pytania} quizId={quizId ?? null} />}
+      {!zwiniety && <FormularzPijany pytania={pytania} />}
     </div>
   );
 }

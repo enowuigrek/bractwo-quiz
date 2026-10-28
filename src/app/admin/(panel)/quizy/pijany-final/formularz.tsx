@@ -37,13 +37,13 @@ function zWklejonych(tekst: string, piwne: boolean): Wiersz[] {
 }
 
 /**
- * Pytania pijanego finału: treść i komentarze po ✓ i ✗, zapis całości jednym przyciskiem.
- * Bez `quizId` wspólna pula w dwóch grupach (złota leci w każdej grze najpierw, potem szara, w każdej losowo), z
- * `quizId` wejście tego quizu (po kolei, ze strzałkami). Przeszkadzaczy się tu nie wybiera: idą według pozycji.
+ * Pytania pijanego finału (wspólne dla wszystkich quizów): treść i komentarze po ✓ i ✗, zapis całości jednym
+ * przyciskiem. Dwie części: „O piwie” leci po kolei (strzałki), „Odklejone” losowo. Przeszkadzaczy się tu nie
+ * wybiera: idą według pozycji.
  */
-export function FormularzPijany({ pytania, quizId = null }: { pytania: PijanePytanie[]; quizId?: string | null }) {
-  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszPijanePytania.bind(null, quizId), {});
-  const limit = quizId ? LIMITY_PIJANE.wejscie : LIMITY_PIJANE.pytan;
+export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
+  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszPijanePytania, {});
+  const limit = LIMITY_PIJANE.pytan;
   const [wiersze, ustawWiersze] = useState<Wiersz[]>(() =>
     pytania.map((p) => ({
       klucz: nowyKlucz(),
@@ -57,11 +57,22 @@ export function FormularzPijany({ pytania, quizId = null }: { pytania: PijanePyt
   const zmien = (klucz: number, zmiana: Partial<Wiersz>) =>
     ustawWiersze((l) => l.map((w) => (w.klucz === klucz ? { ...w, ...zmiana } : w)));
   const usun = (klucz: number) => ustawWiersze((l) => l.filter((w) => w.klucz !== klucz));
-  const przesun = (i: number, o: number) =>
+  // zamiana z sąsiadem z tej samej części (kolejność „O piwie” to kolejność w grze)
+  const przesun = (klucz: number, o: -1 | 1) =>
     ustawWiersze((l) => {
+      const i = l.findIndex((w) => w.klucz === klucz);
+      let j = i + o;
+      while (j >= 0 && j < l.length && l[j].piwne !== l[i].piwne) j += o;
+      if (i < 0 || j < 0 || j >= l.length) return l;
       const n = [...l];
-      [n[i], n[i + o]] = [n[i + o], n[i]];
+      [n[i], n[j]] = [n[j], n[i]];
       return n;
+    });
+  // przeniesione do innej części trafia na jej koniec
+  const przenies = (klucz: number) =>
+    ustawWiersze((l) => {
+      const w = l.find((x) => x.klucz === klucz);
+      return w ? [...l.filter((x) => x.klucz !== klucz), { ...w, piwne: !w.piwne }] : l;
     });
   const dodaj = (nowe: Wiersz[]) => ustawWiersze((l) => [...l, ...nowe].slice(0, limit));
 
@@ -96,89 +107,36 @@ export function FormularzPijany({ pytania, quizId = null }: { pytania: PijanePyt
     </div>
   );
 
-  const przyciskUsun = (w: Wiersz, nr: number) => (
-    <button
-      type="button"
-      className="przycisk-maly ikona niebezpieczny"
-      onClick={() => usun(w.klucz)}
-      aria-label={`Usuń pytanie ${nr}`}
-    >
-      ✕
-    </button>
-  );
-
   return (
     <form action={akcja}>
       <input
         type="hidden"
         name="pytania"
         value={JSON.stringify(
-          wiersze.map(({ tresc, komentarzPrawda, komentarzFalsz, piwne }) => ({
-            tresc,
-            komentarz_prawda: komentarzPrawda,
-            komentarz_falsz: komentarzFalsz,
-            piwne,
-          })),
+          // „O piwie” najpierw, w swojej kolejności (to ona daje `nr`)
+          [...wiersze.filter((w) => w.piwne), ...wiersze.filter((w) => !w.piwne)].map(
+            ({ tresc, komentarzPrawda, komentarzFalsz, piwne }) => ({
+              tresc,
+              komentarz_prawda: komentarzPrawda,
+              komentarz_falsz: komentarzFalsz,
+              piwne,
+            }),
+          ),
         )}
       />
-      {quizId ? (
-        // wejście quizu: po kolei
-        <>
-          <ol className="lista pijane-pytania">
-            {wiersze.map((w, i) => (
-              <li key={w.klucz}>
-                <span className="krok-nr">{i + 1}.</span>
-                {pola(w, i + 1)}
-                <div className="lista-akcje">
-                  <button
-                    type="button"
-                    className="przycisk-maly ikona"
-                    onClick={() => przesun(i, -1)}
-                    disabled={i === 0}
-                    aria-label={`Przesuń pytanie ${i + 1} wyżej`}
-                  >
-                    ↑
-                  </button>
-                  <button
-                    type="button"
-                    className="przycisk-maly ikona"
-                    onClick={() => przesun(i, 1)}
-                    disabled={i === wiersze.length - 1}
-                    aria-label={`Przesuń pytanie ${i + 1} niżej`}
-                  >
-                    ↓
-                  </button>
-                  {przyciskUsun(w, i + 1)}
-                </div>
-              </li>
-            ))}
-          </ol>
-          <p className="panel-sekcja">
-            <button
-              type="button"
-              className="przycisk"
-              disabled={wiersze.length >= limit}
-              onClick={() => dodaj([pustyWiersz(false)])}
-            >
-              + pytanie
-            </button>
-          </p>
-        </>
-      ) : (
-        // wspólna pula: dwie grupy kolorami, kolejność w grupie losuje baza
-        [true, false].map((piwne) => (
-          <Grupa
-            key={String(piwne)}
-            piwne={piwne}
-            wiersze={wiersze.filter((w) => w.piwne === piwne)}
-            pelna={wiersze.length >= limit}
-            pola={pola}
-            przyciskUsun={przyciskUsun}
-            przenies={(w) => zmien(w.klucz, { piwne: !piwne })}
-            dodaj={dodaj}
-          />
-        ))
-      )}
+      {[true, false].map((piwne) => (
+        <Grupa
+          key={String(piwne)}
+          piwne={piwne}
+          wiersze={wiersze.filter((w) => w.piwne === piwne)}
+          pelna={wiersze.length >= limit}
+          pola={pola}
+          usun={usun}
+          przesun={przesun}
+          przenies={przenies}
+          dodaj={dodaj}
+        />
+      ))}
       <p className="panel-sekcja">
         <button type="submit" className="przycisk zloty" disabled={trwa}>
           {trwa ? "Zapisuję…" : "Zapisz pytania"}
@@ -189,13 +147,17 @@ export function FormularzPijany({ pytania, quizId = null }: { pytania: PijanePyt
   );
 }
 
-/** Jedna grupa wspólnej puli (złota: na początek, szara: potem) z dodawaniem po jednym i wklejaniem kilku naraz. */
+/**
+ * Jedna część: „O piwie” (złota, po kolei, ze strzałkami) albo „Odklejone” (szara, losowo), z dodawaniem po jednym i
+ * wklejaniem kilku naraz.
+ */
 function Grupa({
   piwne,
   wiersze,
   pelna,
   pola,
-  przyciskUsun,
+  usun,
+  przesun,
   przenies,
   dodaj,
 }: {
@@ -203,40 +165,72 @@ function Grupa({
   wiersze: Wiersz[];
   pelna: boolean;
   pola: (w: Wiersz, nr: number) => React.ReactNode;
-  przyciskUsun: (w: Wiersz, nr: number) => React.ReactNode;
-  przenies: (w: Wiersz) => void;
+  usun: (klucz: number) => void;
+  przesun: (klucz: number, o: -1 | 1) => void;
+  przenies: (klucz: number) => void;
   dodaj: (nowe: Wiersz[]) => void;
 }) {
   const [wklejanie, ustawWklejanie] = useState<string | null>(null);
+  const Lista = piwne ? "ol" : "ul";
   return (
     <section className={`pijana-grupa ${piwne ? "piwne" : "reszta"}`}>
       <h2>
         <span className="pijana-grupa-kropka" aria-hidden />
-        {piwne ? "Na początek" : "Potem"} <span className="pomocniczy">({wiersze.length})</span>
+        {piwne ? "O piwie" : "Odklejone"} <span className="pomocniczy">({wiersze.length})</span>
       </h2>
       <p className="pomocniczy" style={{ marginTop: 0 }}>
         {piwne
-          ? "Jeszcze o piwie, żeby dogrywka płynnie wyszła z finału. W każdej grze lecą najpierw, w losowej kolejności."
-          : "Coraz dziwniej. Lecą po złotych, też losowo."}
+          ? "Lecą zaraz po finale, zawsze w tej kolejności: spokojnie, jak dalszy ciąg finału, z każdym trochę dziwniej."
+          : "Po „O piwie”, w losowej kolejności. Tu już można odlecieć."}
       </p>
-      <ul className="lista pijane-pytania">
+      <Lista className="lista pijane-pytania">
         {wiersze.map((w, i) => (
           <li key={w.klucz}>
+            {piwne && <span className="krok-nr">{i + 1}.</span>}
             {pola(w, i + 1)}
             <div className="lista-akcje">
+              {piwne && (
+                <>
+                  <button
+                    type="button"
+                    className="przycisk-maly ikona"
+                    onClick={() => przesun(w.klucz, -1)}
+                    disabled={i === 0}
+                    aria-label={`Przesuń pytanie ${i + 1} wyżej`}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    className="przycisk-maly ikona"
+                    onClick={() => przesun(w.klucz, 1)}
+                    disabled={i === wiersze.length - 1}
+                    aria-label={`Przesuń pytanie ${i + 1} niżej`}
+                  >
+                    ↓
+                  </button>
+                </>
+              )}
               <button
                 type="button"
                 className="przycisk-maly"
-                onClick={() => przenies(w)}
-                aria-label={`Przenieś pytanie do grupy „${piwne ? "Potem" : "Na początek"}”`}
+                onClick={() => przenies(w.klucz)}
+                aria-label={`Przenieś pytanie do części „${piwne ? "Odklejone" : "O piwie"}”`}
               >
-                {piwne ? "↓ Potem" : "↑ Na początek"}
+                {piwne ? "↓ Odklejone" : "↑ O piwie"}
               </button>
-              {przyciskUsun(w, i + 1)}
+              <button
+                type="button"
+                className="przycisk-maly ikona niebezpieczny"
+                onClick={() => usun(w.klucz)}
+                aria-label={`Usuń pytanie ${i + 1}`}
+              >
+                ✕
+              </button>
             </div>
           </li>
         ))}
-      </ul>
+      </Lista>
       {wklejanie !== null && (
         <div className="pijana-wklej">
           <textarea
