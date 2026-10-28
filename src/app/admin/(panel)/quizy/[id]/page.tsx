@@ -22,6 +22,8 @@ import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import { NAZWY_TYPOW, opisRozwiazania, type TypZadania } from "@/lib/zadania";
 import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
+import { WejsciePijanego } from "./wejscie-pijanego";
+import type { PijanePytanie } from "@/lib/pijany";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
 
@@ -32,7 +34,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
   const { mozeZmieniac } = await wymagajQuizu(rola, id, true);
   const db = supabaseAdmin();
 
-  const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { count: wejscie }] =
+  const [{ data: quiz }, { data: zadania }, { data: etapyZBazy }, { count: aktywneGry }, { data: wejscie }] =
     await Promise.all([
       db
         .from("quizy")
@@ -42,7 +44,12 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
-      db.from("pijane_pytania_quizu").select("id", { count: "exact", head: true }).eq("quiz_id", id),
+      db
+        .from("pijane_pytania_quizu")
+        .select("nr, tresc, komentarz_prawda, komentarz_falsz")
+        .eq("quiz_id", id)
+        .order("nr")
+        .returns<PijanePytanie[]>(),
     ]);
   if (!quiz) notFound();
   const lista = zadania ?? [];
@@ -291,6 +298,10 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
             {!etap && wEtapie.length > 0 && <ol className="lista">{wEtapie.map(wiersz)}</ol>}
           </div>
         ))}
+        {/* pytania pijanego finału zmienia tylko główny; wejście jest tylko po finale wyścigu po piwo i stoi jak etap */}
+        {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
+          <WejsciePijanego quizId={quiz.id} pytania={wejscie ?? []} />
+        )}
         {/* quiz z etapami dodaje pytania w swoich etapach (wyżej), a klasyczny wierszem pod listą, rozwijanym jak
             pytania (28.10: przycisk, który się rozwija, wyglądał źle) */}
         {etapy.length === 0 && (
@@ -316,20 +327,6 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         </section>
       )}
 
-      {/* pytania pijanego finału zmienia tylko główny; jest tylko po finale wyścigu po piwo */}
-      {mozePijanyFinal(rola) && etapy.some((e) => e.finalowy && e.seria) && (
-        <section className="panel-sekcja">
-          <h2>Pijany finał: wejście</h2>
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            {wejscie
-              ? `Pytań wejścia: ${wejscie}. Dogrywka zaczyna się od nich (na temat quizu), potem wspólna pula.`
-              : "Bez wejścia: dogrywka zaczyna się od razu od wspólnej puli."}{" "}
-            <Link href={`/admin/quizy/${quiz.id}/pijany`} className="przycisk-maly">
-              Edytuj wejście
-            </Link>
-          </p>
-        </section>
-      )}
 
       <section className="panel-sekcja quiz-zapisz">
         <button type="submit" form={FORMULARZ_QUIZU} name="wroc" value="1" className="przycisk zloty">
