@@ -1,6 +1,7 @@
 // Tryb „Pijany finał”: dogrywka po finale serią, która nic nie liczy. Pytania są w tabeli `pijane_pytania`
-// (edycja: panel → quiz → Pijany finał albo Quizy → Pijany finał) w dwóch częściach: „O piwie” (`piwne`) po kolei,
-// potem „Odklejone” losowo (28.10: bez osobnego wejścia dla każdego quizu).
+// (edycja: panel → quiz → Pijany finał albo Quizy → Pijany finał) w dwóch częściach: na początek 3 losowe „O piwie”
+// (`piwne`), czwarte z imieniem zza baru ({za_barem}, bez imienia też „O piwie”), potem „Odklejone” losowo do końca
+// czasu (28.10).
 // Każde ma komentarze po ✓ i ✗. Przeszkadzacze nie zależą od pytania: idą zawsze w tej samej, narastającej
 // kolejności według pozycji w dogrywce (`KOLEJNOSC_EFEKTOW`), a cały ekran telefonu faluje coraz mocniej z upływem
 // czasu. Wstawki w treści: {za_barem} (pole w kreatorze gry) i {lokal}.
@@ -153,7 +154,7 @@ export function startZegaraPijanego(stan: { kod: string; faza_od: string | null 
  * (prompt w `scripts/grafiki.mjs`, `pijany-kalsarikannit`); bez pliku plansza jest bez obrazka.
  */
 export const CIEKAWOSTKA_PIJANA = {
-  po: 4,
+  po: 3,
   tytul: "Kalsarikännit",
   tekst:
     "Finowie mają osobne słowo na picie w domu, w samych gaciach, bez zamiaru wychodzenia gdziekolwiek: kalsarikännit. " +

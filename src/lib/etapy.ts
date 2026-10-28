@@ -104,7 +104,7 @@ export const SZABLONY_ETAPOW: SzablonEtapu[] = [
     opis:
       "Punkty z etapów zamieniły się na pozycję startową: lider ma kilka kroków przewagi. Teraz liczy się już tylko wyścig do piwa: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Kto pierwszy dobiegnie, wygrywa.",
     mnoznik: 1,
-    czas_s: 180,
+    czas_s: 120,
     finalowy: true,
     seria: true,
     typy: ["prawda_falsz"],

@@ -38,8 +38,8 @@ function zWklejonych(tekst: string, piwne: boolean): Wiersz[] {
 
 /**
  * Pytania pijanego finału (wspólne dla wszystkich quizów): treść i komentarze po ✓ i ✗, zapis całości jednym
- * przyciskiem. Dwie części: „O piwie” leci po kolei (strzałki), „Odklejone” losowo. Przeszkadzaczy się tu nie
- * wybiera: idą według pozycji.
+ * przyciskiem. Dwie części: z „O piwie” lecą na początek 3 losowe, z „Odklejonych” reszta, losowo. Przeszkadzaczy się
+ * tu nie wybiera: idą według pozycji.
  */
 export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszPijanePytania, {});
@@ -57,17 +57,6 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
   const zmien = (klucz: number, zmiana: Partial<Wiersz>) =>
     ustawWiersze((l) => l.map((w) => (w.klucz === klucz ? { ...w, ...zmiana } : w)));
   const usun = (klucz: number) => ustawWiersze((l) => l.filter((w) => w.klucz !== klucz));
-  // zamiana z sąsiadem z tej samej części (kolejność „O piwie” to kolejność w grze)
-  const przesun = (klucz: number, o: -1 | 1) =>
-    ustawWiersze((l) => {
-      const i = l.findIndex((w) => w.klucz === klucz);
-      let j = i + o;
-      while (j >= 0 && j < l.length && l[j].piwne !== l[i].piwne) j += o;
-      if (i < 0 || j < 0 || j >= l.length) return l;
-      const n = [...l];
-      [n[i], n[j]] = [n[j], n[i]];
-      return n;
-    });
   // przeniesione do innej części trafia na jej koniec
   const przenies = (klucz: number) =>
     ustawWiersze((l) => {
@@ -113,7 +102,6 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
         type="hidden"
         name="pytania"
         value={JSON.stringify(
-          // „O piwie” najpierw, w swojej kolejności (to ona daje `nr`)
           [...wiersze.filter((w) => w.piwne), ...wiersze.filter((w) => !w.piwne)].map(
             ({ tresc, komentarzPrawda, komentarzFalsz, piwne }) => ({
               tresc,
@@ -132,7 +120,6 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
           pelna={wiersze.length >= limit}
           pola={pola}
           usun={usun}
-          przesun={przesun}
           przenies={przenies}
           dodaj={dodaj}
         />
@@ -148,8 +135,7 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
 }
 
 /**
- * Jedna część: „O piwie” (złota, po kolei, ze strzałkami) albo „Odklejone” (szara, losowo), z dodawaniem po jednym i
- * wklejaniem kilku naraz.
+ * Jedna część: „O piwie” (złota) albo „Odklejone” (szara), z dodawaniem po jednym i wklejaniem kilku naraz.
  */
 function Grupa({
   piwne,
@@ -157,7 +143,6 @@ function Grupa({
   pelna,
   pola,
   usun,
-  przesun,
   przenies,
   dodaj,
 }: {
@@ -166,12 +151,10 @@ function Grupa({
   pelna: boolean;
   pola: (w: Wiersz, nr: number) => React.ReactNode;
   usun: (klucz: number) => void;
-  przesun: (klucz: number, o: -1 | 1) => void;
   przenies: (klucz: number) => void;
   dodaj: (nowe: Wiersz[]) => void;
 }) {
   const [wklejanie, ustawWklejanie] = useState<string | null>(null);
-  const Lista = piwne ? "ol" : "ul";
   return (
     <section className={`pijana-grupa ${piwne ? "piwne" : "reszta"}`}>
       <h2>
@@ -180,37 +163,14 @@ function Grupa({
       </h2>
       <p className="pomocniczy" style={{ marginTop: 0 }}>
         {piwne
-          ? "Lecą zaraz po finale, zawsze w tej kolejności: spokojnie, jak dalszy ciąg finału, z każdym trochę dziwniej."
-          : "Po „O piwie”, w losowej kolejności. Tu już można odlecieć."}
+          ? "Na początek 3 losowe, spokojnie, jak dalszy ciąg finału. Czwarte to pytanie z imieniem zza baru ({za_barem}), a bez imienia jeszcze jedno stąd."
+          : "Potem losowo, aż skończy się czas. Tu już można odlecieć."}
       </p>
-      <Lista className="lista pijane-pytania">
+      <ul className="lista pijane-pytania">
         {wiersze.map((w, i) => (
           <li key={w.klucz}>
-            {piwne && <span className="krok-nr">{i + 1}.</span>}
             {pola(w, i + 1)}
             <div className="lista-akcje">
-              {piwne && (
-                <>
-                  <button
-                    type="button"
-                    className="przycisk-maly ikona"
-                    onClick={() => przesun(w.klucz, -1)}
-                    disabled={i === 0}
-                    aria-label={`Przesuń pytanie ${i + 1} wyżej`}
-                  >
-                    ↑
-                  </button>
-                  <button
-                    type="button"
-                    className="przycisk-maly ikona"
-                    onClick={() => przesun(w.klucz, 1)}
-                    disabled={i === wiersze.length - 1}
-                    aria-label={`Przesuń pytanie ${i + 1} niżej`}
-                  >
-                    ↓
-                  </button>
-                </>
-              )}
               <button
                 type="button"
                 className="przycisk-maly"
@@ -230,7 +190,7 @@ function Grupa({
             </div>
           </li>
         ))}
-      </Lista>
+      </ul>
       {wklejanie !== null && (
         <div className="pijana-wklej">
           <textarea

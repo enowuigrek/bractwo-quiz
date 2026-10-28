@@ -1,5 +1,5 @@
 // Finał jako wyścig (od 24.10): szklanka jest `META_FINALU` kroków od startu, dobra odpowiedź to krok naprzód, zła
-// krok w tył (za linię startu się nie cofa), a finaliści startują z przewagą 0–3 kroków według punktów sprzed finału
+// krok w tył (za linię startu się nie cofa), a finaliści startują z przewagą 0–4 kroków: krok za każde 2500 pkt przewagi nad najsłabszym finalistą (28.10)
 // (`gracze.start_finalu`, baza: `wewn.ustaw_start_finalu`, `wewn.meta_finalu`, `wewn.kroki_finalu`, koniec w
 // `wewn.zamknij_serie_jesli_gotowe` także po wyczerpaniu puli, podium według wyścigu w `wewn.ranking`).
 

@@ -27,9 +27,9 @@ export default async function PijanyFinal() {
       <h1>Pijany finał</h1>
       <p className="pomocniczy">
         Dogrywka po finale serią, gdy przy uruchamianiu gry włączysz „Pijany finał”. Wynik jest już ustalony, a gracze
-        przez 60 s odpowiadają prawda/fałsz: najpierw na pytania „O piwie” (zawsze w tej kolejności, spokojnie, jak
-        dalszy ciąg finału), potem na „Odklejone” (losowo). Pytania są wspólne dla wszystkich quizów i nic się nie
-        powtarza.
+        przez 60 s odpowiadają prawda/fałsz: najpierw na 3 losowe „O piwie” (spokojnie, jak dalszy ciąg finału), potem
+        na pytanie z imieniem zza baru (bez imienia na jeszcze jedno „O piwie”), a dalej na „Odklejone” losowo, aż
+        skończy się czas. Pytania są wspólne dla wszystkich quizów i nic się nie powtarza.
         Szybki gracz przechodzi ok. 15–20 pytań, więc razem powinno ich być przynajmniej 25. Utrudnienia (drżenie,
         zamienione kolory, uciekające przyciski…) nie zależą od pytania: zawsze narastają w tej samej kolejności. Po
         każdej odpowiedzi telefon reaguje coraz dłużej i pokazuje komentarz (własny z pól poniżej albo ogólny, np.

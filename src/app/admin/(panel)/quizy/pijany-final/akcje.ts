@@ -8,8 +8,8 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
 /**
- * Zapisuje całą listę pytań pijanego finału naraz (wspólna dla wszystkich quizów): „O piwie” (`piwne`) leci po kolei
- * według `nr`, czyli kolejności z formularza, a „Odklejone” losowo (28.10: bez osobnego wejścia dla każdego quizu).
+ * Zapisuje całą listę pytań pijanego finału naraz (wspólna dla wszystkich quizów): z „O piwie” (`piwne`) lecą na
+ * początek 3 losowe, z „Odklejonych” reszta, losowo (28.10: bez osobnego wejścia dla każdego quizu).
  * Przeszkadzacze nie są przy pytaniach (idą według pozycji, src/lib/pijany.ts).
  */
 export async function zapiszPijanePytania(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
