@@ -34,12 +34,14 @@ export default async function LogowanieLokalu({ params }: PageProps<"/admin/[lok
   if (rola && lokalRoli(rola) === lokal.id) redirect("/admin");
 
   return (
-    <main className="kolumna">
-      <h1 className="logowanie-lokalu">
-        {lokal.logo_url ? <img src={lokal.logo_url} alt={lokal.nazwa} /> : <span>{lokal.nazwa}</span>}
-        <LogoQuiz wysokosc={56} dopisek="panel" priorytet />
-      </h1>
-      <FormularzLogowania akcja={zalogujLokal.bind(null, lokal.id)} etykieta={`Hasło lokalu ${lokal.nazwa}`} />
-    </main>
+    <div className="logowanie-ekran">
+      <main className="kolumna">
+        <h1 className="logowanie-lokalu">
+          {lokal.logo_url ? <img src={lokal.logo_url} alt={lokal.nazwa} /> : <span>{lokal.nazwa}</span>}
+          <LogoQuiz wysokosc={56} dopisek="panel" priorytet />
+        </h1>
+        <FormularzLogowania akcja={zalogujLokal.bind(null, lokal.id)} etykieta={`Hasło lokalu ${lokal.nazwa}`} />
+      </main>
+    </div>
   );
 }

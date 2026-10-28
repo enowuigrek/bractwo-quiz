@@ -13,7 +13,7 @@ export function FormularzLogowania({ akcja: akcjaLogowania = zalogujAdmina, etyk
   const [stan, akcja, trwa] = useActionState<StanLogowania, FormData>(akcjaLogowania, {});
 
   return (
-    <form action={akcja} className="karta" style={{ display: "grid", gap: "var(--card-pad)" }}>
+    <form action={akcja} style={{ display: "grid", gap: "var(--card-pad)" }}>
       <label htmlFor="haslo" className="pomocniczy">
         {etykieta}
       </label>

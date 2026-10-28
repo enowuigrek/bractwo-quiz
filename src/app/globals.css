@@ -184,6 +184,19 @@ input.pole[type="time"] {
 }
 
 /* Logowanie lokalu (/admin/<adres>): logo lokalu z lewej, Bractwo Quiz z prawej, ta sama wysokość */
+/* Logowanie do panelu (główny i lokal, 28.10): karta na środku ekranu, formularz bez własnej ramki w środku */
+.logowanie-ekran {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logowanie-ekran > .kolumna:not(.kolumna-pilot) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .logowanie-lokalu {
   display: flex;
   align-items: center;
