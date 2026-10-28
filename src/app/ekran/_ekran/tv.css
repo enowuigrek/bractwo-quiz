@@ -66,6 +66,14 @@
   object-fit: contain;
 }
 
+/* logo Bractwa w prawym rogu nagłówka (LogaZBractwem w tv.tsx): tej samej wysokości co logo lokalu */
+.tv-naglowek .tv-logo-rog {
+  height: 150px;
+  width: auto;
+  max-width: 360px;
+  object-fit: contain;
+}
+
 /* Poczekalnia */
 
 /* nagłówek poczekalni: lokal (i browar) z lewej, Bractwo w prawym rogu, wszystkie loga tej samej wysokości */

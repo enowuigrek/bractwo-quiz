@@ -263,9 +263,9 @@ export function Tv({ kod, qr, host }: Props) {
           ) : stan.faza === "wstep" ? (
             // klasyczny pub quiz: plansza startowa z odliczaniem 10 s; wyścig: cała droga etapów
             quizKlasyczny(stan) ? (
-              <StartTv stan={stan} teraz={teraz} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
+              <StartTv stan={stan} teraz={teraz} loga={<LogaZBractwem lokal={stan.lokal} browar={stan.browar} />} />
             ) : (
-              <WstepTv stan={stan} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
+              <WstepTv stan={stan} loga={<LogaZBractwem lokal={stan.lokal} browar={stan.browar} />} />
             )
           ) : stan.faza === "poczekalnia" ? (
             <Poczekalnia stan={stan} gracze={gracze} qr={qr} host={host} przesuniecie={przesuniecie} />
@@ -319,6 +319,19 @@ function GotowiTv({ stan }: { stan: StanSesji }) {
       Gotowi <strong>{stan.gotowi}</strong>
       <span className="tv-gotowi-z">/{stan.gotowi_z}</span>
     </p>
+  );
+}
+
+/**
+ * Nagłówek bez innej treści z prawej (wstęp, start, ciekawostka, podium): loga lokalu z lewej, a Bractwo w prawym
+ * rogu tej samej wysokości (28.10, Łukasz: róg z prawej był pusty). Rodzic to flex z `space-between` (`.tv-naglowek`).
+ */
+function LogaZBractwem(props: React.ComponentProps<typeof Loga>) {
+  return (
+    <>
+      <Loga {...props} />
+      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-rog" />
+    </>
   );
 }
 
@@ -470,7 +483,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     return (
       <div className="tv-ciekawostka">
         <header className="tv-naglowek">
-          <Loga lokal={stan.lokal} browar={stan.browar} />
+          <LogaZBractwem lokal={stan.lokal} browar={stan.browar} />
         </header>
         <div className="tv-ciekawostka-tresc">
           {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-ciekawostka-grafika" />}
@@ -768,7 +781,7 @@ function Koniec({
     <div className="tv-koniec">
       {/* nad podium tylko loga: tytuł quizu jest na dole, żeby nie wisiał nad zwycięzcą */}
       <header className="tv-naglowek">
-        <Loga lokal={stan.lokal} browar={stan.browar} />
+        <LogaZBractwem lokal={stan.lokal} browar={stan.browar} />
       </header>
       {bylaGra ? (
         <PodiumTv

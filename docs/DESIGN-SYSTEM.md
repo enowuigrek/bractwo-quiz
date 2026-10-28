@@ -195,6 +195,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 **Lista pytań w panelu (28.10).** Pytanie rozwija się do edycji w miejscu (złota strzałka jak w `.karta-zwijana`), edytor stoi na karcie `--kamien` pod wierszem, akcje (↑ ↓ kosz) zostają obok. Po zapisie edytor się zwija, a wiersz ma złoty pasek z lewej i lekkie złote tło, żeby było widać, gdzie się skończyło. Nowe pytanie dodaje się wierszem „+ pytanie” pod listą (w quizie z etapami w każdym etapie), rozwijanym tak samo jak pytania, a nie przyciskiem. Etap zwija się i rozwija kliknięciem nazwy w nagłówku (złota strzałka obok nazwy); zwinięty zostawia sam nagłówek. Pijany finał stoi pod finałem jak etap, różowy (`#e88ac0`, `.etap-pijany`) z przerywanym obrysem, bo tryb jest opcjonalny; w środku dwie części: „O piwie” (złota kropka, po kolei, numery i strzałki) i „Odklejone” (szara, losowo).
 
+**Logo Bractwa w rogu (28.10).** Na planszach, których nagłówek ma z prawej pusto (wstęp, start pub quizu, ciekawostka, podium), logo Bractwa stoi w prawym rogu, 150 px jak logo lokalu z lewej (`.tv-logo-rog`).
+
 **Tabela wyników po finale (28.10).** Finaliści mają złotawy obrys, a przed przygaszonymi punktami przebieg finału: „start +2” złotem, „✓ 10” zielono, „✗ 1” czerwono i pigułkę kroków „12/12” (`final` z `public.ranking`), bo miejsce dał wyścig, nie punkty. W pijanym finale awatary drżą dalej jak pod koniec serii (`drzy`, `--drzenie: 1`), żeby nie było widać przejścia.
 
 **Odpowiedzi w szacowaniu na TV (28.10).** Plakietka z poprawną liczbą stoi tuż nad najwyższym rzędem podpisów graczy (`--rzedy`), przy kilku graczach nisko nad osią; przy wielu najwyżej 76 px od góry pola, czyli pod nagłówkiem jak wcześniej.
