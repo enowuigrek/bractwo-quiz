@@ -23,30 +23,36 @@ export function FiltrLokali({
   wybrany,
   adres,
   zBractwem = false,
+  etykieta = "Kto",
 }: {
   lokale: LokalAutor[];
   wybrany: string | null;
   adres: (lokal: string | null) => string;
   zBractwem?: boolean;
+  /** Podpis rzędu filtra z lewej (29.10: rzędy filtrów podpisane i wyrównane, `.filtr-wiersz`). */
+  etykieta?: string;
 }) {
   if (lokale.length === 0) return null;
   return (
-    <p className="tagi filtr-lokali" aria-label="Kto">
-      <Link href={adres(null)} className={`tag${wybrany ? "" : " wybrany"}`}>
-        wszyscy
-      </Link>
-      {zBractwem && (
-        <Link href={adres(BRACTWO)} className={`tag${wybrany === BRACTWO ? " wybrany" : ""}`}>
-          <img src="/loga/bractwo.svg" alt="" className="tag-logo logo-bractwo" /> Bractwo
+    <div className="filtr-wiersz">
+      <span className="filtr-etykieta">{etykieta}</span>
+      <p className="tagi filtr-lokali" aria-label={etykieta}>
+        <Link href={adres(null)} className={`tag${wybrany ? "" : " wybrany"}`}>
+          wszyscy
         </Link>
-      )}
-      {lokale.map((l) => (
-        <Link key={l.id} href={adres(l.id)} className={`tag${wybrany === l.id ? " wybrany" : ""}`}>
-          {l.logo_url && <img src={l.logo_url} alt="" className="tag-logo" />}
-          {l.nazwa}
-        </Link>
-      ))}
-    </p>
+        {zBractwem && (
+          <Link href={adres(BRACTWO)} className={`tag${wybrany === BRACTWO ? " wybrany" : ""}`}>
+            <img src="/loga/bractwo.svg" alt="" className="tag-logo logo-bractwo" /> Bractwo
+          </Link>
+        )}
+        {lokale.map((l) => (
+          <Link key={l.id} href={adres(l.id)} className={`tag${wybrany === l.id ? " wybrany" : ""}`}>
+            {l.logo_url && <img src={l.logo_url} alt="" className="tag-logo" />}
+            {l.nazwa}
+          </Link>
+        ))}
+      </p>
+    </div>
   );
 }
 

@@ -33,7 +33,14 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
           ▶ Uruchom quiz
         </Link>
       </p>
-      <FiltrLokali lokale={lokale ?? []} wybrany={lokal} adres={(l) => (l ? `/admin/gry?lokal=${l}` : "/admin/gry")} />
+      <div className="filtry">
+        <FiltrLokali
+          lokale={lokale ?? []}
+          wybrany={lokal}
+          adres={(l) => (l ? `/admin/gry?lokal=${l}` : "/admin/gry")}
+          etykieta="Lokal"
+        />
+      </div>
       {error && <p className="blad">Nie udało się pobrać rozgrywek: {error.message}</p>}
 
       <section className="panel-sekcja">

@@ -165,10 +165,17 @@ span.panel-logo-lokalu {
 }
 
 @media (min-width: 960px) {
-  /* zakładki sięgają do szarej linii nagłówka, więc pasek leży na niej */
-  .panel-nawigacja {
+  /* zakładki sięgają do szarej linii nagłówka, więc i złoty pasek, i pasek po najechaniu leżą na niej (29.10: zakładki
+     były wyśrodkowane, a nawigacja miała 3 px dołu, więc hover wisiał nad linią) */
+  .panel-naglowek .panel-nawigacja {
     overflow: visible;
     margin-bottom: -1px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .panel-nawigacja a.zakladka {
+    align-self: stretch;
   }
 
   .panel-nawigacja a.zakladka::after,
@@ -1556,7 +1563,7 @@ a.tag.wybrany:hover {
 
 /* filtr „kto” u głównego (lokale-autorzy.tsx): pastylki z logo lokalu */
 .filtr-lokali {
-  margin-bottom: 16px;
+  margin: 0;
 }
 
 .filtr-lokali .tag {
@@ -1672,6 +1679,66 @@ button.tag:hover:not(.wybrany) {
 /* Zasady wyścigu po piwo (quizy/zasady, 28.10): przebieg jako droga z ikonami etapów, karty konkurencji z tabelami
    punktów, wykres szybkości, pasek udziału etapów i tor finału */
 /* rząd zakładek rodzajów z linkiem do zasad z prawej (na wąskim ekranie link schodzi pod zakładki) */
+/* Nagłówek strony z akcją z prawej (Quizy + „Zasady i punktacja”, 29.10) */
+.naglowek-strony {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.naglowek-strony h1 {
+  margin: 0;
+}
+
+/* Filtry nad listą: rzędy z podpisem z lewej („Kto”, „Temat”, „Lokal”), pigułki tej samej wysokości, odstęp od
+   listy (29.10: dwa rzędy pigułek bez podpisów i z różnymi odstępami wyglądały chaotycznie) */
+.filtry {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 24px;
+}
+
+.filtry:empty {
+  display: none;
+}
+
+.filtr-wiersz {
+  display: grid;
+  grid-template-columns: 4.5em minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+
+.filtr-etykieta {
+  padding-top: 6px;
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+}
+
+.filtry .tagi {
+  margin: 0;
+}
+
+.filtry .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+}
+
+/* telefon: zakładki rodzajów na całą szerokość */
+@media (max-width: 959px) {
+  .quizy-rodzaje {
+    display: grid;
+    width: 100%;
+  }
+}
+
 .quizy-pasek {
   display: flex;
   flex-wrap: wrap;

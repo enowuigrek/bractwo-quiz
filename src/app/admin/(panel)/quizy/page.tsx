@@ -71,7 +71,15 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
 
   return (
     <main>
-      <h1>Quizy</h1>
+      <div className="naglowek-strony">
+        <h1>Quizy</h1>
+        <Link
+          href={rodzaj === "wyscig" ? "/admin/quizy/zasady" : "/admin/quizy/zasady/pub-quiz"}
+          className="przycisk-maly"
+        >
+          Zasady i punktacja
+        </Link>
+      </div>
       {typeof blad === "string" && BLEDY[blad] && (
         <p className="blad" role="alert">
           {BLEDY[blad]}
@@ -84,40 +92,37 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         </p>
       )}
 
-      {/* zakładki rodzajów, a w tym samym rzędzie z prawej link do zasad wyścigu (28.10) */}
-      <div className="quizy-pasek">
-        <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
-          {(["wyscig", "klasyczny"] as const).map((r) => (
-            <Link
-              key={r}
-              href={adres(r)}
-              className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
-              aria-current={rodzaj === r ? "page" : undefined}
-            >
-              {NAZWY_RODZAJOW[r]}
-            </Link>
-          ))}
-        </nav>
-        <Link
-          href={rodzaj === "wyscig" ? "/admin/quizy/zasady" : "/admin/quizy/zasady/pub-quiz"}
-          className="quizy-zasady"
-        >
-          Zasady i punktacja →
-        </Link>
-      </div>
-      <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
-      {tagi.length > 0 && (
-        <p className="tagi quizy-tagi">
-          <Link href={adres(rodzaj)} className={`tag${wybranyTag ? "" : " wybrany"}`}>
-            wszystkie
+      {/* zakładki rodzajów (na telefonie na całą szerokość), pod nimi podpisane rzędy filtrów (29.10) */}
+      <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
+        {(["wyscig", "klasyczny"] as const).map((r) => (
+          <Link
+            key={r}
+            href={adres(r)}
+            className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
+            aria-current={rodzaj === r ? "page" : undefined}
+          >
+            {NAZWY_RODZAJOW[r]}
           </Link>
-          {tagi.map((t) => (
-            <Link key={t} href={adres(rodzaj, t)} className={`tag${wybranyTag === t ? " wybrany" : ""}`}>
-              {t}
-            </Link>
-          ))}
-        </p>
-      )}
+        ))}
+      </nav>
+      <div className="filtry">
+        <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
+        {tagi.length > 0 && (
+          <div className="filtr-wiersz">
+            <span className="filtr-etykieta">Temat</span>
+            <p className="tagi" aria-label="Temat">
+              <Link href={adres(rodzaj)} className={`tag${wybranyTag ? "" : " wybrany"}`}>
+                wszystkie
+              </Link>
+              {tagi.map((t) => (
+                <Link key={t} href={adres(rodzaj, t)} className={`tag${wybranyTag === t ? " wybrany" : ""}`}>
+                  {t}
+                </Link>
+              ))}
+            </p>
+          </div>
+        )}
+      </div>
 
       {data && data.length > 0 ? (
         <ul className="lista">
