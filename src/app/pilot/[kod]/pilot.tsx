@@ -628,7 +628,9 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
               </p>
               {stan.finalisci && (
                 <p style={{ margin: "10px 0 0" }}>
-                  <strong>Finał trójki:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}. Reszta kibicuje.
+                  {/* przy małej grze (do 3 grających) finalistami są wszyscy, więc nikt nie kibicuje (29.10) */}
+                  <strong>Finał:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}.
+                  {stan.liczba_graczy > stan.finalisci.length ? " Reszta kibicuje." : ""}
                 </p>
               )}
               {!etap.finalowy && (etap.przechodzi !== null || etap.final_po_etapie) && (

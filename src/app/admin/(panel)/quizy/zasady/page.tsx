@@ -263,7 +263,8 @@ export default async function ZasadyWyscigu() {
           <li>Progi ustalają się przy starcie gry z liczby graczy; prowadzący może je zmienić w pilocie.</li>
           <li>
             Po ostatnim etapie przed finałem <strong>trójka z najwyższymi punktami</strong> wchodzi do finału. Remis
-            rozstrzyga krótszy łączny czas odpowiedzi. Reszta kibicuje na telefonach.
+            rozstrzyga krótszy łączny czas odpowiedzi. Reszta kibicuje na telefonach. Przy trzech albo mniej grających w
+            finale są wszyscy, a finał to i tak wyścig do piwa (bez punktów).
           </li>
         </ul>
         <table className="zasady-tabela zasady-odpadanie">
