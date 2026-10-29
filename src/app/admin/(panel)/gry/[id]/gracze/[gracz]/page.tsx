@@ -31,7 +31,7 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
     }>();
   if (!gra) notFound();
 
-  const [wyniki, zadania, { data: odpowiedzi }] = await Promise.all([
+  const [wyniki, wszystkieZadania, { data: odpowiedzi }] = await Promise.all([
     wynikiGry(db, gra.id),
     zadaniaGry(db, gra.quiz_id, gra.zadanie_nr),
     db
@@ -41,6 +41,15 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
       .eq("gracz_id", graczId)
       .returns<OdpowiedzGracza[]>(),
   ]);
+  // finał serią: każdy dostał pulę w swojej kolejności i przeszedł tylko część, więc z puli tylko pytania, na które
+  // odpowiedział, w kolejności odpowiedzi (28.10)
+  const czasOdp = (id: string) => (odpowiedzi ?? []).find((o) => o.zadanie_id === id)?.czas_ms;
+  const zadania = [
+    ...wszystkieZadania.filter((z) => !z.zSerii),
+    ...wszystkieZadania
+      .filter((z) => z.zSerii && czasOdp(z.id) !== undefined)
+      .sort((a, b) => (czasOdp(a.id) ?? 0) - (czasOdp(b.id) ?? 0)),
+  ];
   const i = wyniki.findIndex((w) => w.id === graczId);
   if (i < 0) notFound();
   const ja = wyniki[i];

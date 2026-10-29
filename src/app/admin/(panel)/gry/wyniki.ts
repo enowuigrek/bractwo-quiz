@@ -19,7 +19,14 @@ export type WynikGracza = {
   zdjecie: string | null;
 };
 
-export type ZadanieGry = { id: string; nr: number; tresc: string; czas_s: number | null } & ZadanieDane;
+export type ZadanieGry = {
+  id: string;
+  nr: number;
+  tresc: string;
+  czas_s: number | null;
+  /** Pytanie z puli serii (finał): każdy dostaje swoje w swojej kolejności (`etapy.seria`). */
+  zSerii: boolean;
+} & ZadanieDane;
 
 export type OdpowiedzGracza = {
   gracz_id: string;
@@ -39,12 +46,12 @@ export type OdpowiedzGracza = {
 export async function zadaniaGry(db: SupabaseClient, quizId: string, doNr: number): Promise<ZadanieGry[]> {
   const { data } = await db
     .from("zadania")
-    .select("id, nr, tresc, czas_s, typ, dane")
+    .select("id, nr, tresc, czas_s, typ, dane, etapy(seria)")
     .eq("quiz_id", quizId)
     .lte("nr", doNr)
     .order("nr")
-    .returns<ZadanieGry[]>();
-  return data ?? [];
+    .returns<(Omit<ZadanieGry, "zSerii"> & { etapy: { seria: boolean } | null })[]>();
+  return (data ?? []).map(({ etapy, ...z }) => ({ ...z, zSerii: !!etapy?.seria }) as ZadanieGry);
 }
 
 /** Tabela końcowa: wszyscy gracze gry z punktami, miejscem i liczbą dobrych odpowiedzi. */
