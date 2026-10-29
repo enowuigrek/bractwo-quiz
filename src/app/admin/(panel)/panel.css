@@ -1503,11 +1503,32 @@ button.tag:hover:not(.wybrany) {
 
 /* Kreator gry bez zapasu pod formularzem (26.10: 45vh pustego miejsca na końcu wyglądało na błąd) */
 
-/* logo lokalu zamiast zębatki w pasku panelu lokalu (nawigacja.tsx) */
+/* logo lokalu zamiast zębatki w pasku panelu lokalu (nawigacja.tsx): samo logo wysokości „Wyloguj”, bez kółka
+   przycisku, i bliżej „Wyloguj” niż reszta paska (29.10) */
 .nawigacja-logo-lokalu {
-  width: 26px;
-  height: 26px;
+  width: auto;
+  height: 40px;
+  max-width: 96px;
   object-fit: contain;
+}
+
+.panel-nawigacja a.nawigacja-ustawienia:has(.nawigacja-logo-lokalu) {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  width: auto;
+  min-width: 0;
+  margin-left: auto;
+}
+
+@media (min-width: 960px) {
+  .panel-naglowek:has(.nawigacja-logo-lokalu) {
+    column-gap: 12px;
+  }
+
+  .panel-naglowek:has(.nawigacja-logo-lokalu) .panel-nawigacja {
+    margin-left: 28px;
+  }
 }
 
 /* Zasady wyścigu po piwo (quizy/zasady, 28.10): przebieg jako droga z ikonami etapów, karty konkurencji z tabelami
@@ -1963,4 +1984,16 @@ button.tag:hover:not(.wybrany) {
   .etap-brakujace .nowe-pytanie .zadanie-edytor {
     margin-left: -2.2em;
   }
+}
+
+/* tabela wyników gry: pod nickiem kto odpadł (i na którym miejscu) albo został usunięty przez prowadzącego (28.10) */
+.tabela-wynikow .tw-uwaga {
+  display: block;
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-regular);
+}
+
+.tabela-wynikow tr.usuniety td {
+  color: var(--szary);
 }

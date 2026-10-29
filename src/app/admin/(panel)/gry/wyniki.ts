@@ -13,6 +13,8 @@ export type WynikGracza = {
   odpowiedzi: number;
   /** Ile odpowiedzi w finale serią (każdy dostaje inną liczbę pytań z puli). */
   wSerii: number;
+  /** Odpadł po etapie: który, jak się nazywał i na którym miejscu wtedy był (`odpadniecia`). */
+  odpadl: { etap: number; nazwa: string; miejsce: number } | null;
   /** Średni czas odpowiedzi (dobrych i złych), null gdy gracz nic nie odpowiedział. */
   sredniCzasMs: number | null;
   /** Kiedy gracz potwierdził odbiór nagrody (null: nie odebrał albo bez nagrody). */
@@ -66,7 +68,7 @@ export async function wynikiGry(
   sesjaId: string,
   opcje: { kod?: string; zadaniaSerii?: Set<string> } = {},
 ): Promise<WynikGracza[]> {
-  const [{ data: gracze }, { data: odpowiedzi }, { data: ranking }] = await Promise.all([
+  const [{ data: gracze }, { data: odpowiedzi }, { data: ranking }, { data: odpadli }] = await Promise.all([
     db
       .from("gracze")
       .select("id, nick, nagroda_odebrana, zdjecie_url")
@@ -78,7 +80,14 @@ export async function wynikiGry(
       .eq("sesja_id", sesjaId)
       .returns<Pick<OdpowiedzGracza, "gracz_id" | "zadanie_id" | "czas_ms" | "poprawna" | "punkty">[]>(),
     opcje.kod ? db.rpc("ranking", { p_kod: opcje.kod }) : Promise.resolve({ data: null }),
+    db.rpc("odpadniecia", { p_sesja_id: sesjaId }),
   ]);
+  const odpadlGracz = new Map(
+    ((odpadli ?? []) as { gracz_id: string; etap_nr: number; etap_nazwa: string; miejsce: number }[]).map((o) => [
+      o.gracz_id,
+      { etap: o.etap_nr, nazwa: o.etap_nazwa, miejsce: Number(o.miejsce) },
+    ]),
+  );
   // `ranking` zwraca jsonb: tablicę wierszy jak na TV
   const wierszeRankingu = (Array.isArray(ranking) ? ranking : []) as { nick: string; miejsce: number }[];
   const miejsceZRankingu = new Map<string, number>(wierszeRankingu.map((r) => [r.nick, r.miejsce]));
@@ -93,6 +102,7 @@ export async function wynikiGry(
       dobre: jego.filter((o) => o.poprawna).length,
       odpowiedzi: jego.length,
       wSerii: opcje.zadaniaSerii ? jego.filter((o) => opcje.zadaniaSerii!.has(o.zadanie_id)).length : 0,
+      odpadl: odpadlGracz.get(g.id) ?? null,
       sredniCzasMs: jego.length ? jego.reduce((s, o) => s + o.czas_ms, 0) / jego.length : null,
       nagrodaOdebrana: g.nagroda_odebrana,
       zdjecie: g.zdjecie_url,
@@ -109,4 +119,25 @@ export async function wynikiGry(
     w.miejsce = i > 0 && wiersze[i - 1].punkty === w.punkty ? wiersze[i - 1].miejsce : i + 1;
   });
   return wiersze;
+}
+
+/** Gracz usunięty przez prowadzącego w trakcie gry: wynik zapisany przed usunięciem (`gracze_usunieci`, 28.10). */
+export type UsunietyGracz = {
+  nick: string;
+  punkty: number;
+  dobre: number;
+  odpowiedzi: number;
+  miejsce: number | null;
+  zadanie_nr: number | null;
+  usunieto: string;
+};
+
+export async function usunieciGry(db: SupabaseClient, sesjaId: string): Promise<UsunietyGracz[]> {
+  const { data } = await db
+    .from("gracze_usunieci")
+    .select("nick, punkty, dobre, odpowiedzi, miejsce, zadanie_nr, usunieto")
+    .eq("sesja_id", sesjaId)
+    .order("usunieto")
+    .returns<UsunietyGracz[]>();
+  return data ?? [];
 }

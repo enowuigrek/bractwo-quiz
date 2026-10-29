@@ -11,7 +11,7 @@ import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
 import { IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
-import { wynikiGry, zadaniaGry } from "../wyniki";
+import { usunieciGry, wynikiGry, zadaniaGry } from "../wyniki";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
 import { LinkDoSkopiowania } from "./kopiuj";
@@ -72,7 +72,12 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   // pytania z puli finału liczą się każdemu osobno (dostał tyle, na ile zdążył), ciekawostki wcale (28.10)
   const zadaniaSerii = new Set(zadania.filter((z) => z.zSerii).map((z) => z.id));
   const pytanEtapow = zadania.filter((z) => !z.zSerii && z.typ !== "ciekawostka").length;
-  const wyniki = trwa ? [] : await wynikiGry(db, gra.id, { kod: gra.kod, zadaniaSerii });
+  const [wyniki, usunieci] = trwa
+    ? [[], []]
+    : await Promise.all([wynikiGry(db, gra.id, { kod: gra.kod, zadaniaSerii }), usunieciGry(db, gra.id)]);
+  // numer pytania w grze (jak na TV, bez ciekawostek) z numeru zadania
+  const pytaniaWGrze = zadania.filter((z) => z.typ !== "ciekawostka");
+  const lpPytania = (nr: number) => pytaniaWGrze.filter((z) => z.nr <= nr).length;
   // SVG z biblioteki qrcode, bez danych od użytkownika poza adresem, który sami złożyliśmy
   const qrPilota = trwa ? await QRCode.toString(linki.pilot, { type: "svg", margin: 0, errorCorrectionLevel: "M" }) : null;
 
@@ -299,7 +304,13 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               konta={[gra.lokale?.instagram ?? null, gra.browar_instagram]}
             />
           )}
-          <TabelaWynikow graId={gra.id} wyniki={wyniki} liczbaPytan={pytanEtapow} />
+          <TabelaWynikow
+            graId={gra.id}
+            wyniki={wyniki}
+            liczbaPytan={pytanEtapow}
+            usunieci={usunieci}
+            lpPytania={lpPytania}
+          />
         </section>
       )}
     </main>
