@@ -5,6 +5,7 @@ import { filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FiltrLokali, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
+import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
 
@@ -15,31 +16,68 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const { data: lokale } = widziWszystko(rola)
     ? await db.from("lokale").select("id, nazwa, logo_url").order("nazwa").returns<LokalAutor[]>()
     : { data: [] as LokalAutor[] };
-  const lokal = wybranyLokal((await searchParams).lokal, lokale ?? [], false);
+  const { lokal: lokalZAdresu, rodzaj: rodzajZAdresu, tag } = await searchParams;
+  const lokal = wybranyLokal(lokalZAdresu, lokale ?? [], false);
+  // ten sam układ co lista quizów (29.10): rodzaj quizu, a pod nim filtry „Kto” i „Temat”
+  const rodzaj: RodzajQuizu = rodzajZAdresu === "klasyczny" ? "klasyczny" : "wyscig";
   let zapytanie = filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola, true);
   const jakoLokal = !!lokalRoli(rola);
   if (lokal) zapytanie = zapytanie.eq("lokal_id", lokal);
   const { data, error } = await zapytanie.order("utworzono", { ascending: false }).limit(100).returns<GraNaLiscie[]>();
 
-  const gry = data ?? [];
+  const wRodzaju = (data ?? []).filter(
+    (g) => ((g.quizy?.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny") === rodzaj,
+  );
+  const tagi = wszystkieTagi(wRodzaju.map((g) => ({ tagi: g.quizy?.tagi ?? [] })));
+  const wybranyTag = typeof tag === "string" && tagi.includes(tag) ? tag : null;
+  const gry = wybranyTag ? wRodzaju.filter((g) => g.quizy?.tagi.includes(wybranyTag)) : wRodzaju;
+  const adres = (r: RodzajQuizu, t: string | null = null, l: string | null = lokal) =>
+    `/admin/gry?${new URLSearchParams({
+      ...(r === "klasyczny" ? { rodzaj: r } : {}),
+      ...(t ? { tag: t } : {}),
+      ...(l ? { lokal: l } : {}),
+    })}`;
   const trwajace = gry.filter((g) => g.faza !== "koniec");
   const zakonczone = gry.filter((g) => g.faza === "koniec");
   return (
     <main>
-      <h1>Rozgrywki</h1>
-      {/* na komputerze „Uruchom quiz” stoi w pasku nawigacji, więc duży przycisk tylko na telefonie (29.10) */}
-      <p className="tylko-telefon">
-        <Link href="/admin/gry/nowa" className="przycisk zloty">
+      {/* ten sam układ co „Quizy”, żeby przy przełączaniu zakładek nic nie skakało; na komputerze „Uruchom quiz”
+          stoi w pasku nawigacji, więc przycisk w nagłówku tylko na telefonie */}
+      <div className="naglowek-strony">
+        <h1>Rozgrywki</h1>
+        <Link href="/admin/gry/nowa" className="przycisk-maly zloty tylko-telefon">
           ▶ Uruchom quiz
         </Link>
-      </p>
+      </div>
+      <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
+        {(["wyscig", "klasyczny"] as const).map((r) => (
+          <Link
+            key={r}
+            href={adres(r)}
+            className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
+            aria-current={rodzaj === r ? "page" : undefined}
+          >
+            {NAZWY_RODZAJOW[r]}
+          </Link>
+        ))}
+      </nav>
       <div className="filtry">
-        <FiltrLokali
-          lokale={lokale ?? []}
-          wybrany={lokal}
-          adres={(l) => (l ? `/admin/gry?lokal=${l}` : "/admin/gry")}
-          etykieta="Lokal"
-        />
+        <FiltrLokali lokale={lokale ?? []} wybrany={lokal} adres={(l) => adres(rodzaj, wybranyTag, l)} />
+        {tagi.length > 0 && (
+          <div className="filtr-wiersz">
+            <span className="filtr-etykieta">Temat</span>
+            <p className="tagi" aria-label="Temat">
+              <Link href={adres(rodzaj, null)} className={`tag${wybranyTag ? "" : " wybrany"}`}>
+                wszystkie
+              </Link>
+              {tagi.map((t) => (
+                <Link key={t} href={adres(rodzaj, t)} className={`tag${wybranyTag === t ? " wybrany" : ""}`}>
+                  {t}
+                </Link>
+              ))}
+            </p>
+          </div>
+        )}
       </div>
       {error && <p className="blad">Nie udało się pobrać rozgrywek: {error.message}</p>}
 

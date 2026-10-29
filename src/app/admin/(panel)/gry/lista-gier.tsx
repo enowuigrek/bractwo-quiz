@@ -16,12 +16,12 @@ export type GraNaLiscie = {
   planowany_start: string | null;
   wystartowano: string | null;
   notatka: string | null;
-  quizy: { tytul: string } | null;
+  quizy: { tytul: string; tagi: string[]; etapy: { count: number }[] } | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
 };
 
 export const ZAPYTANIE_GIER =
-  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul), lokale(nazwa, miasto, logo_url)";
+  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, etapy(count)), lokale(nazwa, miasto, logo_url)";
 
 /** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
 const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);

@@ -350,7 +350,7 @@ h2 {
 
 /* rzeczy tylko na telefon (na komputerze są w pasku nawigacji) */
 @media (min-width: 960px) {
-  .tylko-telefon {
+  .panel .tylko-telefon {
     display: none;
   }
 }
@@ -1691,6 +1691,11 @@ button.tag:hover:not(.wybrany) {
 
 .naglowek-strony h1 {
   margin: 0;
+}
+
+/* nagłówek ma wysokość przycisku także bez przycisku (rozgrywki na komputerze), więc Quizy i Rozgrywki nie skaczą */
+.naglowek-strony {
+  min-height: 40px;
 }
 
 /* Filtry nad listą: rzędy z podpisem z lewej („Kto”, „Temat”, „Lokal”), pigułki tej samej wysokości, odstęp od
