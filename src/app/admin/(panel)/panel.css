@@ -2027,14 +2027,31 @@ button.tag:hover:not(.wybrany) {
 }
 
 .notatka-karta {
-  margin-bottom: 14px;
+  margin: 0 0 14px;
 }
 
-.notatka-autor {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+.notatka-autor > span {
+  min-width: 0;
+}
+
+.notatka-poczatek {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.notatka-karta[open] .notatka-poczatek {
+  display: none;
+}
+
+.karta-zwijana summary.notatka-autor {
+  justify-content: flex-start;
+}
+
+.notatka-autor::after {
+  margin-left: auto;
 }
 
 .notatka-autor > span {
@@ -2080,6 +2097,20 @@ button.tag:hover:not(.wybrany) {
   display: grid;
   grid-template-columns: 11em 1fr;
   gap: 12px;
+}
+
+/* komputer: dwie kolumny czytane z góry na dół (zakończona gra ma całą szerokość) */
+@media (min-width: 960px) {
+  .dane-gry {
+    display: block;
+    columns: 2;
+    column-gap: 48px;
+  }
+
+  .dane-gry > div {
+    break-inside: avoid;
+    margin-bottom: 6px;
+  }
 }
 
 .dane-gry dt {

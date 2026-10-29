@@ -168,7 +168,8 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
       <p className="okruchy">
         <Link href="/admin/gry">← Rozgrywki</Link>
       </p>
-      <div className="uklad-dwa">
+      {/* zakończona gra nie ma prawej kolumny (prowadzenie, ekran), więc dane gry idą na całą szerokość */}
+      <div className={trwa ? "uklad-dwa" : undefined}>
         <div>
           <p className="pomocniczy" style={{ margin: 0 }}>
             Kod gry · <span className={`znaczek${trwa ? " aktywny" : ""}`}>{NAZWY_FAZ[gra.faza]}</span>
@@ -188,9 +189,9 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
 
           {gosc ? (
             <p className="pomocniczy">Grę ustawiło Bractwo Piwne: możesz oglądać wyniki i pobrać grafiki.</p>
-          ) : (
+          ) : trwa && (
           <section className="panel-sekcja akcje-gry">
-            {trwa && (
+            {(
               <PrzyciskPotwierdz
                 akcja={zakonczGre.bind(null, gra.id)}
                 pytanie={`Zakończyć grę ${gra.kod}? Gracze nie będą mogli już dołączyć ani odpowiadać.`}
@@ -200,16 +201,6 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
                 Zakończ grę
               </PrzyciskPotwierdz>
             )}
-            <PrzyciskPotwierdz
-              akcja={usunGre.bind(null, gra.id, true)}
-              pytanie={
-                trwa
-                  ? `Gra ${gra.kod} jeszcze trwa. Usunąć ją razem z graczami i wynikami? Ekrany graczy i TV pokażą, że gry nie ma.`
-                  : `Usunąć grę ${gra.kod} razem z graczami i wynikami?`
-              }
-            >
-              <IkonaKosz /> Usuń grę
-            </PrzyciskPotwierdz>
           </section>
           )}
         </div>
@@ -422,6 +413,22 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
               lpPytania={lpPytania}
             />
           )}
+        </section>
+      )}
+
+      {/* usuwanie na samym dole strony (29.10), z dala od notatki i wyników */}
+      {!gosc && (
+        <section className="panel-sekcja akcje-gry">
+          <PrzyciskPotwierdz
+            akcja={usunGre.bind(null, gra.id, true)}
+            pytanie={
+              trwa
+                ? `Gra ${gra.kod} jeszcze trwa. Usunąć ją razem z graczami i wynikami? Ekrany graczy i TV pokażą, że gry nie ma.`
+                : `Usunąć grę ${gra.kod} razem z graczami i wynikami?`
+            }
+          >
+            <IkonaKosz /> Usuń grę
+          </PrzyciskPotwierdz>
         </section>
       )}
     </main>

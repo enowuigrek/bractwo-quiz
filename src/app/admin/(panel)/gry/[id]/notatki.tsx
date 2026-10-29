@@ -11,7 +11,7 @@ import { zapiszNotatke } from "../akcje";
 export type AutorNotatki = { nazwa: string; logo: string | null };
 
 /**
- * Notatka do gry (29.10): zapisana stoi jako karta z logo autora (lokal albo Bractwo) i datą, a pod nią „Edytuj
+ * Notatka do gry (29.10): zapisana stoi jako zwijana karta (zwinięta: logo autora, data i pierwsza linijka) z logo autora (lokal albo Bractwo) i datą, a pod nią „Edytuj
  * notatkę”; bez notatki sam przycisk „Dodaj notatkę”. Pole do pisania pojawia się dopiero po kliknięciu, na całą
  * szerokość strony. Widzi ją tylko panel (główny i lokal gry), nie gracze ani lokal-gość.
  */
@@ -61,8 +61,8 @@ export function Notatki({
   return (
     <>
       {notatka && (
-        <article className="karta notatka-karta">
-          <header className="notatka-autor">
+        <details className="karta karta-zwijana notatka-karta">
+          <summary className="notatka-autor">
             {autor.logo ? (
               <img src={autor.logo} alt="" className="notatka-logo" />
             ) : (
@@ -81,10 +81,12 @@ export function Notatki({
                   })}
                 </span>
               )}
+              {/* zwinięta: pierwsza linijka notatki */}
+              <span className="notatka-poczatek">{notatka.split("\n")[0]}</span>
             </span>
-          </header>
+          </summary>
           <p className="notatka-tekst">{notatka}</p>
-        </article>
+        </details>
       )}
       <button type="button" className="przycisk-maly notatka-przycisk" onClick={() => ustawEdycje(true)}>
         {notatka ? (
