@@ -102,7 +102,8 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               !gra.poczekalnia_otwarta && trwa ? "zapowiedź (poczekalnia zamknięta)" : null,
               gra.auto ? "prowadzenie automatyczne" : null,
               gra.browar_nazwa ? `kranoprzejęcie: ${gra.browar_nazwa}` : null,
-              gra.tryb === "druzyny" ? "drużyny" : "każdy sam",
+              // „każdy sam” to jedyny tryb od 26.10, więc piszemy tylko o drużynach (starsze gry)
+              gra.tryb === "druzyny" ? "drużyny" : null,
               gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,
               gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",
               `graczy: ${gracze ?? 0}/${gra.max_graczy}`,
