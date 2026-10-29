@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Werble } from "@/components/werble";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { komunikatBledu } from "@/lib/gra/nasluch";
+import { zapiszZPonowieniem } from "@/lib/gra/zapis";
 import type { PytanieSerii, StanSesji, ZapisOdpowiedzi, ZadanieWidoczne } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import { LITERY, type DaneOdpowiedzi } from "@/lib/zadania";
@@ -121,7 +122,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     if (!teraz_ || wysylam || ocena) return;
     ustawWysylam(true);
     ustawBlad(null);
-    const { data, error } = await supabase().rpc("zapisz_odpowiedz_serii", {
+    const { data, error } = await zapiszZPonowieniem("zapisz_odpowiedz_serii", {
       p_token: ja.token,
       p_zadanie_id: teraz_.id,
       p_dane: dane,

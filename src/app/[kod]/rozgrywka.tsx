@@ -6,7 +6,7 @@ import { sekundy } from "@/lib/czas";
 import { rozmycie } from "@/lib/gra/dodatki";
 import { fazaTeraz, komunikatBledu, sekundaOdliczania } from "@/lib/gra/nasluch";
 import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
-import { supabase } from "@/lib/supabase/przegladarka";
+import { zapiszZPonowieniem } from "@/lib/gra/zapis";
 import { LITERY, PODPOWIEDZI_TYPOW, jedenWybor, liczbaCzesci, ulamek, type DaneOdpowiedzi } from "@/lib/zadania";
 import {
   OdpowiedzKolejnosc,
@@ -140,7 +140,7 @@ export function Rozgrywka({
     ustawWyslana({ zadanieId, dane, czasMs: null });
     ustawWysylam(true);
     ustawBlad(null);
-    const { data, error } = await supabase().rpc("zapisz_odpowiedz", {
+    const { data, error } = await zapiszZPonowieniem("zapisz_odpowiedz", {
       p_token: ja.token,
       p_zadanie_id: zadanieId,
       p_dane: dane,
@@ -157,6 +157,11 @@ export function Rozgrywka({
     const wynik = data as ZapisOdpowiedzi;
     if (wynik.przyjeta) {
       ustawWyslana({ zadanieId, dane, czasMs: wynik.czas_ms });
+      return;
+    }
+    // po ponowieniu: pierwsza próba weszła, tylko odpowiedź nie doszła. Wybór zostaje, czas i punkty dociągamy z bazy
+    if (wynik.powod === "juz_odpowiedziano") {
+      void odswiez();
       return;
     }
     // odrzucona: pokazujemy powód i bierzemy stan z bazy (np. odpowiedź zapisaną wcześniej)

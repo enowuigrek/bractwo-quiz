@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NAZWY_FAZ, type Faza } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
-import { IkonaKosz } from "@/components/ikony";
+import { IkonaKosz, IkonaNotatka } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunGre, zwolnijEkran } from "./akcje";
 
@@ -55,13 +55,17 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
                   {g.kod} · {g.quizy?.tytul ?? "quiz usunięty"}
                 </Link>{" "}
                 <span className={`znaczek${g.faza === "koniec" ? "" : " aktywny"}`}>{NAZWY_FAZ[g.faza]}</span>
+                {g.notatka && (
+                  <span className="notatka-gry" title="Gra ma notatki" aria-label="Gra ma notatki">
+                    <IkonaNotatka />
+                  </span>
+                )}
               </div>
               <div className="lista-opis">
                 {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(g.utworzono))]
                   .filter(Boolean)
                   .join(" · ")}
               </div>
-              {g.notatka && <div className="lista-opis notatka-gry">📝 {g.notatka}</div>}
             </div>
             <div className="lista-akcje">
               {/* podgląd ekranu gry bez sterowania (28.10), jak u lokalu przy grach Bractwa */}

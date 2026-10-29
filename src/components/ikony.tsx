@@ -31,6 +31,15 @@ export function IkonaEdytuj() {
   );
 }
 
+/** Kartka z tekstem: gra ma notatki (lista rozgrywek, 29.10). */
+export function IkonaNotatka() {
+  return (
+    <svg {...wspolne}>
+      <path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h5" />
+    </svg>
+  );
+}
+
 /** Podgląd bez zmian (quiz Bractwa w panelu lokalu). */
 export function IkonaOko() {
   return (

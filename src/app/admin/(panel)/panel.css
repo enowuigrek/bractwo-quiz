@@ -2008,7 +2008,7 @@ button.tag:hover:not(.wybrany) {
   color: var(--szary);
 }
 
-/* Notatki do gry (strona gry, 29.10) i ich pierwsza linijka na liście rozgrywek */
+/* Notatki do gry (strona gry, 29.10), a na liście rozgrywek sama ikona przy grze z notatkami */
 .notatki-gry textarea.pole {
   min-height: 120px;
 }
@@ -2020,9 +2020,9 @@ button.tag:hover:not(.wybrany) {
   flex-wrap: wrap;
 }
 
-.lista-opis.notatka-gry {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 60ch;
+.lista-tytul .notatka-gry {
+  display: inline-flex;
+  margin-left: 6px;
+  color: var(--zloto);
+  vertical-align: -0.15em;
 }
