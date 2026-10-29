@@ -18,7 +18,6 @@ export function Notatki({ graId, notatka }: { graId: string; notatka: string | n
         defaultValue={notatka ?? ""}
         maxLength={5000}
         rows={5}
-        placeholder="Co poszło dobrze, co poprawić, kto grał…"
       />
       <div className="notatki-stopka">
         <button type="submit" className="przycisk-maly" disabled={trwa}>

@@ -30,6 +30,8 @@ export type ZadanieGry = {
   czas_s: number | null;
   /** Pytanie z puli serii (finał): każdy dostaje swoje w swojej kolejności (`etapy.seria`). */
   zSerii: boolean;
+  /** Numer etapu (null w quizie bez etapów): kto odpadł przed nim, nie odpowiadał. */
+  etapNr: number | null;
 } & ZadanieDane;
 
 export type OdpowiedzGracza = {
@@ -50,12 +52,14 @@ export type OdpowiedzGracza = {
 export async function zadaniaGry(db: SupabaseClient, quizId: string, doNr: number): Promise<ZadanieGry[]> {
   const { data } = await db
     .from("zadania")
-    .select("id, nr, tresc, czas_s, typ, dane, etapy(seria)")
+    .select("id, nr, tresc, czas_s, typ, dane, etapy(seria, nr)")
     .eq("quiz_id", quizId)
     .lte("nr", doNr)
     .order("nr")
-    .returns<(Omit<ZadanieGry, "zSerii"> & { etapy: { seria: boolean } | null })[]>();
-  return (data ?? []).map(({ etapy, ...z }) => ({ ...z, zSerii: !!etapy?.seria }) as ZadanieGry);
+    .returns<(Omit<ZadanieGry, "zSerii" | "etapNr"> & { etapy: { seria: boolean; nr: number } | null })[]>();
+  return (data ?? []).map(
+    ({ etapy, ...z }) => ({ ...z, zSerii: !!etapy?.seria, etapNr: etapy?.nr ?? null }) as ZadanieGry,
+  );
 }
 
 /**

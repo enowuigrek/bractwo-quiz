@@ -11,11 +11,12 @@ import { NAZWY_FAZ, type Sesja } from "@/lib/typy";
 import { IkonaKosz } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
-import { usunieciGry, wynikiGry, zadaniaGry } from "../wyniki";
+import { usunieciGry, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../wyniki";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { Notatki } from "./notatki";
+import { PrzegladPytan, type GraczPrzegladu } from "./przeglad-pytan";
 import { TabelaWynikow } from "./tabela-wynikow";
 
 export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
@@ -31,9 +32,10 @@ type GraZDanymi = Sesja & {
   } | null;
 };
 
-export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
+export default async function Gra({ params, searchParams }: PageProps<"/admin/gry/[id]">) {
   const rola = await wymagajAdmina();
   const { id } = await params;
+  const widokPytan = (await searchParams).widok === "pytania";
   // z pilota (udostepnij.tsx) przychodzi kod gry zamiast id: najnowsza gra z tym kodem
   if (poprawnyKod(id)) {
     const { data: zKodem } = await supabaseAdmin()
@@ -79,6 +81,71 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
   // numer pytania w grze (jak na TV, bez ciekawostek) z numeru zadania
   const pytaniaWGrze = zadania.filter((z) => z.typ !== "ciekawostka");
   const lpPytania = (nr: number) => pytaniaWGrze.filter((z) => z.nr <= nr).length;
+  // godziny gry jedna pod drugą (29.10): ustawiony start, dołączanie, faktyczny start (pierwsze pytanie) i koniec
+  const [{ data: dolaczanie }, { data: pierwszePytanie }] = await Promise.all([
+    db.from("gracze").select("dolaczyl").eq("sesja_id", id).order("dolaczyl"),
+    db
+      .from("odpowiedzi")
+      .select("utworzono, czas_ms")
+      .eq("sesja_id", id)
+      .order("utworzono")
+      .limit(1)
+      .maybeSingle<{ utworzono: string; czas_ms: number }>(),
+  ]);
+  const godzina = (kiedy: string | number | null | undefined, zDniem = false) =>
+    kiedy == null
+      ? null
+      : new Date(kiedy).toLocaleString("pl-PL", {
+          timeZone: "Europe/Warsaw",
+          ...(zDniem ? { day: "numeric", month: "numeric" } : {}),
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+  const dolaczyli = (dolaczanie ?? []) as { dolaczyl: string }[];
+  // pierwsze pytanie ruszyło czas_ms przed pierwszą odpowiedzią
+  const startFaktyczny = pierwszePytanie
+    ? new Date(pierwszePytanie.utworzono).getTime() - pierwszePytanie.czas_ms
+    : null;
+  const daneGry: [string, string | null][] = [
+    ["Lokal", gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu"],
+    ["Okazja", gra.okazja],
+    ["Start ustawiony", godzina(gra.planowany_start, true)],
+    ["Pierwszy gracz", godzina(dolaczyli[0]?.dolaczyl, !gra.planowany_start)],
+    ["Ostatni gracz", dolaczyli.length > 1 ? godzina(dolaczyli[dolaczyli.length - 1].dolaczyl) : null],
+    ["Pierwsze pytanie", godzina(startFaktyczny)],
+    ["Koniec", !trwa ? godzina(gra.faza_od) : null],
+    ["Graczy", `${gracze ?? 0}/${gra.max_graczy}`],
+    ["Czas na odpowiedź", gra.czas_s === null ? "bez limitu" : `${gra.czas_s} s`],
+    ["Bonus za szybkość", gra.bonus_czas ? "tak" : "nie"],
+    ["Nagrody", gra.nagrody?.length ? gra.nagrody.map((n) => `${n.miejsce}. ${n.nagroda}`).join(", ") : null],
+    ["Kranoprzejęcie", gra.browar_nazwa],
+    // „każdy sam” to jedyny tryb od 26.10, więc piszemy tylko o drużynach (starsze gry)
+    ["Tryb", gra.tryb === "druzyny" ? "drużyny" : null],
+    ["Prowadzenie", gra.auto ? "automatyczne" : null],
+    ["Poczekalnia", !gra.poczekalnia_otwarta && trwa ? "zamknięta (zapowiedź)" : null],
+  ];
+  // przegląd pytań: wszystkie odpowiedzi z treścią i gracze z etapem odpadnięcia
+  const [{ data: odpowiedziGry }, { data: graczeGry }] =
+    !trwa && widokPytan
+      ? await Promise.all([
+          db
+            .from("odpowiedzi")
+            .select("gracz_id, zadanie_id, dane, czas_ms, poprawna, punkty, ocena")
+            .eq("sesja_id", gra.id)
+            .returns<OdpowiedzGracza[]>(),
+          db
+            .from("gracze")
+            .select("id, nick, zdjecie_url, odpadl_po_etapie")
+            .eq("sesja_id", gra.id)
+            .returns<{ id: string; nick: string; zdjecie_url: string | null; odpadl_po_etapie: number | null }[]>(),
+        ])
+      : [{ data: [] as OdpowiedzGracza[] }, { data: [] }];
+  const graczePrzegladu: GraczPrzegladu[] = (graczeGry ?? []).map((g) => ({
+    id: g.id,
+    nick: g.nick,
+    zdjecie: g.zdjecie_url,
+    odpadlPoEtapie: g.odpadl_po_etapie,
+  }));
   // SVG z biblioteki qrcode, bez danych od użytkownika poza adresem, który sami złożyliśmy
   const qrPilota = trwa ? await QRCode.toString(linki.pilot, { type: "svg", margin: 0, errorCorrectionLevel: "M" }) : null;
 
@@ -94,32 +161,16 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
           </p>
           <div className="kod-gry">{gra.kod}</div>
           <h1 style={{ marginTop: 16 }}>{gra.quizy?.tytul ?? "quiz usunięty"}</h1>
-          <p className="pomocniczy">
-            {[
-              gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu",
-              gra.okazja,
-              gra.planowany_start
-                ? `start ${new Date(gra.planowany_start).toLocaleString("pl-PL", {
-                    timeZone: "Europe/Warsaw",
-                    day: "numeric",
-                    month: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}`
-                : null,
-              !gra.poczekalnia_otwarta && trwa ? "zapowiedź (poczekalnia zamknięta)" : null,
-              gra.auto ? "prowadzenie automatyczne" : null,
-              gra.browar_nazwa ? `kranoprzejęcie: ${gra.browar_nazwa}` : null,
-              // „każdy sam” to jedyny tryb od 26.10, więc piszemy tylko o drużynach (starsze gry)
-              gra.tryb === "druzyny" ? "drużyny" : null,
-              gra.czas_s === null ? "bez limitu czasu" : `${gra.czas_s} s na odpowiedź`,
-              gra.bonus_czas ? "z bonusem za szybkość" : "bez bonusu",
-              `graczy: ${gracze ?? 0}/${gra.max_graczy}`,
-              gra.nagrody?.length ? `nagrody: ${gra.nagrody.map((n) => `${n.miejsce}. ${n.nagroda}`).join(", ")}` : null,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
+          <dl className="dane-gry">
+            {daneGry
+              .filter(([, wartosc]) => wartosc)
+              .map(([nazwa, wartosc]) => (
+                <div key={nazwa}>
+                  <dt>{nazwa}</dt>
+                  <dd>{wartosc}</dd>
+                </div>
+              ))}
+          </dl>
 
           {gosc ? (
             <p className="pomocniczy">Grę ustawiło Bractwo Piwne: możesz oglądać wyniki i pobrać grafiki.</p>
@@ -282,15 +333,38 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
       )}
 
       {!trwa && (
-        <section className="panel-sekcja">
-          <h2>Wyniki</h2>
+        <section className="panel-sekcja" id="wyniki">
+          <div className="wyniki-pasek">
+            <h2>Wyniki</h2>
+            <nav className="wybor-czasu" aria-label="Widok wyników">
+              {[
+                ["gracze", "Gracze", `/admin/gry/${gra.id}#wyniki`],
+                ["pytania", "Pytania", `/admin/gry/${gra.id}?widok=pytania#wyniki`],
+              ].map(([klucz, napis, href]) => {
+                const wybrany = (klucz === "pytania") === widokPytan;
+                return (
+                  <Link
+                    key={klucz}
+                    href={href}
+                    scroll={false}
+                    className={`wybor-czasu-opcja${wybrany ? " wybrana" : ""}`}
+                    aria-current={wybrany ? "page" : undefined}
+                  >
+                    {napis}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
           <p className="pomocniczy" style={{ marginTop: 0 }}>
             {pytanEtapow > 0
               ? `Pytań w grze: ${pytanEtapow}${zadaniaSerii.size ? " i finał (każdy finalista tyle, na ile zdążył)" : ""}. `
               : ""}
-            Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy.
+            {widokPytan
+              ? "Rozwiń pytanie, żeby zobaczyć, kto co odpowiedział i w jakim czasie."
+              : "Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy."}
           </p>
-          {wyniki.some((w) => w.punkty > 0) && (
+          {!widokPytan && wyniki.some((w) => w.punkty > 0) && (
             <GrafikaPodium
               dane={{
                 tytul: gra.quizy?.tytul ?? "Quiz",
@@ -313,13 +387,22 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               konta={[gra.lokale?.instagram ?? null, gra.browar_instagram]}
             />
           )}
-          <TabelaWynikow
-            graId={gra.id}
-            wyniki={wyniki}
-            liczbaPytan={pytanEtapow}
-            usunieci={usunieci}
-            lpPytania={lpPytania}
-          />
+          {widokPytan ? (
+            <PrzegladPytan
+              graId={gra.id}
+              zadania={zadania}
+              odpowiedzi={odpowiedziGry ?? []}
+              gracze={graczePrzegladu}
+            />
+          ) : (
+            <TabelaWynikow
+              graId={gra.id}
+              wyniki={wyniki}
+              liczbaPytan={pytanEtapow}
+              usunieci={usunieci}
+              lpPytania={lpPytania}
+            />
+          )}
         </section>
       )}
     </main>

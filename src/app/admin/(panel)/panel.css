@@ -2026,3 +2026,180 @@ button.tag:hover:not(.wybrany) {
   color: var(--zloto);
   vertical-align: -0.15em;
 }
+
+/* Dane gry na stronie gry jedna pod drugą (29.10): nazwa z lewej, wartość z prawej */
+.dane-gry {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 20px;
+}
+
+.dane-gry > div {
+  display: grid;
+  grid-template-columns: 11em 1fr;
+  gap: 12px;
+}
+
+.dane-gry dt {
+  color: var(--szary);
+}
+
+.dane-gry dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Wyniki: nagłówek i przełącznik Gracze / Pytania w jednym rzędzie */
+.wyniki-pasek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.wyniki-pasek h2 {
+  margin: 0;
+}
+
+/* Przegląd pytań (przeglad-pytan.tsx): zwijana karta na pytanie, pod odpowiedziami kapsle graczy */
+.przeglad-pytan .karta-zwijana {
+  margin-top: 10px;
+}
+
+.przeglad-naglowek {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.przeglad-lp {
+  flex: none;
+  min-width: 1.8em;
+  color: var(--szary);
+  font-weight: var(--w-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.przeglad-tresc {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.przeglad-wynik {
+  flex: none;
+  margin-left: auto;
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+  color: var(--zloto);
+}
+
+.przeglad-wynik.wszyscy {
+  color: var(--chmiel);
+}
+
+.przeglad-final {
+  margin: 24px 0 0;
+}
+
+.przeglad-opcje {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.przeglad-opcja {
+  padding: 10px 0 10px 12px;
+  border-left: 4px solid var(--kamien2);
+}
+
+.przeglad-opcja.poprawna {
+  border-left-color: var(--chmiel);
+}
+
+.przeglad-opcja-tytul {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.przeglad-opcja.poprawna .historia-litera {
+  background: var(--chmiel);
+  border-color: var(--chmiel);
+  color: var(--na-chmielu);
+}
+
+.przeglad-opcja.poprawna .przeglad-opcja-tekst {
+  color: var(--chmiel);
+  font-weight: var(--w-bold);
+}
+
+.przeglad-ile {
+  margin-left: auto;
+  color: var(--szary);
+  font-weight: var(--w-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.przeglad-gracze {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.przeglad-gracz {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.przeglad-nick {
+  font-weight: var(--w-semibold);
+}
+
+.przeglad-odp {
+  flex-basis: 100%;
+  order: 5;
+  padding-left: 38px;
+  color: var(--piana);
+  font-size: var(--fs-small);
+}
+
+.przeglad-gracz.zle .przeglad-odp {
+  color: var(--czerwien);
+}
+
+.przeglad-gracz.czesciowo .przeglad-odp {
+  color: var(--zloto);
+}
+
+.przeglad-punkty {
+  margin-left: auto;
+  font-weight: var(--w-black);
+  font-variant-numeric: tabular-nums;
+  color: var(--szary);
+}
+
+.przeglad-gracz.dobrze .przeglad-punkty {
+  color: var(--chmiel);
+}
+
+.przeglad-gracz.czesciowo .przeglad-punkty {
+  color: var(--zloto);
+}
+
+.przeglad-rozwiazanie {
+  margin: 0;
+  color: var(--chmiel);
+}
+
+.przeglad-brak {
+  margin: 12px 0 0;
+}
