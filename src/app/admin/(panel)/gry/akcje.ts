@@ -263,12 +263,18 @@ export async function ustawOdbiorNagrody(sesjaId: string, graczId: string, odebr
 
 /** Notatki prowadzącego do gry (29.10): co zadziałało, co poprawić, kto grał. */
 export async function zapiszNotatke(sesjaId: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajGry(await wymagajAdmina(), sesjaId);
+  const rola = await wymagajAdmina();
+  await wymagajGry(rola, sesjaId);
   const notatka = String(dane.get("notatka") ?? "").trim();
   if (notatka.length > MAX_NOTATKA) return { blad: `Notatki mogą mieć najwyżej ${MAX_NOTATKA} znaków.` };
+  // autor przy notatce: logo lokalu, który ją zapisał, albo Bractwa (główny)
   const { error } = await supabaseAdmin()
     .from("sesje")
-    .update({ notatka: notatka || null })
+    .update({
+      notatka: notatka || null,
+      notatka_lokal_id: notatka ? (lokalRoli(rola) ?? null) : null,
+      notatka_zmieniono: notatka ? new Date().toISOString() : null,
+    })
     .eq("id", sesjaId);
   if (error) return { blad: `Nie udało się zapisać notatek: ${error.message}` };
   refresh();

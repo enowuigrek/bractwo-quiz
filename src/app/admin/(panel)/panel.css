@@ -1531,12 +1531,17 @@ button.tag:hover:not(.wybrany) {
   filter: brightness(1.2);
 }
 
+/* zębatka (panel główny) i logo lokalu stoją z prawej, tuż przy „Wyloguj” (29.10) */
+.panel-nawigacja a.nawigacja-ustawienia {
+  margin-left: auto;
+}
+
 @media (min-width: 960px) {
-  .panel-naglowek:has(.nawigacja-logo-lokalu) {
+  .panel-naglowek {
     column-gap: 12px;
   }
 
-  .panel-naglowek:has(.nawigacja-logo-lokalu) .panel-nawigacja {
+  .panel-naglowek .panel-nawigacja {
     margin-left: 28px;
   }
 }
@@ -2008,9 +2013,10 @@ button.tag:hover:not(.wybrany) {
   color: var(--szary);
 }
 
-/* Notatki do gry (strona gry, 29.10), a na liście rozgrywek sama ikona przy grze z notatkami */
+/* Notatka do gry (strona gry, 29.10): karta z logo autora, pole do pisania na całą szerokość, a na liście
+   rozgrywek sama ikona przy grze z notatką */
 .notatki-gry textarea.pole {
-  min-height: 120px;
+  min-height: 200px;
 }
 
 .notatki-stopka {
@@ -2018,6 +2024,42 @@ button.tag:hover:not(.wybrany) {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.notatka-karta {
+  margin-bottom: 14px;
+}
+
+.notatka-autor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.notatka-autor > span {
+  display: grid;
+}
+
+.notatka-logo {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.notatka-logo-tekst {
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-round);
+  background: var(--kamien2);
+  font-weight: var(--w-black);
+}
+
+.notatka-tekst {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
 }
 
 .lista-tytul .notatka-gry {
@@ -2056,6 +2098,10 @@ button.tag:hover:not(.wybrany) {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 16px;
+}
+
+.wyniki-pasek .wybor-czasu-opcja {
+  text-decoration: none;
 }
 
 .wyniki-pasek h2 {

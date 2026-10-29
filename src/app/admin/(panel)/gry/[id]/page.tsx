@@ -15,7 +15,7 @@ import { usunieciGry, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../wyn
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
 import { LinkDoSkopiowania } from "./kopiuj";
-import { Notatki } from "./notatki";
+import { Notatki, type AutorNotatki } from "./notatki";
 import { PrzegladPytan, type GraczPrzegladu } from "./przeglad-pytan";
 import { TabelaWynikow } from "./tabela-wynikow";
 
@@ -103,16 +103,30 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
         });
   const dolaczyli = (dolaczanie ?? []) as { dolaczyl: string }[];
   // pierwsze pytanie ruszyło czas_ms przed pierwszą odpowiedzią
-  const startFaktyczny = pierwszePytanie
+  // od 29.10 baza zapisuje start (`wystartowano`), starsze gry: z pierwszej odpowiedzi
+  const startFaktyczny = gra.wystartowano
+    ? gra.wystartowano
+    : pierwszePytanie
     ? new Date(pierwszePytanie.utworzono).getTime() - pierwszePytanie.czas_ms
     : null;
+  // autor notatki: lokal, który ją zapisał, albo Bractwo
+  const { data: lokalNotatki } = gra.notatka_lokal_id
+    ? await db
+        .from("lokale")
+        .select("nazwa, logo_url")
+        .eq("id", gra.notatka_lokal_id)
+        .maybeSingle<{ nazwa: string; logo_url: string | null }>()
+    : { data: null };
+  const autorNotatki: AutorNotatki = lokalNotatki
+    ? { nazwa: lokalNotatki.nazwa, logo: lokalNotatki.logo_url }
+    : { nazwa: "Bractwo Piwne", logo: "/loga/bractwo-biale.svg" };
   const daneGry: [string, string | null][] = [
     ["Lokal", gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu"],
     ["Okazja", gra.okazja],
     ["Start ustawiony", godzina(gra.planowany_start, true)],
     ["Pierwszy gracz", godzina(dolaczyli[0]?.dolaczyl, !gra.planowany_start)],
     ["Ostatni gracz", dolaczyli.length > 1 ? godzina(dolaczyli[dolaczyli.length - 1].dolaczyl) : null],
-    ["Pierwsze pytanie", godzina(startFaktyczny)],
+    [gra.wystartowano ? "Start faktyczny" : "Pierwsze pytanie", godzina(startFaktyczny)],
     ["Koniec", !trwa ? godzina(gra.faza_od) : null],
     ["Graczy", `${gracze ?? 0}/${gra.max_graczy}`],
     ["Czas na odpowiedź", gra.czas_s === null ? "bez limitu" : `${gra.czas_s} s`],
@@ -198,14 +212,6 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
             </PrzyciskPotwierdz>
           </section>
           )}
-
-          {/* notatki prowadzącego: lokal-gość (gra Bractwa u niego) ich nie widzi */}
-          {!gosc && (
-            <section className="panel-sekcja">
-              <h2>Notatki</h2>
-              <Notatki graId={gra.id} notatka={gra.notatka ?? null} />
-            </section>
-          )}
         </div>
 
         {trwa && qrPilota ? (
@@ -269,6 +275,19 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
           </div>
         ) : null}
       </div>
+
+      {/* notatka prowadzącego na całą szerokość: lokal-gość (gra Bractwa u niego) jej nie widzi */}
+      {!gosc && (
+        <section className="panel-sekcja">
+          <h2>Notatka</h2>
+          <Notatki
+            graId={gra.id}
+            notatka={gra.notatka ?? null}
+            autor={autorNotatki}
+            zmieniono={gra.notatka_zmieniono ?? null}
+          />
+        </section>
+      )}
 
       {!trwa && !!gra.nagrody?.length && (
         <section className="panel-sekcja">

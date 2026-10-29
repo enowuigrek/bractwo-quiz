@@ -72,6 +72,11 @@ export type Sesja = {
   okazja: string | null;
   /** notatki prowadzącego w panelu (29.10), niewidoczne dla graczy */
   notatka?: string | null;
+  /** autor notatki: lokal (null: Bractwo, panel główny) i kiedy ją zmieniono */
+  notatka_lokal_id?: string | null;
+  notatka_zmieniono?: string | null;
+  /** faktyczny start: pierwsze wyjście z poczekalni (wyzwalacz w bazie, od 29.10) */
+  wystartowano?: string | null;
   grafika_url: string | null;
   tryb: "solo" | "druzyny";
   bonus_czas: boolean;
