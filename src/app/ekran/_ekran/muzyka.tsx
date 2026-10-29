@@ -105,9 +105,22 @@ function strona(): Wspolne {
 
 /** Który utwór pasuje do fazy: seria i pijany finał to jeden utwór, więc gra dalej bez przerwy. */
 function utworFazy(stan: StanMuzyki): Utwor | null {
-  // klasyczny pub quiz na razie bez muzyki (26.10, Łukasz: utwory z promptów nie pasowały), efekty grają
+  // klasyczny pub quiz (29.10, Łukasz): poczekalnia i podium jak w wyścigu, a cała gra na melodii z pierwszej rundy
+  // (bez etapów, więc bez narastania i bez ciszy na końcu etapu); pilot włącza i wyłącza ją tym samym przełącznikiem
   const klasyczny = stan.klasyczny ?? (!!stan.quiz && stan.quiz.liczba_etapow === 0);
-  if (klasyczny) return null;
+  if (klasyczny) {
+    switch (stan.faza) {
+      case "poczekalnia":
+        return "poczekalnia";
+      case "podium":
+      case "tabela":
+        return "podium";
+      case "koniec":
+        return null;
+      default:
+        return "etap1";
+    }
+  }
   switch (stan.faza) {
     case "poczekalnia":
       return "poczekalnia";

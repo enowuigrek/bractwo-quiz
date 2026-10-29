@@ -333,23 +333,21 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
           </div>
           {/* lokal i faza, a obok przełączniki samymi ikonami (26.10: bez podpisów, mieszczą się w jednym wierszu);
               włączony świeci na złoto, nazwa w podpowiedzi i dla czytnika ekranu. Muzyka i efekty grają tylko na TV,
-              klasyczny pub quiz na razie nie ma muzyki. Automat klika kolejne kroki sam (auto.tsx) */}
+              także w klasycznym pub quizie (od 29.10 melodia pierwszej rundy). Automat klika kroki sam (auto.tsx) */}
           <div className="pilot-pasek">
             <p className="pomocniczy">{[stan.lokal?.nazwa, NAZWY[faza]].filter(Boolean).join(" · ")}</p>
             <div className="pilot-przelaczniki">
-              {!klasyczny && (
-                <button
-                  type="button"
-                  className={`pilot-ikona${stan.muzyka ? " wlaczony" : ""}`}
-                  aria-pressed={stan.muzyka}
-                  aria-label="Muzyka i dźwięki na TV"
-                  title={stan.muzyka ? "Muzyka i dźwięki na TV: grają" : "Muzyka i dźwięki na TV: wyłączone"}
-                  disabled={wysylam}
-                  onClick={() => akcja("muzyka")}
-                >
-                  {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
-                </button>
-              )}
+              <button
+                type="button"
+                className={`pilot-ikona${stan.muzyka ? " wlaczony" : ""}`}
+                aria-pressed={stan.muzyka}
+                aria-label="Muzyka i dźwięki na TV"
+                title={stan.muzyka ? "Muzyka i dźwięki na TV: grają" : "Muzyka i dźwięki na TV: wyłączone"}
+                disabled={wysylam}
+                onClick={() => akcja("muzyka")}
+              >
+                {stan.muzyka ? <IkonaGlosnik /> : <IkonaWyciszony />}
+              </button>
               <button
                 type="button"
                 className={`pilot-ikona${stan.auto ? " wlaczony" : ""}`}
