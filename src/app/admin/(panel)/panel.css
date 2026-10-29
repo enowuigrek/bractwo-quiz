@@ -807,6 +807,20 @@ a.przycisk {
   box-shadow: 0 0 0 2px var(--zloto);
 }
 
+/* logo lokalu zamiast zębatki: bez złotej obwódki także na stronie lokalu (28.10) */
+.panel-nawigacja a.nawigacja-ustawienia[aria-current="page"]:has(.nawigacja-logo-lokalu) {
+  box-shadow: none;
+}
+
+/* komputer: „Uruchom quiz” pierwsze, przed zakładkami (28.10, jak na górze menu na telefonie) */
+@media (min-width: 960px) {
+  .panel-nawigacja a.nawigacja-start {
+    order: -1;
+    margin-left: 0;
+    margin-right: 16px;
+  }
+}
+
 @media (max-width: 559px) {
   .panel-nawigacja .na-szerokim {
     display: none;
