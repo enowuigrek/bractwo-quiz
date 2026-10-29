@@ -711,6 +711,22 @@ html:has(.kolumna) {
   display: none;
 }
 
+/* przycisk przy prawej krawędzi (ostatni w wierszu listy): dymek wyrównany do prawej, żeby nie wystawał poza ekran
+   (29.10: niewidoczny dymek „Usuń grę” dawał przewijanie w poziomie na telefonie) */
+.lista-akcje > :last-child[data-podpis]::after,
+.lista-akcje > :last-child [data-podpis]::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, 4px);
+}
+
+.lista-akcje > :last-child[data-podpis]:hover::after,
+.lista-akcje > :last-child [data-podpis]:hover::after,
+.lista-akcje > :last-child[data-podpis]:focus-visible::after,
+.lista-akcje > :last-child [data-podpis]:focus-visible::after {
+  transform: translate(0, 0);
+}
+
 
 /* Werble po finale (components/werble.tsx): ekran gaśnie jak wyłączany telewizor, potem wolno wchodzi napis.
    Na telefonie zasłania całą stronę, na TV całą scenę (.duzy). */
@@ -3506,7 +3522,10 @@ html:has(.kolumna) {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
+  /* strona pod otwartym menu rozmyta (29.10), żeby menu odcinało się od treści */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;

@@ -9,6 +9,8 @@ html:has(.panel) {
 }
 
 .panel {
+  /* nic nie wystaje w bok (np. ukryte dymki przy prawej krawędzi), a przyklejone elementy dalej działają */
+  overflow-x: clip;
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
@@ -105,6 +107,76 @@ span.panel-logo-lokalu {
   border-bottom-color: var(--zloto);
 }
 
+/* Zakładki (nawigacja.tsx): złoty pasek to jeden element `.nawigacja-pasek`, który jeździ między zakładkami po szarej
+   linii nagłówka; najechanie rozjaśnia napis i pokazuje pod nim przygaszony pasek w tym samym miejscu (29.10) */
+.panel-nawigacja {
+  position: relative;
+}
+
+.panel-nawigacja a.zakladka {
+  position: relative;
+  border-bottom: 0;
+  transition: color 0.25s var(--ease-std);
+}
+
+.panel-nawigacja a.zakladka::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--kamien3);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease-std);
+}
+
+.panel-nawigacja a.zakladka:hover {
+  color: var(--piana);
+}
+
+.panel-nawigacja a.zakladka:hover::after {
+  transform: scaleX(1);
+}
+
+.panel-nawigacja a.zakladka[aria-current="page"]:hover {
+  color: var(--zloto);
+}
+
+.panel-nawigacja a.zakladka[aria-current="page"]::after {
+  display: none;
+}
+
+.nawigacja-pasek {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--zloto);
+  pointer-events: none;
+}
+
+.nawigacja-pasek.animuj {
+  transition:
+    transform 0.4s var(--ease-std),
+    width 0.4s var(--ease-std);
+}
+
+@media (min-width: 960px) {
+  /* zakładki sięgają do szarej linii nagłówka, więc pasek leży na niej */
+  .panel-nawigacja {
+    overflow: visible;
+    margin-bottom: -1px;
+  }
+
+  .panel-nawigacja a.zakladka::after,
+  .nawigacja-pasek {
+    bottom: 0;
+  }
+}
+
 /* Formularze nie rozlewają się na całą szerokość desktopu */
 .panel .formularz {
   max-width: 640px;
@@ -170,13 +242,9 @@ span.panel-logo-lokalu {
   }
 }
 
-/* Sekcja (np. karta „Nowy quiz”) pod listą albo komunikatem nie przykleja się do ostatniej linii */
-.panel-sekcja + .panel-sekcja,
-.karta + .panel-sekcja,
-.uklad-dwa + .panel-sekcja,
-.lista + .panel-sekcja,
-.lista-pusta + .panel-sekcja,
-.blad + .panel-sekcja {
+/* Sekcja nie przykleja się do tego, co nad nią: odstęp po każdym poprzedniku (29.10: wcześniej lista z nazwy i
+   przełącznik „udostępnij lokalom” czy dane gry stały tuż przy nagłówku sekcji) */
+* + .panel-sekcja {
   margin-top: var(--section-gap);
 }
 
@@ -242,9 +310,42 @@ h2 {
   flex-shrink: 0;
 }
 
+/* pusta lista: przerywana ramka zamiast samego tekstu z dużym marginesem (29.10) */
 .lista-pusta {
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px dashed var(--kamien2);
+  border-radius: var(--r-card);
   color: var(--szary);
-  padding: 14px 0;
+}
+
+/* nagłówek sekcji z liczbą pozycji obok (Trwające 2, Zakończone 14) */
+.naglowek-z-licznikiem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.licznik {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--r-pill);
+  background: var(--kamien2);
+  color: var(--piana);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* rzeczy tylko na telefon (na komputerze są w pasku nawigacji) */
+@media (min-width: 960px) {
+  .tylko-telefon {
+    display: none;
+  }
 }
 
 .miniatura {
@@ -510,13 +611,19 @@ a.przycisk {
   text-shadow: var(--glow-md);
 }
 
+/* znaczek: wielkie litery wyśrodkowane w ramce (29.10: we flexie rozciągał się do wysokości przycisków obok, a tekst
+   zostawał u góry; wersaliki Open Sans siedzą w linii nisko, więc dół ma 1 px więcej) */
 .znaczek {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   font-size: var(--fs-micro);
   font-weight: var(--w-black);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 2px 8px;
+  /* odstęp liter dokleja się też za ostatnią literą: prawa strona o tyle węższa */
+  padding: 4px calc(9px - 0.06em) 5px 9px;
   border-radius: var(--r-pill);
   border: 1px solid var(--kamien2);
   color: var(--szary);
@@ -735,16 +842,29 @@ a.przycisk {
 }
 
 /* Wybór czasu na odpowiedź przy uruchamianiu gry: rząd pigułek */
+/* Grupa wyboru (rodzaj quizu, Gracze / Pytania, mnożnik, czas etapu, prawda / fałsz…): wszystkie opcje tej samej
+   szerokości, czyli najszerszej (29.10, Łukasz: „Wyścig po piwo” i „Pub quiz” różnej szerokości). Pięć i więcej opcji
+   (szablony etapów) zawija się w równe kafelki, żeby nie wyjść poza telefon. */
 .wybor-czasu {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: 8px;
+  max-width: 100%;
+}
+
+.wybor-czasu:has(> :nth-child(5)) {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
 }
 
 .wybor-czasu-opcja {
   position: relative;
   display: inline-flex !important;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   margin: 0 !important;
   padding: 10px 18px;
   border-radius: var(--r-btn-sm);
@@ -1146,10 +1266,13 @@ a.przycisk {
   gap: 4px;
 }
 
+/* −/+ tej samej wysokości co znaczki obok (29.10: były spłaszczone do 40×20) */
 .etap-plan .przycisk-maly {
+  min-width: 32px;
   min-height: 0;
+  height: 24px;
   padding: 0 8px;
-  line-height: 1.4;
+  line-height: 1;
 }
 
 .etap-brakujace {
@@ -2100,8 +2223,14 @@ button.tag:hover:not(.wybrany) {
 
 .dane-gry > div {
   display: grid;
-  grid-template-columns: 11em 1fr;
+  grid-template-columns: 9em minmax(0, 1fr);
   gap: 12px;
+}
+
+@media (min-width: 960px) {
+  .dane-gry > div {
+    grid-template-columns: 11em minmax(0, 1fr);
+  }
 }
 
 /* komputer: dwie kolumny czytane z góry na dół (zakończona gra ma całą szerokość) */

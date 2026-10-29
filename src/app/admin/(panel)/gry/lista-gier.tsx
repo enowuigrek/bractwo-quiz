@@ -14,13 +14,14 @@ export type GraNaLiscie = {
   host_token: string;
   tylko_glowny: boolean;
   planowany_start: string | null;
+  wystartowano: string | null;
   notatka: string | null;
   quizy: { tytul: string } | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
 };
 
 export const ZAPYTANIE_GIER =
-  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, notatka, quizy(tytul), lokale(nazwa, miasto, logo_url)";
+  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul), lokale(nazwa, miasto, logo_url)";
 
 /** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
 const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);
@@ -32,6 +33,9 @@ const data = new Intl.DateTimeFormat("pl-PL", {
   minute: "2-digit",
   timeZone: "Europe/Warsaw",
 });
+
+/** Kiedy gra była: faktyczny start, a bez niego zaplanowany albo założenie gry (29.10: lista pokazywała założenie). */
+const kiedyGra = (g: GraNaLiscie) => g.wystartowano ?? g.planowany_start ?? g.utworzono;
 
 const godzina = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
 
@@ -54,7 +58,8 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
                 <Link href={adresGry(g)}>
                   {g.kod} · {g.quizy?.tytul ?? "quiz usunięty"}
                 </Link>{" "}
-                <span className={`znaczek${g.faza === "koniec" ? "" : " aktywny"}`}>{NAZWY_FAZ[g.faza]}</span>
+                {/* w „Zakończonych” plakietka fazy nic nie mówi, więc tylko przy trwających */}
+                {g.faza !== "koniec" && <span className="znaczek aktywny">{NAZWY_FAZ[g.faza]}</span>}
                 {g.notatka && (
                   <span className="notatka-gry" title="Gra ma notatki" aria-label="Gra ma notatki">
                     <IkonaNotatka />
@@ -62,7 +67,7 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
                 )}
               </div>
               <div className="lista-opis">
-                {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(g.utworzono))]
+                {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(kiedyGra(g)))]
                   .filter(Boolean)
                   .join(" · ")}
               </div>
@@ -117,7 +122,7 @@ function GraBractwa({ g }: { g: GraNaLiscie }) {
           <span className={`znaczek${g.faza === "koniec" ? "" : " aktywny"}`}>{NAZWY_FAZ[g.faza]}</span>
         </div>
         <div className="lista-opis">
-          {["ustawiło Bractwo Piwne", start && `start ${start}`, data.format(new Date(g.utworzono))]
+          {["ustawiło Bractwo Piwne", start && `start ${start}`, data.format(new Date(kiedyGra(g)))]
             .filter(Boolean)
             .join(" · ")}
         </div>

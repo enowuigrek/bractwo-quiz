@@ -138,9 +138,28 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 ## Panel admina: dwa układy
 
-- **Mobilny** (< 960px): kolumna do 640px, logo i „Wyloguj” u góry, nawigacja pod spodem.
+- **Mobilny** (< 960px): kolumna do 640px, u góry logo i menu z trzema kreskami (zakładki, „Uruchom quiz”, ustawienia i „Wyloguj” są w menu).
 - **Desktopowy** (≥ 960px): stała szerokość 1120px, logo, nawigacja i „Wyloguj” w jednym pasku. Strony mogą mieć dwie kolumny (`.uklad-dwa`, np. gra: dane i akcje po lewej, pilot i linki po prawej). Formularze zostają węższe (do 640px), a duże przyciski mają szerokość według treści.
 - **Szerokość nie zależy od treści.** Pasek przewijania ma zarezerwowane miejsce (`scrollbar-gutter: stable`), więc strona nie skacze, gdy treść się wydłuża.
+- **Nic nie wystaje w bok.** `.panel` ma `overflow-x: clip`; dymki `data-podpis` przy ostatnim przycisku wiersza (`.lista-akcje > :last-child`) są wyrównane do prawej, bo niewidoczny dymek kosza dawał na telefonie przewijanie w poziomie (29.10).
+
+### Zasady panelu (porządki 29.10)
+
+Łukasz: „bałagan się robi i ciągle coś znajduję”. Poniższe obowiązuje każdą nową stronę panelu; nowy element składamy z tych klas, a nie z własnych reguł.
+
+- **Odstęp sekcji.** Każda `.panel-sekcja` ma `--section-gap` nad sobą po czymkolwiek (`* + .panel-sekcja`). Nie dopisujemy wyjątków dla konkretnych poprzedników (lista z nazwy przeoczyła przełącznik „udostępnij lokalom” i dane gry).
+- **Zakładki w pasku (komputer).** Złoty pasek pod wybraną zakładką to jeden element (`.nawigacja-pasek`), który leży na szarej linii nagłówka i przesuwa się między zakładkami (0,4 s); przestawia się od razu po kliknięciu, nie po wczytaniu strony. Najechanie: napis jaśnieje do `--piana`, a w miejscu paska pojawia się pasek `--kamien3`. Zębatka (główny) albo logo lokalu stoją z prawej, 16 px od „Wyloguj”. Logo lokalu ma wysokość „Wyloguj” (40 px), bez kółka i tła także po najechaniu.
+- **Grupa wyboru (`.wybor-czasu`).** Wszystkie opcje grupy mają tę samą szerokość (najszerszej) i wyśrodkowany tekst: rodzaj quizu, Gracze / Pytania, mnożnik, czas etapu, prawda / fałsz. Od pięciu opcji grupa zawija się w równe kafelki (min. 10 em). Link w roli opcji bez podkreślenia.
+- **Znaczek (`.znaczek`).** Wersaliki 11 px, `inline-flex` wyśrodkowany; dół ma 1 px więcej paddingu (wersaliki Open Sans siedzą w linii nisko), a prawa strona jest węższa o odstęp liter. We flexie znaczek może się rozciągnąć do wysokości sąsiadów, a tekst zostaje na środku. Przyciski −/+ obok znaczków mają 24 px wysokości.
+- **Nagłówek z licznikiem.** Sekcje list mają przy nagłówku pigułkę z liczbą (`.naglowek-z-licznikiem` + `.licznik`, tło `--kamien2`), np. „Trwające 0”, „Zakończone 14”.
+- **Pusta lista.** `.lista-pusta` to przerywana ramka `--kamien2` z szarym tekstem, bez dużego marginesu, zamiast samego zdania zawieszonego w próżni.
+- **Menu z trzema kreskami.** Pod otwartym menu strona jest przyciemniona (50%) i rozmyta (`backdrop-filter: blur(6px)`).
+- **Rzeczy tylko na telefon.** `.tylko-telefon` znika od 960 px; np. duży „Uruchom quiz” na liście rozgrywek, bo na komputerze ten przycisk stoi w pasku.
+- **Plakietka fazy** tylko tam, gdzie coś mówi: przy trwających grach tak, w „Zakończonych” nie (wszystkie są zakończone). Data gry na liście to faktyczny start, bez niego planowany, a dopiero potem założenie.
+- **Dane obiektu (`dl.dane-gry`).** Nazwa szara z lewej, wartość z prawej, jedna pod drugą; kolumna nazw 9 em na telefonie, 11 em na komputerze, gdzie całość idzie w dwóch kolumnach czytanych z góry na dół. Puste pozycje znikają.
+- **Akcje niszczące na dole.** „Usuń grę” stoi na samym dole strony gry, pod wynikami; „Zakończ grę” trwającej gry zostaje na górze.
+- **Notatka.** Bez notatki sam przycisk „+ Dodaj notatkę”; pole do pisania na całą szerokość (bez limitu 640 px formularzy) dopiero po kliknięciu, bez podpowiedzi w polu. Zapisana to zwijana karta (`.karta-zwijana`): logo autora 44 px (lokal albo białe logo Bractwa), nazwa, data i zwinięta pierwsza linijka; po rozwinięciu cały tekst z akapitami. Pod nią „Edytuj notatkę” z ołówkiem. Na liście rozgrywek sama ikona kartki przy grze z notatką.
+- **Wyniki gry od strony pytań.** Zakładki „Gracze / Pytania” obok nagłówka „Wyniki”. Pytanie to `.karta-zwijana`: numer, rodzaj w swoim kolorze, treść, „dobrze X z Y · najszybciej …” i złoty wynik X/Y (zielony, gdy wszyscy dobrze). W wyborze i prawda/fałsz każda odpowiedź ma lewy pasek (zielony przy poprawnej), literę w kółku, liczbę wyborów i pod spodem kapsle graczy (28 px) od najszybszego z czasem i punktami; w innych rodzajach rozwiązanie zielono na górze i gracze od najlepszej odpowiedzi (częściowo i blisko złoto, źle czerwono).
 
 ## Komponenty
 

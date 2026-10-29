@@ -22,10 +22,13 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const { data, error } = await zapytanie.order("utworzono", { ascending: false }).limit(100).returns<GraNaLiscie[]>();
 
   const gry = data ?? [];
+  const trwajace = gry.filter((g) => g.faza !== "koniec");
+  const zakonczone = gry.filter((g) => g.faza === "koniec");
   return (
     <main>
       <h1>Rozgrywki</h1>
-      <p>
+      {/* na komputerze „Uruchom quiz” stoi w pasku nawigacji, więc duży przycisk tylko na telefonie (29.10) */}
+      <p className="tylko-telefon">
         <Link href="/admin/gry/nowa" className="przycisk zloty">
           ▶ Uruchom quiz
         </Link>
@@ -34,20 +37,16 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
       {error && <p className="blad">Nie udało się pobrać rozgrywek: {error.message}</p>}
 
       <section className="panel-sekcja">
-        <h2>Trwające</h2>
-        <ListaGier
-          gry={gry.filter((g) => g.faza !== "koniec")}
-          pusta="Żadna rozgrywka teraz nie trwa."
-          lokal={jakoLokal}
-        />
+        <h2 className="naglowek-z-licznikiem">
+          Trwające <span className="licznik">{trwajace.length}</span>
+        </h2>
+        <ListaGier gry={trwajace} pusta="Żadna rozgrywka teraz nie trwa." lokal={jakoLokal} />
       </section>
       <section className="panel-sekcja">
-        <h2>Zakończone</h2>
-        <ListaGier
-          gry={gry.filter((g) => g.faza === "koniec")}
-          pusta="Nie ma jeszcze zakończonych rozgrywek."
-          lokal={jakoLokal}
-        />
+        <h2 className="naglowek-z-licznikiem">
+          Zakończone <span className="licznik">{zakonczone.length}</span>
+        </h2>
+        <ListaGier gry={zakonczone} pusta="Nie ma jeszcze zakończonych rozgrywek." lokal={jakoLokal} />
       </section>
     </main>
   );
