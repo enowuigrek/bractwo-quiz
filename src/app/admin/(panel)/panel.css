@@ -456,6 +456,11 @@ a.przycisk {
   min-width: 0;
 }
 
+/* data szersza od godziny: na telefonie data z dużym krojem pola nie mieściła się („29.10.202”, 29.10) */
+.wiersz-pol.start-pola {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+}
+
 
 .podpowiedz {
   color: var(--szary);
@@ -860,6 +865,11 @@ a.przycisk {
   max-width: 100%;
 }
 
+/* do czterech opcji napis w jednej linii („Wyścig po piwo” łamał się na telefonie) */
+.wybor-czasu:not(:has(> :nth-child(5))) > .wybor-czasu-opcja {
+  white-space: nowrap;
+}
+
 .wybor-czasu:has(> :nth-child(5)) {
   display: grid;
   grid-auto-flow: row;
@@ -873,7 +883,7 @@ a.przycisk {
   justify-content: center;
   text-align: center;
   margin: 0 !important;
-  padding: 10px 18px;
+  padding: 10px 14px;
   border-radius: var(--r-btn-sm);
   background: var(--kamien2);
   color: var(--piana) !important;

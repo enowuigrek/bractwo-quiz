@@ -22,6 +22,8 @@ export type QuizDoWyboru = {
   rodzaj: RodzajQuizu;
   /** Finał serią, po którym może być pijany finał. */
   pijany: boolean;
+  /** Ma finał serią (pula pytań poza liczbą). */
+  final?: boolean;
 };
 
 /** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) ustawia widoczność gry; lokal dostaje tylko swój lokal. */
@@ -214,6 +216,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                 <strong>{q.tytul}</strong>
                 <span className="kafelek-opis">
                   {q.pytania === 0 ? "brak pytań" : liczbaPytan(q.pytania)}
+                  {q.final && " i finał"}
                   {q.tagi.length > 0 && ` · ${q.tagi.join(", ")}`}
                 </span>
               </label>

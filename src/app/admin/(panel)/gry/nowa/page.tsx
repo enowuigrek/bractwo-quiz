@@ -16,7 +16,7 @@ export default async function NowaGra() {
   const zapytanieLokali = db.from("lokale").select("id, nazwa, miasto, logo_url");
   const [{ data: lokale }, { data: quizy }] = await Promise.all([
     (lokalId ? zapytanieLokali.eq("id", lokalId) : zapytanieLokali).order("nazwa").returns<Lokal[]>(),
-    filtrQuizow(db.from("quizy").select("id, tytul, tagi, zadania(count), etapy(finalowy, seria)"), rola)
+    filtrQuizow(db.from("quizy").select("id, tytul, tagi, zadania(typ, etap_id), etapy(id, finalowy, seria)"), rola)
       .is("usunieto", null)
       .order("utworzono", { ascending: false })
       .returns<
@@ -24,8 +24,8 @@ export default async function NowaGra() {
           id: string;
           tytul: string;
           tagi: string[];
-          zadania: { count: number }[];
-          etapy: { finalowy: boolean; seria: boolean }[];
+          zadania: { typ: string; etap_id: string | null }[];
+          etapy: { id: string; finalowy: boolean; seria: boolean }[];
         }[]
       >(),
   ]);
@@ -43,7 +43,11 @@ export default async function NowaGra() {
           quizy={(quizy ?? []).map((q) => ({
             id: q.id,
             tytul: q.tytul,
-            pytania: q.zadania[0]?.count ?? 0,
+            // pytania, które zobaczy każdy: bez ciekawostek i bez puli finału serią (29.10: „66 pytań” liczyło pulę)
+            pytania: q.zadania.filter(
+              (z) => z.typ !== "ciekawostka" && !q.etapy.some((e) => e.id === z.etap_id && e.seria),
+            ).length,
+            final: q.etapy.some((e) => e.seria),
             tagi: q.tagi,
             rodzaj: q.etapy.length ? "wyscig" : "klasyczny",
             pijany: q.etapy.some((e) => e.finalowy && e.seria),
