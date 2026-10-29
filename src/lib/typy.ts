@@ -70,6 +70,8 @@ export type Sesja = {
   quiz_id: string;
   lokal_id: string | null;
   okazja: string | null;
+  /** notatki prowadzącego w panelu (29.10), niewidoczne dla graczy */
+  notatka?: string | null;
   grafika_url: string | null;
   tryb: "solo" | "druzyny";
   bonus_czas: boolean;

@@ -14,12 +14,13 @@ export type GraNaLiscie = {
   host_token: string;
   tylko_glowny: boolean;
   planowany_start: string | null;
+  notatka: string | null;
   quizy: { tytul: string } | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
 };
 
 export const ZAPYTANIE_GIER =
-  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, quizy(tytul), lokale(nazwa, miasto, logo_url)";
+  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, notatka, quizy(tytul), lokale(nazwa, miasto, logo_url)";
 
 /** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
 const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);
@@ -60,6 +61,7 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
                   .filter(Boolean)
                   .join(" · ")}
               </div>
+              {g.notatka && <div className="lista-opis notatka-gry">📝 {g.notatka}</div>}
             </div>
             <div className="lista-akcje">
               {/* podgląd ekranu gry bez sterowania (28.10), jak u lokalu przy grach Bractwa */}

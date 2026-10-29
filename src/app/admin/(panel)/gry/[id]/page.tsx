@@ -15,6 +15,7 @@ import { usunieciGry, wynikiGry, zadaniaGry } from "../wyniki";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
 import { LinkDoSkopiowania } from "./kopiuj";
+import { Notatki } from "./notatki";
 import { TabelaWynikow } from "./tabela-wynikow";
 
 export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
@@ -145,6 +146,14 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               <IkonaKosz /> Usuń grę
             </PrzyciskPotwierdz>
           </section>
+          )}
+
+          {/* notatki prowadzącego: lokal-gość (gra Bractwa u niego) ich nie widzi */}
+          {!gosc && (
+            <section className="panel-sekcja">
+              <h2>Notatki</h2>
+              <Notatki graId={gra.id} notatka={gra.notatka ?? null} />
+            </section>
           )}
         </div>
 

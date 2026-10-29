@@ -12,6 +12,7 @@ import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { LIMITY } from "../quizy/limity";
 
 const MAX_OKAZJA = 80;
+const MAX_NOTATKA = 5000;
 
 export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
   const rola = await wymagajAdmina();
@@ -258,6 +259,20 @@ export async function ustawOdbiorNagrody(sesjaId: string, graczId: string, odebr
     .eq("sesja_id", sesjaId);
   if (error) throw new Error(`Nie udało się zapisać odbioru: ${error.message}`);
   refresh();
+}
+
+/** Notatki prowadzącego do gry (29.10): co zadziałało, co poprawić, kto grał. */
+export async function zapiszNotatke(sesjaId: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
+  await wymagajGry(await wymagajAdmina(), sesjaId);
+  const notatka = String(dane.get("notatka") ?? "").trim();
+  if (notatka.length > MAX_NOTATKA) return { blad: `Notatki mogą mieć najwyżej ${MAX_NOTATKA} znaków.` };
+  const { error } = await supabaseAdmin()
+    .from("sesje")
+    .update({ notatka: notatka || null })
+    .eq("id", sesjaId);
+  if (error) return { blad: `Nie udało się zapisać notatek: ${error.message}` };
+  refresh();
+  return { ok: "Zapisano." };
 }
 
 /**

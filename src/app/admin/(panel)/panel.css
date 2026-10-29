@@ -1512,13 +1512,23 @@ button.tag:hover:not(.wybrany) {
   object-fit: contain;
 }
 
-.panel-nawigacja a.nawigacja-ustawienia:has(.nawigacja-logo-lokalu) {
+.panel-nawigacja a.nawigacja-ustawienia:has(.nawigacja-logo-lokalu),
+.panel-nawigacja a.nawigacja-ustawienia:has(.nawigacja-logo-lokalu):hover {
   background: none;
   border: 0;
   border-radius: 0;
   width: auto;
   min-width: 0;
   margin-left: auto;
+}
+
+/* najechanie: logo lekko jaśnieje zamiast kwadratowego tła przycisku (29.10) */
+.nawigacja-logo-lokalu {
+  transition: filter 0.35s var(--ease-std);
+}
+
+.panel-nawigacja a.nawigacja-ustawienia:hover .nawigacja-logo-lokalu {
+  filter: brightness(1.2);
 }
 
 @media (min-width: 960px) {
@@ -1996,4 +2006,23 @@ button.tag:hover:not(.wybrany) {
 
 .tabela-wynikow tr.usuniety td {
   color: var(--szary);
+}
+
+/* Notatki do gry (strona gry, 29.10) i ich pierwsza linijka na liście rozgrywek */
+.notatki-gry textarea.pole {
+  min-height: 120px;
+}
+
+.notatki-stopka {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.lista-opis.notatka-gry {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60ch;
 }
