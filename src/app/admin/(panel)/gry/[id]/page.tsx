@@ -68,9 +68,11 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
     ? await db.from("sesje").select("kod").eq("lokal_id", gra.lokal_id).neq("faza", "koniec").neq("id", gra.id)
     : { data: [] as { kod: string }[] };
   // historia zakończonej gry: tabela końcowa, a z niej odpowiedzi każdego gracza
-  const [wyniki, zadania] = trwa
-    ? [[], []]
-    : await Promise.all([wynikiGry(db, gra.id), zadaniaGry(db, gra.quiz_id, gra.zadanie_nr)]);
+  const zadania = trwa ? [] : await zadaniaGry(db, gra.quiz_id, gra.zadanie_nr);
+  // pytania z puli finału liczą się każdemu osobno (dostał tyle, na ile zdążył), ciekawostki wcale (28.10)
+  const zadaniaSerii = new Set(zadania.filter((z) => z.zSerii).map((z) => z.id));
+  const pytanEtapow = zadania.filter((z) => !z.zSerii && z.typ !== "ciekawostka").length;
+  const wyniki = trwa ? [] : await wynikiGry(db, gra.id, { kod: gra.kod, zadaniaSerii });
   // SVG z biblioteki qrcode, bez danych od użytkownika poza adresem, który sami złożyliśmy
   const qrPilota = trwa ? await QRCode.toString(linki.pilot, { type: "svg", margin: 0, errorCorrectionLevel: "M" }) : null;
 
@@ -269,7 +271,10 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
         <section className="panel-sekcja">
           <h2>Wyniki</h2>
           <p className="pomocniczy" style={{ marginTop: 0 }}>
-            {zadania.length > 0 ? `Pytań w grze: ${zadania.length}. ` : ""}Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy.
+            {pytanEtapow > 0
+              ? `Pytań w grze: ${pytanEtapow}${zadaniaSerii.size ? " i finał (każdy finalista tyle, na ile zdążył)" : ""}. `
+              : ""}
+            Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy.
           </p>
           {wyniki.some((w) => w.punkty > 0) && (
             <GrafikaPodium
@@ -294,7 +299,7 @@ export default async function Gra({ params }: PageProps<"/admin/gry/[id]">) {
               konta={[gra.lokale?.instagram ?? null, gra.browar_instagram]}
             />
           )}
-          <TabelaWynikow graId={gra.id} wyniki={wyniki} liczbaPytan={zadania.length} />
+          <TabelaWynikow graId={gra.id} wyniki={wyniki} liczbaPytan={pytanEtapow} />
         </section>
       )}
     </main>

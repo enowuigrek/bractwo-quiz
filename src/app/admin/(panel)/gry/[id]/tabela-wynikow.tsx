@@ -2,7 +2,10 @@ import Link from "next/link";
 import { sekundy } from "@/lib/czas";
 import type { WynikGracza } from "../wyniki";
 
-/** Tabela końcowa gry. Kliknięcie w wiersz otwiera historię odpowiedzi gracza. */
+/**
+ * Tabela końcowa gry. Kliknięcie w wiersz otwiera historię odpowiedzi gracza. `liczbaPytan`: pytania etapów; finaliście
+ * dochodzą jego pytania z finału (`wSerii`).
+ */
 export function TabelaWynikow({ graId, wyniki, liczbaPytan }: { graId: string; wyniki: WynikGracza[]; liczbaPytan: number }) {
   if (wyniki.length === 0) return <p className="lista-pusta">Nikt nie dołączył do tej gry.</p>;
   return (
@@ -31,7 +34,7 @@ export function TabelaWynikow({ graId, wyniki, liczbaPytan }: { graId: string; w
             </td>
             <td className="liczba">{w.punkty.toLocaleString("pl-PL")}</td>
             <td className="liczba">
-              {w.dobre}/{liczbaPytan}
+              {w.dobre}/{liczbaPytan + w.wSerii}
             </td>
             <td className="liczba na-szerokim">{w.sredniCzasMs !== null ? sekundy(w.sredniCzasMs) : "–"}</td>
           </tr>

@@ -32,7 +32,7 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
   if (!gra) notFound();
 
   const [wyniki, wszystkieZadania, { data: odpowiedzi }] = await Promise.all([
-    wynikiGry(db, gra.id),
+    wynikiGry(db, gra.id, { kod: gra.kod }),
     zadaniaGry(db, gra.quiz_id, gra.zadanie_nr),
     db
       .from("odpowiedzi")
@@ -66,7 +66,7 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
       <h1 style={{ marginBottom: 4 }}>{ja.nick}</h1>
       <p className="pomocniczy" style={{ marginTop: 0 }}>
         {ja.miejsce}. miejsce z {wyniki.length} · {ja.punkty.toLocaleString("pl-PL")} pkt · dobrze {ja.dobre}/
-        {zadania.length}
+        {zadania.filter((z) => z.typ !== "ciekawostka").length}
         {ja.sredniCzasMs !== null && ` · średni czas ${sekundy(ja.sredniCzasMs)}`}
       </p>
 

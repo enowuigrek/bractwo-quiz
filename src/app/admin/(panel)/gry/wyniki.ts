@@ -11,6 +11,8 @@ export type WynikGracza = {
   miejsce: number;
   dobre: number;
   odpowiedzi: number;
+  /** Ile odpowiedzi w finale serią (każdy dostaje inną liczbę pytań z puli). */
+  wSerii: number;
   /** Średni czas odpowiedzi (dobrych i złych), null gdy gracz nic nie odpowiedział. */
   sredniCzasMs: number | null;
   /** Kiedy gracz potwierdził odbiór nagrody (null: nie odebrał albo bez nagrody). */
@@ -54,9 +56,17 @@ export async function zadaniaGry(db: SupabaseClient, quizId: string, doNr: numbe
   return (data ?? []).map(({ etapy, ...z }) => ({ ...z, zSerii: !!etapy?.seria }) as ZadanieGry);
 }
 
-/** Tabela końcowa: wszyscy gracze gry z punktami, miejscem i liczbą dobrych odpowiedzi. */
-export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<WynikGracza[]> {
-  const [{ data: gracze }, { data: odpowiedzi }] = await Promise.all([
+/**
+ * Tabela końcowa: wszyscy gracze gry z punktami, miejscem i liczbą dobrych odpowiedzi. `kod`: miejsca jak na TV
+ * (`ranking`, po finale pierwsze miejsca daje wyścig, nie punkty; 28.10). `zadaniaSerii`: pytania z puli finału,
+ * żeby policzyć, na ile z nich gracz odpowiedział.
+ */
+export async function wynikiGry(
+  db: SupabaseClient,
+  sesjaId: string,
+  opcje: { kod?: string; zadaniaSerii?: Set<string> } = {},
+): Promise<WynikGracza[]> {
+  const [{ data: gracze }, { data: odpowiedzi }, { data: ranking }] = await Promise.all([
     db
       .from("gracze")
       .select("id, nick, nagroda_odebrana, zdjecie_url")
@@ -64,10 +74,14 @@ export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<Wy
       .returns<{ id: string; nick: string; nagroda_odebrana: string | null; zdjecie_url: string | null }[]>(),
     db
       .from("odpowiedzi")
-      .select("gracz_id, czas_ms, poprawna, punkty")
+      .select("gracz_id, zadanie_id, czas_ms, poprawna, punkty")
       .eq("sesja_id", sesjaId)
-      .returns<Pick<OdpowiedzGracza, "gracz_id" | "czas_ms" | "poprawna" | "punkty">[]>(),
+      .returns<Pick<OdpowiedzGracza, "gracz_id" | "zadanie_id" | "czas_ms" | "poprawna" | "punkty">[]>(),
+    opcje.kod ? db.rpc("ranking", { p_kod: opcje.kod }) : Promise.resolve({ data: null }),
   ]);
+  // `ranking` zwraca jsonb: tablicę wierszy jak na TV
+  const wierszeRankingu = (Array.isArray(ranking) ? ranking : []) as { nick: string; miejsce: number }[];
+  const miejsceZRankingu = new Map<string, number>(wierszeRankingu.map((r) => [r.nick, r.miejsce]));
 
   const wiersze = (gracze ?? []).map((g) => {
     const jego = (odpowiedzi ?? []).filter((o) => o.gracz_id === g.id);
@@ -78,12 +92,18 @@ export async function wynikiGry(db: SupabaseClient, sesjaId: string): Promise<Wy
       miejsce: 0,
       dobre: jego.filter((o) => o.poprawna).length,
       odpowiedzi: jego.length,
+      wSerii: opcje.zadaniaSerii ? jego.filter((o) => opcje.zadaniaSerii!.has(o.zadanie_id)).length : 0,
       sredniCzasMs: jego.length ? jego.reduce((s, o) => s + o.czas_ms, 0) / jego.length : null,
       nagrodaOdebrana: g.nagroda_odebrana,
       zdjecie: g.zdjecie_url,
     };
   });
 
+  if (miejsceZRankingu.size) {
+    for (const w of wiersze) w.miejsce = miejsceZRankingu.get(w.nick) ?? wiersze.length;
+    wiersze.sort((a, b) => a.miejsce - b.miejsce || b.punkty - a.punkty || a.nick.localeCompare(b.nick, "pl"));
+    return wiersze;
+  }
   wiersze.sort((a, b) => b.punkty - a.punkty || a.nick.localeCompare(b.nick, "pl"));
   wiersze.forEach((w, i) => {
     w.miejsce = i > 0 && wiersze[i - 1].punkty === w.punkty ? wiersze[i - 1].miejsce : i + 1;
