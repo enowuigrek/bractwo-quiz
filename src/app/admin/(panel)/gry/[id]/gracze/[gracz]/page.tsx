@@ -72,7 +72,8 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
               const stan = !o ? "brak" : o.poprawna ? "dobrze" : "zle";
               const czesciowo = o && !o.poprawna && (o.ocena ?? 0) > 0;
               return (
-                <li key={z.id} className={`historia-${stan}`}>
+                // blisko (szacowanie) albo częściowo dobrze: żółte, nie czerwone (28.10)
+                <li key={z.id} className={`historia-${czesciowo ? "czesciowo" : stan}`}>
                   <span className="krok-nr historia-nr">{n + 1}.</span>
                   <div className="lista-glowna">
                     <div className="lista-tytul">{z.tresc}</div>

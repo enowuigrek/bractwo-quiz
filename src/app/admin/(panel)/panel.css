@@ -654,6 +654,10 @@ a.przycisk {
   border-left-color: var(--czerwien);
 }
 
+.historia > li.historia-czesciowo {
+  border-left-color: var(--zloto);
+}
+
 .historia-nr {
   min-width: 1.6em;
 }
@@ -705,6 +709,10 @@ a.przycisk {
 
 .historia-dobrze .historia-punkty {
   color: var(--chmiel);
+}
+
+.historia-czesciowo .historia-punkty {
+  color: var(--zloto);
 }
 
 .historia-nawigacja {
