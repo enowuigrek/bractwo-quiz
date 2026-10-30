@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IkonaKorona } from "@/components/ikony";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { jestTworca, lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { wylogujAdmina } from "../akcje";
@@ -73,8 +74,25 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
         </Link>
         <Nawigacja ustawienia={ustawienia} lokal={lokal} tworca={tworca} />
         <div className="panel-wyloguj">
-          <Link href="/admin/konto" className="przycisk-maly panel-konto" title={`${konto.nazwa}: ${konto.jako}`}>
-            {konto.nazwa} <span>· {konto.jako}</span>
+          {/* ikona aktywnej roli zamiast napisu (30.10): korona twórcy, logo Bractwa albo logo lokalu */}
+          <Link
+            href="/admin/konto"
+            className="przycisk-maly panel-konto"
+            title={`${konto.nazwa}: ${konto.jako}`}
+            aria-label={`Moje konto: ${konto.nazwa}, ${konto.jako}`}
+          >
+            {tworca ? (
+              <span className="panel-konto-korona">
+                <IkonaKorona />
+              </span>
+            ) : lokal?.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- logo lokalu z bucketu Supabase
+              <img src={lokal.logo_url} alt="" className="panel-konto-logo" />
+            ) : !lokal ? (
+              // eslint-disable-next-line @next/next/no-img-element -- logo Bractwa z /public
+              <img src="/loga/bractwo.svg" alt="" className="panel-konto-logo logo-bractwo" />
+            ) : null}
+            {konto.nazwa}
           </Link>
           <form action={wylogujAdmina}>
             <button type="submit" className="przycisk-maly">

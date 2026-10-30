@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
-import { IkonaUstawienia } from "@/components/ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
 const WSPOLNE = [
@@ -11,9 +10,7 @@ const WSPOLNE = [
   { href: "/admin/quizy", tekst: "Quizy" },
 ];
 
-/**
- * `ustawienia`: lista lokali u głównego, strona własnego lokalu w panelu lokalu (wtedy zamiast zębatki logo lokalu).
- */
+/** `ustawienia`: lista lokali (twórca, Bractwo) albo strona własnego lokalu (zakładka „Mój lokal”). */
 export function Nawigacja({
   ustawienia,
   lokal = null,
@@ -25,7 +22,12 @@ export function Nawigacja({
   tworca?: boolean;
 }) {
   const sciezka = usePathname();
-  const POZYCJE = tworca ? [...WSPOLNE, { href: "/admin/konta", tekst: "Konta" }] : WSPOLNE;
+  // lokale to zwykła zakładka (30.10, Łukasz: zębatka „Ustawienia” prowadziła tylko do lokali); lokal ma „Mój lokal”
+  const POZYCJE = [
+    ...WSPOLNE,
+    { href: ustawienia, tekst: lokal ? "Mój lokal" : "Lokale" },
+    ...(tworca ? [{ href: "/admin/konta", tekst: "Konta" }] : []),
+  ];
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");
   const zeSciezki = uruchamianie ? -1 : POZYCJE.findIndex((p) => sciezka.startsWith(p.href));
   // kliknięta zakładka przejmuje pasek od razu, zanim wczyta się nowa strona; nowa ścieżka to kasuje
@@ -76,20 +78,6 @@ export function Nawigacja({
         aria-current={uruchamianie ? "page" : undefined}
       >
         ▶ Uruchom<span className="na-szerokim"> quiz</span>
-      </Link>
-      <Link
-        href={ustawienia}
-        className="przycisk-maly ikona nawigacja-ustawienia"
-        aria-label="Ustawienia lokalu"
-        data-podpis={lokal ? "Mój lokal" : "Ustawienia"}
-        aria-current={sciezka.startsWith("/admin/lokale") ? "page" : undefined}
-      >
-        {lokal?.logo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element -- logo lokalu z bucketu Supabase
-          <img src={lokal.logo_url} alt="" className="nawigacja-logo-lokalu" />
-        ) : (
-          <IkonaUstawienia />
-        )}
       </Link>
     </nav>
   );

@@ -64,20 +64,41 @@ span.panel-logo-lokalu {
   margin: 0;
 }
 
-/* imię zalogowanego i rola obok „Wyloguj” (konta osobowe, 30.10) */
+/* imię zalogowanego obok „Wyloguj” z ikoną aktywnej roli: korona twórcy, logo Bractwa albo lokalu (30.10) */
 .panel-konto {
+  gap: var(--o-2);
   max-width: 220px;
-  padding: 0 14px;
+  padding: 0 14px 0 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-decoration: none;
 }
 
-.panel-konto span {
-  color: var(--szary);
-  font-weight: var(--w-semibold);
+.panel-konto-logo {
+  flex: none;
+  height: 28px;
+  width: auto;
+  max-width: 48px;
+  object-fit: contain;
 }
+
+.panel-konto-korona {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-round);
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  color: var(--na-zlocie);
+}
+
+.panel-konto-korona svg {
+  width: 16px;
+  height: 16px;
+}
+
 
 /* Telefon (do 959 px): logo i przycisk menu (menu.tsx, style w globals.css), bez paska zakładek i „Wyloguj” */
 .panel-naglowek .panel-menu {
@@ -1120,36 +1141,17 @@ a.przycisk {
   margin-bottom: 8px;
 }
 
-/* „Uruchom quiz” i ustawienia w pasku nawigacji: przyciski, nie zakładki */
+/* „Uruchom quiz” w pasku nawigacji: przycisk, nie zakładka */
 .panel-nawigacja {
   align-items: center;
 }
 
-.panel-nawigacja a.nawigacja-start,
-.panel-nawigacja a.nawigacja-ustawienia {
+.panel-nawigacja a.nawigacja-start {
   align-self: center;
   border-bottom: 0;
   margin-left: 8px;
-}
-
-.panel-nawigacja a.nawigacja-start {
   padding: 8px 16px;
   color: var(--na-zlocie);
-}
-
-.panel-nawigacja a.nawigacja-ustawienia {
-  padding: 0;
-  color: var(--piana);
-}
-
-.panel-nawigacja a.nawigacja-ustawienia[aria-current="page"] {
-  color: var(--zloto);
-  box-shadow: 0 0 0 2px var(--zloto);
-}
-
-/* logo lokalu zamiast zębatki: bez złotej obwódki także na stronie lokalu (28.10) */
-.panel-nawigacja a.nawigacja-ustawienia[aria-current="page"]:has(.nawigacja-logo-lokalu) {
-  box-shadow: none;
 }
 
 /* komputer: „Uruchom quiz” pierwsze, przed zakładkami (28.10, jak na górze menu na telefonie) */
@@ -1167,8 +1169,7 @@ a.przycisk {
   }
 }
 
-/* Pasek nawigacji: na telefonie przewija się w poziomie, więc dajemy zapas na obwódkę aktywnej ⚙.
-   Na komputerze nic nie przycinamy (dymek „Ustawienia” i obwódka mieszczą się w całości). */
+/* Pasek nawigacji: na telefonie przewija się w poziomie (zapas na obwódkę fokusu), na komputerze nic nie przycina */
 .panel-nawigacja {
   padding: 3px 4px;
 }
@@ -1179,19 +1180,7 @@ a.przycisk {
   }
 }
 
-/* dymek przy ⚙ pod ikoną: nad nią jest już górna krawędź strony */
-.panel-nawigacja [data-podpis]::after {
-  bottom: auto;
-  top: calc(100% + 8px);
-  transform: translate(-50%, -4px);
-}
-
-.panel-nawigacja [data-podpis]:hover::after,
-.panel-nawigacja [data-podpis]:focus-visible::after {
-  transform: translate(-50%, 0);
-}
-
-/* Telefon: zakładki po lewej, „Uruchom” i ⚙ dosunięte do prawej. Na komputerze całość stoi przy prawej. */
+/* Telefon: zakładki po lewej, „Uruchom” dosunięte do prawej. Na komputerze całość stoi przy prawej. */
 @media (max-width: 959px) {
   .panel-nawigacja {
     gap: 2px;
@@ -1206,10 +1195,6 @@ a.przycisk {
   .panel-nawigacja a.nawigacja-start {
     margin-left: auto;
     padding: 8px 12px;
-  }
-
-  .panel-nawigacja a.nawigacja-ustawienia {
-    margin-left: 6px;
   }
 }
 
@@ -1744,38 +1729,6 @@ button.tag:hover:not(.wybrany) {
 
 /* Kreator gry bez zapasu pod formularzem (26.10: 45vh pustego miejsca na końcu wyglądało na błąd) */
 
-/* logo lokalu zamiast zębatki w pasku panelu lokalu (nawigacja.tsx): samo logo wysokości „Wyloguj”, bez kółka
-   przycisku, i bliżej „Wyloguj” niż reszta paska (29.10) */
-.nawigacja-logo-lokalu {
-  width: auto;
-  height: 40px;
-  max-width: 96px;
-  object-fit: contain;
-}
-
-.panel-nawigacja a.nawigacja-ustawienia:has(.nawigacja-logo-lokalu),
-.panel-nawigacja a.nawigacja-ustawienia:has(.nawigacja-logo-lokalu):hover {
-  background: none;
-  border: 0;
-  border-radius: 0;
-  width: auto;
-  min-width: 0;
-  margin-left: auto;
-}
-
-/* najechanie: logo lekko jaśnieje zamiast kwadratowego tła przycisku (29.10) */
-.nawigacja-logo-lokalu {
-  transition: filter 0.35s var(--ease-std);
-}
-
-.panel-nawigacja a.nawigacja-ustawienia:hover .nawigacja-logo-lokalu {
-  filter: brightness(1.2);
-}
-
-/* zębatka (panel główny) i logo lokalu stoją z prawej, tuż przy „Wyloguj” (29.10) */
-.panel-nawigacja a.nawigacja-ustawienia {
-  margin-left: auto;
-}
 
 @media (min-width: 960px) {
   .panel-naglowek {

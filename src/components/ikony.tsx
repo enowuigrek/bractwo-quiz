@@ -119,6 +119,15 @@ export function IkonaDobrze() {
   );
 }
 
+/** Korona: twórca aplikacji (konto z pełnymi uprawnieniami, przycisk konta w panelu, 30.10). */
+export function IkonaKorona() {
+  return (
+    <svg {...wspolne}>
+      <path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z" />
+    </svg>
+  );
+}
+
 /** Puchar: miejsce w finałowej trójce. */
 export function IkonaPuchar() {
   return (
