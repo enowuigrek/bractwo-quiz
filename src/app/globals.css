@@ -1758,19 +1758,14 @@ a.glowna-lokal:focus-visible {
   padding-top: var(--section-gap);
 }
 
-.glowna-stopka nav {
-  display: flex;
-  gap: var(--o-4);
+.glowna-bractwo {
+  color: var(--szary);
   font-size: var(--fs-small);
   font-weight: var(--w-semibold);
-}
-
-.glowna-stopka nav a {
-  color: var(--szary);
   text-decoration: none;
 }
 
-.glowna-stopka nav a:hover {
+.glowna-bractwo:hover {
   color: var(--zloto);
 }
 
@@ -3329,6 +3324,12 @@ a.glowna-lokal:focus-visible {
       radial-gradient(ellipse 70% 55% at 50% 0%, rgba(227, 172, 63, 0.1) 0%, transparent 70%),
       var(--bg);
     background-attachment: fixed;
+  }
+
+  /* karta z kolumną i stopką na dole mieści się w oknie razem z marginesami (30.10: stopka strony głównej była pod
+     krawędzią ekranu, bo karta miała 100dvh plus 56 px marginesu z góry i z dołu) */
+  .kolumna:not(.kolumna-pilot):is(:has(> .autor), :has(> .glowna-stopka)) {
+    min-height: calc(100dvh - 112px);
   }
 
   .kolumna:not(.kolumna-pilot) {

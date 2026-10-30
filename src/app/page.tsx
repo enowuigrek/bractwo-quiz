@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element -- loga lokali z /public albo z bucketu Supabase */
-import Link from "next/link";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { WpiszKod } from "./ekran/wpisz-kod";
@@ -44,8 +43,8 @@ async function zapowiedziane() {
 
 /**
  * Strona główna dla graczy (30.10): pole na kod gry i najbliższe quizy w lokalach. QR z telewizora prowadzi od razu
- * do gry (`/<kod>`), więc tu trafia ten, kto wpisał adres z pamięci albo z plakatu. Ekrany lokali są w panelu
- * (strona lokalu), a panel ma link w stopce.
+ * do gry (`/<kod>`), więc tu trafia ten, kto wpisał adres z pamięci albo z plakatu. Bez linków do panelu i ekranów
+ * (30.10, Łukasz): obsługa ma swoje adresy w zakładkach, a graczy to tylko myli.
  */
 export default async function Home() {
   const zapowiedzi = await zapowiedziane();
@@ -94,13 +93,9 @@ export default async function Home() {
       )}
 
       <footer className="glowna-stopka">
-        <nav aria-label="Linki">
-          <a href="https://bractwopiwne.pl" target="_blank" rel="noopener">
-            bractwopiwne.pl
-          </a>
-          <Link href="/ekran">Ekran TV</Link>
-          <Link href="/admin">Panel</Link>
-        </nav>
+        <a href="https://bractwopiwne.pl" target="_blank" rel="noopener" className="glowna-bractwo">
+          bractwopiwne.pl
+        </a>
         <p className="autor">
           <span className="autor-etykieta">Aplikacja</span>
           <a href="https://lukasznowak.dev" target="_blank" rel="noopener">
