@@ -29,6 +29,7 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 **Jak testować:** `CLAUDE.md`, „Testy lokalne”. Najszybciej: gra SQL-em bez lokalu, boty, przeskok fazy `update sesje …`, pilot i TV w panelu przeglądarki. Przy zmianach panelu warto puścić audyt układu jak 29.10 (ramki z każdą stroną w 1280 i 390 px: przewijanie w bok, przyklejone nagłówki, nierówne przyciski i opcje). Zrzuty z emulacji telefonu w panelu przeglądarki bywają przekłamane, więc szczegóły sprawdzaj pomiarami (`getBoundingClientRect`).
 
 **Otwarte i niepewne:**
+- Linki „Ekran TV” i „Panel” w stopce strony głównej (dla graczy): Łukasz nie jest pewien, czy powinny tam być. Zostają na razie, decyzja przy kontach adminów (30.10).
 - Gry testowe do usunięcia w panelu (MCP nie usuwa): RUJH, HABV, GPPU, WAXP, XCKE, RPHX, RJNS i starsze.
 - Efekty dźwiękowe i muzyka w głośnym pubie ginęły (28.10); pijany finał wprowadził zamieszanie, a wybuch zrobił mniejsze wrażenie. Pomysły na poprawę w `POMYSLY.md`, nic nie ustalone.
 - Telewizor w Piwiarni działał z pełnym ekranem; starszy Samsung u mamy Łukasza pokazuje czarny ekran (Next 16 chce Chrome 111+), wtedy `?prosty`.
