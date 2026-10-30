@@ -51,11 +51,14 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
-      db
-        .from("pijane_pytania")
-        .select("nr, tresc, komentarz_prawda, komentarz_falsz, piwne")
-        .order("nr")
-        .returns<PijanePytanie[]>(),
+      // pytania pijanego finału widzi i zmienia tylko twórca (30.10); reszta może go tylko włączyć w kreatorze gry
+      mozePijanyFinal(rola)
+        ? db
+            .from("pijane_pytania")
+            .select("nr, tresc, komentarz_prawda, komentarz_falsz, piwne")
+            .order("nr")
+            .returns<PijanePytanie[]>()
+        : Promise.resolve({ data: null }),
     ]);
   if (!quiz) notFound();
   const lista = zadania ?? [];
