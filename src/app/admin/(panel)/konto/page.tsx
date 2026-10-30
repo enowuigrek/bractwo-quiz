@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- loga lokali z bucketu Supabase */
 import type { Metadata } from "next";
 import { kodAktywnejRoli, roleDoWyboru, wymagajAdmina } from "@/lib/admin";
-import { przelaczRole } from "../../akcje";
+import { przelaczRole, wylogujAdmina } from "../../akcje";
 import { FormularzImienia, FormularzZmianyHasla } from "./formularz";
 
 export const metadata: Metadata = { title: "Moje konto · Bractwo Quiz" };
@@ -48,6 +48,12 @@ export default async function MojeKonto() {
           <FormularzZmianyHasla />
         </section>
       </div>
+      {/* „Wyloguj” tutaj, a nie w nagłówku (30.10, Łukasz); na telefonie jest też na dole menu */}
+      <form action={wylogujAdmina} className="panel-sekcja przyciski">
+        <button type="submit" className="przycisk">
+          Wyloguj
+        </button>
+      </form>
     </main>
   );
 }

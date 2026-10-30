@@ -1,6 +1,7 @@
 /* Panel admina: dwa układy.
    Mobilny (< 960px): kolumna 640px, nawigacja pod logo.
-   Desktopowy (≥ 960px): stała szerokość 1120px, logo, nawigacja i „Wyloguj” w jednym pasku,
+   Desktopowy (≥ 960px): cała szerokość okna z marginesem 48 px (od 30.10, wcześniej 1120 px), logo, nawigacja
+   i „Wyloguj” w jednym pasku,
    szersze strony (np. gra: dane po lewej, linki i QR po prawej).
    Szerokość nie zależy od treści, a pasek przewijania ma zarezerwowane miejsce, żeby nic nie skakało. */
 
@@ -64,7 +65,7 @@ span.panel-logo-lokalu {
   margin: 0;
 }
 
-/* imię zalogowanego obok „Wyloguj” z ikoną aktywnej roli: korona twórcy, logo Bractwa albo lokalu (30.10) */
+/* imię zalogowanego w nagłówku (bez „Wyloguj”, które jest na „Moim koncie”) z ikoną aktywnej roli: korona twórcy, logo Bractwa albo lokalu (30.10) */
 .panel-konto {
   gap: var(--o-2);
   max-width: 220px;
@@ -240,8 +241,8 @@ span.panel-logo-lokalu {
 
 @media (min-width: 960px) {
   .panel {
-    max-width: 1120px;
-    padding: 28px 40px 64px;
+    max-width: none;
+    padding: 28px 48px 64px;
   }
 
   .panel-naglowek {

@@ -24,7 +24,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
         .maybeSingle<{ nazwa: string; logo_url: string | null }>()
     : { data: null };
   const ustawienia = lokalId ? `/admin/lokale/${lokalId}` : "/admin/lokale";
-  // kto i jako kto (konta osobowe, 30.10): obok „Wyloguj” i w menu, prowadzi do „Mojego konta” z „działam jako”
+  // kto i jako kto (konta osobowe, 30.10): w nagłówku i w menu, prowadzi do „Mojego konta” z „działam jako”
   const konto = {
     nazwa: rola.konto.nazwa,
     jako: rola.typ === "tworca" ? "Twórca" : rola.typ === "bractwo" ? "Bractwo" : (lokal?.nazwa ?? "Lokal"),
@@ -94,11 +94,6 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
             ) : null}
             {konto.nazwa}
           </Link>
-          <form action={wylogujAdmina}>
-            <button type="submit" className="przycisk-maly">
-              Wyloguj
-            </button>
-          </form>
         </div>
         {/* telefon: zamiast paska i „Wyloguj” samo menu obok logo */}
         <MenuPanelu
