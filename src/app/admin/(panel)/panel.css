@@ -325,7 +325,9 @@ span.panel-logo-lokalu {
   margin-top: var(--o-3);
 }
 
-.kreator-tematy {
+/* tematy nad kafelkami quizów w kreatorze: podwójna klasa, bo ogólne `.tagi` stoi niżej w pliku i zerowało odstęp
+   (30.10: pigułki dotykały kafelków) */
+.tagi.kreator-tematy {
   margin: 0 0 var(--o-3);
 }
 
