@@ -241,6 +241,7 @@ export type UstawieniaPromptu = {
 
 /** Najwięcej pytań w jednym prompcie: tyle przyjmuje wklejanie naraz (`MAX_WKLEJONYCH` w quizy/akcje.ts). */
 export const MAX_PYTAN_PROMPTU = 80;
+export const MIN_PYTAN_PROMPTU = 1;
 
 const listaPolska = (l: string[]) => (l.length < 2 ? l.join("") : `${l.slice(0, -1).join(", ")} i ${l[l.length - 1]}`);
 

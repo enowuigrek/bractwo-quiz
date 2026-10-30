@@ -6,6 +6,7 @@ import type { TypZadania } from "@/lib/zadania";
 import {
   czytajPytania,
   MAX_PYTAN_PROMPTU,
+  MIN_PYTAN_PROMPTU,
   POZIOMY_PROMPTU,
   promptPytan,
   RODZAJE_PROMPTU,
@@ -47,7 +48,11 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
 
   // formularz promptu: temat domyślnie z tytułu quizu
   const [temat, ustawTemat] = useState(domyslnyTemat);
-  const [liczba, ustawLiczbe] = useState(30);
+  // pole trzyma tekst, żeby dało się skasować cyfry i wpisać nową liczbę (30.10: pusta wartość od razu wracała do 1);
+  // do zakresu wyrównuje się dopiero po wyjściu z pola, a prompt bierze ostatnią poprawną liczbę
+  const [liczbaPole, ustawLiczbePole] = useState("30");
+  const doZakresu = (tekst: string) => Math.min(MAX_PYTAN_PROMPTU, Math.max(MIN_PYTAN_PROMPTU, Number(tekst) || 30));
+  const liczba = doZakresu(liczbaPole);
   const [rodzaje, ustawRodzaje] = useState<RodzajPromptu[]>(["jedna", "kilka", "liczba", "pary"]);
   const [poziom, ustawPoziom] = useState<PoziomPromptu>("mieszany");
   const [uwagi, ustawUwagi] = useState("");
@@ -104,10 +109,11 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
               type="number"
               inputMode="numeric"
               className="pole"
-              min={5}
+              min={MIN_PYTAN_PROMPTU}
               max={MAX_PYTAN_PROMPTU}
-              value={liczba}
-              onChange={(e) => ustawLiczbe(Math.min(MAX_PYTAN_PROMPTU, Math.max(1, Number(e.target.value) || 1)))}
+              value={liczbaPole}
+              onChange={(e) => ustawLiczbePole(e.target.value.replace(/\D/g, "").slice(0, 3))}
+              onBlur={() => ustawLiczbePole(String(doZakresu(liczbaPole)))}
             />
           </div>
         </div>
