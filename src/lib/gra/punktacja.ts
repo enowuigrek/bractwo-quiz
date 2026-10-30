@@ -1,16 +1,18 @@
 // Punktacja odpowiedzi w TypeScripcie, tylko do opisu zasad w panelu (quizy/zasady). Punkty w grze liczy wyłącznie
 // baza: ten plik musi się zgadzać z `wewn.punkty_odpowiedzi`, `wewn.okno_bez_limitu_ms` i `wewn.ocena`
-// (migracje 20261027204332_punkty_dluzej_do_200_final_500, 20261026202041_szacowanie_przedzial).
+// (migracje 20261027204332_punkty_dluzej_do_200_final_500, 20261026202041_szacowanie_przedzial,
+// 20261030152715_pub_quiz_prawda_falsz_pol).
 
 import type { TypZadania } from "../zadania";
 
 /**
  * Pub quiz (pytania bez etapu): trudniejsze rodzaje dają więcej punktów, jak mnożniki etapów w wyścigu
- * (`wewn.waga_typu`, gdy etap nie podaje mnożnika).
+ * (`wewn.waga_typu`, gdy etap nie podaje mnożnika). Prawda/fałsz za połowę (30.10): przy dwóch odpowiedziach
+ * zgadywanie dawało średnio dwa razy więcej niż przy jednej z czterech.
  */
 export const WAGA_TYPU: Record<Exclude<TypZadania, "ciekawostka">, number> = {
   wybor: 1,
-  prawda_falsz: 1,
+  prawda_falsz: 0.5,
   wielokrotny: 1.5,
   szacowanie: 2,
   kolejnosc: 2,

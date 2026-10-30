@@ -46,11 +46,27 @@ export type Osoba = { nazwa: string; zdjecie_url?: string | null };
 export function ZnaczekOsoby({ osoba, duzy = false }: { osoba: Osoba | null; duzy?: boolean }) {
   if (!osoba) return <span className="znaczek-osoby pusty" aria-hidden />;
   const klasa = `znaczek-osoby${duzy ? " duzy" : ""}`;
-  return osoba.zdjecie_url ? (
-    <img src={osoba.zdjecie_url} alt={osoba.nazwa} title={osoba.nazwa} className={klasa} />
-  ) : (
-    <span className={klasa} title={osoba.nazwa} aria-label={osoba.nazwa}>
-      {inicjaly(osoba.nazwa)}
+  return (
+    <Podpis nazwa={osoba.nazwa}>
+      {osoba.zdjecie_url ? (
+        <img src={osoba.zdjecie_url} alt={osoba.nazwa} className={klasa} />
+      ) : (
+        <span className={klasa} aria-label={osoba.nazwa}>
+          {inicjaly(osoba.nazwa)}
+        </span>
+      )}
+    </Podpis>
+  );
+}
+
+/**
+ * Dymek z nazwą po najechaniu na ikonę (lokal, Bractwo, osoba; 30.10, Łukasz): ten sam co przy przyciskach z ikoną
+ * (`data-podpis`). Obrazek nie ma `::after`, więc dymek siedzi na otoczce.
+ */
+export function Podpis({ nazwa, children }: { nazwa: string; children: React.ReactNode }) {
+  return (
+    <span className="podpis-ikony" data-podpis={nazwa}>
+      {children}
     </span>
   );
 }
@@ -58,13 +74,19 @@ export function ZnaczekOsoby({ osoba, duzy = false }: { osoba: Osoba | null; duz
 /** Znaczek autora w wierszu listy: logo lokalu (albo Bractwa), z nazwą w podpowiedzi. */
 export function ZnaczekLokalu({ lokal }: { lokal: LokalAutor | null }) {
   if (!lokal) {
-    return <img src="/loga/bractwo.svg" alt="Bractwo" title="Bractwo" className="znaczek-lokalu logo-bractwo" />;
+    return (
+      <Podpis nazwa="Bractwo Piwne">
+        <img src="/loga/bractwo.svg" alt="Bractwo" className="znaczek-lokalu logo-bractwo" />
+      </Podpis>
+    );
   }
-  return lokal.logo_url ? (
-    <img src={lokal.logo_url} alt={lokal.nazwa} title={lokal.nazwa} className="znaczek-lokalu" />
-  ) : (
-    <span className="znaczek-lokalu znaczek-lokalu-nazwa" title={lokal.nazwa}>
-      {lokal.nazwa.slice(0, 2)}
-    </span>
+  return (
+    <Podpis nazwa={lokal.nazwa}>
+      {lokal.logo_url ? (
+        <img src={lokal.logo_url} alt={lokal.nazwa} className="znaczek-lokalu" />
+      ) : (
+        <span className="znaczek-lokalu znaczek-lokalu-nazwa">{lokal.nazwa.slice(0, 2)}</span>
+      )}
+    </Podpis>
   );
 }

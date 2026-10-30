@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ZnaczekOsoby, type Osoba } from "../_komponenty/lokale-autorzy";
+import { Podpis, ZnaczekOsoby, type Osoba } from "../_komponenty/lokale-autorzy";
 import { NAZWY_FAZ, type Faza } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { IkonaKosz, IkonaNotatka } from "@/components/ikony";
@@ -57,7 +57,9 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
           <li key={g.id}>
             {/* kolumna ikon (30.10): lokal gry i osoba, która ją uruchomiła */}
             <span className="lista-ikony">
-              <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
+              <Podpis nazwa={g.lokale?.nazwa ?? "bez lokalu"}>
+                <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
+              </Podpis>
               <ZnaczekOsoby osoba={g.konta} />
             </span>
             <div className="lista-glowna">
@@ -119,7 +121,9 @@ function GraBractwa({ g }: { g: GraNaLiscie }) {
   return (
     <li className="gra-bractwa">
       <span className="lista-ikony">
-        <Miniatura src="/loga/bractwo-biale.svg" alt="" />
+        <Podpis nazwa="Bractwo Piwne">
+          <Miniatura src="/loga/bractwo-biale.svg" alt="" />
+        </Podpis>
         <ZnaczekOsoby osoba={g.konta} />
       </span>
       <div className="lista-glowna">

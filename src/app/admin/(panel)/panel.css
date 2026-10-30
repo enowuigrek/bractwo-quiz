@@ -2464,3 +2464,19 @@ img.znaczek-osoby {
 .konto-naglowek h1 {
   margin: 0;
 }
+
+/* Dymek z nazwą nad ikoną w kolumnie ikon (30.10): otoczka tej samej wielkości co ikona; pierwszy dymek w wierszu
+   wyrównany do lewej, żeby długa nazwa lokalu nie wychodziła za krawędź ekranu */
+.podpis-ikony {
+  display: inline-flex;
+  flex: none;
+}
+
+.lista-ikony > .podpis-ikony:first-child::after {
+  left: 0;
+  transform: translate(0, 4px);
+}
+
+.lista-ikony > .podpis-ikony:first-child:hover::after {
+  transform: translate(0, 0);
+}

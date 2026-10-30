@@ -68,8 +68,9 @@ export default async function ZasadyPubQuizu() {
           <div>
             <p>
               Każda odpowiedź dostaje <strong>ocenę od 0 do 1</strong> (jaka część jest dobrze), a punkty to ocena ×
-              punkty za szybkość. <strong>Trudniejsze rodzaje są warte więcej</strong>: jedna odpowiedź i prawda/fałsz
-              do {pkt(przedzial("wybor", 1, WAGA_TYPU.wybor)[1])} pkt, kilka dobrych do{" "}
+              punkty za szybkość. <strong>Trudniejsze rodzaje są warte więcej</strong>: prawda/fałsz do{" "}
+              {pkt(przedzial("prawda_falsz", 1, WAGA_TYPU.prawda_falsz)[1])} pkt (zgadując, trafia się co drugi raz),
+              jedna odpowiedź do {pkt(przedzial("wybor", 1, WAGA_TYPU.wybor)[1])}, kilka dobrych do{" "}
               {pkt(przedzial("wielokrotny", 1, WAGA_TYPU.wielokrotny)[1])}, szacowanie, kolejność i pary do{" "}
               {pkt(przedzial("pary", 1, WAGA_TYPU.pary)[1])}.
             </p>
