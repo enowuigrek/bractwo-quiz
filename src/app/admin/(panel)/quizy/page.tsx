@@ -57,7 +57,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
     db
       .from("quizy")
       .select(
-        "id, tytul, opis, udostepniony, autor_konto_id, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(nazwa, zdjecie_url), zadania(count), etapy(count)",
+        "id, tytul, opis, udostepniony, autor_konto_id, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(id, nazwa, zdjecie_url), zadania(count), etapy(count)",
       ),
     rola,
   ).is("usunieto", null);
@@ -129,8 +129,8 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
             <li key={q.id}>
               {/* kolumna ikon (30.10): kto założył (lokal albo Bractwo) i osoba; tytuł ma resztę wiersza */}
               <span className="lista-ikony">
-                <ZnaczekLokalu lokal={q.lokale} />
-                <ZnaczekOsoby osoba={q.konta} />
+                <ZnaczekLokalu lokal={q.lokale} link={glowny} />
+                <ZnaczekOsoby osoba={q.konta} link={glowny} />
               </span>
               <div className="lista-glowna">
                 {/* na liście same tytuły (26.10): liczba pytań, tematy i opis dopiero po wejściu w quiz */}

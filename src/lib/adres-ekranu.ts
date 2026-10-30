@@ -17,6 +17,7 @@ export const SEGMENTY_PANELU: readonly string[] = [
   "haslo",
   "konta",
   "konto",
+  "osoby",
 ];
 
 /** „Piwiarnia w Alejach” → „piwiarnia-w-alejach”. */

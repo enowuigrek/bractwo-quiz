@@ -18,13 +18,14 @@ export type GraNaLiscie = {
   wystartowano: string | null;
   notatka: string | null;
   quizy: { tytul: string; tagi: string[]; etapy: { count: number }[] } | null;
+  lokal_id: string | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
   /** kto uruchomił (konta osobowe, 30.10) */
   konta: Osoba | null;
 };
 
 export const ZAPYTANIE_GIER =
-  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, etapy(count)), lokale(nazwa, miasto, logo_url), konta(nazwa, zdjecie_url)";
+  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, etapy(count)), lokal_id, lokale(nazwa, miasto, logo_url), konta(id, nazwa, zdjecie_url)";
 
 /** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
 const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);
@@ -57,10 +58,14 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
           <li key={g.id}>
             {/* kolumna ikon (30.10): lokal gry i osoba, która ją uruchomiła */}
             <span className="lista-ikony">
-              <Podpis nazwa={g.lokale?.nazwa ?? "bez lokalu"}>
+              {/* ikony prowadzą do strony lokalu i profilu osoby; lokal (rola) ogląda tylko swoje, bez profili (30.10) */}
+              <Podpis
+                nazwa={g.lokale?.nazwa ?? "bez lokalu"}
+                href={g.lokal_id ? `/admin/lokale/${g.lokal_id}` : undefined}
+              >
                 <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
               </Podpis>
-              <ZnaczekOsoby osoba={g.konta} />
+              <ZnaczekOsoby osoba={g.konta} link={!lokal} />
             </span>
             <div className="lista-glowna">
               <div className="lista-tytul">

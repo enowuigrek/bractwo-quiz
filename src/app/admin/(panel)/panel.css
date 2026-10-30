@@ -2566,3 +2566,86 @@ img.znaczek-osoby {
     flex: 1;
   }
 }
+
+/* Strona lokalu i profil osoby (30.10): duże logo albo zdjęcie obok nazwy, role ikonami, osoby lokalu jako kafelki */
+.profil-naglowek {
+  display: flex;
+  align-items: center;
+  gap: var(--o-4);
+  min-width: 0;
+}
+
+.profil-naglowek h1 {
+  margin: 0;
+}
+
+.profil-logo {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.profil-logo-litera {
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-round);
+  background: var(--kamien2);
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+}
+
+.stos-ciasny {
+  display: grid;
+  gap: var(--o-1);
+}
+
+.profil-role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--o-2);
+  margin: 0;
+}
+
+.profil-role .znaczek-lokalu {
+  height: 28px;
+  margin: 0;
+}
+
+.osoby {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--o-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.osoba {
+  display: grid;
+  justify-items: center;
+  gap: var(--o-2);
+  padding: var(--o-4) var(--o-2);
+  border-radius: var(--r-card);
+  background: var(--kamien);
+  border: 1px solid var(--kamien2);
+  color: var(--piana);
+  font-weight: var(--w-black);
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.25s var(--ease-std);
+}
+
+.osoba:hover {
+  border-color: var(--zloto);
+}
+
+/* ikona-link w kolumnie ikon: po najechaniu lekko jaśnieje */
+a.podpis-ikony {
+  transition: filter 0.25s var(--ease-std);
+}
+
+a.podpis-ikony:hover {
+  filter: brightness(1.2);
+}

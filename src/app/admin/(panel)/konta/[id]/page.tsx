@@ -36,7 +36,12 @@ export default async function Konto({ params }: PageProps<"/admin/konta/[id]">) 
       <p className="okruchy">
         <Link href="/admin/konta">← Konta</Link>
       </p>
-      <h1>{konto.nazwa}</h1>
+      <div className="naglowek-strony">
+        <h1>{konto.nazwa}</h1>
+        <Link href={`/admin/osoby/${konto.id}`} className="przycisk-maly">
+          Profil
+        </Link>
+      </div>
       {konto.zablokowane && <p className="blad">Konto zablokowane: nie wejdzie do panelu.</p>}
       <div className="uklad-dwa">
         <section className="karta">

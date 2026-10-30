@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- loga lokali z bucketu Supabase */
+import Link from "next/link";
 /** Lokal w filtrach i znaczkach panelu głównego. */
 export type LokalAutor = { id: string; nazwa: string; logo_url: string | null; miasto?: string | null };
 
@@ -36,18 +37,27 @@ export const inicjaly = (nazwa: string) =>
     .join("");
 
 /** Osoba z konta: imię i zdjęcie (konta osobowe, 30.10). */
-export type Osoba = { nazwa: string; zdjecie_url?: string | null };
+export type Osoba = { id?: string; nazwa: string; zdjecie_url?: string | null };
 
 /**
  * Osoba, która założyła quiz albo uruchomiła grę: kółko ze zdjęciem z „Mojego konta”, a bez zdjęcia z inicjałami;
  * imię w podpowiedzi. Bez autora (starsze rzeczy) puste miejsce tej samej szerokości, żeby kolumna ikon się nie
  * rozjeżdżała. `duzy`: podgląd na „Moim koncie”.
  */
-export function ZnaczekOsoby({ osoba, duzy = false }: { osoba: Osoba | null; duzy?: boolean }) {
+export function ZnaczekOsoby({
+  osoba,
+  duzy = false,
+  link = false,
+}: {
+  osoba: Osoba | null;
+  duzy?: boolean;
+  /** kółko prowadzi do profilu osoby (gdy oglądający może go zobaczyć) */
+  link?: boolean;
+}) {
   if (!osoba) return <span className="znaczek-osoby pusty" aria-hidden />;
   const klasa = `znaczek-osoby${duzy ? " duzy" : ""}`;
   return (
-    <Podpis nazwa={osoba.nazwa}>
+    <Podpis nazwa={osoba.nazwa} href={link && osoba.id ? `/admin/osoby/${osoba.id}` : undefined}>
       {osoba.zdjecie_url ? (
         <img src={osoba.zdjecie_url} alt={osoba.nazwa} className={klasa} />
       ) : (
@@ -63,8 +73,13 @@ export function ZnaczekOsoby({ osoba, duzy = false }: { osoba: Osoba | null; duz
  * Dymek z nazwą po najechaniu na ikonę (lokal, Bractwo, osoba; 30.10, Łukasz): ten sam co przy przyciskach z ikoną
  * (`data-podpis`). Obrazek nie ma `::after`, więc dymek siedzi na otoczce.
  */
-export function Podpis({ nazwa, children }: { nazwa: string; children: React.ReactNode }) {
-  return (
+export function Podpis({ nazwa, href, children }: { nazwa: string; href?: string; children: React.ReactNode }) {
+  // z `href` ikona prowadzi do strony lokalu albo profilu osoby (30.10)
+  return href ? (
+    <Link href={href} className="podpis-ikony" data-podpis={nazwa} aria-label={nazwa}>
+      {children}
+    </Link>
+  ) : (
     <span className="podpis-ikony" data-podpis={nazwa}>
       {children}
     </span>
@@ -72,7 +87,7 @@ export function Podpis({ nazwa, children }: { nazwa: string; children: React.Rea
 }
 
 /** Znaczek autora w wierszu listy: logo lokalu (albo Bractwa), z nazwą w podpowiedzi. */
-export function ZnaczekLokalu({ lokal }: { lokal: LokalAutor | null }) {
+export function ZnaczekLokalu({ lokal, link = false }: { lokal: LokalAutor | null; link?: boolean }) {
   if (!lokal) {
     return (
       <Podpis nazwa="Bractwo Piwne">
@@ -81,7 +96,7 @@ export function ZnaczekLokalu({ lokal }: { lokal: LokalAutor | null }) {
     );
   }
   return (
-    <Podpis nazwa={lokal.nazwa}>
+    <Podpis nazwa={lokal.nazwa} href={link ? `/admin/lokale/${lokal.id}` : undefined}>
       {lokal.logo_url ? (
         <img src={lokal.logo_url} alt={lokal.nazwa} className="znaczek-lokalu" />
       ) : (

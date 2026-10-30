@@ -48,7 +48,7 @@ export default async function Lokale() {
                   </div>
                   <div className="lista-akcje">
                     <Link
-                      href={`/admin/lokale/${p.id}`}
+                      href={`/admin/lokale/${p.id}/edycja`}
                       className="przycisk-maly ikona"
                       aria-label={`Edytuj lokal ${p.nazwa}`}
                       data-podpis="Edytuj"

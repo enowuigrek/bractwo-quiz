@@ -103,3 +103,20 @@ export function wymagajLokalu(rola: Rola, lokalId: string): void {
   if (lokal && lokal !== lokalId) notFound();
   if (widziWszystko(rola) && ukryteLokale(rola).includes(lokalId)) notFound();
 }
+
+/**
+ * Profil osoby (30.10): twórca i Bractwo oglądają wszystkich, lokal tylko ludzi ze swojego lokalu. Dla innych 404.
+ * Siebie każdy może obejrzeć.
+ */
+export async function wymagajOsoby(rola: Rola, kontoId: string): Promise<void> {
+  if (widziWszystko(rola) || rola.konto.id === kontoId) return;
+  const lokal = lokalRoli(rola);
+  const { data } = await supabaseAdmin()
+    .from("konta_role")
+    .select("id")
+    .eq("konto_id", kontoId)
+    .eq("rola", "lokal")
+    .eq("lokal_id", lokal ?? "")
+    .limit(1);
+  if (!data?.length) notFound();
+}
