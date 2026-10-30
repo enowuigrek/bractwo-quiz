@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { adresAplikacji } from "@/lib/adres";
 import { jestTworca, widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { wymagajLokalu } from "@/lib/admin-dostep";
+import { ukryteOsobyLokali, wymagajLokalu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { PrzyciskPotwierdz } from "../../../_komponenty/przycisk-potwierdz";
@@ -20,7 +20,7 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
   wymagajLokalu(rola, id);
   const glowny = widziWszystko(rola);
   const db = supabaseAdmin();
-  const [{ data: lokal }, { data: wszystkie }, { data: osoby }] = await Promise.all([
+  const [{ data: lokal }, { data: wszystkie }, { data: osoby }, ukryte] = await Promise.all([
     db.from("lokale").select("id, nazwa, miasto, logo_url, adres_ekranu, instagram").eq("id", id).maybeSingle<Lokal>(),
     db.from("lokale").select("miasto"),
     // osoby z dostępem do panelu tego lokalu (konta osobowe, 30.10)
@@ -30,6 +30,7 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
       .eq("rola", "lokal")
       .eq("lokal_id", id)
       .returns<{ konta: { id: string; nazwa: string; email: string; zablokowane: boolean } | null }[]>(),
+    ukryteOsobyLokali(rola),
   ]);
   if (!lokal) notFound();
 
@@ -59,10 +60,10 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
         </section>
         <section className="karta">
           <h2>Osoby</h2>
-          {osoby?.length ? (
+          {osoby?.some((o) => o.konta && !ukryte.includes(o.konta.id)) ? (
             <ul className="lista">
               {osoby
-                .flatMap((o) => (o.konta ? [o.konta] : []))
+                .flatMap((o) => (o.konta && !ukryte.includes(o.konta.id) ? [o.konta] : []))
                 .map((k) => (
                   <li key={k.id}>
                     <div className="lista-glowna">

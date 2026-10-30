@@ -61,10 +61,14 @@ export default async function ProfilOsoby({ params }: PageProps<"/admin/osoby/[i
 
   const tworca = konto.konta_role.some((r) => r.rola === "tworca");
   const bractwo = konto.konta_role.some((r) => r.rola === "bractwo");
-  // lokale osoby, bez testowego u tych, którzy go nie widzą
-  const lokaleOsoby = konto.konta_role
-    .flatMap((r) => (r.rola === "lokal" && r.lokale ? [r.lokale] : []))
-    .filter((l) => !ukryteLokale(rola).includes(l.id));
+  // lokale osoby, bez testowego u tych, którzy go nie widzą; twórca ma dostęp do lokali, żeby pomagać, ale dla
+  // innych jest tylko Bractwem z koroną (30.10), więc jego lokale widzi tylko on sam
+  const lokaleOsoby =
+    tworca && rola.konto.id !== konto.id
+      ? []
+      : konto.konta_role
+          .flatMap((r) => (r.rola === "lokal" && r.lokale ? [r.lokale] : []))
+          .filter((l) => !ukryteLokale(rola).includes(l.id));
   const lokaleGier = [...new Set(gry.map((g) => g.lokale?.nazwa).filter((n): n is string => !!n))];
   const licznikLokali = new Map<string, number>();
   for (const g of gry) if (g.lokale?.nazwa) licznikLokali.set(g.lokale.nazwa, (licznikLokali.get(g.lokale.nazwa) ?? 0) + 1);

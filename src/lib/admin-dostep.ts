@@ -30,6 +30,16 @@ export function filtrLokaliRoli<Q>(zapytanie: Q, rola: Rola): Q {
   return jestTworca(rola) ? zapytanie : (zapytanie as unknown as { eq(k: string, w: boolean): Q }).eq("testowy", false);
 }
 
+/**
+ * Konta twórcy, których rola nie widzi wśród osób lokalu (30.10, Łukasz: ma dostęp do lokali, żeby pomagać, ale
+ * przed ludźmi jest tylko Bractwem). Twórca widzi wszystkich.
+ */
+export async function ukryteOsobyLokali(rola: Rola): Promise<string[]> {
+  if (jestTworca(rola)) return [];
+  const { data } = await supabaseAdmin().from("konta_role").select("konto_id").eq("rola", "tworca");
+  return (data ?? []).map((r) => r.konto_id as string);
+}
+
 /** Widzi go: udostępniony albo własny (autor). */
 const widocznyQuiz = (rola: Rola) => `or(udostepniony.is.true,autor_konto_id.eq.${rola.konto.id})`;
 

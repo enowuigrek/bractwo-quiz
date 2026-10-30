@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { widziWszystko, wymagajAdmina, lokalRoli } from "@/lib/admin";
-import { filtrGier, filtrQuizow, wymagajLokalu } from "@/lib/admin-dostep";
+import { filtrGier, filtrQuizow, ukryteOsobyLokali, wymagajLokalu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { ZnaczekOsoby, type Osoba } from "../../_komponenty/lokale-autorzy";
@@ -30,7 +30,7 @@ export default async function StronaLokalu({ params }: PageProps<"/admin/lokale/
   const { id } = await params;
   wymagajLokalu(rola, id);
   const db = supabaseAdmin();
-  const [{ data: lokal }, { data: osoby }, { data: gryZBazy }, { data: quizy }] = await Promise.all([
+  const [{ data: lokal }, { data: osoby }, { data: gryZBazy }, { data: quizy }, ukryte] = await Promise.all([
     db.from("lokale").select("id, nazwa, miasto, logo_url, adres_ekranu, instagram").eq("id", id).maybeSingle<Lokal>(),
     db
       .from("konta_role")
@@ -45,6 +45,7 @@ export default async function StronaLokalu({ params }: PageProps<"/admin/lokale/
       .is("usunieto", null)
       .order("tytul")
       .returns<{ id: string; tytul: string }[]>(),
+    ukryteOsobyLokali(rola),
   ]);
   if (!lokal) notFound();
   const gry = gryZBazy ?? [];
@@ -58,7 +59,7 @@ export default async function StronaLokalu({ params }: PageProps<"/admin/lokale/
         )
         .eq("bot", false)
     : { count: 0 };
-  const ludzie = (osoby ?? []).flatMap((o) => (o.konta && !o.konta.zablokowane ? [o.konta] : []));
+  const ludzie = (osoby ?? []).flatMap((o) => (o.konta && !o.konta.zablokowane && !ukryte.includes(o.konta.id) ? [o.konta] : []));
   const ostatnia = gry.map((g) => g.wystartowano ?? g.planowany_start ?? g.utworzono).sort().at(-1);
   const quiz = najczesciej(gry.map((g) => g.quizy?.tytul));
   const prowadzi = najczesciej(gry.map((g) => g.konta?.nazwa));
