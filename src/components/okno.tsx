@@ -15,13 +15,34 @@ type PropsOkna = {
 /**
  * Okno potwierdzenia w stylu aplikacji, zamiast `window.confirm`. Natywny `<dialog>`:
  * wyśrodkowany, z przyciemnionym tłem, Esc i kliknięcie obok zamykają bez akcji.
- * Domyślnie zaznaczony jest przycisk rezygnacji, żeby Enter niczego nie usunął.
+ * Fokus dostaje samo okno, a nie „Anuluj” (`fokusNaOknie`; atrybut `autofocus` Chromium przy `showModal` pomija): Enter niczego nie usuwa, a przeglądarka nie
+ * rysuje złotej obwódki fokusu na przycisku po kliknięciu myszą (30.10, Łukasz). Tabem dalej przechodzi się po
+ * przyciskach z obwódką.
  */
+/**
+ * Po otwarciu okna (`showModal`) przeglądarka daje fokus pierwszemu przyciskowi, a Safari rysuje na nim złotą obwódkę
+ * także po kliknięciu myszą (30.10). Pierwszy fokus po otwarciu przejmuje więc samo okno; Enter niczego nie klika,
+ * Esc zamyka, a Tab przechodzi po przyciskach z obwódką. Po zamknięciu znacznik się zeruje.
+ */
+export const fokusNaOknie = {
+  onFocus: (e: React.FocusEvent<HTMLDialogElement>) => {
+    const okno = e.currentTarget;
+    if (okno.dataset.fokus) return;
+    okno.dataset.fokus = "1";
+    if (e.target !== okno) okno.focus();
+  },
+  onClose: (e: React.SyntheticEvent<HTMLDialogElement>) => {
+    delete e.currentTarget.dataset.fokus;
+  },
+};
+
 export function Okno({ ref, pytanie, nie = "Anuluj", onNie, children }: PropsOkna) {
   return (
     <dialog
       ref={ref}
       className="okno"
+      tabIndex={-1}
+      {...fokusNaOknie}
       onCancel={onNie}
       onClick={(e) => {
         if (e.target === e.currentTarget) onNie();
@@ -30,7 +51,7 @@ export function Okno({ ref, pytanie, nie = "Anuluj", onNie, children }: PropsOkn
       <div className="okno-tresc">
         <p className="okno-pytanie">{pytanie}</p>
         <div className="okno-przyciski">
-          <button type="button" className="przycisk" onClick={onNie} autoFocus>
+          <button type="button" className="przycisk" onClick={onNie}>
             {nie}
           </button>
           {children}

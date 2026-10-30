@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IkonaKosz } from "@/components/ikony";
+import { fokusNaOknie } from "@/components/okno";
 
 export function Miniatura({ src, alt }: { src: string | null; alt: string }) {
   return src ? <img src={src} alt={alt} className="miniatura" /> : <span className="miniatura-pusta" aria-hidden />;
@@ -173,7 +174,8 @@ function Kadrowanie({ plik, onGotowe, onAnuluj }: { plik: File; onGotowe: (plik:
   };
 
   return (
-    <dialog ref={okno} className="okno kadrowanie" onCancel={onAnuluj}>
+    // fokus na oknie, nie na suwaku (`fokusNaOknie` z okno.tsx)
+    <dialog ref={okno} className="okno kadrowanie" tabIndex={-1} {...fokusNaOknie} onCancel={onAnuluj}>
       <div className="okno-tresc">
         <div
           className="kadrowanie-pole"

@@ -652,6 +652,11 @@ html:has(.kolumna) {
   box-shadow: var(--shadow-panel);
 }
 
+/* samo okno ma fokus po otwarciu (okno.tsx): bez obwódki na całym oknie */
+.okno:focus {
+  outline: none;
+}
+
 .okno::backdrop {
   background: rgba(0, 0, 0, 0.75);
 }

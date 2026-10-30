@@ -179,7 +179,7 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 
 ## Komponenty
 
-**Okno potwierdzenia (Quiz).** Zamiast okien przeglądarki (`confirm`). Wyśrodkowany natywny `<dialog>`, max 440px, tło `--kamien`, obrys 1px w `--kamien2`, radius `--r-card`, cień `--shadow-panel`, tło pod spodem przyciemnione do 75%. Pytanie 17/600, pod nim dwa przyciski obok siebie: „Anuluj” (zwykły, zaznaczony na start, żeby Enter niczego nie usunął) i akcja (niebezpieczny przy usuwaniu i kończeniu, złoty przy pozostałych). Esc i kliknięcie obok zamykają bez akcji. Wjazd 0.25s z lekkim powiększeniem.
+**Okno potwierdzenia (Quiz).** Zamiast okien przeglądarki (`confirm`). Wyśrodkowany natywny `<dialog>`, max 440px, tło `--kamien`, obrys 1px w `--kamien2`, radius `--r-card`, cień `--shadow-panel`, tło pod spodem przyciemnione do 75%. Pytanie 17/600, pod nim dwa przyciski obok siebie: „Anuluj” (zwykły; od 30.10 fokus po otwarciu ma samo okno, a nie „Anuluj” (`fokusNaOknie` w `components/okno.tsx`, bo Chromium przy `showModal` pomija `autofocus` na oknie): Enter niczego nie usuwa, a po kliknięciu myszą nie widać złotej obwódki fokusu na przycisku, która zostaje tylko przy przechodzeniu Tabem) i akcja (niebezpieczny przy usuwaniu i kończeniu, złoty przy pozostałych). Esc i kliknięcie obok zamykają bez akcji. Wjazd 0.25s z lekkim powiększeniem.
 
 **Podpis ikony (Quiz).** Przyciski z samą ikoną (ołówek, kosz, strzałki) mają `data-podpis="Edytuj"`. Po najechaniu albo fokusie z klawiatury nad przyciskiem pojawia się dymek: 13/600, tło `--kamien3`, obrys `--kamien2`, radius `--r-pole`. Zamiast atrybutu `title`, bo systemowy dymek nie pasuje do wyglądu.
 
