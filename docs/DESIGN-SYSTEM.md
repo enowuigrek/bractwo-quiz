@@ -113,6 +113,8 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Nazwa z ikoną (TV):** plansza etapu od 26.10: ikona (120 px) przed blokiem „Etap X z Y” + nazwa, tytuł 96 px, zasady 42 px zwykłą wagą, drobne plakietki; lewa strona ma oddychać obok telefonu z pokazem.
 
+**Pilot pod nagłówkiem panelu (30.10).** Zalogowany widzi nad pilotem ten sam nagłówek co w panelu (na komputerze zakładki, „Uruchom quiz” i konto, na telefonie menu z trzema kreskami), a pilot zajmuje całą szerokość okna jak panel; wcześniej na komputerze stała wąska kolumna z hamburgerem, a menu otwierało się przy krawędzi ekranu, daleko od przycisku.
+
 **Komputer (od 960 px):** nic nie wygląda jak rozciągnięty telefon. Strony z kolumną treści stoją na karcie (600 px, `--kamien` 72%, obrys `--kamien2`, cień) na ciepłym tle; pilot ma dwie kolumny (sterowanie 420 px przyklejone, podgląd obok); panel ma swój układ desktopowy.
 
 **Komplet odpowiedzi (pilot):** licznik „Odpowiedziało x/y” w widocznym miejscu, przy komplecie zielony (`--chmiel`, ✓) i główny przycisk zielony (`.pozytywny`).
@@ -234,6 +236,8 @@ Ramka `--pole` z obrysem `--kamien2`, krój o stałej szerokości. Kliknięcie w
 **Edytor quizu na telefonie (28.10).** Poniżej 560 px przyciski ↑ ↓ kosz (pytania, nagłówki etapów, pytania pijanego finału, lista gier) schodzą do osobnego rzędu pod treścią, z prawej; przy rozwiniętym pytaniu chowają się, a edytor ma całą szerokość.
 
 **Logo Bractwa w rogu (28.10).** Na planszach, których nagłówek ma z prawej pusto (wstęp, start pub quizu, ciekawostka, podium), logo Bractwa stoi w prawym rogu, 150 px jak logo lokalu z lewej (`.tv-logo-rog`).
+
+**Ranking stronami na TV (30.10).** Przy więcej niż 10 graczach ranking (tory wyścigu i tabela pub quizu) zmienia strony co 5 s. Każda strona najpierw stoi w kolejności sprzed pytania, a potem przetasowuje się na oczach widzów: kto spada na następną stronę, zjeżdża w dół i znika, a w jego miejsce z dołu wjeżdża ten, kto z niej awansował; na następnej stronie odwrotnie (awansujący odjeżdża w górę, spadający wjeżdża z góry). Nowa strona wchodzi od razu (krótkie pojawienie się), bez czekania na wiersze poprzedniej.
 
 **Tabela wyników po finale (28.10).** Finaliści mają złotawy obrys, a przed przygaszonymi punktami przebieg finału: „start +2” złotem, „✓ 10” zielono, „✗ 1” czerwono i pigułkę kroków „12/12” (`final` z `public.ranking`), bo miejsce dał wyścig, nie punkty. W pijanym finale awatary drżą dalej jak pod koniec serii (`drzy`, `--drzenie: 1`), żeby nie było widać przejścia.
 

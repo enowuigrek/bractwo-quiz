@@ -58,31 +58,41 @@ export function KoniecEtapu({ stan }: { stan: StanSesji }) {
 }
 
 export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
-  const [po, ustawPo] = useState(false);
-  useEffect(() => {
-    const zegar = setTimeout(() => ustawPo(true), PRZETASOWANIE_MS);
-    return () => clearTimeout(zegar);
-  }, []);
-
   // po 10 graczy na stronę, przy większej grupie strony się zmieniają (26.10)
   const strona = useStronaRankingu(ranking.length);
-  const wiersze = [...ranking]
-    .sort((a, b) =>
-      po
-        ? a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl")
-        : a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
-    )
-    .slice(strona * naStronieRankingu(ranking.length), (strona + 1) * naStronieRankingu(ranking.length));
+  // każda strona najpierw stoi w kolejności sprzed pytania, a po chwili przetasowuje się na oczach widzów (30.10,
+  // Łukasz: druga strona pokazywała się już po zmianach); kto przechodzi na inną stronę, wyjeżdża w jej stronę,
+  // a kto przychodzi z innej, wjeżdża z jej strony
+  const [poStrony, ustawPoStrony] = useState<number | null>(null);
+  useEffect(() => {
+    const zegar = setTimeout(() => ustawPoStrony(strona), PRZETASOWANIE_MS);
+    return () => clearTimeout(zegar);
+  }, [strona]);
+  const po = poStrony === strona;
+  const naStronie = naStronieRankingu(ranking.length);
+  const od = strona * naStronie;
+  const wgPo = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
+  const wgPrzed = [...ranking].sort(
+    (a, b) => a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
+  );
+  const indeksPo = new Map(wgPo.map((w, i) => [w.nick, i]));
+  const indeksPrzed = new Map(wgPrzed.map((w, i) => [w.nick, i]));
+  const wiersze = (po ? wgPo : wgPrzed).slice(od, od + naStronie);
+  /** Przesunięcie wejścia i wyjścia: w górę, gdy gracz jest (albo był) na wcześniejszej stronie, inaczej w dół. */
+  const kierunek = (indeks: number | undefined) => ((indeks ?? 0) < od ? -70 : 70);
   const z = stan.zadanie;
   // „fiuu” przy przetasowaniu, gdy ktoś zmienia miejsce (jak zamiana torów w wyścigu; w klasycznym pub quizie
   // tabela zastępuje wyścig, 26.10). Po pierwszym pytaniu i w finale bez dźwięku, jak w wyścigu.
-  const zamiana = (z?.lp ?? 0) > 1 && !stan.etap?.finalowy && wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce);
+  const zamiana =
+    (z?.lp ?? 0) > 1 &&
+    !stan.etap?.finalowy &&
+    wgPrzed.slice(od, od + naStronie).some((w, i) => wgPo[od + i]?.nick !== w.nick);
   const dzwieki = stan.muzyka;
   useEffect(() => {
     if (!dzwieki || !zamiana) return;
     const minutnik = window.setTimeout(() => zagraj("zamiana"), PRZETASOWANIE_MS);
     return () => window.clearTimeout(minutnik);
-  }, [dzwieki, zamiana]);
+  }, [dzwieki, zamiana, strona]);
   // odcięcie po etapie (jak w wyścigu): kreska pod ostatnim, kto gra dalej
   const odciecie = odciecieEtapu(stan);
 
@@ -102,8 +112,16 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
         {ranking.length === 0 ? (
           <p className="tv-zacheta">Nikt jeszcze nie gra.</p>
         ) : (
-          <ol className={`tv-ranking-lista${wiersze.length > 8 ? " gesto" : ""}`}>
-            <AnimatePresence initial={false}>
+          // nowa strona wchodzi cała (klucz), bez czekania na znikające wiersze poprzedniej
+          <motion.ol
+            key={strona}
+            className={`tv-ranking-lista${wiersze.length > 8 ? " gesto" : ""}`}
+            initial={strona > 0 ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            {/* przy przetasowaniu wychodzący nie zajmują miejsca (popLayout), więc nikt nie czeka nisko na liście */}
+            <AnimatePresence initial={false} mode="popLayout">
               {wiersze.map((w) => {
                 const miejsce = po ? w.miejsce : w.poprzednie_miejsce;
                 const zmiana = w.poprzednie_miejsce - w.miejsce;
@@ -113,9 +131,9 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                     key={w.nick}
                     layout="position"
                     transition={ruch}
-                    initial={{ opacity: 0, x: -60 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 60 }}
+                    initial={{ opacity: 0, y: kierunek(indeksPrzed.get(w.nick)) }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: kierunek(indeksPo.get(w.nick)) }}
                     className={`tv-ranking-wiersz${po && w.miejsce === 1 ? " lider" : ""}${
                       po && odciecie !== null && ranking.length > odciecie && w.miejsce === odciecie ? " granica" : ""
                     }${po && kreska ? ` ${kreska}` : ""}`}
@@ -151,7 +169,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                 );
               })}
             </AnimatePresence>
-          </ol>
+          </motion.ol>
         )}
       </div>
     </MotionConfig>

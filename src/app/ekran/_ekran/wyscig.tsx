@@ -38,16 +38,28 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const naStronieGraczy = naStronieRankingu(wszyscy.length);
   const odMiejsca = strona * naStronieGraczy;
   const wiersze = wszyscy.slice(odMiejsca, odMiejsca + naStronieGraczy);
+  // każda strona pokazuje swoją zamianę torów (30.10, Łukasz: druga strona wjeżdżała już po zmianach): startuje od
+  // kolejności sprzed pytania na tej stronie, kto przechodzi na inną stronę, wyjeżdża w jej stronę (w górę albo w dół),
+  // a kto przychodzi z innej, wjeżdża z jej strony
+  const wszyscyPrzed = [...ranking].sort(
+    (a, b) => a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
+  );
+  const przedPytaniem = wszyscyPrzed.slice(odMiejsca, odMiejsca + naStronieGraczy);
+  const indeksPrzed = new Map(wszyscyPrzed.map((w, i) => [w.nick, i]));
+  const indeksPo = new Map(wszyscy.map((w, i) => [w.nick, i]));
+  const naTejStronie = new Set(wiersze.map((w) => w.nick));
+  const wychodza = przedPytaniem.filter((w) => !naTejStronie.has(w.nick));
   const maks = stan.quiz?.max_przed_finalem ?? 0;
   // dźwięk (src/lib/gra/efekty.ts): tylko „fiuu” przy zamianie torów; szumu jazdy razem z awatarami nie ma od 25.10
   // (Łukasz: nie brzmiał jak przesuwanie). W finale każdy ma swoją drogę: tory się nie zamieniają, więc i bez dźwięku
-  const zamiana = lp > 1 && !stan.etap?.finalowy && wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce);
+  const zamiana =
+    lp > 1 && !stan.etap?.finalowy && (wychodza.length > 0 || wiersze.some((w) => w.poprzednie_miejsce !== w.miejsce));
   const dzwieki = stan.muzyka;
   useEffect(() => {
     if (!dzwieki || !zamiana) return;
     const minutnik = window.setTimeout(() => zagraj("zamiana"), ZAMIANA_OD_S * 1000);
     return () => window.clearTimeout(minutnik);
-  }, [dzwieki, zamiana]);
+  }, [dzwieki, zamiana, strona]);
   // wysokość toru: wszystkie tory mieszczą się w ok. 700 px sceny, przy wielu ciaśniej
   // tory tej samej wysokości na każdej stronie (na drugiej, krótszej stronie nie rosną)
   const torow = Math.min(naStronieGraczy, wszyscy.length);
@@ -72,11 +84,11 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   );
   // awans i spadek: każdy tor startuje tam, gdzie stał w rankingu przed pytaniem, i pod koniec jazdy
   // przesuwa się na nowe miejsce (kto awansował, przejeżdża nad innymi)
-  const przedPytaniem = [...wiersze].sort(
-    (a, b) => a.poprzednie_miejsce - b.poprzednie_miejsce || a.nick.localeCompare(b.nick, "pl"),
-  );
   const pozycja = (idx: number) =>
     Math.max(0, idx) * (tor + odstep) + (strefaFinalu && idx >= (naStronie ?? 0) ? STREFA_PX + odstep : 0);
+  // poza stroną: nad pierwszym torem albo pod ostatnim
+  const nadStrona = -(tor + odstep) * 1.5;
+  const podStrona = pozycja(torow) + (tor + odstep) * 0.5;
   const ruch = (i: number) => ({ delay: START_S + i * 0.08, duration: RUCH_S, ease: [0.22, 1, 0.36, 1] as const });
   const etap = stan.etap;
   // zdjęcie nagrody za 1. miejsce stoi przy szklance na mecie: „gracie o to”
@@ -85,6 +97,78 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   // z etapu na etap szklanka jest bliżej: większa, a tory krótsze (bez etapów jak dotąd)
   const blisko = etap ? (etap.nr - 1) / Math.max(1, etap.liczba - 1) : 0.4;
   const szklanka = Math.round(240 + 200 * blisko);
+
+  /** Jeden tor: jazda awatara po ladzie i zamiana torów (`ruchToru`: skąd i dokąd tor jedzie przy zamianie). */
+  const torGracza = (
+    w: WierszRankingu,
+    i: number,
+    ruchToru: {
+      initial: { y: number; opacity: number };
+      animate: { y: number; opacity: number };
+      styl?: React.CSSProperties;
+    },
+  ) => {
+    const przed = naTrasie(w.punkty - w.zdobyte, maks) * 100;
+    const teraz = naTrasie(w.punkty, maks) * 100;
+    const prowadzi = w.miejsce === 1 && w.punkty > 0;
+    // pod kreską (zagrożony) albo właśnie ją przeskoczył w którąś stronę
+    const kreska = wzgledemKreski(w, odciecie, wszyscy.length);
+    // o ile miejsc w górę (na pierwszym pytaniu wszyscy startują razem, więc bez awansów)
+    const awans = lp > 1 ? Math.max(0, w.poprzednie_miejsce - w.miejsce) : 0;
+    return (
+      <motion.div
+        key={w.nick}
+        className={`wyscig-wiersz${prowadzi ? " lider" : ""}${kreska ? ` ${kreska}` : ""}${awans ? " awansuje" : ""}`}
+        style={ruchToru.styl}
+        initial={ruchToru.initial}
+        animate={ruchToru.animate}
+        transition={{ delay: ZAMIANA_OD_S, duration: ZAMIANA_S, ease: [0.45, 0, 0.2, 1] }}
+      >
+        {/* przed zamianą torów stary numer miejsca, z zamianą nowy */}
+        {lp > 1 && w.poprzednie_miejsce !== w.miejsce ? (
+          <span className="wyscig-miejsce zmiana" style={{ "--zamiana": `${ZAMIANA_OD_S}s` } as React.CSSProperties}>
+            <span className="stare">{w.poprzednie_miejsce}.</span>
+            <span className="nowe">{w.miejsce}.</span>
+          </span>
+        ) : (
+          <span className="wyscig-miejsce">{w.miejsce}.</span>
+        )}
+        <span className="wyscig-nick">
+          {w.nick}
+          {(kreska === "awans" || kreska === "spadek") && (
+            <span className={`wyscig-kreska ${kreska}`} style={{ animationDelay: `${START_S + RUCH_S * 0.7}s` }}>
+              {kreska === "awans" ? "▲ nad kreską" : "▼ pod kreską"}
+            </span>
+          )}
+          {/* bez plakietki „▲ 1” przy awansie (25.10, Łukasz: zamianę torów i tak widać) */}
+        </span>
+        <div className="wyscig-lada">
+          {/* trasa krótsza o pół awatara z każdej strony: na mecie awatar dotyka linii, nie wychodzi za nią */}
+          <div className="wyscig-trasa">
+            {/* ślad za graczem: złota smuga od startu */}
+            <motion.div
+              className="wyscig-slad"
+              initial={{ width: `${przed}%` }}
+              animate={{ width: `${teraz}%` }}
+              transition={ruch(i)}
+            />
+            <motion.div
+              className="wyscig-jezdziec"
+              initial={{ left: `${przed}%` }}
+              animate={{ left: `${teraz}%` }}
+              transition={ruch(i)}
+            >
+              <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={Math.round(tor * 0.9)} />
+            </motion.div>
+          </div>
+        </div>
+        <span className="wyscig-punkty">
+          <Licznik wartosc={w.punkty} />
+          {w.zdobyte > 0 && <span className="wyscig-zdobyte">+{w.zdobyte}</span>}
+        </span>
+      </motion.div>
+    );
+  };
 
   const naglowek = (
     <header className="tv-ranking-gora">
@@ -115,83 +199,27 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         <KoniecEtapu stan={stan} />
 
         <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
-          {/* nowa strona: tory wjeżdżają od nowa (klucz); dalsza strona wjeżdża cała z dołu ekranu, bez zamiany
-              torów (26.10: przesunięte tory czekały widoczne pod listą) */}
+          {/* nowa strona: tory od nowa (klucz) ze stanem sprzed pytania na tej stronie, potem jazda i zamiana torów
+              jak na pierwszej (30.10) */}
           <motion.div
             key={strona}
             className="wyscig-tory"
-            style={{ "--tor": `${tor}px`, gap: odstep } as React.CSSProperties}
-            initial={strona > 0 ? { y: 900, opacity: 0 } : false}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            style={{ "--tor": `${tor}px` } as React.CSSProperties}
+            initial={strona > 0 ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
           >
+            <div className="wyscig-tory-pola" style={{ gap: odstep }}>
             {wiersze.map((w, i) => {
-              const przed = naTrasie(w.punkty - w.zdobyte, maks) * 100;
-              const teraz = naTrasie(w.punkty, maks) * 100;
-              const prowadzi = w.miejsce === 1 && w.punkty > 0;
-              // pod kreską (zagrożony) albo właśnie ją przeskoczył w którąś stronę
-              const kreska = wzgledemKreski(w, odciecie, wszyscy.length);
-              const przesuniecie = strona > 0 ? 0 : pozycja(przedPytaniem.indexOf(w)) - pozycja(i);
-              // o ile miejsc w górę (na pierwszym pytaniu wszyscy startują razem, więc bez awansów)
-              const awans = lp > 1 ? Math.max(0, w.poprzednie_miejsce - w.miejsce) : 0;
-              const wiersz = (
-                <motion.div
-                  key={w.nick}
-                  className={`wyscig-wiersz${prowadzi ? " lider" : ""}${kreska ? ` ${kreska}` : ""}${awans ? " awansuje" : ""}`}
-                  initial={{ y: przesuniecie }}
-                  animate={{ y: 0 }}
-                  transition={{ delay: ZAMIANA_OD_S, duration: ZAMIANA_S, ease: [0.45, 0, 0.2, 1] }}
-                >
-                  {/* przed zamianą torów stary numer miejsca, z zamianą nowy */}
-                  {lp > 1 && w.poprzednie_miejsce !== w.miejsce ? (
-                    <span
-                      className="wyscig-miejsce zmiana"
-                      style={{ "--zamiana": `${ZAMIANA_OD_S}s` } as React.CSSProperties}
-                    >
-                      <span className="stare">{w.poprzednie_miejsce}.</span>
-                      <span className="nowe">{w.miejsce}.</span>
-                    </span>
-                  ) : (
-                    <span className="wyscig-miejsce">{w.miejsce}.</span>
-                  )}
-                  <span className="wyscig-nick">
-                    {w.nick}
-                    {(kreska === "awans" || kreska === "spadek") && (
-                      <span
-                        className={`wyscig-kreska ${kreska}`}
-                        style={{ animationDelay: `${START_S + RUCH_S * 0.7}s` }}
-                      >
-                        {kreska === "awans" ? "▲ nad kreską" : "▼ pod kreską"}
-                      </span>
-                    )}
-                    {/* bez plakietki „▲ 1” przy awansie (25.10, Łukasz: zamianę torów i tak widać) */}
-                  </span>
-                  <div className="wyscig-lada">
-                    {/* trasa krótsza o pół awatara z każdej strony: na mecie awatar dotyka linii, nie wychodzi za nią */}
-                    <div className="wyscig-trasa">
-                      {/* ślad za graczem: złota smuga od startu */}
-                      <motion.div
-                        className="wyscig-slad"
-                        initial={{ width: `${przed}%` }}
-                        animate={{ width: `${teraz}%` }}
-                        transition={ruch(i)}
-                      />
-                      <motion.div
-                        className="wyscig-jezdziec"
-                        initial={{ left: `${przed}%` }}
-                        animate={{ left: `${teraz}%` }}
-                        transition={ruch(i)}
-                      >
-                        <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={Math.round(tor * 0.9)} />
-                      </motion.div>
-                    </div>
-                  </div>
-                  <span className="wyscig-punkty">
-                    <Licznik wartosc={w.punkty} />
-                    {w.zdobyte > 0 && <span className="wyscig-zdobyte">+{w.zdobyte}</span>}
-                  </span>
-                </motion.div>
-              );
+              // tor z tej strony startuje ze swojego starego miejsca; kto przyszedł z innej strony, spoza niej
+              const stare = przedPytaniem.indexOf(w);
+              const zInnejStrony = stare < 0;
+              const start =
+                stare >= 0 ? pozycja(stare) : (indeksPrzed.get(w.nick) ?? 0) < odMiejsca ? nadStrona : podStrona;
+              const wiersz = torGracza(w, i, {
+                initial: { y: start - pozycja(i), opacity: zInnejStrony ? 0 : 1 },
+                animate: { y: 0, opacity: 1 },
+              });
               // pod ostatnim, kto przechodzi: kto jest wyżej, gra dalej
               return strefaFinalu && i === (naStronie ?? 0) - 1 ? (
                 <Fragment key={w.nick}>
@@ -206,6 +234,18 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                 wiersz
               );
             })}
+            {/* kto przechodzi na inną stronę: stoi na swoim starym torze, a przy zamianie wyjeżdża w jej stronę */}
+            {wychodza.map((w) =>
+              torGracza(w, przedPytaniem.indexOf(w), {
+                styl: { position: "absolute", left: 0, right: 0, top: pozycja(przedPytaniem.indexOf(w)) },
+                initial: { y: 0, opacity: 1 },
+                animate: {
+                  y: ((indeksPo.get(w.nick) ?? 0) < odMiejsca ? nadStrona : podStrona) - pozycja(przedPytaniem.indexOf(w)),
+                  opacity: 0,
+                },
+              }),
+            )}
+            </div>
           </motion.div>
 
           <Szklanka

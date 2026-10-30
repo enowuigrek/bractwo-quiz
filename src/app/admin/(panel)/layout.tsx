@@ -1,110 +1,13 @@
-import Link from "next/link";
-import { IkonaKorona } from "@/components/ikony";
-import { LogoQuiz } from "@/components/logo-quiz";
-import { jestTworca, lokalRoli, wymagajAdmina } from "@/lib/admin";
-import { wylogujAdmina } from "../akcje";
-import { MenuPanelu, type GraWMenu } from "./_komponenty/menu";
-import { filtrGier } from "@/lib/admin-dostep";
-import { supabaseAdmin } from "@/lib/supabase/serwer";
-import type { Faza } from "@/lib/typy";
-import { Nawigacja } from "./_komponenty/nawigacja";
+import { wymagajAdmina } from "@/lib/admin";
+import { NaglowekPanelu } from "./_komponenty/naglowek-panelu";
 import { Powiadomienia } from "./_komponenty/powiadomienia";
 import "./panel.css";
 
 export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
   const rola = await wymagajAdmina();
-  const lokalId = lokalRoli(rola);
-  const db = supabaseAdmin();
-  // panel lokalu: jego logo w nagłówku (lokal z lewej, Bractwo z prawej), ustawienia to jego strona
-  const { data: lokal } = lokalId
-    ? await db
-        .from("lokale")
-        .select("nazwa, logo_url")
-        .eq("id", lokalId)
-        .maybeSingle<{ nazwa: string; logo_url: string | null }>()
-    : { data: null };
-  const ustawienia = lokalId ? `/admin/lokale/${lokalId}` : "/admin/lokale";
-  // kto i jako kto (konta osobowe, 30.10): w nagłówku i w menu, prowadzi do „Mojego konta” z „działam jako”
-  const konto = {
-    nazwa: rola.konto.nazwa,
-    jako: rola.typ === "tworca" ? "Twórca" : rola.typ === "bractwo" ? "Bractwo" : (lokal?.nazwa ?? "Lokal"),
-  };
-  const tworca = jestTworca(rola);
-  // trwająca gra (najnowsza, którą ta rola widzi): w menu skrót do jej pilota zamiast „Uruchom quiz”
-  const { data: trwa } = await filtrGier(
-    db
-      .from("sesje")
-      .select("kod, host_token, faza, poczekalnia_otwarta, quizy(tytul), lokale(nazwa, logo_url)")
-      .neq("faza", "koniec"),
-    rola,
-  )
-    .order("utworzono", { ascending: false })
-    .limit(1)
-    .maybeSingle<{
-      kod: string;
-      host_token: string;
-      faza: Faza;
-      poczekalnia_otwarta: boolean;
-      quizy: { tytul: string } | null;
-      lokale: { nazwa: string; logo_url: string | null } | null;
-    }>();
-  const gra: GraWMenu | null = trwa
-    ? {
-        href: `/pilot/${trwa.kod}?t=${trwa.host_token}`,
-        tytul: trwa.quizy?.tytul ?? "Quiz",
-        kod: trwa.kod,
-        faza: trwa.faza,
-        poczekalniaOtwarta: trwa.poczekalnia_otwarta,
-        lokal: trwa.lokale,
-      }
-    : null;
-
   return (
     <div className="panel">
-      <header className="panel-naglowek">
-        <Link href="/admin" className="panel-logo" aria-label="Panel, strona główna" style={{ textDecoration: "none" }}>
-          {lokal &&
-            (lokal.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element -- logo lokalu z bucketu Supabase
-              <img src={lokal.logo_url} alt={lokal.nazwa} className="panel-logo-lokalu" />
-            ) : (
-              <span className="panel-logo-lokalu">{lokal.nazwa}</span>
-            ))}
-          <LogoQuiz wysokosc={44} dopisek={lokal ? undefined : "panel"} />
-        </Link>
-        <Nawigacja ustawienia={ustawienia} lokal={lokal} tworca={tworca} />
-        <div className="panel-wyloguj">
-          {/* ikona aktywnej roli zamiast napisu (30.10): korona twórcy, logo Bractwa albo logo lokalu */}
-          <Link
-            href="/admin/konto"
-            className="przycisk-maly panel-konto"
-            title={`${konto.nazwa}: ${konto.jako}`}
-            aria-label={`Moje konto: ${konto.nazwa}, ${konto.jako}`}
-          >
-            {tworca ? (
-              <span className="panel-konto-korona">
-                <IkonaKorona />
-              </span>
-            ) : lokal?.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element -- logo lokalu z bucketu Supabase
-              <img src={lokal.logo_url} alt="" className="panel-konto-logo" />
-            ) : !lokal ? (
-              // eslint-disable-next-line @next/next/no-img-element -- logo Bractwa z /public
-              <img src="/loga/bractwo.svg" alt="" className="panel-konto-logo logo-bractwo" />
-            ) : null}
-            {konto.nazwa}
-          </Link>
-        </div>
-        {/* telefon: zamiast paska i „Wyloguj” samo menu obok logo */}
-        <MenuPanelu
-          wyloguj={wylogujAdmina}
-          gra={gra}
-          ustawienia={ustawienia}
-          lokal={lokal}
-          konto={konto}
-          tworca={tworca}
-        />
-      </header>
+      <NaglowekPanelu rola={rola} />
       <Powiadomienia rola={rola} />
       {children}
     </div>

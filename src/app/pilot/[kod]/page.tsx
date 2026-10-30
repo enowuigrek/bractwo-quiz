@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { jestTworca, rolaAdmina } from "@/lib/admin";
 import { poprawnyKod } from "@/lib/gra/kod";
+import { NaglowekPanelu } from "@/app/admin/(panel)/_komponenty/naglowek-panelu";
 import { Pilot } from "./pilot";
 
 export async function generateMetadata({ params }: PageProps<"/pilot/[kod]">): Promise<Metadata> {
@@ -20,9 +21,20 @@ export default async function StronaPilota({ params, searchParams }: PageProps<"
 
   // boty do testów tylko dla głównego (26.10): lokale ich nie potrzebują
   const rola = await rolaAdmina();
+  // zalogowany: nagłówek panelu nad pilotem (na komputerze zakładki i konto, na telefonie menu), szerokość jak panel
+  if (rola) {
+    return (
+      <div className="pilot-strona">
+        <NaglowekPanelu rola={rola} />
+        <main className="kolumna kolumna-pilot">
+          <Pilot kod={kod} tokenZAdresu={token} boty={jestTworca(rola)} naglowek={false} />
+        </main>
+      </div>
+    );
+  }
   return (
     <main className="kolumna kolumna-pilot">
-      <Pilot kod={kod} tokenZAdresu={token} boty={!!rola && jestTworca(rola)} />
+      <Pilot kod={kod} tokenZAdresu={token} boty={false} />
     </main>
   );
 }

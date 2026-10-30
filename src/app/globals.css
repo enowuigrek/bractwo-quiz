@@ -1459,6 +1459,24 @@ html:has(.kolumna) {
   font-size: 1.3rem;
 }
 
+/* Pilot zalogowanego (page.tsx): nagłówek panelu nad pilotem, na telefonie jak kolumna panelu (30.10) */
+.pilot-strona {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--gutter) max(var(--gutter), env(safe-area-inset-right)) 48px max(var(--gutter), env(safe-area-inset-left));
+}
+
+.pilot-strona .kolumna-pilot {
+  padding: 0;
+}
+
+@media (min-width: 960px) {
+  .pilot-strona {
+    max-width: none;
+  }
+}
+
 /* zakończenie gry i powrót do panelu pod wszystkim (pilot.tsx) */
 .pilot-dol {
   display: grid;
@@ -3362,6 +3380,16 @@ a.glowna-lokal:focus-visible {
   .kolumna-pilot {
     max-width: 1180px;
     padding: 28px 40px 48px;
+  }
+
+  /* zalogowany pilot pod nagłówkiem panelu: cała szerokość okna, jak panel (30.10) */
+  .pilot-strona {
+    padding: 28px 48px 64px;
+  }
+
+  .pilot-strona .kolumna-pilot {
+    max-width: none;
+    padding: 0;
   }
 
   .pilot {

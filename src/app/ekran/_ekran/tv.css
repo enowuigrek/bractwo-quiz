@@ -916,6 +916,8 @@
 }
 
 .tv-ranking-lista {
+  /* wiersze wychodzące przy przetasowaniu (popLayout) liczą pozycję od listy */
+  position: relative;
   list-style: none;
   margin: 28px 0 0;
   padding: 0;
@@ -4251,4 +4253,11 @@
     opacity: 1;
     transform: scale(1.06);
   }
+}
+
+/* pola torów: tory jeden pod drugim, a tory przechodzące na inną stronę leżą nad nimi absolutnie na swoim starym
+   miejscu (wyscig.tsx, 30.10) */
+.wyscig-tory-pola {
+  position: relative;
+  display: grid;
 }

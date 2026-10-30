@@ -18,215 +18,11 @@ html:has(.panel) {
   padding: var(--gutter) max(var(--gutter), env(safe-area-inset-right)) 48px max(var(--gutter), env(safe-area-inset-left));
 }
 
-.panel-naglowek {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "logo wyloguj"
-    "nawigacja nawigacja";
-  align-items: center;
-  gap: 0 12px;
-  margin-bottom: var(--section-gap);
-  border-bottom: 1px solid var(--kamien2);
-}
-
-.panel-logo {
-  grid-area: logo;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* panel lokalu: jego logo z lewej, tej samej wysokości co logo Bractwa */
-.panel-logo-lokalu {
-  height: 44px;
-  width: auto;
-  max-width: 120px;
-  object-fit: contain;
-}
-
-span.panel-logo-lokalu {
-  display: inline-flex;
-  align-items: center;
-  max-width: none;
-  color: var(--piana);
-  font-weight: var(--w-bold);
-}
-
-.panel-wyloguj {
-  grid-area: wyloguj;
-  display: flex;
-  align-items: center;
-  gap: var(--o-2);
-}
-
-.panel-wyloguj form {
-  margin: 0;
-}
-
-/* imię zalogowanego w nagłówku (bez „Wyloguj”, które jest na „Moim koncie”) z ikoną aktywnej roli: korona twórcy, logo Bractwa albo lokalu (30.10) */
-.panel-konto {
-  gap: var(--o-2);
-  max-width: 220px;
-  padding: 0 14px 0 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-decoration: none;
-}
-
-.panel-konto-logo {
-  flex: none;
-  height: 28px;
-  width: auto;
-  max-width: 48px;
-  object-fit: contain;
-}
-
-.panel-konto-korona {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--r-round);
-  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
-  color: var(--na-zlocie);
-}
-
-.panel-konto-korona svg {
-  width: 16px;
-  height: 16px;
-}
 
 
-/* Telefon (do 959 px): logo i przycisk menu (menu.tsx, style w globals.css), bez paska zakładek i „Wyloguj” */
-.panel-naglowek .panel-menu {
-  grid-area: wyloguj;
-}
 
-@media (max-width: 959px) {
-  .panel-naglowek {
-    padding-bottom: 14px;
-  }
 
-  .panel-naglowek .panel-nawigacja,
-  .panel-naglowek .panel-wyloguj {
-    display: none;
-  }
-}
 
-@media (min-width: 960px) {
-  /* na komputerze logo lokalu stoi już w nawigacji (zamiast zębatki), więc z lewej przy Bractwie go nie dublujemy
-     (28.10); na telefonie zostaje, bo nawigacja jest schowana w menu */
-  .panel-naglowek .panel-logo-lokalu {
-    display: none;
-  }
-
-  .panel-naglowek .panel-menu {
-    display: none;
-  }
-}
-
-.panel-nawigacja {
-  grid-area: nawigacja;
-  display: flex;
-  gap: 6px;
-  margin-top: 18px;
-  overflow-x: auto;
-}
-
-.panel-nawigacja a {
-  color: var(--szary);
-  font-weight: var(--w-semibold);
-  text-decoration: none;
-  padding: 8px 12px 10px;
-  border-bottom: 3px solid transparent;
-  white-space: nowrap;
-}
-
-.panel-nawigacja a[aria-current="page"] {
-  color: var(--zloto);
-  border-bottom-color: var(--zloto);
-}
-
-/* Zakładki (nawigacja.tsx): złoty pasek to jeden element `.nawigacja-pasek`, który jeździ między zakładkami po szarej
-   linii nagłówka; najechanie rozjaśnia napis i pokazuje pod nim przygaszony pasek w tym samym miejscu (29.10) */
-.panel-nawigacja {
-  position: relative;
-}
-
-.panel-nawigacja a.zakladka {
-  position: relative;
-  border-bottom: 0;
-  transition: color 0.25s var(--ease-std);
-}
-
-.panel-nawigacja a.zakladka::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--kamien3);
-  transform: scaleX(0);
-  transition: transform 0.25s var(--ease-std);
-}
-
-.panel-nawigacja a.zakladka:hover {
-  color: var(--piana);
-}
-
-.panel-nawigacja a.zakladka:hover::after {
-  transform: scaleX(1);
-}
-
-.panel-nawigacja a.zakladka[aria-current="page"]:hover {
-  color: var(--zloto);
-}
-
-.panel-nawigacja a.zakladka[aria-current="page"]::after {
-  display: none;
-}
-
-.nawigacja-pasek {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--zloto);
-  pointer-events: none;
-}
-
-.nawigacja-pasek.animuj {
-  transition:
-    transform 0.4s var(--ease-std),
-    width 0.4s var(--ease-std);
-}
-
-@media (min-width: 960px) {
-  /* zakładki sięgają do szarej linii nagłówka, więc i złoty pasek, i pasek po najechaniu leżą na niej (29.10: zakładki
-     były wyśrodkowane, a nawigacja miała 3 px dołu, więc hover wisiał nad linią) */
-  .panel-naglowek .panel-nawigacja {
-    overflow: visible;
-    margin-bottom: -1px;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .panel-nawigacja a.zakladka {
-    align-self: stretch;
-  }
-
-  .panel-nawigacja a.zakladka::after,
-  .nawigacja-pasek {
-    bottom: 0;
-  }
-}
 
 /* Formularze nie rozlewają się na całą szerokość desktopu */
 .panel .formularz {
@@ -243,28 +39,6 @@ span.panel-logo-lokalu {
   .panel {
     max-width: none;
     padding: 28px 48px 64px;
-  }
-
-  .panel-naglowek {
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: "logo nawigacja wyloguj";
-    gap: 40px;
-    padding-bottom: 0;
-  }
-
-  /* nawigacja przy prawej krawędzi, obok „Wyloguj”, żeby nie czytała się jako ciąg dalszy „Quiz · panel” */
-  .panel-nawigacja {
-    margin-top: 0;
-    align-self: stretch;
-    align-items: stretch;
-    justify-content: flex-end;
-  }
-
-  .panel-nawigacja a {
-    display: flex;
-    align-items: center;
-    padding: 22px 16px;
-    font-size: var(--fs-body);
   }
 
   .uklad-dwa {
@@ -1172,62 +946,14 @@ a.przycisk {
   margin-bottom: 8px;
 }
 
-/* „Uruchom quiz” w pasku nawigacji: przycisk, nie zakładka */
-.panel-nawigacja {
-  align-items: center;
-}
 
-.panel-nawigacja a.nawigacja-start {
-  align-self: center;
-  border-bottom: 0;
-  margin-left: 8px;
-  padding: 8px 16px;
-  color: var(--na-zlocie);
-}
 
-/* komputer: „Uruchom quiz” pierwsze, przed zakładkami (28.10, jak na górze menu na telefonie) */
-@media (min-width: 960px) {
-  .panel-nawigacja a.nawigacja-start {
-    order: -1;
-    margin-left: 0;
-    margin-right: 16px;
-  }
-}
 
-@media (max-width: 559px) {
-  .panel-nawigacja .na-szerokim {
-    display: none;
-  }
-}
 
-/* Pasek nawigacji: na telefonie przewija się w poziomie (zapas na obwódkę fokusu), na komputerze nic nie przycina */
-.panel-nawigacja {
-  padding: 3px 4px;
-}
 
-@media (min-width: 960px) {
-  .panel-nawigacja {
-    overflow: visible;
-  }
-}
 
 /* Telefon: zakładki po lewej, „Uruchom” dosunięte do prawej. Na komputerze całość stoi przy prawej. */
-@media (max-width: 959px) {
-  .panel-nawigacja {
-    gap: 2px;
-    scrollbar-width: none;
-  }
 
-  .panel-nawigacja a {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .panel-nawigacja a.nawigacja-start {
-    margin-left: auto;
-    padding: 8px 12px;
-  }
-}
 
 /* Edytor pytań: wiersze kolejności (numer, pole, strzałki, usuń) i par (lewa ↔ prawa, usuń) */
 .odpowiedz.odpowiedz-kolejnosc {
@@ -1738,15 +1464,7 @@ button.tag:hover:not(.wybrany) {
 /* Kreator gry bez zapasu pod formularzem (26.10: 45vh pustego miejsca na końcu wyglądało na błąd) */
 
 
-@media (min-width: 960px) {
-  .panel-naglowek {
-    column-gap: 12px;
-  }
 
-  .panel-naglowek .panel-nawigacja {
-    margin-left: 28px;
-  }
-}
 
 /* Zasady wyścigu po piwo (quizy/zasady, 28.10): przebieg jako droga z ikonami etapów, karty konkurencji z tabelami
    punktów, wykres szybkości, pasek udziału etapów i tor finału */

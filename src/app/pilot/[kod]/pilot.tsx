@@ -58,9 +58,13 @@ type Props = {
   tokenZAdresu: string | null;
   /** Karta „Boty do testów” (tylko główny admin). */
   boty: boolean;
+  /** false: nagłówek panelu stoi już nad pilotem (zalogowany, page.tsx), więc pilot nie rysuje swojego */
+  naglowek?: boolean;
 };
 
-export function Pilot({ kod, tokenZAdresu, boty }: Props) {
+export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
+  // zalogowany ma nad pilotem nagłówek panelu (30.10); z przekazanego linku bez logowania samo logo i menu
+  const naglowekPilota = (gra?: GraWMenu) => (naglowek ? <NaglowekPilota gra={gra} /> : null);
   // Token z linku zapisujemy w localStorage i usuwamy z paska adresu,
   // żeby nie wyciekł przy pokazywaniu ekranu. Odświeżenie strony bierze go z pamięci.
   const zamontowany = useSyncExternalStore(
@@ -127,13 +131,13 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
   const [potwierdz, oknoPotwierdzenia] = usePotwierdzenie();
 
   if (!zamontowany) {
-    return <Naglowek />;
+    return naglowekPilota();
   }
 
   if (!token || (bladDostepu && !stan)) {
     return (
       <>
-        <Naglowek />
+        {naglowekPilota()}
         <h1>Brak dostępu do pilota</h1>
         <p className="pomocniczy">
           Ten link pilota jest nieprawidłowy albo niepełny. Zeskanuj kod QR pilota z ekranu gry w panelu admina.
@@ -145,7 +149,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
   if (!stan) {
     return (
       <>
-        <Naglowek />
+        {naglowekPilota()}
         <p className="pomocniczy">{bladSieci ?? "Łączę z grą…"}</p>
       </>
     );
@@ -302,16 +306,14 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
 
   return (
     <>
-      <Naglowek
-        gra={{
+      {naglowekPilota({
           href: `/pilot/${kod}`,
           tytul: stan.quiz?.tytul ?? "Quiz",
           kod,
           faza,
           poczekalniaOtwarta: stan.poczekalnia_otwarta,
           lokal: stan.lokal ?? null,
-        }}
-      />
+        })}
       {/* na komputerze dwie kolumny: sterowanie po lewej (zawsze pod ręką), podgląd pytania i graczy po prawej */}
       <div className="pilot">
         <div className="pilot-sterowanie">
@@ -898,7 +900,7 @@ function PodiumPilota({ gracze }: { gracze: GraczPilota[] }) {
 }
 
 /** Nagłówek pilota: logo i menu panelu (zawsze, także na komputerze), ze skrótem do tej gry, gdy już wiadomo jakiej. */
-function Naglowek({ gra = null }: { gra?: GraWMenu | null }) {
+function NaglowekPilota({ gra = null }: { gra?: GraWMenu | null }) {
   return (
     <header className="gra-naglowek">
       <LogoQuiz wysokosc={40} dopisek="pilot" />
