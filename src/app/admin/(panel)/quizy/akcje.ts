@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { jestTworca, lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
@@ -64,7 +64,6 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       tytul,
       opis: tekst(dane, "opis") || null,
       tagi: czytajTagi(tekst(dane, "tagi")),
-      tylko_glowny: widziWszystko(rola) && !!dane.get("tylko_glowny"),
       lokal_id: lokalRoli(rola),
       autor_konto_id: rola.konto.id,
     })
@@ -101,11 +100,16 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   return { ok: "Zapisano." };
 }
 
-/** Przełącznik „Tylko Bractwo” na stronie quizu: lokale przestają albo zaczynają widzieć quiz Bractwa. */
-export async function ustawWidocznoscQuizu(id: string, tylkoGlowny: boolean): Promise<void> {
+/**
+ * Oko na liście quizów (30.10): prywatny quiz widzi tylko autor (i twórca), udostępniony grają wszyscy z dostępem do
+ * jego miejsca. Zmienia autor albo twórca.
+ */
+export async function ustawWidocznoscQuizu(id: string, udostepniony: boolean): Promise<void> {
   const rola = await wymagajAdmina();
-  if (!widziWszystko(rola)) return;
-  const { error } = await supabaseAdmin().from("quizy").update({ tylko_glowny: tylkoGlowny }).eq("id", id);
+  const db = supabaseAdmin();
+  const { data } = await db.from("quizy").select("autor_konto_id").eq("id", id).maybeSingle<{ autor_konto_id: string | null }>();
+  if (!jestTworca(rola) && data?.autor_konto_id !== rola.konto.id) return;
+  const { error } = await db.from("quizy").update({ udostepniony }).eq("id", id);
   if (error) throw new Error(`Nie udało się zmienić widoczności: ${error.message}`);
   refresh();
 }

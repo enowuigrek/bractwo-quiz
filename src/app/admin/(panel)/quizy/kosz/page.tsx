@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { wymagajAdmina } from "@/lib/admin";
 import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_RODZAJOW } from "@/lib/tagi";
@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Kosz · Bractwo Quiz" };
 type QuizWKoszu = {
   id: string;
   tytul: string;
-  tylko_glowny: boolean;
+  udostepniony: boolean;
   usunieto: string;
   zadania: { count: number }[];
   etapy: { count: number }[];
@@ -34,7 +34,7 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
   const { blad } = await searchParams;
   // lokal widzi w koszu tylko swoje quizy (quizów Bractwa nie usuwa)
   const { data, error } = await filtrQuizow(
-    supabaseAdmin().from("quizy").select("id, tytul, tylko_glowny, usunieto, zadania(count), etapy(count)"),
+    supabaseAdmin().from("quizy").select("id, tytul, udostepniony, usunieto, zadania(count), etapy(count)"),
     rola,
     true,
   )
@@ -61,9 +61,9 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
               <div className="lista-glowna">
                 <div className="lista-tytul">{q.tytul}</div>
                 <div className="lista-opis">
-                  {widziWszystko(rola) && q.tylko_glowny && (
+                  {!q.udostepniony && (
                     <>
-                      <IkonaOkoPrzekreslone /> tylko Bractwo ·{" "}
+                      <IkonaOkoPrzekreslone /> prywatny ·{" "}
                     </>
                   )}
                   {NAZWY_RODZAJOW[(q.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny"]} ·{" "}

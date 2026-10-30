@@ -80,9 +80,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
     db
       .from("quizy")
-      .select("tylko_glowny, usunieto")
+      .select("udostepniony, usunieto")
       .eq("id", quiz_id)
-      .maybeSingle<{ tylko_glowny: boolean; usunieto: string | null }>(),
+      .maybeSingle<{ udostepniony: boolean; usunieto: string | null }>(),
     db
       .from("etapy")
       .select("id", { count: "exact", head: true })
@@ -120,7 +120,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   // (od 26.10 włącza go też lokal; pytania zmienia tylko główny)
   const pijany_final = !!finalySerii && dane.get("pijany_final") === "on";
   // gra głównego jest domyślnie tylko jego (lokal jej nie widzi; przełącznik w kreatorze); gra z ukrytego quizu zawsze
-  const tylko_glowny = widziWszystko(rola) && (dane.get("tylko_glowny") === "on" || !!quiz?.tylko_glowny);
+  const tylko_glowny = widziWszystko(rola) && (dane.get("tylko_glowny") === "on" || !quiz?.udostepniony);
   const za_barem = pijany_final
     ? String(dane.get("za_barem") ?? "")
         .trim()

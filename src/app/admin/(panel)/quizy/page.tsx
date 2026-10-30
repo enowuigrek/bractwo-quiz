@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { jestTworca, lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { IkonaEdytuj, IkonaKosz, IkonaOko, IkonaOkoPrzekreslone } from "@/components/ikony";
@@ -16,7 +16,7 @@ import {
 } from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz, ustawWidocznoscQuizu } from "./akcje";
-import { wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { nowyQuiz, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
 
@@ -24,7 +24,8 @@ type QuizNaLiscie = {
   id: string;
   tytul: string;
   opis: string | null;
-  tylko_glowny: boolean;
+  udostepniony: boolean;
+  autor_konto_id: string | null;
   tagi: string[];
   lokal_id: string | null;
   lokale: LokalAutor | null;
@@ -56,7 +57,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
     db
       .from("quizy")
       .select(
-        "id, tytul, opis, tylko_glowny, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(nazwa, zdjecie_url), zadania(count), etapy(count)",
+        "id, tytul, opis, udostepniony, autor_konto_id, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(nazwa, zdjecie_url), zadania(count), etapy(count)",
       ),
     rola,
   ).is("usunieto", null);
@@ -144,16 +145,17 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
                   </Link>
                 ) : (
                   <>
-                    {/* widoczność quizu Bractwa dla lokali: oko (widzą) albo przekreślone oko (tylko Bractwo) */}
-                    {glowny && !q.lokal_id && (
-                      <form action={ustawWidocznoscQuizu.bind(null, q.id, !q.tylko_glowny)}>
+                    {/* widoczność (30.10): oko = udostępniony, przekreślone oko = prywatny (autor i twórca);
+                        zmienia autor albo twórca */}
+                    {(jestTworca(rola) || q.autor_konto_id === rola.konto.id) && (
+                      <form action={ustawWidocznoscQuizu.bind(null, q.id, !q.udostepniony)}>
                         <button
                           type="submit"
                           className="przycisk-maly ikona"
-                          aria-label={q.tylko_glowny ? "Tylko Bractwo: pokaż lokalom" : "Widzą lokale: ukryj przed lokalami"}
-                          data-podpis={q.tylko_glowny ? "Tylko Bractwo" : "Widzą lokale"}
+                          aria-label={q.udostepniony ? "Udostępniony: ukryj" : "Prywatny: udostępnij"}
+                          data-podpis={q.udostepniony ? "Udostępniony" : "Prywatny"}
                         >
-                          {q.tylko_glowny ? <IkonaOkoPrzekreslone /> : <IkonaOko />}
+                          {q.udostepniony ? <IkonaOko /> : <IkonaOkoPrzekreslone />}
                         </button>
                       </form>
                     )}
@@ -190,7 +192,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
 
       <div className="panel-sekcja przyciski">
         <Link href={`/admin/quizy/nowy?rodzaj=${rodzaj}`} className="przycisk zloty">
-          {rodzaj === "klasyczny" ? "Nowy klasyczny quiz" : "Nowy wyścig po piwo"}
+          {nowyQuiz(rodzaj)}
         </Link>
         {/* pytania dogrywki „Pijany finał” (tylko po finale wyścigu po piwo), wspólne dla wszystkich gier;
             pytania zmienia tylko główny */}

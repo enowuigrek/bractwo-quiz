@@ -1444,7 +1444,6 @@ a.przycisk {
 }
 
 .etap-brakujace li {
-  padding: 9px 0 9px 2.2em;
   border-bottom: 1px dashed var(--kamien2);
 }
 
@@ -1530,8 +1529,8 @@ a.przycisk {
 }
 
 /* miejsca na nowe pytania w etapie: szary tekst jak link, edytor rozwija się pod nim */
+/* „Dodaj pytanie”: wiersz jak pytanie na liście (30.10), napis szary, po najechaniu złoty */
 .nowe-pytanie > summary {
-  padding: 0;
   color: var(--szary);
   font-weight: var(--w-semibold);
 }
@@ -1540,12 +1539,9 @@ a.przycisk {
   color: var(--zloto);
 }
 
-.nowe-pytanie > summary::after {
-  margin-left: 8px;
-}
-
-.etap-brakujace .nowe-pytanie .zadanie-edytor {
-  margin: 10px 0 4px -2.2em;
+.nowe-pytanie-plus {
+  min-width: 1.6em;
+  color: var(--zloto);
 }
 
 /* Rodzaj pytania w edytorze: kafelki w kolorach rodzajów, wybrany wypełniony swoim kolorem (DESIGN-SYSTEM.md) */
@@ -2205,9 +2201,6 @@ button.tag:hover:not(.wybrany) {
     padding: 16px 14px;
   }
 
-  .etap-brakujace .nowe-pytanie .zadanie-edytor {
-    margin-left: -2.2em;
-  }
 }
 
 /* tabela wyników gry: pod nickiem kto odpadł (i na którym miejscu) albo został usunięty przez prowadzącego (28.10) */

@@ -15,7 +15,7 @@ import { LIMITY, liczbaPytan } from "./limity";
  * i opis. „Wyścig po piwo” ma stały zestaw konkurencji (kreator ich nie zmienia), klasyczny pub quiz to same
  * pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
  */
-export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: RodzajQuizu }) {
+export function FormularzQuizu({ rodzaj }: { rodzaj: RodzajQuizu }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(utworzQuiz, {});
   // klucze szablonów to rodzaje
   const szablon = SZABLONY_QUIZU.find((s) => s.klucz === rodzaj);
@@ -75,12 +75,6 @@ export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: Ro
         <label htmlFor="tagi">Tematy (po przecinku, do filtrowania)</label>
         <input id="tagi" name="tagi" className="pole" placeholder="np. filmy, lata 90." maxLength={200} />
       </div>
-      {/* tylko główny: jego nowe quizy są domyślnie ukryte przed lokalami (zmiana później na stronie quizu) */}
-      {glowny && (
-        <label className="przelacznik">
-          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko Bractwo (bez lokali)
-        </label>
-      )}
 
       <KomunikatFormularza stan={stan} />
       <button type="submit" className="przycisk zloty" disabled={trwa}>

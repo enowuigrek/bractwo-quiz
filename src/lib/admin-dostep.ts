@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 import { lokalRoli, ukryteLokale, widziWszystko, jestTworca, type Rola } from "./admin";
 import { supabaseAdmin } from "./supabase/serwer";
 
-// Kto co widzi w panelu (od 26.10, konta od 30.10). Twórca i Bractwo: wszystko, tylko Bractwo nie widzi lokalu
-// testowego (`lokale.testowy`, Kwadrat). `tylko_glowny` znaczy „tylko Bractwo, nie lokale”. Lokal:
-// - quizy: swoje (`quizy.lokal_id`) do zmian, a quizy Bractwa (`lokal_id` null) bez `tylko_glowny` tylko do grania
-//   i podglądu, bez edycji i usuwania;
+// Kto co widzi w panelu (od 26.10, konta od 30.10). Twórca: wszystko. Bractwo: wszystko poza lokalem testowym
+// (`lokale.testowy`, Kwadrat). Quiz jest prywatny (widzi go tylko autor i twórca) albo udostępniony
+// (`quizy.udostepniony`, oko na liście, 30.10). Lokal:
+// - quizy: swojego lokalu do zmian, a udostępnione quizy Bractwa (`lokal_id` null) tylko do grania i podglądu;
 // - gry: rozegrane w swoim lokalu; gry Bractwa (`tylko_glowny`) w swoim lokalu tylko na listach, do podglądu
 //   i zwolnienia ekranu przed startem (28.10), bez pilota i strony gry;
 // - lokale: tylko swój (logo, Instagram, hasło).
@@ -30,14 +30,16 @@ export function filtrLokaliRoli<Q>(zapytanie: Q, rola: Rola): Q {
   return jestTworca(rola) ? zapytanie : (zapytanie as unknown as { eq(k: string, w: boolean): Q }).eq("testowy", false);
 }
 
+/** Widzi go: udostępniony albo własny (autor). */
+const widocznyQuiz = (rola: Rola) => `or(udostepniony.is.true,autor_konto_id.eq.${rola.konto.id})`;
+
 /** Quizy, które rola widzi na listach i w kreatorze (`wlasne`: tylko te, które może zmieniać, np. w koszu). */
 export function filtrQuizow<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, wlasne = false): Q {
   const lokal = lokalRoli(rola);
   if (jestTworca(rola)) return zapytanie;
-  if (!lokal) return zapytanie.or(filtrBractwa(rola));
-  return zapytanie.or(
-    wlasne ? `lokal_id.eq.${lokal}` : `lokal_id.eq.${lokal},and(lokal_id.is.null,tylko_glowny.is.false)`,
-  );
+  if (!lokal) return zapytanie.or(`and(${widocznyQuiz(rola)},or(${filtrBractwa(rola)}))`);
+  const swoje = `and(lokal_id.eq.${lokal},${widocznyQuiz(rola)})`;
+  return zapytanie.or(wlasne ? swoje : `${swoje},and(lokal_id.is.null,udostepniony.is.true)`);
 }
 
 /**
@@ -60,15 +62,17 @@ export async function wymagajQuizu(rola: Rola, quizId: string, podglad = false):
   const lokal = lokalRoli(rola);
   const { data } = await supabaseAdmin()
     .from("quizy")
-    .select("lokal_id, tylko_glowny")
+    .select("lokal_id, udostepniony, autor_konto_id")
     .eq("id", quizId)
-    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean }>();
+    .maybeSingle<{ lokal_id: string | null; udostepniony: boolean; autor_konto_id: string | null }>();
+  // prywatny quiz widzi tylko autor (i twórca)
+  if (!data || (!data.udostepniony && data.autor_konto_id !== rola.konto.id)) notFound();
   if (!lokal) {
-    if (!data || ukryteDlaBractwa(rola, data)) notFound();
+    if (ukryteDlaBractwa(rola, data)) notFound();
     return { mozeZmieniac: true };
   }
-  if (data?.lokal_id === lokal) return { mozeZmieniac: true };
-  if (podglad && data && data.lokal_id === null && !data.tylko_glowny) return { mozeZmieniac: false };
+  if (data.lokal_id === lokal) return { mozeZmieniac: true };
+  if (podglad && data.lokal_id === null) return { mozeZmieniac: false };
   notFound();
 }
 

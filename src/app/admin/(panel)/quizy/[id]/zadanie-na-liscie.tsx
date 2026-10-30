@@ -70,7 +70,13 @@ export function NowePytanie({
       open={otwarte}
       onToggle={(e) => ustawOtwarte(e.currentTarget.open)}
     >
-      <summary>{napis}</summary>
+      {/* jak wiersz pytania (30.10): złoty „+” w kolumnie numerów, napis w miejscu treści, strzałka z prawej */}
+      <summary>
+        <span className="krok-nr nowe-pytanie-plus" aria-hidden>
+          +
+        </span>
+        <span className="nowe-pytanie-napis">{napis}</span>
+      </summary>
       {otwarte && (
         <div className="zadanie-edytor">
           <EdytorZadania

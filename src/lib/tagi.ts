@@ -21,6 +21,9 @@ export const NAZWY_RODZAJOW: Record<RodzajQuizu, string> = {
   klasyczny: "Pub quiz",
 };
 
+/** „Nowy wyścig po piwo”, „Nowy pub quiz”: przycisk i nagłówek nowego quizu z nazwy zakładki (30.10). */
+export const nowyQuiz = (rodzaj: RodzajQuizu) => `Nowy ${NAZWY_RODZAJOW[rodzaj].toLowerCase()}`;
+
 /** Wszystkie tagi z listy quizów, alfabetycznie. */
 export function wszystkieTagi(quizy: { tagi: string[] }[]): string[] {
   return [...new Set(quizy.flatMap((q) => q.tagi))].sort((a, b) => a.localeCompare(b, "pl"));

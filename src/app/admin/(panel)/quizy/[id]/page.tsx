@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { mozePijanyFinal, wymagajAdmina } from "@/lib/admin";
 import { wymagajQuizu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
@@ -18,7 +18,6 @@ import {
 } from "../akcje";
 import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { WklejPytania } from "./wklej";
-import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
 import type { TypZadania } from "@/lib/zadania";
 import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
@@ -45,7 +44,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     await Promise.all([
       db
         .from("quizy")
-        .select("id, tytul, opis, utworzono, tylko_glowny, tagi, usunieto, lokal_id, konta(nazwa)")
+        .select("id, tytul, opis, utworzono, tagi, usunieto, lokal_id, konta(nazwa)")
         .eq("id", id)
         .maybeSingle<Quiz & { usunieto: string | null; lokal_id: string | null; konta: { nazwa: string } | null }>(),
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
@@ -181,10 +180,6 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         <Link href="/admin/quizy">← Quizy</Link>
       </p>
       <NaglowekQuizu quiz={quiz} autor={quiz.konta?.nazwa ?? null} />
-      {/* tylko główny decyduje, czy lokale widzą jego quiz (do grania); quizów lokali to nie dotyczy */}
-      {widziWszystko(rola) && !quiz.lokal_id && (
-        <UdostepnijLokalom quizId={quiz.id} udostepniony={!quiz.tylko_glowny} />
-      )}
       {quiz.usunieto && (
         <form action={przywrocQuiz.bind(null, quiz.id)} className="blad quiz-w-koszu">
           Ten quiz jest w koszu: nie ma go na liście ani przy uruchamianiu gry.
@@ -273,7 +268,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                   {Array.from({ length: Math.max(0, (etap.plan_pytan ?? 0) - wEtapie.length) }, (_, i) => (
                     <li key={i}>
                       <NowePytanie
-                        napis={`+ pytanie ${wEtapie.length + i + 1} z ${etap.plan_pytan}`}
+                        napis={`Dodaj pytanie ${wEtapie.length + i + 1} z ${etap.plan_pytan}`}
                         edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
                       />
                     </li>
@@ -281,7 +276,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                   {(etap.plan_pytan ?? 0) <= wEtapie.length && (
                     <li className="etap-brakujace-dodaj">
                       <NowePytanie
-                        napis="+ pytanie w tym etapie"
+                        napis="Dodaj pytanie w tym etapie"
                         edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: etap.id, domyslnyTyp: etap.typ_domyslny ?? undefined }}
                       />
                     </li>
@@ -301,7 +296,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         {etapy.length === 0 && (
           <ol className="etap-brakujace">
             <li className="etap-brakujace-dodaj">
-              <NowePytanie napis="+ pytanie" edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: null, domyslnyTyp: ostatniTyp }} />
+              <NowePytanie napis="Dodaj pytanie" edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: null, domyslnyTyp: ostatniTyp }} />
             </li>
           </ol>
         )}
