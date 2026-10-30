@@ -28,7 +28,7 @@ export function FormularzProfilu({ nazwa, zdjecie }: { nazwa: string; zdjecie: s
         <label htmlFor="nazwa">Imię i nazwisko</label>
         <input id="nazwa" name="nazwa" className="pole" defaultValue={nazwa} required maxLength={60} />
       </div>
-      <PoleGrafiki nazwa="zdjecie" etykieta="Zdjęcie" obecna={zdjecie} />
+      <PoleGrafiki nazwa="zdjecie" etykieta="Zdjęcie" obecna={zdjecie} kadruj />
       <Komunikat stan={stan} />
       <button type="submit" className="przycisk" disabled={trwa}>
         Zapisz

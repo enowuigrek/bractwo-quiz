@@ -113,6 +113,8 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Nazwa z ikoną (TV):** plansza etapu od 26.10: ikona (120 px) przed blokiem „Etap X z Y” + nazwa, tytuł 96 px, zasady 42 px zwykłą wagą, drobne plakietki; lewa strona ma oddychać obok telefonu z pokazem.
 
+**Pole grafiki (30.10, `_komponenty/grafika.tsx`).** Podgląd, przycisk „Wybierz plik” (przy grafice: „Zmień”) i kosz w jednym rzędzie, bez natywnego „Brak zaznaczonych plików” i bez przełącznika „usuń”: kosz chowa podgląd i pokazuje „Cofnij”. Zdjęcie konta (`kadruj`) po wyborze otwiera okno kadrowania: zdjęcie w kole, przesuwanie palcem albo myszą (zawsze wypełnia koło), suwak przybliżenia, „Gotowe” zapisuje JPEG 512×512; podgląd okrągły.
+
 **Pilot pod nagłówkiem panelu (30.10).** Zalogowany widzi nad pilotem ten sam nagłówek co w panelu (na komputerze zakładki, „Uruchom quiz” i konto, na telefonie menu z trzema kreskami), a pilot zajmuje całą szerokość okna jak panel; wcześniej na komputerze stała wąska kolumna z hamburgerem, a menu otwierało się przy krawędzi ekranu, daleko od przycisku.
 
 **Komputer (od 960 px):** nic nie wygląda jak rozciągnięty telefon. Strony z kolumną treści stoją na karcie (600 px, `--kamien` 72%, obrys `--kamien2`, cień) na ciepłym tle; pilot ma dwie kolumny (sterowanie 420 px przyklejone, podgląd obok); panel ma swój układ desktopowy.
