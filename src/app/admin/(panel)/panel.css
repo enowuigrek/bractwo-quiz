@@ -488,13 +488,8 @@ a.przycisk {
   gap: var(--o-3);
 }
 
-.formularz .pole-grafiki-wiersz label.przycisk-maly {
-  margin: 0;
+.pole-grafiki-wiersz .przycisk-maly:not(.ikona) {
   padding: 0 16px;
-  color: var(--piana);
-  font-size: var(--fs-xs);
-  font-weight: var(--w-black);
-  cursor: pointer;
 }
 
 .pole-grafiki-podglad {

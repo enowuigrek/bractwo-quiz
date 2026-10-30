@@ -49,9 +49,10 @@ export function PoleGrafiki({ nazwa, etykieta, obecna, podpowiedz, kadruj = fals
       <label htmlFor={nazwa}>{etykieta}</label>
       <div className="pole-grafiki-wiersz">
         {podglad && <img src={podglad} alt="" className={`pole-grafiki-podglad${kadruj ? " okragly" : ""}`} />}
-        <label htmlFor={nazwa} className="przycisk-maly">
+        {/* prawdziwy przycisk, nie etykieta: `.formularz label` robiła z klasy przycisku blok z tekstem u góry (30.10) */}
+        <button type="button" className="przycisk-maly" onClick={() => pole.current?.click()}>
           {podglad ? "Zmień" : "Wybierz plik"}
-        </label>
+        </button>
         {nowa ? (
           <button type="button" className="przycisk-maly" onClick={() => ustawPlik(null)}>
             Cofnij
