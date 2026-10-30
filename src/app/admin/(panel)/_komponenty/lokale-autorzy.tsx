@@ -26,15 +26,31 @@ export function wybranyLokal(
   return lokale.some((l) => l.id === wartosc && (!miasto || l.miasto === miasto)) ? wartosc : null;
 }
 
+/** Inicjały z imienia i nazwiska: „Łukasz Nowak” → „ŁN”, samo imię → „Ł”. */
+export const inicjaly = (nazwa: string) =>
+  nazwa
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]!.toUpperCase())
+    .join("");
+
+/** Osoba z konta: imię i zdjęcie (konta osobowe, 30.10). */
+export type Osoba = { nazwa: string; zdjecie_url?: string | null };
+
 /**
- * Osoba, która założyła quiz albo uruchomiła grę (konta osobowe, 30.10): kółko z inicjałem, imię w podpowiedzi.
- * Bez autora (starsze rzeczy) puste miejsce tej samej szerokości, żeby kolumna ikon się nie rozjeżdżała.
+ * Osoba, która założyła quiz albo uruchomiła grę: kółko ze zdjęciem z „Mojego konta”, a bez zdjęcia z inicjałami;
+ * imię w podpowiedzi. Bez autora (starsze rzeczy) puste miejsce tej samej szerokości, żeby kolumna ikon się nie
+ * rozjeżdżała. `duzy`: podgląd na „Moim koncie”.
  */
-export function ZnaczekOsoby({ osoba }: { osoba: { nazwa: string } | null }) {
+export function ZnaczekOsoby({ osoba, duzy = false }: { osoba: Osoba | null; duzy?: boolean }) {
   if (!osoba) return <span className="znaczek-osoby pusty" aria-hidden />;
-  return (
-    <span className="znaczek-osoby" title={osoba.nazwa} aria-label={osoba.nazwa}>
-      {osoba.nazwa.slice(0, 1).toUpperCase()}
+  const klasa = `znaczek-osoby${duzy ? " duzy" : ""}`;
+  return osoba.zdjecie_url ? (
+    <img src={osoba.zdjecie_url} alt={osoba.nazwa} title={osoba.nazwa} className={klasa} />
+  ) : (
+    <span className={klasa} title={osoba.nazwa} aria-label={osoba.nazwa}>
+      {inicjaly(osoba.nazwa)}
     </span>
   );
 }

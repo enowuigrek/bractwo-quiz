@@ -43,7 +43,7 @@ function rowne(a: string, b: string): boolean {
  * Konto z kilkoma rolami przełącza się w menu („działam jako”), a aktywna rola siedzi w ciasteczku.
  * Uprawnienia sprawdzamy funkcjami niżej i w `admin-dostep.ts`, a nie porównując role.
  */
-export type Konto = { id: string; nazwa: string; email: string };
+export type Konto = { id: string; nazwa: string; email: string; zdjecie_url: string | null };
 export type Rola =
   | { typ: "tworca"; konto: Konto }
   | { typ: "bractwo"; konto: Konto; testowe: string[] }
@@ -118,11 +118,11 @@ export async function kontoZLinku(token: string): Promise<(Konto & { maHaslo: bo
   if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;
   const { data } = await supabaseAdmin()
     .from("konta")
-    .select("id, nazwa, email, skrot, link_do, zablokowane")
+    .select("id, nazwa, email, zdjecie_url, skrot, link_do, zablokowane")
     .eq("link_skrot", skrotLinku(token))
     .maybeSingle<Konto & { skrot: string | null; link_do: string | null; zablokowane: boolean }>();
   if (!data || data.zablokowane || !data.link_do || Date.parse(data.link_do) < Date.now()) return null;
-  return { id: data.id, nazwa: data.nazwa, email: data.email, maHaslo: !!data.skrot };
+  return { id: data.id, nazwa: data.nazwa, email: data.email, zdjecie_url: data.zdjecie_url, maHaslo: !!data.skrot };
 }
 
 /** E-mail z formularza: małe litery, bez spacji; null, gdy nie wygląda na adres. */
@@ -142,7 +142,7 @@ type KontoZBazy = Konto & {
 async function pobierzKonto(kontoId: string): Promise<KontoZBazy | null> {
   const { data } = await supabaseAdmin()
     .from("konta")
-    .select("id, nazwa, email, skrot, zablokowane, konta_role(rola, lokal_id)")
+    .select("id, nazwa, email, zdjecie_url, skrot, zablokowane, konta_role(rola, lokal_id)")
     .eq("id", kontoId)
     .maybeSingle<KontoZBazy>();
   return data;
@@ -223,7 +223,7 @@ export async function sprawdzLogowanie(email: string, haslo: string): Promise<Wy
   const glowne = process.env.ADMIN_HASLO_GLOWNE;
   const awaryjne = !!glowne && role.some((r) => r.rola === "tworca") && rowne(haslo, glowne);
   if (!awaryjne && !(await zgodneHaslo(konto.skrot, haslo))) return null;
-  return { konto: { id: konto.id, nazwa: konto.nazwa, email: konto.email }, role };
+  return { konto: { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url }, role };
 }
 
 /** Role konta (puste, gdy zablokowane albo czeka na nadanie ról). */
@@ -299,7 +299,7 @@ export const rolaAdmina = cache(async (): Promise<Rola | null> => {
   const rola = rolaZKodu(c.kod);
   if (!konto || konto.zablokowane || !rola || wersjaHasla(konto.skrot) !== c.wersja) return null;
   if (!mozeDzialacJako(konto, rola)) return null;
-  const k: Konto = { id: konto.id, nazwa: konto.nazwa, email: konto.email };
+  const k: Konto = { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url };
   if (rola.rola === "tworca") return { typ: "tworca", konto: k };
   if (rola.rola === "lokal") return { typ: "lokal", konto: k, lokalId: rola.lokalId };
   const { data } = await supabaseAdmin().from("lokale").select("id").eq("testowy", true).returns<{ id: string }[]>();

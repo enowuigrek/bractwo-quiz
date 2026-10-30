@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { IkonaKorona } from "@/components/ikony";
 import { kodAktywnejRoli, roleDoWyboru, wymagajAdmina } from "@/lib/admin";
 import { przelaczRole, wylogujAdmina } from "../../akcje";
-import { FormularzImienia, FormularzZmianyHasla } from "./formularz";
+import { ZnaczekOsoby } from "../_komponenty/lokale-autorzy";
+import { FormularzProfilu, FormularzZmianyHasla } from "./formularz";
 
 export const metadata: Metadata = { title: "Moje konto · Bractwo Quiz" };
 
@@ -15,7 +16,10 @@ export default async function MojeKonto() {
   return (
     <main>
       <p className="okruchy">{rola.konto.email}</p>
-      <h1>{rola.konto.nazwa}</h1>
+      <div className="konto-naglowek">
+        <ZnaczekOsoby osoba={rola.konto} duzy />
+        <h1>{rola.konto.nazwa}</h1>
+      </div>
       {role.length > 1 && (
         <section className="panel-sekcja">
           <h2>Działam jako</h2>
@@ -45,8 +49,8 @@ export default async function MojeKonto() {
       )}
       <div className="uklad-dwa panel-sekcja">
         <section className="karta">
-          <h2>Imię</h2>
-          <FormularzImienia nazwa={rola.konto.nazwa} />
+          <h2>Imię i zdjęcie</h2>
+          <FormularzProfilu nazwa={rola.konto.nazwa} zdjecie={rola.konto.zdjecie_url} />
         </section>
         <section className="karta">
           <h2>Hasło</h2>

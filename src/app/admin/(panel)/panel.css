@@ -413,9 +413,29 @@ span.panel-logo-lokalu {
   color: var(--zloto);
 }
 
+/* złoty pasek wybranej zakładki to osobny element, który się przesuwa (`zakladki.tsx`, jak `.nawigacja-pasek`) */
 .zakladki a[aria-current="page"]::after {
+  display: none;
+}
+
+.zakladki {
+  position: relative;
+}
+
+.zakladki-pasek {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
   background: var(--zloto);
-  transform: scaleX(1);
+  pointer-events: none;
+}
+
+.zakladki-pasek.animuj {
+  transition:
+    transform 0.4s var(--ease-std),
+    width 0.4s var(--ease-std);
 }
 
 @media (min-width: 960px) {
@@ -2618,9 +2638,22 @@ button.tag:hover:not(.wybrany) {
   border-radius: var(--r-round);
   background: var(--kamien2);
   color: var(--piana);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-micro);
   font-weight: var(--w-black);
+  letter-spacing: 0.02em;
   cursor: default;
+}
+
+/* zdjęcie z „Mojego konta” zamiast inicjałów */
+img.znaczek-osoby {
+  object-fit: cover;
+}
+
+/* podgląd na „Moim koncie” obok imienia */
+.znaczek-osoby.duzy {
+  width: 64px;
+  height: 64px;
+  font-size: var(--fs-h3);
 }
 
 .znaczek-osoby.pusty {
@@ -2662,4 +2695,15 @@ button.tag:hover:not(.wybrany) {
 .kafelek-roli.wybrana .kafelek-roli-korona {
   background: var(--na-zlocie);
   color: var(--zloto);
+}
+
+/* „Moje konto”: zdjęcie (albo inicjały) obok imienia */
+.konto-naglowek {
+  display: flex;
+  align-items: center;
+  gap: var(--o-4);
+}
+
+.konto-naglowek h1 {
+  margin: 0;
 }

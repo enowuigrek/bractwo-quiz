@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Zakladki } from "../../_komponenty/zakladki";
 import { notFound, redirect } from "next/navigation";
 import { poprawnyKod } from "@/lib/gra/kod";
 import QRCode from "qrcode";
@@ -326,21 +327,14 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
       {!trwa && (
         <section className="panel-sekcja" id="wyniki">
           <h2>Wyniki</h2>
-          <nav className="zakladki" aria-label="Widok wyników">
-            {[
-              ["gracze", "Gracze", `/admin/gry/${gra.id}#wyniki`],
-              ["pytania", "Pytania", `/admin/gry/${gra.id}?widok=pytania#wyniki`],
-            ].map(([klucz, napis, href]) => (
-              <Link
-                key={klucz}
-                href={href}
-                scroll={false}
-                aria-current={(klucz === "pytania") === widokPytan ? "page" : undefined}
-              >
-                {napis}
-              </Link>
-            ))}
-          </nav>
+          <Zakladki
+            etykieta="Widok wyników"
+            przewijaj={false}
+            pozycje={[
+              { href: `/admin/gry/${gra.id}#wyniki`, napis: "Gracze", aktywna: !widokPytan },
+              { href: `/admin/gry/${gra.id}?widok=pytania#wyniki`, napis: "Pytania", aktywna: widokPytan },
+            ]}
+          />
           {!widokPytan && wyniki.some((w) => w.punkty > 0) && (
             <GrafikaPodium
               dane={{

@@ -11,6 +11,7 @@ import {
   wybranyLokal,
   ZnaczekLokalu,
   ZnaczekOsoby,
+  type Osoba,
   type LokalAutor,
 } from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
@@ -27,7 +28,7 @@ type QuizNaLiscie = {
   tagi: string[];
   lokal_id: string | null;
   lokale: LokalAutor | null;
-  konta: { nazwa: string } | null;
+  konta: Osoba | null;
   zadania: { count: number }[];
   etapy: { count: number }[];
 };
@@ -55,7 +56,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
     db
       .from("quizy")
       .select(
-        "id, tytul, opis, tylko_glowny, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(nazwa), zadania(count), etapy(count)",
+        "id, tytul, opis, tylko_glowny, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(nazwa, zdjecie_url), zadania(count), etapy(count)",
       ),
     rola,
   ).is("usunieto", null);

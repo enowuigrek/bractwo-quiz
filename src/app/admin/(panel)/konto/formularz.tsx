@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import type { StanFormularza } from "@/lib/typy";
-import { zmienHaslo, zmienImie } from "./akcje";
+import { PoleGrafiki } from "../_komponenty/grafika";
+import { zapiszProfil, zmienHaslo } from "./akcje";
 
 function Komunikat({ stan }: { stan: StanFormularza }) {
   if (stan.blad) {
@@ -19,12 +20,15 @@ function Komunikat({ stan }: { stan: StanFormularza }) {
   ) : null;
 }
 
-export function FormularzImienia({ nazwa }: { nazwa: string }) {
-  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zmienImie, {});
+export function FormularzProfilu({ nazwa, zdjecie }: { nazwa: string; zdjecie: string | null }) {
+  const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zapiszProfil, {});
   return (
     <form action={akcja} className="formularz">
-      {/* podpis daje nagłówek karty „Imię” (30.10: było dwa razy „Imię”) */}
-      <input id="nazwa" name="nazwa" className="pole" defaultValue={nazwa} required maxLength={60} aria-label="Imię" />
+      <div>
+        <label htmlFor="nazwa">Imię i nazwisko</label>
+        <input id="nazwa" name="nazwa" className="pole" defaultValue={nazwa} required maxLength={60} />
+      </div>
+      <PoleGrafiki nazwa="zdjecie" etykieta="Zdjęcie" obecna={zdjecie} />
       <Komunikat stan={stan} />
       <button type="submit" className="przycisk" disabled={trwa}>
         Zapisz

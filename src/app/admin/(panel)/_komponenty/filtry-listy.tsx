@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { NAZWY_RODZAJOW, type RodzajQuizu } from "@/lib/tagi";
 import { Filtr, type OpcjaFiltra } from "./filtr";
+import { Zakladki } from "./zakladki";
 import { BRACTWO, miastaLokali, type LokalAutor } from "./lokale-autorzy";
 
 /**
@@ -9,16 +9,17 @@ import { BRACTWO, miastaLokali, type LokalAutor } from "./lokale-autorzy";
  * równe listy rozwijane (`Filtr`): miasto (gdy lokale są w kilku miastach), lokal i temat.
  */
 
-/** Zakładki „Wyścig po piwo / Pub quiz”. */
+/** Zakładki „Wyścig po piwo / Pub quiz” (z przesuwanym paskiem, `Zakladki`). */
 export function ZakladkiRodzaju({ rodzaj, adres }: { rodzaj: RodzajQuizu; adres: (r: RodzajQuizu) => string }) {
   return (
-    <nav className="zakladki" aria-label="Rodzaj quizu">
-      {(["wyscig", "klasyczny"] as const).map((r) => (
-        <Link key={r} href={adres(r)} aria-current={rodzaj === r ? "page" : undefined}>
-          {NAZWY_RODZAJOW[r]}
-        </Link>
-      ))}
-    </nav>
+    <Zakladki
+      etykieta="Rodzaj quizu"
+      pozycje={(["wyscig", "klasyczny"] as const).map((r) => ({
+        href: adres(r),
+        napis: NAZWY_RODZAJOW[r],
+        aktywna: rodzaj === r,
+      }))}
+    />
   );
 }
 
