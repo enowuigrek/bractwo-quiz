@@ -173,7 +173,7 @@ export function Gracz({ kod }: { kod: string }) {
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
-            <p className="pomocniczy">Piwu Cześć! Do zobaczenia na kolejnym quizie.</p>
+            <p className="pomocniczy">Do zobaczenia na kolejnym quizie. Piwu Cześć!</p>
           </>
         ) : !stan.poczekalnia_otwarta ? (
           <>
