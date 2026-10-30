@@ -295,24 +295,27 @@ span.panel-logo-lokalu {
 /* Rytm odstępów (30.10, Łukasz: „odstęp nie jest stały między elementami”). Odstęp ustawia rodzic, nie element:
    dzieci strony, kolumny, sekcji i karty nie mają własnych marginesów, a między sobą dostają 16 px, po nagłówku 12 px,
    po okruchach 8 px, a przed sekcją 34 px. Element nie dopisuje marginesu ani `style={{ marginTop }}`; inny odstęp
-   to inna klasa rodzica (np. `.przyciski`, `.filtry`). Kontener bez klasy dostaje `.stos`. */
-.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > * {
+   to inna klasa rodzica (np. `.przyciski`, `.filtry`). Kontener bez klasy dostaje `.stos`. Siatka kolumn
+   (`.uklad-dwa`) i rzędy przycisków (`.przyciski`), także z klasą `.panel-sekcja`, nigdy nie dostają rytmu: druga
+   kolumna z marginesem stała niżej (30.10, „Moje konto”). Wykluczenie jest w `:where()`, żeby nie podnosić wagi
+   reguły (z `:not()` rytm wygrywał z regułami rzędów i bloków etapów). */
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *):where(:not(.uklad-dwa, .przyciski, .przyciski-male)) > * {
   margin-block: 0;
 }
 
-.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > * + * {
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *):where(:not(.uklad-dwa, .przyciski, .przyciski-male)) > * + * {
   margin-top: var(--o-4);
 }
 
-.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > :is(h1, h2, h3) + * {
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *):where(:not(.uklad-dwa, .przyciski, .przyciski-male)) > :is(h1, h2, h3) + * {
   margin-top: var(--o-3);
 }
 
-.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > .okruchy + * {
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *):where(:not(.uklad-dwa, .przyciski, .przyciski-male)) > .okruchy + * {
   margin-top: var(--o-2);
 }
 
-.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > * + .panel-sekcja {
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *):where(:not(.uklad-dwa, .przyciski, .przyciski-male)) > * + .panel-sekcja {
   margin-top: var(--section-gap);
 }
 
@@ -324,6 +327,11 @@ span.panel-logo-lokalu {
 
 .kreator-tematy {
   margin: 0 0 var(--o-3);
+}
+
+/* kolumny siatki zaczynają się równo u góry: odstęp między nimi daje `gap`, nie margines (także `* + .panel-sekcja`) */
+.panel .uklad-dwa > * {
+  margin-block: 0;
 }
 
 /* Przyciski obok siebie: na telefonie jeden pod drugim na całą szerokość, na komputerze w rzędzie, wszystkie tej
@@ -2638,4 +2646,20 @@ button.tag:hover:not(.wybrany) {
 
 .lista > li:has(> .lista-ikony) .lista-tytul {
   overflow-wrap: break-word;
+}
+
+/* korona twórcy na kafelku „Działam jako”: ta sama co w przycisku konta, wysokości logo (44 px) */
+.kafelek-roli .kafelek-roli-korona {
+  width: 44px;
+  height: 44px;
+}
+
+.kafelek-roli .kafelek-roli-korona svg {
+  width: 24px;
+  height: 24px;
+}
+
+.kafelek-roli.wybrana .kafelek-roli-korona {
+  background: var(--na-zlocie);
+  color: var(--zloto);
 }

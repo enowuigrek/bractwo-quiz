@@ -23,10 +23,8 @@ export function FormularzImienia({ nazwa }: { nazwa: string }) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(zmienImie, {});
   return (
     <form action={akcja} className="formularz">
-      <div>
-        <label htmlFor="nazwa">Imię</label>
-        <input id="nazwa" name="nazwa" className="pole" defaultValue={nazwa} required maxLength={60} />
-      </div>
+      {/* podpis daje nagłówek karty „Imię” (30.10: było dwa razy „Imię”) */}
+      <input id="nazwa" name="nazwa" className="pole" defaultValue={nazwa} required maxLength={60} aria-label="Imię" />
       <Komunikat stan={stan} />
       <button type="submit" className="przycisk" disabled={trwa}>
         Zapisz

@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- loga lokali z bucketu Supabase */
 import type { Metadata } from "next";
+import { IkonaKorona } from "@/components/ikony";
 import { kodAktywnejRoli, roleDoWyboru, wymagajAdmina } from "@/lib/admin";
 import { przelaczRole, wylogujAdmina } from "../../akcje";
 import { FormularzImienia, FormularzZmianyHasla } from "./formularz";
@@ -26,7 +27,11 @@ export default async function MojeKonto() {
                   className={`kafelek-roli${r.kod === aktywna ? " wybrana" : ""}`}
                   aria-pressed={r.kod === aktywna}
                 >
-                  {r.logo_url ? (
+                  {r.kod === "t" ? (
+                    <span className="panel-konto-korona kafelek-roli-korona">
+                      <IkonaKorona />
+                    </span>
+                  ) : r.logo_url ? (
                     <img src={r.logo_url} alt="" />
                   ) : (
                     <img src="/loga/bractwo.svg" alt="" className="logo-bractwo" />
