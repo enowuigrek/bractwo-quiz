@@ -36,6 +36,16 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - Kwadrat ma testowe hasło lokalu; Piwiarnia i PPR hasła ustawia Łukasz.
 - W bazie nieużywane dla zgodności: `przerobki_ai`, `sesje.widok_rankingu`, `gracze_sesji`, `pijane_pytania_quizu`.
 
+### Konta osobowe w panelu (ustalenia 30.10, do zrobienia)
+
+- **Konto = osoba**, logowanie e-mailem i hasłem na jednej stronie `/admin` (adresy `/admin/<lokal>` znikną). E-mail dowolny: bractwowy albo prywatny (nie każdy właściciel lokalu ma adres Bractwa).
+- **Role nadaje Łukasz.** Konto może mieć kilka ról: twórca (Łukasz: wszystko, narzędzia techniczne, Kwadrat, konta), Bractwo (wszystkie lokale, gry i quizy, quizy Bractwa, gry w każdym lokalu; bez narzędzi technicznych i bez Kwadratu), lokal X (tylko swój lokal). Rola Bractwo tylko dla tych, którzy jej potrzebują (na start Zbyszko); lokal może mieć kilku ludzi (Piwiarnia ma 5–6 właścicieli, część w Bractwie, część nie, do panelu wejdą pewnie najwyżej 3).
+- **Przełącznik „działam jako”** w menu, gdy konto ma kilka ról: gra i quiz dostają logo tej roli (lokal albo Bractwo), a autorem jest osoba. Twórca może wejść jako dowolny lokal, żeby zobaczyć widok lokalu (bez osobnego konta Kwadratu).
+- **Zakładanie kont:** Łukasz zakłada konto znanej osobie (e-mail i role) i dostaje jednorazowy link do ustawienia hasła, który wysyła sam (WhatsApp, mail). Ktoś może też założyć konto sam: wtedy czeka bez ról, aż Łukasz je nada. Reset hasła tym samym linkiem z panelu. Bez wysyłania maili przez aplikację na start.
+- **Kwadrat** dostaje znacznik lokalu testowego: widzi go tylko twórca (bez filtrów, list i „Najbliższych quizów” u innych).
+- **Autor:** przy grze, quizie i notatce zapisujemy osobę (i rolę, w której działała); w panelu widać „uruchomił Arzy (Piwiarnia)”.
+- Hasła lokali (`lokale_hasla`) i hasło główne z `.env` zostają do przejścia; potem wyłączamy.
+
 ### Strona główna dla graczy (30.10) ✅
 
 - `quiz.bractwopiwne.pl` jest teraz dla graczy (Łukasz): logo, pole na kod gry (`WpiszKod`, to samo co na `/ekran`, wielkie litery same) i „Najbliższe quizy”: gry w lokalach w poczekalni z godziną startu, od godziny przed startem wzwyż, bez gier bez lokalu i „tylko dla mnie” (logo lokalu, dzień i godzina, okazja albo rodzaj, miasto; odświeżane co minutę). Stopka: bractwopiwne.pl i autor, bez linków do panelu i ekranów (Łukasz: obsługa ma swoje adresy, graczy to myli). Karta z kolumną na komputerze mieści się w oknie razem ze stopką (wcześniej stopka była pod krawędzią).
