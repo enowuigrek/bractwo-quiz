@@ -49,23 +49,15 @@ export function UdostepnijPilota({ kod, token }: { kod: string; token: string })
       {gracz && pilot && adres && (
         <>
           <h3>Dla gracza</h3>
-          <p className="pomocniczy">
-            Skanuje kod albo wpisuje <strong>{kod}</strong> na stronie głównej.
-          </p>
           {qrGracza && <div className="qr" dangerouslySetInnerHTML={{ __html: qrGracza }} />}
           <LinkDoSkopiowania url={gracz} />
 
           <h3>Przekaż pilota</h3>
-          <p className="pomocniczy">
-            Prowadzący skanuje ten kod i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
-          </p>
+          <p className="pomocniczy">Nie pokazuj graczom: link prowadzi do pilota.</p>
           {qrPilota && <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />}
           <LinkDoSkopiowania url={pilot} />
 
           <h3>Ekran</h3>
-          <p className="pomocniczy">
-            Ekran lokalu przełącza się na grę sam. Inny telewizor: otwórz w jego przeglądarce.
-          </p>
           <LinkDoSkopiowania url={`${adres}/ekran/${kod}`} />
         </>
       )}

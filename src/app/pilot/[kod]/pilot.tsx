@@ -323,10 +323,11 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
             )}
             <strong>{stan.lokal?.nazwa ?? "Bez lokalu"}</strong>
           </div>
+          <div className="pilot-gra">
           {stan.okazja && <p className="nadtytul">{stan.okazja}</p>}
           {/* kod gry na wierzchu, przy tytule: do podania komuś do wpisania (26.10, w nagłówku jest teraz menu) */}
           <div className="pilot-tytul">
-            <h1 style={{ marginBottom: 4 }}>{stan.quiz?.tytul ?? "Quiz"}</h1>
+            <h1>{stan.quiz?.tytul ?? "Quiz"}</h1>
             <span className="gra-kod" aria-label={`Kod gry ${kod}`}>
               {kod}
             </span>
@@ -361,18 +362,13 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
               </button>
             </div>
           </div>
+          </div>
 
           {licznik}
 
-          {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy */}
-          {bladAkcji && (
-            <p className="blad" role="alert">
-              {bladAkcji}
-            </p>
-          )}
-          {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
-
-          <section style={{ marginTop: 18, display: "grid", gap: 12 }}>
+          {/* przyciski zawsze na górze: nie uciekają w dół, gdy rośnie lista odpowiedzi albo graczy; błędy pod nimi,
+              żeby ich nie przesuwały (30.10) */}
+          <section className="pilot-przyciski">
             {faza === "poczekalnia" && !stan.poczekalnia_otwarta && (
               <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja("otworz")}>
                 Otwórz poczekalnię (QR na TV)
@@ -579,6 +575,13 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
 
           </section>
 
+          {bladAkcji && (
+            <p className="blad" role="alert">
+              {bladAkcji}
+            </p>
+          )}
+          {bladSieci && <p className="pomocniczy">{bladSieci}, ponawiam…</p>}
+
           {/* odpadanie przed finałem ustalone na sztywno (26.10), progi zmienia się już tylko w bazie */}
           {boty && faza === "poczekalnia" && <BotyPilota stan={stan} kod={kod} token={token} onZmiana={ustawStan} />}
         </div>
@@ -605,17 +608,13 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
           )}
 
           {faza === "etap" && etap && (
-            <section className="karta" style={{ marginTop: 18 }}>
-              <p className="etykieta" style={{ marginTop: 0 }}>
+            <section className="karta">
+              <p className="etykieta">
                 Etap {etap.nr} z {etap.liczba} · {etap.liczba_pytan} pyt.
               </p>
-              <p
-                style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 6px", color: "var(--zloto)" }}
-              >
-                {etap.nazwa}
-              </p>
-              {etap.opis && <p style={{ margin: "0 0 10px" }}>{etap.opis}</p>}
-              <p className="pomocniczy" style={{ margin: 0 }}>
+              <p className="pilot-wyroznienie">{etap.nazwa}</p>
+              {etap.opis && <p>{etap.opis}</p>}
+              <p className="pomocniczy">
                 {[
                   bezPunktow(etap) ? null : `Punkty ${napisMnoznika(etap.mnoznik)}`,
                   etap.czas_s ? `${etap.czas_s} s ${etap.seria ? "na całą serię" : "na odpowiedź"}` : null,
@@ -625,14 +624,14 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
                   .join(" · ")}
               </p>
               {stan.finalisci && (
-                <p style={{ margin: "10px 0 0" }}>
+                <p>
                   {/* przy małej grze (do 3 grających) finalistami są wszyscy, więc nikt nie kibicuje (29.10) */}
                   <strong>Finał:</strong> {stan.finalisci.map((f) => f.nick).join(", ")}.
                   {stan.liczba_graczy > stan.finalisci.length ? " Reszta kibicuje." : ""}
                 </p>
               )}
               {!etap.finalowy && (etap.przechodzi !== null || etap.final_po_etapie) && (
-                <p style={{ margin: "10px 0 0" }}>
+                <p>
                   <strong>Odpadanie:</strong> po tym etapie gra dalej{" "}
                   {etap.final_po_etapie ? "trójka (finał)" : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
                 </p>
@@ -642,8 +641,8 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
 
           {/* seria: postęp każdego grającego na żywo (TV pokazuje go na drogach do szklanki) */}
           {faza === "seria" && etap && (
-            <section className="karta" style={{ marginTop: 18 }}>
-              <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+            <section className="karta">
+              <p className="etykieta etykieta-z-czasem">
                 <span>
                   {etap.nazwa} · {etap.finalowy ? `wyścig do ${META_FINALU} kroków` : `seria ${etap.liczba_pytan} pyt.`}
                 </span>
@@ -675,8 +674,8 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
 
           {/* pijany finał: wynik jest już ustalony i widzi go tylko prowadzący */}
           {faza === "pijany" && (
-            <section className="karta" style={{ marginTop: 18 }}>
-              <p className="etykieta" style={{ marginTop: 0, display: "flex", justifyContent: "space-between" }}>
+            <section className="karta">
+              <p className="etykieta etykieta-z-czasem">
                 <span>Pijany finał · nic się nie liczy</span>
                 <span className="gra-kod">
                   {stan.faza_do ? `${Math.max(0, Math.ceil((Date.parse(stan.faza_do) - teraz) / 1000))} s` : ""}
@@ -702,16 +701,16 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
                   Pytanie {z.lp}/{liczba} z rozwiązaniem
                 </summary>
                 {etap && (
-                  <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+                  <p className="pomocniczy">
                     {etap.nazwa}
                     {bezPunktow(etap) ? "" : ` · punkty ${napisMnoznika(etap.mnoznik)}`}
                     {stan.finalisci ? " · finał trójki" : ""}
                   </p>
                 )}
-                <p style={{ fontWeight: "var(--w-black)", margin: "0 0 12px" }}>{z.tresc}</p>
+                <p className="pilot-tresc">{z.tresc}</p>
                 <RozwiazaniePilota z={z} poprawna={stan.poprawna} poprawnaDo={stan.poprawna_do} />
                 {stan.wszystkie_podpowiedzi.length > 0 && (
-                  <ol className="pilot-odpowiedzi" style={{ marginTop: 10 }}>
+                  <ol className="pilot-odpowiedzi">
                     {stan.wszystkie_podpowiedzi.map((p, i) => (
                       <li key={i} className={i < z.podpowiedzi.length ? "poprawna" : undefined}>
                         <span className="pilot-litera">P{i + 1}</span>
@@ -720,7 +719,7 @@ export function Pilot({ kod, tokenZAdresu, boty }: Props) {
                     ))}
                   </ol>
                 )}
-                <p style={{ margin: "14px 0 0" }}>
+                <p>
                   Odpowiedziało{" "}
                   <strong className="gra-kod">
                     {stan.liczba_odpowiedzi}/{grajacy}
@@ -799,7 +798,7 @@ function RozwiazaniePilota({
   if (z.typ === "szacowanie" && typeof poprawna === "number") {
     return (
       <>
-        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+        <p className="pomocniczy">
           {NAZWY_TYPOW[z.typ]} · zakres {liczbaZJednostka(z.dane.min ?? 0)}–{liczbaZJednostka(z.dane.max ?? 0)}
         </p>
         <ol className="pilot-odpowiedzi">
@@ -818,7 +817,7 @@ function RozwiazaniePilota({
   if (z.typ === "kolejnosc" && p) {
     return (
       <>
-        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+        <p className="pomocniczy">
           {NAZWY_TYPOW[z.typ]} · właściwa:
         </p>
         <ol className="pilot-odpowiedzi">
@@ -835,7 +834,7 @@ function RozwiazaniePilota({
   if (z.typ === "pary" && p) {
     return (
       <>
-        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+        <p className="pomocniczy">
           {NAZWY_TYPOW[z.typ]}:
         </p>
         <ol className="pilot-odpowiedzi">
@@ -852,7 +851,7 @@ function RozwiazaniePilota({
   return (
     <>
       {z.typ !== "wybor" && (
-        <p className="pomocniczy" style={{ margin: "0 0 6px" }}>
+        <p className="pomocniczy">
           {NAZWY_TYPOW[z.typ]}
         </p>
       )}
@@ -883,7 +882,7 @@ function PodiumPilota({ gracze }: { gracze: GraczPilota[] }) {
   if (pierwsi.length === 0) return null;
   return (
     <>
-      <p style={{ fontWeight: "var(--w-black)", fontSize: "var(--fs-h3)", margin: "0 0 10px", color: "var(--zloto)" }}>
+      <p className="pilot-wyroznienie">
         {pierwsi.length > 1 ? "Wygrywają" : "Wygrywa"}: {pierwsi.join(", ")}
       </p>
       <ol className="pilot-odpowiedzi">

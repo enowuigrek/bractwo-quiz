@@ -97,9 +97,7 @@ export function GraczePilota({ kod, token, gracze, pytanie, gotowosc = false, ko
 
   if (gracze.length === 0) {
     return (
-      <p className="pomocniczy" style={{ margin: 0 }}>
-        Nikt jeszcze nie dołączył. Gracze skanują QR z telewizora.
-      </p>
+      <p className="pomocniczy">Nikt jeszcze nie dołączył.</p>
     );
   }
 

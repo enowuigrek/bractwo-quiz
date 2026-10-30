@@ -61,15 +61,15 @@ export function BotyPilota({
   }
 
   return (
-    <section className="karta" style={{ marginTop: 18 }}>
-      <p className="etykieta" style={{ marginTop: 0 }}>
+    <section className="karta">
+      <p className="etykieta">
         Boty do testów{stan.boty ? ` · ${stan.boty}` : ""}
       </p>
       <button type="button" className="przycisk" disabled={wysylam} onClick={() => void dodaj(4)}>
         {wysylam ? "Dodaję…" : "Dodaj 4 boty"}
       </button>
       {blad && (
-        <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>
+        <p className="blad" role="alert">
           {blad}
         </p>
       )}

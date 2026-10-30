@@ -123,6 +123,8 @@ Kafelki odpowiedzi w grze (A–F) to nie przyciski w tym sensie: mają `--r-pole
 
 **Lokal na górze pilota (27.10).** Pierwsza rzecz w pilocie to ramka lokalu gry (`.pilot-lokal`): logo 44 px i nazwa (1,35 rem, pogrubiona) w złotym obrysie 2 px; gra bez lokalu ma „Bez lokalu” w obrysie `--kamien3`. Stoi tak samo we wszystkich fazach, więc nie przesuwa przycisków, a przy dwóch grach naraz od razu widać, którą się prowadzi.
 
+**Rytm pilota (30.10).** Jak w panelu: odstęp ustawia rodzic (`globals.css`, „Rytm pilota”). W kolumnie sterowania i podglądu 16 px między blokami (lokal, nazwa gry, ramka stanu, przyciski, karty), między przyciskami 12 px (`.pilot-przyciski`), w karcie 12 px, podtytuł w karcie 16 px; nadtytuł, tytuł i pasek z fazą to jeden ciasny blok (`.pilot-gra`, 4 px). Komunikaty błędów stoją pod przyciskami, nie nad nimi. Bez `style={{ margin… }}` i bez zdań objaśniających w kartach. Pomiar 30.10 (390 i 1280 px, poczekalnia, plansza etapu, wynik, odpowiedzi, pijany finał, podium): przyciski zawsze 458 px od góry na telefonie, ramka stanu 101 px, odstępy tylko ze skali.
+
 **Zwijane karty pilota (27.10).** Wszystko do wglądu pod przyciskami (nagrody, gracze, pytanie z rozwiązaniem, dołączanie) to `<details className="karta karta-zwijana">` z `<summary className="etykieta">`: etykieta z lewej, złota strzałka z prawej, 18 px od karty wyżej, 12 px pod nagłówkiem po rozwinięciu. Nowa karta dostaje tę klasę, a nie własne reguły. Kod QR w karcie ma szerokość linku pod nim (`.pilot-udostepnij .qr`).
 
 **Boty do testów (pilot).** Karta „Boty do testów” tylko dla głównego admina, w poczekalni (także zamkniętej). Lokale jej nie widzą.

@@ -136,7 +136,7 @@ export function NagrodyPilota({
         </>
       )}
       {komunikat && (
-        <p className={komunikat.ok ? "sukces" : "blad"} role={komunikat.ok ? "status" : "alert"} style={{ margin: 0 }}>
+        <p className={komunikat.ok ? "sukces" : "blad"} role={komunikat.ok ? "status" : "alert"}>
           {komunikat.tekst}
         </p>
       )}

@@ -1445,8 +1445,73 @@ html:has(.kolumna) {
 /* zakończenie gry i powrót do panelu pod wszystkim (pilot.tsx) */
 .pilot-dol {
   display: grid;
-  gap: 12px;
-  margin-top: 32px;
+  gap: var(--o-3);
+  margin-top: var(--section-gap);
+}
+
+/* Rytm pilota (30.10, jak w panelu): odstęp ustawia rodzic. Kolumna sterowania i podglądu: 16 px między blokami
+   (lokal, nazwa gry, ramka stanu, przyciski, karty); w karcie 12 px, a podtytuł w karcie (`h3`) 16 px od tego, co nad
+   nim. Elementy pilota nie mają własnych marginesów ani `style={{ margin… }}`. Komunikaty błędów stoją pod przyciskami,
+   bo nad nimi nic nie może się pojawiać i znikać. */
+.pilot :is(.pilot-sterowanie, .pilot-podglad, .karta) > * {
+  margin-block: 0;
+}
+
+.pilot :is(.pilot-sterowanie, .pilot-podglad) > * + * {
+  margin-top: var(--o-4);
+}
+
+.pilot .karta > * + * {
+  margin-top: var(--o-3);
+}
+
+.pilot .karta > * + h3 {
+  margin-top: var(--o-4);
+}
+
+/* nadtytuł (okazja), tytuł z kodem i pasek z fazą i przełącznikami: jeden blok, ciasno */
+.pilot-gra {
+  display: grid;
+  gap: var(--o-1);
+}
+
+.pilot .pilot-gra > *,
+.pilot .pilot-gra h1 {
+  margin: 0;
+}
+
+/* na telefonie sterowanie i podgląd jedno pod drugim, z tym samym odstępem co bloki w kolumnie */
+.pilot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--o-4);
+}
+
+.pilot-przyciski {
+  display: grid;
+  gap: var(--o-3);
+}
+
+.pilot-przyciski > * {
+  margin: 0;
+}
+
+/* nazwa etapu w karcie, zwycięzca w pijanym finale */
+.pilot-wyroznienie {
+  color: var(--zloto);
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+}
+
+.pilot-tresc {
+  font-weight: var(--w-black);
+}
+
+/* etykieta karty z czasem po prawej (seria, pijany finał) */
+.etykieta-z-czasem {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--o-3);
 }
 
 .pilot-gracze {
