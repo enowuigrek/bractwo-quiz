@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ZnaczekOsoby } from "../_komponenty/lokale-autorzy";
 import { NAZWY_FAZ, type Faza } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { IkonaKosz, IkonaNotatka } from "@/components/ikony";
@@ -54,7 +55,11 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
           <GraBractwa key={g.id} g={g} />
         ) : (
           <li key={g.id}>
-            <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
+            {/* kolumna ikon (30.10): lokal gry i osoba, która ją uruchomiła */}
+            <span className="lista-ikony">
+              <Miniatura src={g.lokale?.logo_url ?? null} alt="" />
+              <ZnaczekOsoby osoba={g.konta} />
+            </span>
             <div className="lista-glowna">
               <div className="lista-tytul">
                 <Link href={adresGry(g)}>
@@ -69,7 +74,7 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
                 )}
               </div>
               <div className="lista-opis">
-                {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(kiedyGra(g))), g.konta?.nazwa]
+                {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(kiedyGra(g)))]
                   .filter(Boolean)
                   .join(" · ")}
               </div>
@@ -113,7 +118,10 @@ function GraBractwa({ g }: { g: GraNaLiscie }) {
   const start = g.planowany_start ? godzina.format(new Date(g.planowany_start)) : null;
   return (
     <li className="gra-bractwa">
-      <Miniatura src="/loga/bractwo-biale.svg" alt="" />
+      <span className="lista-ikony">
+        <Miniatura src="/loga/bractwo-biale.svg" alt="" />
+        <ZnaczekOsoby osoba={g.konta} />
+      </span>
       <div className="lista-glowna">
         <div className="lista-tytul">
           {g.faza === "koniec" ? (

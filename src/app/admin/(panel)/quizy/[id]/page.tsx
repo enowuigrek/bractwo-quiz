@@ -20,8 +20,9 @@ import { NaglowekEtapu, NowyEtap } from "./etapy";
 import { WklejPytania } from "./wklej";
 import { UdostepnijLokalom } from "./udostepnij-lokalom";
 import { FORMULARZ_QUIZU, NaglowekQuizu } from "./naglowek-quizu";
-import { NAZWY_TYPOW, opisRozwiazania, type TypZadania } from "@/lib/zadania";
+import type { TypZadania } from "@/lib/zadania";
 import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
+import { PytanieNaLiscie } from "./rozwiazanie";
 import { BlokPijany } from "./blok-pijany";
 import type { PijanePytanie } from "@/lib/pijany";
 
@@ -92,9 +93,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
                       {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
                       <div className="lista-glowna">
                         <div className="lista-tytul">{z.tresc}</div>
-                        <div className="lista-opis">
-                          {NAZWY_TYPOW[z.typ]} · {opisRozwiazania(z)}
-                        </div>
+                        <PytanieNaLiscie z={z} />
                       </div>
                     </li>
                   ))}
@@ -138,11 +137,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
             {z.grafika_url && <Miniatura src={z.grafika_url} alt="" />}
             <div className="lista-glowna">
               <div className="lista-tytul">{z.tresc}</div>
-              <div className="lista-opis">
-                <span className={`rodzaj-pytania ${z.typ}`}>{NAZWY_TYPOW[z.typ]}</span> {opisRozwiazania(z)}
-                {z.dane.podpowiedzi?.length ? ` · podpowiedzi: ${z.dane.podpowiedzi.length}` : ""}
-                {z.dane.odslaniaj ? " · odsłaniana grafika" : ""}
-              </div>
+              <PytanieNaLiscie z={z} />
             </div>
           </>
         }

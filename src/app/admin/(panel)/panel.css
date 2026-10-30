@@ -1490,12 +1490,6 @@ a.przycisk {
   color: var(--zloto);
 }
 
-.zadanie-rozwijane .lista-opis .rodzaj-pytania {
-  display: inline-block;
-  margin-right: 4px;
-  padding: 0 8px;
-}
-
 .zadanie-edytor {
   margin: 0 0 16px;
   padding: var(--card-pad, 20px);
@@ -1524,37 +1518,55 @@ a.przycisk {
 }
 
 /* Rodzaj pytania w edytorze: kafelki w kolorach rodzajów, wybrany wypełniony swoim kolorem (DESIGN-SYSTEM.md) */
-.rodzaje-pytan {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+/* Wybór rodzaju pytania (edytor) i rodzajów w prompcie (wklej.tsx), 30.10: te same pigułki co na liście pytań
+   (`.rodzaj-pytania`: kolorowy napis, obrys i lekkie tło), równej szerokości, dwie w wierszu na telefonie, więcej na
+   komputerze. Wybrany rodzaj wypełniony swoim kolorem. Kolor i grubość mocniej niż reguły etykiet formularza. */
+.rodzaje-pytan,
+.wybor-rodzajow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--o-2);
 }
 
-.rodzaje-pytan .rodzaj-pytania {
+@media (min-width: 960px) {
+  .rodzaje-pytan,
+  .wybor-rodzajow {
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  }
+}
+
+.formularz :is(.rodzaje-pytan, .wybor-rodzajow) .rodzaj-pytania,
+:is(.rodzaje-pytan, .wybor-rodzajow) .rodzaj-pytania {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  min-height: 44px;
+  justify-content: center;
+  min-height: 36px;
   margin: 0;
-  padding: 8px 18px;
-  border-radius: var(--r-btn-sm);
-  font-size: var(--fs-small);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  color: var(--kolor-rodzaju);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+  text-align: center;
+  white-space: nowrap;
   cursor: pointer;
 }
 
+.formularz .rodzaje-pytan .rodzaj-pytania.wybrana,
 .rodzaje-pytan .rodzaj-pytania.wybrana {
   background: var(--kolor-rodzaju);
   border-color: var(--kolor-rodzaju);
   color: var(--na-zlocie);
 }
 
-.rodzaje-pytan input {
+:is(.rodzaje-pytan, .wybor-rodzajow) input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.rodzaje-pytan .rodzaj-pytania:has(input:focus-visible) {
+:is(.rodzaje-pytan, .wybor-rodzajow) .rodzaj-pytania:has(input:focus-visible) {
   outline: 3px solid var(--zloto);
   outline-offset: 2px;
 }
@@ -1565,43 +1577,12 @@ a.przycisk {
   gap: 12px;
 }
 
-/* Rodzaje pytań w prompcie (wklej.tsx): równe kafelki po dwa w wierszu w kolorach rodzajów (.rodzaj-pytania),
-   wyłączony szary */
-.wybor-rodzajow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.wybor-rodzajow .rodzaj-pytania {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  margin: 0;
-  padding: 8px 12px;
-  border-radius: var(--r-btn-sm);
-  font-size: var(--fs-small);
-  text-align: center;
-  cursor: pointer;
-}
-
+/* rodzaj wyłączony w prompcie: szary */
+.formularz .wybor-rodzajow .rodzaj-pytania.wylaczony,
 .wybor-rodzajow .rodzaj-pytania.wylaczony {
   color: var(--szary);
   background: transparent;
   border-color: var(--kamien2);
-}
-
-.wybor-rodzajow input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.wybor-rodzajow .rodzaj-pytania:has(input:focus-visible) {
-  outline: 3px solid var(--zloto);
-  outline-offset: 2px;
 }
 
 /* Wklejanie pytań do klasycznego quizu (quizy/[id]/wklej.tsx): tekst w krój o stałej szerokości, bo liczą się
@@ -2535,4 +2516,125 @@ button.tag:hover:not(.wybrany) {
   width: auto;
   max-width: 100px;
   object-fit: contain;
+}
+
+/* Pytanie na liście quizu (quizy/[id]/rozwiazanie.tsx, 30.10): pod treścią rodzaj, pod nim odpowiedzi jako kafelki
+   z literą; poprawne zielone z ✓ zamiast napisu „Poprawna: …” */
+.pytanie-skrot {
+  display: grid;
+  gap: var(--o-2);
+  margin-top: var(--o-2);
+}
+
+.pytanie-skrot-rodzaj {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--o-2);
+  margin: 0;
+}
+
+.odpowiedzi-skrot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--o-1) var(--o-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.odpowiedzi-skrot li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px 10px;
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-regular);
+}
+
+.odpowiedzi-skrot li b {
+  color: var(--piana);
+}
+
+.odpowiedzi-skrot li.dobra {
+  border-color: var(--chmiel);
+  color: var(--piana);
+}
+
+.odpowiedzi-skrot li.dobra b,
+.odpowiedzi-skrot li.dobra span:last-child {
+  color: var(--chmiel);
+}
+
+.pytanie-skrot-tekst {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Kolumna ikon w wierszu listy quizów i rozgrywek (30.10): kto (logo lokalu albo Bractwa) i osoba (kółko
+   z inicjałem, imię w podpowiedzi). Stała szerokość, więc tytuły zaczynają się w jednej linii. */
+.lista-ikony {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--o-2);
+}
+
+.lista-ikony :is(.znaczek-lokalu, .miniatura, .miniatura-pusta) {
+  width: 44px;
+  height: 36px;
+  max-width: none;
+  margin: 0;
+  object-fit: contain;
+}
+
+.lista-ikony .znaczek-lokalu-nazwa {
+  width: 36px;
+  height: 36px;
+  margin: 0 4px;
+}
+
+.znaczek-osoby {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-round);
+  background: var(--kamien2);
+  color: var(--piana);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-black);
+  cursor: default;
+}
+
+.znaczek-osoby.pusty {
+  background: none;
+}
+
+/* Wiersz z kolumną ikon na telefonie (lista quizów, 30.10): przyciski pod tytułem, z prawej, jak w rozgrywkach,
+   żeby tytuł miał całą szerokość i nie łamał się w środku słowa */
+@media (max-width: 559px) {
+  .lista > li:has(> .lista-ikony) {
+    flex-wrap: wrap;
+  }
+
+  .lista > li:has(> .lista-ikony) .lista-glowna {
+    flex: 1 1 0;
+  }
+
+  .lista > li:has(> .lista-ikony) .lista-akcje {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.lista > li:has(> .lista-ikony) .lista-tytul {
+  overflow-wrap: break-word;
 }

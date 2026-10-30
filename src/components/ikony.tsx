@@ -40,7 +40,17 @@ export function IkonaNotatka() {
   );
 }
 
-/** Podgląd bez zmian (quiz Bractwa w panelu lokalu). */
+/** Przekreślone oko: quiz widzi tylko Bractwo, lokale nie (przełącznik widoczności na liście quizów, 30.10). */
+export function IkonaOkoPrzekreslone() {
+  return (
+    <svg {...wspolne}>
+      <path d="M2 12s3.6-7 10-7c2 0 3.7.7 5.1 1.6M22 12s-3.6 7-10 7c-2 0-3.7-.7-5.1-1.6" />
+      <path d="M9.9 14.1a3 3 0 0 1 4.2-4.2M3 21L21 3" />
+    </svg>
+  );
+}
+
+/** Oko: quiz widoczny też dla lokali (przełącznik widoczności na liście quizów, 30.10). */
 export function IkonaOko() {
   return (
     <svg {...wspolne}>

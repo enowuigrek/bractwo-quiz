@@ -26,6 +26,19 @@ export function wybranyLokal(
   return lokale.some((l) => l.id === wartosc && (!miasto || l.miasto === miasto)) ? wartosc : null;
 }
 
+/**
+ * Osoba, która założyła quiz albo uruchomiła grę (konta osobowe, 30.10): kółko z inicjałem, imię w podpowiedzi.
+ * Bez autora (starsze rzeczy) puste miejsce tej samej szerokości, żeby kolumna ikon się nie rozjeżdżała.
+ */
+export function ZnaczekOsoby({ osoba }: { osoba: { nazwa: string } | null }) {
+  if (!osoba) return <span className="znaczek-osoby pusty" aria-hidden />;
+  return (
+    <span className="znaczek-osoby" title={osoba.nazwa} aria-label={osoba.nazwa}>
+      {osoba.nazwa.slice(0, 1).toUpperCase()}
+    </span>
+  );
+}
+
 /** Znaczek autora w wierszu listy: logo lokalu (albo Bractwa), z nazwą w podpowiedzi. */
 export function ZnaczekLokalu({ lokal }: { lokal: LokalAutor | null }) {
   if (!lokal) {

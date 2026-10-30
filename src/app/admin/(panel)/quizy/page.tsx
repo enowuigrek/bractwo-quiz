@@ -3,17 +3,18 @@ import Link from "next/link";
 import { lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { IkonaEdytuj, IkonaKlodka, IkonaKosz, IkonaOko } from "@/components/ikony";
+import { IkonaEdytuj, IkonaKosz, IkonaOko, IkonaOkoPrzekreslone } from "@/components/ikony";
 import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty/filtry-listy";
 import {
   BRACTWO,
   wybraneMiasto,
   wybranyLokal,
   ZnaczekLokalu,
+  ZnaczekOsoby,
   type LokalAutor,
 } from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
-import { usunQuiz } from "./akcje";
+import { usunQuiz, ustawWidocznoscQuizu } from "./akcje";
 import { wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
@@ -26,6 +27,7 @@ type QuizNaLiscie = {
   tagi: string[];
   lokal_id: string | null;
   lokale: LokalAutor | null;
+  konta: { nazwa: string } | null;
   zadania: { count: number }[];
   etapy: { count: number }[];
 };
@@ -53,7 +55,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
     db
       .from("quizy")
       .select(
-        "id, tytul, opis, tylko_glowny, tagi, lokal_id, lokale(id, nazwa, logo_url), zadania(count), etapy(count)",
+        "id, tytul, opis, tylko_glowny, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(nazwa), zadania(count), etapy(count)",
       ),
     rola,
   ).is("usunieto", null);
@@ -123,32 +125,37 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         <ul className="lista">
           {data.map((q) => (
             <li key={q.id}>
+              {/* kolumna ikon (30.10): kto założył (lokal albo Bractwo) i osoba; tytuł ma resztę wiersza */}
+              <span className="lista-ikony">
+                <ZnaczekLokalu lokal={q.lokale} />
+                <ZnaczekOsoby osoba={q.konta} />
+              </span>
               <div className="lista-glowna">
+                {/* na liście same tytuły (26.10): liczba pytań, tematy i opis dopiero po wejściu w quiz */}
                 <div className="lista-tytul">
-                  {/* autor: u głównego zawsze, u lokalu tylko przy quizach Bractwa */}
-                  {(glowny || tylkoPodglad(q)) && <ZnaczekLokalu lokal={q.lokale} />}
                   <Link href={`/admin/quizy/${q.id}`}>{q.tytul}</Link>
-                  {/* na liście same tytuły (26.10): liczba pytań, tematy i opis dopiero po wejściu w quiz */}
-                  {glowny && q.tylko_glowny && (
-                    <span className="lista-klodka" title="Tylko Bractwo" aria-label="Tylko Bractwo">
-                      {" "}
-                      <IkonaKlodka />
-                    </span>
-                  )}
                 </div>
               </div>
               <div className="lista-akcje">
                 {tylkoPodglad(q) ? (
-                  <Link
-                    href={`/admin/quizy/${q.id}`}
-                    className="przycisk-maly ikona"
-                    aria-label={`Podgląd quizu ${q.tytul}`}
-                    data-podpis="Podgląd"
-                  >
-                    <IkonaOko />
+                  <Link href={`/admin/quizy/${q.id}`} className="przycisk-maly">
+                    Otwórz
                   </Link>
                 ) : (
                   <>
+                    {/* widoczność quizu Bractwa dla lokali: oko (widzą) albo przekreślone oko (tylko Bractwo) */}
+                    {glowny && !q.lokal_id && (
+                      <form action={ustawWidocznoscQuizu.bind(null, q.id, !q.tylko_glowny)}>
+                        <button
+                          type="submit"
+                          className="przycisk-maly ikona"
+                          aria-label={q.tylko_glowny ? "Tylko Bractwo: pokaż lokalom" : "Widzą lokale: ukryj przed lokalami"}
+                          data-podpis={q.tylko_glowny ? "Tylko Bractwo" : "Widzą lokale"}
+                        >
+                          {q.tylko_glowny ? <IkonaOkoPrzekreslone /> : <IkonaOko />}
+                        </button>
+                      </form>
+                    )}
                     <Link
                       href={`/admin/quizy/${q.id}`}
                       className="przycisk-maly ikona"

@@ -4,7 +4,7 @@ import { widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { NAZWY_RODZAJOW } from "@/lib/tagi";
-import { IkonaKlodka, IkonaKosz } from "@/components/ikony";
+import { IkonaKosz, IkonaOkoPrzekreslone } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przywrocQuiz, usunQuizNaZawsze } from "../akcje";
 import { liczbaPytan } from "../limity";
@@ -63,7 +63,7 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
                 <div className="lista-opis">
                   {widziWszystko(rola) && q.tylko_glowny && (
                     <>
-                      <IkonaKlodka /> tylko Bractwo ·{" "}
+                      <IkonaOkoPrzekreslone /> tylko Bractwo ·{" "}
                     </>
                   )}
                   {NAZWY_RODZAJOW[(q.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny"]} ·{" "}
