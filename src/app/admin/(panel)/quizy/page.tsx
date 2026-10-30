@@ -134,8 +134,9 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
               </span>
               <div className="lista-glowna">
                 {/* na liście same tytuły (26.10): liczba pytań, tematy i opis dopiero po wejściu w quiz */}
+                {/* tytuł prowadzi do statystyk quizu, ołówek do edycji (30.10) */}
                 <div className="lista-tytul">
-                  <Link href={`/admin/quizy/${q.id}`}>{q.tytul}</Link>
+                  <Link href={`/admin/quizy/${q.id}/statystyki`}>{q.tytul}</Link>
                 </div>
               </div>
               <div className="lista-akcje">

@@ -2480,3 +2480,89 @@ img.znaczek-osoby {
 .lista-ikony > .podpis-ikony:first-child:hover::after {
   transform: translate(0, 0);
 }
+
+/* Statystyki quizu (quizy/[id]/statystyki, 30.10): trzy równe karty wyróżnień, a przy każdym pytaniu pasek trafności
+   w kolorze trudności (zielony łatwe od 70%, złoty średnie, czerwony trudne poniżej 40%) */
+.wyroznienia {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--o-3);
+}
+
+@media (min-width: 960px) {
+  .wyroznienia {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wyroznienie-pytania .etykieta {
+  margin: 0;
+}
+
+.wyroznienie-wartosc {
+  color: var(--zloto);
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+}
+
+.statystyki-nr {
+  align-self: flex-start;
+  min-width: 1.6em;
+}
+
+.trafnosc {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--o-2);
+  --kolor-trafnosci: var(--zloto);
+}
+
+.trafnosc.latwe {
+  --kolor-trafnosci: var(--chmiel);
+}
+
+.trafnosc.trudne {
+  --kolor-trafnosci: var(--czerwien);
+}
+
+.trafnosc-pasek {
+  width: 120px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--kamien2);
+  overflow: hidden;
+}
+
+.trafnosc-pasek > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--kolor-trafnosci);
+}
+
+.trafnosc strong {
+  min-width: 3em;
+  text-align: right;
+  color: var(--kolor-trafnosci);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 559px) {
+  .statystyki-pytan > li {
+    flex-wrap: wrap;
+  }
+
+  .statystyki-pytan .lista-glowna {
+    flex: 1 1 0;
+  }
+
+  .statystyki-pytan .trafnosc {
+    width: 100%;
+    padding-left: calc(1.6em + 12px);
+  }
+
+  .statystyki-pytan .trafnosc-pasek {
+    flex: 1;
+  }
+}
