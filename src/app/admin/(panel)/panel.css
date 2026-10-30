@@ -195,13 +195,6 @@ span.panel-logo-lokalu {
   gap: var(--section-gap);
 }
 
-/* kolumna kart w układzie dwóch kolumn (strona lokalu): karty jedna pod drugą, niezależnie od drugiej kolumny */
-.stos-kart {
-  display: grid;
-  gap: var(--section-gap);
-  min-width: 0;
-}
-
 @media (min-width: 960px) {
   .panel {
     max-width: 1120px;
@@ -370,7 +363,6 @@ h2 {
   flex-shrink: 0;
 }
 
-
 /* Okrągły przycisk z samą ikoną (np. kosz) */
 .przycisk-maly.ikona {
   width: 40px;
@@ -461,7 +453,6 @@ a.przycisk {
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
 }
 
-
 .podpowiedz {
   color: var(--szary);
   font-size: var(--fs-xs);
@@ -539,7 +530,6 @@ a.przycisk {
   font-size: var(--fs-body);
 }
 
-
 /* lokale: wszystkie kafelki tej samej wysokości, logo na środku */
 .kafelki-lokali {
   grid-auto-rows: 1fr;
@@ -595,13 +585,11 @@ a.przycisk {
   margin-top: 12px;
 }
 
-
 .krok {
   display: flex;
   gap: 10px;
   align-items: baseline;
 }
-
 
 /* Uruchomiona gra */
 .akcje-gry {
@@ -972,7 +960,6 @@ a.przycisk {
   }
 }
 
-
 /* Pasek nawigacji: na telefonie przewija się w poziomie, więc dajemy zapas na obwódkę aktywnej ⚙.
    Na komputerze nic nie przycinamy (dymek „Ustawienia” i obwódka mieszczą się w całości). */
 .panel-nawigacja {
@@ -1200,61 +1187,6 @@ a.przycisk {
   gap: 12px;
 }
 
-/* Szablony nowego quizu i plan pytań w etapach */
-.szablony-quizu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
-}
-
-.formularz label.szablon-quizu {
-  position: relative;
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: var(--r-card);
-  border: 2px solid var(--kamien2);
-  background: var(--kamien);
-  cursor: pointer;
-}
-
-.szablon-quizu input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.szablon-quizu strong {
-  color: var(--piana);
-  font-size: var(--fs-body);
-}
-
-.szablon-quizu span {
-  color: var(--szary);
-  font-weight: var(--w-regular);
-}
-
-/* wybrana karta: wypełniona złotem jak wybrana opcja czasu (bez poświaty, która ledwo odróżniała wybór) */
-.formularz label.szablon-quizu.wybrany {
-  border-color: var(--zloto);
-  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
-}
-
-.szablon-quizu.wybrany strong,
-.szablon-quizu.wybrany span {
-  color: var(--na-zlocie);
-}
-
-.szablon-quizu:has(input:focus-visible) {
-  outline: 3px solid var(--zloto);
-  outline-offset: 3px;
-}
-
-.etapy-szablonu-akcje {
-  align-items: center;
-}
-
 .etapy-szablonu-liczba {
   min-width: 2ch;
   white-space: nowrap;
@@ -1262,16 +1194,6 @@ a.przycisk {
   font-weight: var(--w-black);
   color: var(--zloto);
   font-variant-numeric: tabular-nums;
-}
-
-.etapy-szablonu-dodaj {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.etapy-szablonu-dodaj .pole {
-  max-width: 260px;
 }
 
 .pole.pole-waskie {
@@ -1451,7 +1373,6 @@ a.przycisk {
   gap: 12px;
 }
 
-
 /* Rodzaje pytań w prompcie (wklej.tsx): równe kafelki po dwa w wierszu w kolorach rodzajów (.rodzaj-pytania),
    wyłączony szary */
 .wybor-rodzajow {
@@ -1544,10 +1465,6 @@ a.przycisk {
   flex-wrap: wrap;
   gap: 6px;
   margin: 6px 0 0;
-}
-
-.quizy-tagi {
-  margin-bottom: 16px;
 }
 
 .tag {
@@ -1752,29 +1669,6 @@ button.tag:hover:not(.wybrany) {
     display: grid;
     width: 100%;
   }
-}
-
-.quizy-pasek {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  margin-bottom: 14px;
-}
-
-.quizy-pasek .quizy-rodzaje {
-  margin-bottom: 0;
-}
-
-.quizy-zasady {
-  color: var(--zloto);
-  font-weight: var(--w-semibold);
-  text-decoration: none;
-}
-
-.quizy-zasady:hover {
-  text-decoration: underline;
 }
 
 .zasady-wstep {

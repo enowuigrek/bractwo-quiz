@@ -3,9 +3,10 @@ import Link from "next/link";
 import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
+import { FiltrTematow, ZakladkiRodzaju } from "../_komponenty/filtry-listy";
 import { FiltrLokali, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
-import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
 
@@ -49,35 +50,10 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
           ▶ Uruchom quiz
         </Link>
       </div>
-      <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
-        {(["wyscig", "klasyczny"] as const).map((r) => (
-          <Link
-            key={r}
-            href={adres(r)}
-            className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
-            aria-current={rodzaj === r ? "page" : undefined}
-          >
-            {NAZWY_RODZAJOW[r]}
-          </Link>
-        ))}
-      </nav>
+      <ZakladkiRodzaju rodzaj={rodzaj} adres={(r) => adres(r)} />
       <div className="filtry">
         <FiltrLokali lokale={lokale ?? []} wybrany={lokal} adres={(l) => adres(rodzaj, wybranyTag, l)} />
-        {tagi.length > 0 && (
-          <div className="filtr-wiersz">
-            <span className="filtr-etykieta">Temat</span>
-            <p className="tagi" aria-label="Temat">
-              <Link href={adres(rodzaj, null)} className={`tag${wybranyTag ? "" : " wybrany"}`}>
-                wszystkie
-              </Link>
-              {tagi.map((t) => (
-                <Link key={t} href={adres(rodzaj, t)} className={`tag${wybranyTag === t ? " wybrany" : ""}`}>
-                  {t}
-                </Link>
-              ))}
-            </p>
-          </div>
-        )}
+        <FiltrTematow tagi={tagi} wybrany={wybranyTag} adres={(t) => adres(rodzaj, t)} />
       </div>
       {error && <p className="blad">Nie udało się pobrać rozgrywek: {error.message}</p>}
 

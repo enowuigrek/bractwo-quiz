@@ -727,7 +727,6 @@ html:has(.kolumna) {
   transform: translate(0, 0);
 }
 
-
 /* Werble po finale (components/werble.tsx): ekran gaśnie jak wyłączany telewizor, potem wolno wchodzi napis.
    Na telefonie zasłania całą stronę, na TV całą scenę (.duzy). */
 .werble {
@@ -1264,21 +1263,10 @@ html:has(.kolumna) {
   }
 }
 
-/* Nowe typy pytań na telefonie: kilka odpowiedzi, kolejność, pary */
-.gra-podpowiedz {
-  margin: 0 0 12px;
-  font-size: var(--fs-small);
-  font-weight: var(--w-black);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--zloto);
-}
-
 .odp-zatwierdz {
   width: 100%;
   margin-top: 10px;
 }
-
 
 .odp-litera.odp-numer {
   background: var(--zloto);
@@ -1681,20 +1669,6 @@ html:has(.kolumna) {
   text-decoration: none;
 }
 
-/* Pilot: zapowiedź innego rodzaju następnego pytania */
-.pilot-zapowiedz {
-  margin: 18px 0 0;
-  padding: 12px 14px;
-  border: 2px solid var(--zloto);
-  border-radius: var(--r-card);
-  background: rgba(227, 172, 63, 0.1);
-  font-size: var(--fs-small);
-}
-
-.pilot-zapowiedz strong {
-  color: var(--zloto);
-}
-
 /* Rodzaj pytania w odliczaniu na telefonie */
 .odliczanie-typ {
   font-size: var(--fs-body);
@@ -1703,22 +1677,6 @@ html:has(.kolumna) {
   text-transform: uppercase;
   color: var(--zloto);
   text-align: center;
-}
-
-/* Pilot: godzina zapowiedzianego startu i odliczanie */
-.pilot-start {
-  display: grid;
-  gap: 4px;
-  margin: 18px 0 0;
-  padding: 12px 14px;
-  border: 1px solid var(--kamien2);
-  border-radius: var(--r-card);
-  background: var(--kamien);
-}
-
-.pilot-start .pomocniczy {
-  margin: 0;
-  font-size: var(--fs-xs);
 }
 
 /* Koniec gry na telefonie: udostępnianie wyniku */
@@ -1809,11 +1767,6 @@ html:has(.kolumna) {
   width: auto;
   margin-top: 10px;
   padding-top: 8px;
-}
-
-/* Etapy na telefonie: plansza etapu, mnożnik w pasku, finał trójki */
-.gra-mnoznik {
-  color: var(--zloto);
 }
 
 .etap-nazwa {
@@ -3084,66 +3037,6 @@ html:has(.kolumna) {
   .efekt-obrot .pijany-pytanie {
     transform: rotate(180deg);
   }
-}
-
-/* Pilot: odpadanie przed finałem (pilot/[kod]/progi.tsx): etap po lewej, − liczba + po prawej */
-.progi-pilota {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.progi-pilota li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px 12px;
-}
-
-/* na wąskim telefonie nazwa etapu w całości nad przyciskami, nie słowo pod słowem */
-.progi-pilota li > span:first-child {
-  flex: 1 1 12em;
-}
-
-.progi-pilota-wartosc {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 10px;
-}
-
-.progi-pilota-wartosc strong {
-  min-width: 6.5em;
-  text-align: center;
-  color: var(--zloto);
-}
-
-.progi-pilota-wartosc .przycisk-zdjecie {
-  min-width: 40px;
-  padding-inline: 0;
-  font-size: 1.2rem;
-}
-
-/* Telefon w rankingu etapu z odcięciem: przeskok przez kreskę (gracz.tsx, src/lib/gra/odpadanie.ts) */
-.kreska-zmiana {
-  margin: 10px 0 0;
-  padding: 10px 14px;
-  border-radius: var(--r-card);
-  font-weight: var(--w-black);
-  text-align: center;
-}
-
-.kreska-zmiana.awans {
-  background: color-mix(in srgb, var(--chmiel) 22%, transparent);
-  color: var(--chmiel);
-}
-
-.kreska-zmiana.spadek {
-  background: color-mix(in srgb, var(--czerwien) 18%, transparent);
-  color: var(--czerwien);
 }
 
 /* Automatyczne prowadzenie: „Gotowy” na planszach (src/app/[kod]/gotowy.tsx) */

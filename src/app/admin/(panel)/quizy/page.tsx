@@ -4,10 +4,11 @@ import { lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/
 import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { IkonaEdytuj, IkonaKlodka, IkonaKosz, IkonaOko } from "@/components/ikony";
+import { FiltrTematow, ZakladkiRodzaju } from "../_komponenty/filtry-listy";
 import { BRACTWO, FiltrLokali, wybranyLokal, ZnaczekLokalu, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz } from "./akcje";
-import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
 
@@ -93,35 +94,10 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
       )}
 
       {/* zakładki rodzajów (na telefonie na całą szerokość), pod nimi podpisane rzędy filtrów (29.10) */}
-      <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
-        {(["wyscig", "klasyczny"] as const).map((r) => (
-          <Link
-            key={r}
-            href={adres(r)}
-            className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
-            aria-current={rodzaj === r ? "page" : undefined}
-          >
-            {NAZWY_RODZAJOW[r]}
-          </Link>
-        ))}
-      </nav>
+      <ZakladkiRodzaju rodzaj={rodzaj} adres={(r) => adres(r)} />
       <div className="filtry">
         <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
-        {tagi.length > 0 && (
-          <div className="filtr-wiersz">
-            <span className="filtr-etykieta">Temat</span>
-            <p className="tagi" aria-label="Temat">
-              <Link href={adres(rodzaj)} className={`tag${wybranyTag ? "" : " wybrany"}`}>
-                wszystkie
-              </Link>
-              {tagi.map((t) => (
-                <Link key={t} href={adres(rodzaj, t)} className={`tag${wybranyTag === t ? " wybrany" : ""}`}>
-                  {t}
-                </Link>
-              ))}
-            </p>
-          </div>
-        )}
+        <FiltrTematow tagi={tagi} wybrany={wybranyTag} adres={(t) => adres(rodzaj, t)} />
       </div>
 
       {data && data.length > 0 ? (
