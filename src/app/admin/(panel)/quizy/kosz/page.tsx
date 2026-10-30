@@ -48,9 +48,6 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
         <Link href="/admin/quizy">← Quizy</Link>
       </p>
       <h1>Kosz</h1>
-      <p className="pomocniczy">
-        Usunięte quizy czekają tu, aż je przywrócisz albo usuniesz na dobre. Usunięcia na dobre nie da się cofnąć.
-      </p>
       {typeof blad === "string" && BLEDY[blad] && (
         <p className="blad" role="alert">
           {BLEDY[blad]}

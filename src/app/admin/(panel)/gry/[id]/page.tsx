@@ -169,13 +169,13 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
         <Link href="/admin/gry">← Rozgrywki</Link>
       </p>
       {/* zakończona gra nie ma prawej kolumny (prowadzenie, ekran), więc dane gry idą na całą szerokość */}
-      <div className={trwa ? "uklad-dwa" : undefined}>
-        <div>
-          <p className="pomocniczy" style={{ margin: 0 }}>
+      <div className={trwa ? "uklad-dwa" : "stos"}>
+        <div className="stos">
+          <p className="pomocniczy">
             Kod gry · <span className={`znaczek${trwa ? " aktywny" : ""}`}>{NAZWY_FAZ[gra.faza]}</span>
           </p>
           <div className="kod-gry">{gra.kod}</div>
-          <h1 style={{ marginTop: 16 }}>{gra.quizy?.tytul ?? "quiz usunięty"}</h1>
+          <h1>{gra.quizy?.tytul ?? "quiz usunięty"}</h1>
           <dl className="dane-gry">
             {daneGry
               .filter(([, wartosc]) => wartosc)
@@ -187,9 +187,7 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
               ))}
           </dl>
 
-          {gosc ? (
-            <p className="pomocniczy">Grę ustawiło Bractwo Piwne: możesz oglądać wyniki i pobrać grafiki.</p>
-          ) : trwa && (
+          {!gosc && trwa && (
           <section className="panel-sekcja akcje-gry">
             {(
               <PrzyciskPotwierdz
@@ -209,21 +207,14 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
           <div>
             <section className="panel-sekcja karta">
               <h2>Prowadzenie</h2>
-              <p className="pomocniczy" style={{ marginTop: 0 }}>
-                Prowadzisz sam? Otwórz pilota na tym urządzeniu (telefon albo laptop). Grę możesz też przekazać komuś innemu.
-              </p>
               <a href={linki.pilot} className="przycisk zloty">
                 Prowadź z tego urządzenia
               </a>
               <details className="przekaz">
                 <summary>Przekaż prowadzącemu (kod QR)</summary>
-                <p className="pomocniczy">
-                  Prowadzący skanuje ten kod i ma pilota. Link zawiera tajny klucz, nie pokazuj go graczom.
-                </p>
+                <p className="pomocniczy">Nie pokazuj graczom: link prowadzi do pilota.</p>
                 <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />
-                <div style={{ marginTop: 14 }}>
-                  <LinkDoSkopiowania url={linki.pilot} />
-                </div>
+                <LinkDoSkopiowania url={linki.pilot} />
               </details>
             </section>
 
@@ -231,38 +222,23 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
               <h2>Ekran</h2>
               {linki.ekranLokalu ? (
                 <>
-                  <p className="pomocniczy" style={{ marginTop: 0 }}>
-                    {gra.poczekalnia_otwarta
-                      ? `Ekran lokalu ${gra.lokale?.nazwa} przełączy się na tę grę sam.`
-                      : `Ekran lokalu ${gra.lokale?.nazwa} pokazuje zapowiedź z odliczaniem. QR pojawi się, gdy otworzysz poczekalnię na pilocie.`}{" "}
-                    Jeśli TV nie ma go w zakładkach, otwórz:
-                  </p>
                   <LinkDoSkopiowania url={linki.ekranLokalu} />
                   {!!inneGry?.length && (
-                    <p className="blad" style={{ marginBottom: 0 }}>
+                    <p className="blad">
                       W tym lokalu trwa też gra {inneGry.map((g) => g.kod).join(", ")}. Ekran lokalu pokazuje najnowszą, czyli
                       tę. Zakończ starą, jeśli już nie jest potrzebna.
                     </p>
                   )}
                 </>
               ) : (
-                <>
-                  <p className="pomocniczy" style={{ marginTop: 0 }}>
-                    Otwórz w przeglądarce na TV. Na ekranie pojawi się kod QR dla graczy.
-                  </p>
-                  <LinkDoSkopiowania url={linki.ekran} />
-                </>
+                <LinkDoSkopiowania url={linki.ekran} />
               )}
             </section>
 
             <section className="panel-sekcja karta">
               <h2>Gracze</h2>
-              <p className="pomocniczy" style={{ marginTop: 0 }}>
-                Gracze skanują QR z telewizora albo wpisują kod <strong>{gra.kod}</strong> na stronie głównej.
-              </p>
               <LinkDoSkopiowania url={linki.gracz} />
             </section>
-            <p className="podpowiedz">Kliknij link, żeby otworzyć go w nowej karcie. Ikona obok albo przytrzymanie palcem kopiuje.</p>
           </div>
         ) : null}
       </div>
@@ -283,10 +259,6 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
       {!trwa && !!gra.nagrody?.length && (
         <section className="panel-sekcja">
           <h2>Nagrody</h2>
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            Zwycięzca klika na telefonie „Potwierdź odbiór”, gdy dostanie nagrodę. Godzina pojawia się tutaj. Jeśli z
-            telefonu się nie udało, oznacz odbiór tutaj: telefon gracza też pokaże „Odebrana”.
-          </p>
           <ul className="lista">
             {gra.nagrody.flatMap((n) => {
               const zdobywcy = wyniki.filter((w) => w.miejsce === n.miejsce);
@@ -344,36 +316,22 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
 
       {!trwa && (
         <section className="panel-sekcja" id="wyniki">
-          <div className="wyniki-pasek">
-            <h2>Wyniki</h2>
-            <nav className="wybor-czasu" aria-label="Widok wyników">
-              {[
-                ["gracze", "Gracze", `/admin/gry/${gra.id}#wyniki`],
-                ["pytania", "Pytania", `/admin/gry/${gra.id}?widok=pytania#wyniki`],
-              ].map(([klucz, napis, href]) => {
-                const wybrany = (klucz === "pytania") === widokPytan;
-                return (
-                  <Link
-                    key={klucz}
-                    href={href}
-                    scroll={false}
-                    className={`wybor-czasu-opcja${wybrany ? " wybrana" : ""}`}
-                    aria-current={wybrany ? "page" : undefined}
-                  >
-                    {napis}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            {pytanEtapow > 0
-              ? `Pytań w grze: ${pytanEtapow}${zadaniaSerii.size ? " i finał (każdy finalista tyle, na ile zdążył)" : ""}. `
-              : ""}
-            {widokPytan
-              ? "Rozwiń pytanie, żeby zobaczyć, kto co odpowiedział i w jakim czasie."
-              : "Kliknij gracza, żeby zobaczyć jego odpowiedzi i czasy."}
-          </p>
+          <h2>Wyniki</h2>
+          <nav className="zakladki" aria-label="Widok wyników">
+            {[
+              ["gracze", "Gracze", `/admin/gry/${gra.id}#wyniki`],
+              ["pytania", "Pytania", `/admin/gry/${gra.id}?widok=pytania#wyniki`],
+            ].map(([klucz, napis, href]) => (
+              <Link
+                key={klucz}
+                href={href}
+                scroll={false}
+                aria-current={(klucz === "pytania") === widokPytan ? "page" : undefined}
+              >
+                {napis}
+              </Link>
+            ))}
+          </nav>
           {!widokPytan && wyniki.some((w) => w.punkty > 0) && (
             <GrafikaPodium
               dane={{

@@ -305,10 +305,6 @@ export function EdytorZadania({
             maxLength={LIMITY_CIEKAWOSTKI}
             rows={4}
           />
-          <p className="podpowiedz">
-            Ciekawostka to plansza bez odpowiedzi i punktów: grafika (poniżej), tytuł i ten tekst. Prowadzący przechodzi
-            dalej z pilota. Nie liczy się do numeracji pytań.
-          </p>
         </div>
       )}
 
@@ -360,10 +356,6 @@ export function EdytorZadania({
               </div>
             ))}
           </div>
-          <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
-            Gracze ustawiają liczbę suwakiem. Trafienie (co do kroku) to pełne punkty, potem coraz mniej, aż do zera w
-            podanej odległości (puste: ćwierć zakresu).
-          </p>
         </fieldset>
       )}
 
@@ -463,12 +455,12 @@ export function EdytorZadania({
             })}
           </div>
           {(powtorzoneA.size > 0 || powtorzoneB.size > 0) && (
-            <p className="blad" role="alert" style={{ margin: "8px 0 0" }}>
+            <p className="blad odstep" role="alert">
               Zaznaczone na czerwono wiersze są takie same. Popraw je przed zapisem.
             </p>
           )}
           {wiersze.length < LIMITY.maxOdpowiedzi && (
-            <button type="button" className="przycisk-maly" onClick={dodaj} style={{ marginTop: 10 }}>
+            <button type="button" className="przycisk-maly odstep" onClick={dodaj}>
               + {typ === "pary" ? "para" : typ === "kolejnosc" ? "element" : "odpowiedź"}
             </button>
           )}
@@ -517,18 +509,11 @@ export function EdytorZadania({
         {podpowiedzi.length < LIMITY.maxPodpowiedzi && (
           <button
             type="button"
-            className="przycisk-maly"
+            className={`przycisk-maly${podpowiedzi.length ? " odstep" : ""}`}
             onClick={() => setPodpowiedzi((l) => [...l, ""])}
-            style={{ marginTop: podpowiedzi.length ? 10 : 0 }}
           >
             + podpowiedź
           </button>
-        )}
-        {podpowiedzi.length > 0 && (
-          <p className="pomocniczy" style={{ margin: "8px 0 0" }}>
-            Pierwsza widać od startu, kolejne co równy kawałek czasu (bez limitu czasu: co 10 s). Z bonusem za szybkość
-            późniejsza odpowiedź daje mniej punktów.
-          </p>
         )}
       </fieldset>
 

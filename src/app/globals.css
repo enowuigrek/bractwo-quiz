@@ -2829,7 +2829,6 @@ html:has(.kolumna) {
 
 /* wspólna pula w dwóch grupach (pijany-final/formularz.tsx): złota leci najpierw, szara potem */
 .pijana-grupa {
-  margin-top: 24px;
   padding-left: 16px;
   border-left: 4px solid var(--kamien3);
 }

@@ -10,7 +10,7 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 
 **Gdzie jesteśmy:** pierwszy prawdziwy quiz poszedł 28.10 w Piwiarni w Alejach (gra AZKJ, 9 graczy, piwny quiz). Działał, wyścig finału na TV zrobił największe wrażenie (szczegóły i ludzie: pamięć „piwiarnia-ludzie”). 29.10 poprawki po tej grze, porządki w wyglądzie panelu i finał przy małej grze. Zasady wyścigu Łukasz uznał za zamknięte („na wczorajszym teście poszło sprawiedliwie”).
 
-**Następny krok:** Łukasz ma nowe plany i poda je na start sesji (30.10: nowy quiz „Wyścig po piwo” odłożony). Gdy wrócimy do nowego quizu: zasady układania pytań w `CLAUDE.md`, etapy z szablonu (`SZABLONY_ETAPOW`/`SZABLONY_QUIZU` w `src/lib/etapy.ts`) jak w piwnym (13, 9, 5, 6 pytań i pula ok. 30–35 zdań prawda/fałsz w finale), treść migracją, grafiki promptami w `scripts/grafiki.mjs`.
+**Następny krok:** plany Łukasza z 30.10: strona główna `quiz.bractwopiwne.pl` (do ustalenia, co ma pokazywać), dopracowanie kont adminów, poprawki wyglądu (panel zrobiony 30.10, pilot jeszcze nie) i nowe gry (do omówienia). Nowy quiz „Wyścig po piwo” odłożony. Gdy wrócimy do nowego quizu: zasady układania pytań w `CLAUDE.md`, etapy z szablonu (`SZABLONY_ETAPOW`/`SZABLONY_QUIZU` w `src/lib/etapy.ts`) jak w piwnym (13, 9, 5, 6 pytań i pula ok. 30–35 zdań prawda/fałsz w finale), treść migracją, grafiki promptami w `scripts/grafiki.mjs`.
 
 **Zasady gry (wspólne dla każdego wyścigu, w funkcjach bazy):**
 - Punkty: 1000 za dobrą odpowiedź, spadek za czas do 200, mnożniki etapów ×1 / ×1,5 / ×2 / ×2 (`wewn.punkty_odpowiedzi`, kopia do opisu w `src/lib/gra/punktacja.ts`). Pub quiz bez etapów: waga rodzaju (`wewn.waga_typu`).
@@ -35,6 +35,16 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - Wygaszacz OLED: Łukasz klika OK na pilocie TV, przeglądarka sama tego nie zrobi.
 - Kwadrat ma testowe hasło lokalu; Piwiarnia i PPR hasła ustawia Łukasz.
 - W bazie nieużywane dla zgodności: `przerobki_ai`, `sesje.widok_rankingu`, `gracze_sesji`, `pijane_pytania_quizu`.
+
+### Porządek w panelu: rytm odstępów, zakładki, filtry rozwijane (30.10) ✅
+
+- Łukasz: odstępy pod przyciskami i między elementami trzeba było ciągle poprawiać, przyciski obok siebie miały różne długości, a filtry list (rodzaj, lokale, tematy) robiły bałagan. Przyczyna: ok. 50 łatek `style={{ marginTop }}` i marginesów w klasach komponentów.
+- Skala odstępów w `docs/tokens.css` (`--o-1`…`--o-4`, `--section-gap`) i rytm w `panel.css`: odstęp ustawia rodzic (`main`, kolumny, sekcje, karty, `.stos`), elementy nie mają marginesów. Łatki usunięte, w formularzach `.odstep`.
+- Przyciski obok siebie w `.przyciski` (równe; na telefonie jeden pod drugim), małe w `.przyciski-male`.
+- Zakładki widoku `.zakladki` (napisy z paskiem): rodzaj quizu na listach i „Gracze / Pytania” w wynikach. Już nie wyglądają jak złote przyciski akcji.
+- Filtry list to równe listy rozwijane (`_komponenty/filtr.tsx`, `FiltryListy`): „Lokal” (w quizach „Autor”) i „Temat”, a „Miasto” pojawia się samo przy lokalach w dwóch miastach (`?miasto=`, lokale pogrupowane miastami).
+- Wycięte teksty objaśniające w panelu (wyniki, prowadzenie, ekran, gracze, nagrody, lokal, kosz, pijany finał, edytor pytań, wklejanie). Zasada w `CLAUDE.md` i `DESIGN-SYSTEM.md`.
+- Audyt (pomiar odstępów i szerokości w rzędach): 18 stron × 390 i 1280 px bez uwag. Pilot i kreator mają jeszcze własne odstępy (pilot nie wczytuje `panel.css`), do przejrzenia osobno.
 
 ### Po teście w Piwiarni (29.10) ✅
 

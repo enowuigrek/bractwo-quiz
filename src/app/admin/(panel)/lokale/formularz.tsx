@@ -60,7 +60,6 @@ export function FormularzLokalu({ lokal, miasta, ograniczony = false }: Props) {
           maxLength={60}
           autoComplete="off"
         />
-        <p className="podpowiedz">Gracze zobaczą je przy grafice z wynikiem, żeby oznaczyć lokal w relacji.</p>
       </div>
       {lokal && !ograniczony && (
         <div>
@@ -79,10 +78,7 @@ export function FormularzLokalu({ lokal, miasta, ograniczony = false }: Props) {
               spellCheck={false}
             />
           </div>
-          <p className="podpowiedz">
-            Zmieniaj tylko w razie potrzeby: zakładka zapisana na TV w lokalu przestanie działać i trzeba ją zapisać od
-            nowa.
-          </p>
+          <p className="podpowiedz">Po zmianie stara zakładka na TV przestanie działać.</p>
         </div>
       )}
       <PoleGrafiki

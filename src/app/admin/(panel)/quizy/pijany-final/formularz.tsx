@@ -97,7 +97,7 @@ export function FormularzPijany({ pytania }: { pytania: PijanePytanie[] }) {
   );
 
   return (
-    <form action={akcja}>
+    <form action={akcja} className="stos">
       <input
         type="hidden"
         name="pytania"
@@ -156,16 +156,11 @@ function Grupa({
 }) {
   const [wklejanie, ustawWklejanie] = useState<string | null>(null);
   return (
-    <section className={`pijana-grupa ${piwne ? "piwne" : "reszta"}`}>
+    <section className={`pijana-grupa panel-sekcja ${piwne ? "piwne" : "reszta"}`}>
       <h2>
         <span className="pijana-grupa-kropka" aria-hidden />
         {piwne ? "O piwie" : "Odklejone"} <span className="pomocniczy">({wiersze.length})</span>
       </h2>
-      <p className="pomocniczy" style={{ marginTop: 0 }}>
-        {piwne
-          ? "Na początek 3 losowe, spokojnie, jak dalszy ciąg finału. Czwarte to pytanie z imieniem zza baru ({za_barem}), a bez imienia jeszcze jedno stąd."
-          : "Potem losowo, aż skończy się czas. Tu już można odlecieć."}
-      </p>
       <ul className="lista pijane-pytania">
         {wiersze.map((w, i) => (
           <li key={w.klucz}>
@@ -192,7 +187,7 @@ function Grupa({
         ))}
       </ul>
       {wklejanie !== null && (
-        <div className="pijana-wklej">
+        <div className="pijana-wklej stos">
           <textarea
             className="pole"
             rows={5}
@@ -204,7 +199,7 @@ function Grupa({
             aria-label="Wklej kilka pytań"
             autoFocus
           />
-          <p style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "8px 0 0" }}>
+          <p className="przyciski-male">
             <button
               type="button"
               className="przycisk-maly"
@@ -222,7 +217,7 @@ function Grupa({
           </p>
         </div>
       )}
-      <p style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <p className="przyciski-male">
         <button type="button" className="przycisk-maly" disabled={pelna} onClick={() => dodaj([pustyWiersz(piwne)])}>
           + pytanie
         </button>

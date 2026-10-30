@@ -248,6 +248,191 @@ span.panel-logo-lokalu {
   margin-top: var(--section-gap);
 }
 
+/* Rytm odstępów (30.10, Łukasz: „odstęp nie jest stały między elementami”). Odstęp ustawia rodzic, nie element:
+   dzieci strony, kolumny, sekcji i karty nie mają własnych marginesów, a między sobą dostają 16 px, po nagłówku 12 px,
+   po okruchach 8 px, a przed sekcją 34 px. Element nie dopisuje marginesu ani `style={{ marginTop }}`; inny odstęp
+   to inna klasa rodzica (np. `.przyciski`, `.filtry`). Kontener bez klasy dostaje `.stos`. */
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > * {
+  margin-block: 0;
+}
+
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > * + * {
+  margin-top: var(--o-4);
+}
+
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > :is(h1, h2, h3) + * {
+  margin-top: var(--o-3);
+}
+
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > .okruchy + * {
+  margin-top: var(--o-2);
+}
+
+.panel :is(main, .stos, .panel-sekcja, .karta, .uklad-dwa > *) > * + .panel-sekcja {
+  margin-top: var(--section-gap);
+}
+
+/* W formularzach (bez rodzica z rytmem) element pod polem albo przełącznikiem dostaje `.odstep` (12 px), nigdy
+   liczbę w `style`. */
+.odstep {
+  margin-top: var(--o-3);
+}
+
+.kreator-tematy {
+  margin: 0 0 var(--o-3);
+}
+
+/* Przyciski obok siebie: na telefonie jeden pod drugim na całą szerokość, na komputerze w rzędzie, wszystkie tej
+   samej szerokości (najszerszego). Zamiast `<p style={{ display: "flex" }}>`. */
+.przyciski {
+  display: grid;
+  gap: var(--o-3);
+}
+
+.panel .przyciski > * {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+@media (min-width: 960px) {
+  .przyciski {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 1fr);
+  }
+}
+
+/* Małe przyciski obok siebie (np. „+ pytanie”, „Wklej kilka naraz”): zawsze w rzędzie, równej szerokości. */
+.przyciski-male {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--o-2);
+}
+
+.panel .przyciski-male > * {
+  margin: 0;
+}
+
+/* Zakładki widoku strony (rodzaj quizu na listach, Gracze / Pytania w wynikach, 30.10): napisy na szarej linii,
+   wybrana złota z paskiem, jak zakładki w pasku panelu. Inaczej niż przyciski i wybór w formularzu (`.wybor-czasu`),
+   żeby nie mylić przełączania widoku z akcją. Wszystkie tej samej szerokości. */
+.zakladki {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  border-bottom: 1px solid var(--kamien2);
+}
+
+.zakladki a {
+  position: relative;
+  padding: 10px 8px 12px;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--szary);
+  font-weight: var(--w-black);
+  text-decoration: none;
+  transition: color 0.25s var(--ease-std);
+}
+
+.zakladki a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--kamien3);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease-std);
+}
+
+.zakladki a:hover {
+  color: var(--piana);
+}
+
+.zakladki a:hover::after {
+  transform: scaleX(1);
+}
+
+.zakladki a[aria-current="page"] {
+  color: var(--zloto);
+}
+
+.zakladki a[aria-current="page"]::after {
+  background: var(--zloto);
+  transform: scaleX(1);
+}
+
+@media (min-width: 960px) {
+  .zakladki {
+    grid-auto-columns: 13em;
+  }
+}
+
+/* Filtry nad listą (30.10): listy rozwijane z podpisem, wszystkie tej samej szerokości (dwie w rzędzie na telefonie,
+   cztery na komputerze), zamiast rzędów pigułek, które zawijały się w nierówne wiersze. Ustawiony filtr ma złotą
+   ramkę. Miasto pojawia się samo, gdy lokale są w więcej niż jednym mieście. */
+.filtry {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--o-3);
+}
+
+@media (min-width: 960px) {
+  .filtry {
+    grid-template-columns: repeat(4, minmax(0, 15rem));
+  }
+}
+
+.filtr {
+  display: grid;
+  gap: var(--o-1);
+  min-width: 0;
+}
+
+.filtr-podpis {
+  color: var(--szary);
+  font-size: var(--fs-xs);
+  font-weight: var(--w-semibold);
+}
+
+.filtr select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 36px 0 12px;
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  color: var(--piana);
+  text-overflow: ellipsis;
+  background: var(--kamien)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23e3ac3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  border: 1px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  cursor: pointer;
+}
+
+.filtr select:hover {
+  border-color: var(--kamien3);
+}
+
+.filtr select:focus-visible {
+  outline: 3px solid var(--zloto);
+  outline-offset: 2px;
+}
+
+.filtr select.ustawiony {
+  border-color: var(--zloto);
+  color: var(--zloto);
+}
+
 h2 {
   font-size: var(--fs-h3);
   font-weight: var(--w-black);
@@ -1072,7 +1257,7 @@ a.przycisk {
 }
 
 .etap-blok + .etap-blok {
-  margin-top: 28px;
+  margin-top: var(--section-gap);
 }
 
 .etap-naglowek {
@@ -1488,26 +1673,7 @@ a.tag.wybrany:hover {
   color: var(--na-zlocie);
 }
 
-/* filtr „kto” u głównego (lokale-autorzy.tsx): pastylki z logo lokalu */
-.filtr-lokali {
-  margin: 0;
-}
-
-.filtr-lokali .tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tag-logo {
-  height: 16px;
-  width: auto;
-  max-width: 40px;
-  object-fit: contain;
-}
-
-/* logo Bractwa ma `display: block` (globals.css); w pastylce i wierszu stoi w linii z tekstem */
-img.tag-logo,
+/* logo Bractwa ma `display: block` (globals.css); w wierszu stoi w linii z tekstem */
 img.znaczek-lokalu {
   display: inline-block;
 }
@@ -1546,16 +1712,12 @@ button.tag:hover:not(.wybrany) {
   color: var(--piana);
 }
 
-/* Pijany finał: przycisk testu na ekranie z opisem obok */
-.pijany-test {
+/* quiz w koszu: komunikat i „Przywróć” w jednym rzędzie */
+.quiz-w-koszu {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
-  margin: 1rem 0 1.5rem;
-}
-
-.pijany-test button {
-  flex: none;
+  gap: var(--o-3);
 }
 
 /* Kreator gry bez zapasu pod formularzem (26.10: 45vh pustego miejsca na końcu wyglądało na błąd) */
@@ -1613,7 +1775,6 @@ button.tag:hover:not(.wybrany) {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 16px;
-  margin-bottom: 16px;
 }
 
 .naglowek-strony h1 {
@@ -1623,44 +1784,6 @@ button.tag:hover:not(.wybrany) {
 /* nagłówek ma wysokość przycisku także bez przycisku (rozgrywki na komputerze), więc Quizy i Rozgrywki nie skaczą */
 .naglowek-strony {
   min-height: 40px;
-}
-
-/* Filtry nad listą: rzędy z podpisem z lewej („Kto”, „Temat”, „Lokal”), pigułki tej samej wysokości, odstęp od
-   listy (29.10: dwa rzędy pigułek bez podpisów i z różnymi odstępami wyglądały chaotycznie) */
-.filtry {
-  display: grid;
-  gap: 10px;
-  margin: 16px 0 24px;
-}
-
-.filtry:empty {
-  display: none;
-}
-
-.filtr-wiersz {
-  display: grid;
-  grid-template-columns: 4.5em minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-}
-
-.filtr-etykieta {
-  padding-top: 6px;
-  color: var(--szary);
-  font-size: var(--fs-xs);
-  font-weight: var(--w-semibold);
-}
-
-.filtry .tagi {
-  margin: 0;
-}
-
-.filtry .tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 30px;
-  padding: 0 12px;
 }
 
 /* telefon: zakładki rodzajów na całą szerokość */
@@ -2230,23 +2353,6 @@ button.tag:hover:not(.wybrany) {
 .dane-gry dd {
   margin: 0;
   font-variant-numeric: tabular-nums;
-}
-
-/* Wyniki: nagłówek i przełącznik Gracze / Pytania w jednym rzędzie */
-.wyniki-pasek {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-}
-
-.wyniki-pasek .wybor-czasu-opcja {
-  text-decoration: none;
-}
-
-.wyniki-pasek h2 {
-  margin: 0;
 }
 
 /* Przegląd pytań (przeglad-pytan.tsx): zwijana karta na pytanie, pod odpowiedziami kapsle graczy */

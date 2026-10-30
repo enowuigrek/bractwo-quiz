@@ -4,8 +4,14 @@ import { lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/
 import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { IkonaEdytuj, IkonaKlodka, IkonaKosz, IkonaOko } from "@/components/ikony";
-import { FiltrTematow, ZakladkiRodzaju } from "../_komponenty/filtry-listy";
-import { BRACTWO, FiltrLokali, wybranyLokal, ZnaczekLokalu, type LokalAutor } from "../_komponenty/lokale-autorzy";
+import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty/filtry-listy";
+import {
+  BRACTWO,
+  wybraneMiasto,
+  wybranyLokal,
+  ZnaczekLokalu,
+  type LokalAutor,
+} from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz } from "./akcje";
 import { wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
@@ -30,14 +36,15 @@ const BLEDY: Record<string, string> = {
 
 export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">) {
   const rola = await wymagajAdmina();
-  const { blad, rodzaj: rodzajZAdresu, tag, kosz, lokal: lokalZAdresu } = await searchParams;
+  const { blad, rodzaj: rodzajZAdresu, tag, kosz, lokal: lokalZAdresu, miasto: miastoZAdresu } = await searchParams;
   const db = supabaseAdmin();
   const glowny = widziWszystko(rola);
   // główny widzi, kto założył quiz (logo lokalu albo Bractwa), i filtruje po autorze (26.10)
   const { data: lokale } = glowny
-    ? await db.from("lokale").select("id, nazwa, logo_url").order("nazwa").returns<LokalAutor[]>()
+    ? await db.from("lokale").select("id, nazwa, logo_url, miasto").order("nazwa").returns<LokalAutor[]>()
     : { data: [] as LokalAutor[] };
-  const autor = wybranyLokal(lokalZAdresu, lokale ?? [], true);
+  const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);
+  const autor = wybranyLokal(lokalZAdresu, lokale ?? [], true, miasto);
   // dwie zakładki: wyścig po piwo (quiz z etapami) i klasyczny pub quiz (bez etapów); w każdej filtr tematów
   const rodzaj: RodzajQuizu = rodzajZAdresu === "klasyczny" ? "klasyczny" : "wyscig";
   let zapytanie = filtrQuizow(
@@ -50,6 +57,11 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
   ).is("usunieto", null);
   if (autor === BRACTWO) zapytanie = zapytanie.is("lokal_id", null);
   else if (autor) zapytanie = zapytanie.eq("lokal_id", autor);
+  else if (miasto)
+    zapytanie = zapytanie.in(
+      "lokal_id",
+      (lokale ?? []).filter((l) => l.miasto === miasto).map((l) => l.id),
+    );
   const { data: wszystkie, error } = await zapytanie.order("utworzono", { ascending: false }).returns<QuizNaLiscie[]>();
   const { count: wKoszu } = await filtrQuizow(
     db.from("quizy").select("id", { count: "exact", head: true }),
@@ -60,11 +72,13 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
   const tagi = wszystkieTagi(wRodzaju);
   const wybranyTag = typeof tag === "string" && tagi.includes(tag) ? tag : null;
   const data = wybranyTag ? wRodzaju.filter((q) => q.tagi.includes(wybranyTag)) : wRodzaju;
-  const adres = (r: RodzajQuizu, t: string | null = null, a: string | null = autor) =>
+  const wybrane: WybraneFiltry = { miasto, lokal: autor, tag: wybranyTag };
+  const adres = (r: RodzajQuizu, f: WybraneFiltry) =>
     `/admin/quizy?${new URLSearchParams({
       ...(r === "klasyczny" ? { rodzaj: r } : {}),
-      ...(t ? { tag: t } : {}),
-      ...(a ? { lokal: a } : {}),
+      ...(f.miasto ? { miasto: f.miasto } : {}),
+      ...(f.lokal ? { lokal: f.lokal } : {}),
+      ...(f.tag ? { tag: f.tag } : {}),
     })}`;
   // lokal: quizy Bractwa są tylko do grania (podgląd bez zmian i bez kosza)
   const mojLokal = lokalRoli(rola);
@@ -93,12 +107,15 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         </p>
       )}
 
-      {/* zakładki rodzajów (na telefonie na całą szerokość), pod nimi podpisane rzędy filtrów (29.10) */}
-      <ZakladkiRodzaju rodzaj={rodzaj} adres={(r) => adres(r)} />
-      <div className="filtry">
-        <FiltrLokali lokale={lokale ?? []} wybrany={autor} adres={(a) => adres(rodzaj, wybranyTag, a)} zBractwem />
-        <FiltrTematow tagi={tagi} wybrany={wybranyTag} adres={(t) => adres(rodzaj, t)} />
-      </div>
+      <ZakladkiRodzaju rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
+      <FiltryListy
+        lokale={lokale ?? []}
+        tagi={tagi}
+        wybrane={wybrane}
+        adres={(f) => adres(rodzaj, f)}
+        podpisLokalu="Autor"
+        zBractwem
+      />
 
       {data && data.length > 0 ? (
         <ul className="lista">
@@ -161,7 +178,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         )
       )}
 
-      <p className="panel-sekcja" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <div className="panel-sekcja przyciski">
         <Link href={`/admin/quizy/nowy?rodzaj=${rodzaj}`} className="przycisk zloty">
           {rodzaj === "klasyczny" ? "Nowy klasyczny quiz" : "Nowy wyścig po piwo"}
         </Link>
@@ -176,7 +193,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         <Link href="/admin/quizy/kosz" className="przycisk">
           Kosz{wKoszu ? ` (${wKoszu})` : ""}
         </Link>
-      </p>
+      </div>
     </main>
   );
 }

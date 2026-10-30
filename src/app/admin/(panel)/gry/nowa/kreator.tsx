@@ -182,7 +182,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <span className="krok-nr">{krok(4)}</span> Quiz
           </legend>
           {tematy.length > 0 && (
-            <p className="tagi" style={{ margin: "0 0 14px" }}>
+            <p className="tagi kreator-tematy">
               <button type="button" className={`tag${temat ? "" : " wybrany"}`} onClick={() => setTemat(null)}>
                 wszystkie
               </button>
@@ -269,7 +269,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <input type="hidden" name="nagrody" value={ileNagrod} />
             {ileNagrod > 0 && (
               <>
-                <div className="kafelki kafelki-dwa" style={{ marginTop: 12 }}>
+                <div className="kafelki kafelki-dwa odstep">
                   {[
                     { ile: 1, napis: "1. miejsce", ikona: <IkonaPodium1 /> },
                     { ile: 3, napis: "pierwsza trójka", ikona: <IkonaPodium3 /> },
@@ -340,7 +340,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                     po finale dogrywka „Pijany finał”
                   </label>
                   {pijany && (
-                    <div style={{ marginTop: 10 }}>
+                    <div className="odstep">
                       <label htmlFor="za_barem">Kto dziś stoi za barem (opcjonalnie)</label>
                       <input id="za_barem" name="za_barem" className="pole" placeholder="np. Kasia" maxLength={40} />
                     </div>
@@ -355,7 +355,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
               najpierw zapowiedź z godziną startu
             </label>
             {zapowiedz && (
-              <div className="wiersz-pol start-pola" style={{ marginTop: 10 }}>
+              <div className="wiersz-pol start-pola odstep">
                 <div>
                   <label htmlFor="start_data">Data</label>
                   <input

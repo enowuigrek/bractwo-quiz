@@ -1,22 +1,20 @@
 import Link from "next/link";
 import { NAZWY_RODZAJOW, type RodzajQuizu } from "@/lib/tagi";
+import { Filtr, type OpcjaFiltra } from "./filtr";
+import { BRACTWO, miastaLokali, type LokalAutor } from "./lokale-autorzy";
 
 /**
- * Wspólne klocki list „Quizy” i „Rozgrywki” (29.10): obie strony mają ten sam układ (nagłówek, zakładki rodzaju,
- * filtry „Kto” i „Temat”), żeby przy przełączaniu nic nie skakało. „Kto” to `FiltrLokali` z `lokale-autorzy.tsx`.
+ * Wspólne klocki list „Quizy” i „Rozgrywki”: obie strony mają ten sam układ (nagłówek, zakładki rodzaju, filtry,
+ * lista), żeby przy przełączaniu nic nie skakało. Od 30.10 zakładki to zakładki z paskiem (`.zakladki`), a filtry to
+ * równe listy rozwijane (`Filtr`): miasto (gdy lokale są w kilku miastach), lokal i temat.
  */
 
-/** Zakładki „Wyścig po piwo / Pub quiz” (równe opcje `.wybor-czasu`, na telefonie na całą szerokość). */
+/** Zakładki „Wyścig po piwo / Pub quiz”. */
 export function ZakladkiRodzaju({ rodzaj, adres }: { rodzaj: RodzajQuizu; adres: (r: RodzajQuizu) => string }) {
   return (
-    <nav className="wybor-czasu quizy-rodzaje" aria-label="Rodzaj quizu">
+    <nav className="zakladki" aria-label="Rodzaj quizu">
       {(["wyscig", "klasyczny"] as const).map((r) => (
-        <Link
-          key={r}
-          href={adres(r)}
-          className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}
-          aria-current={rodzaj === r ? "page" : undefined}
-        >
+        <Link key={r} href={adres(r)} aria-current={rodzaj === r ? "page" : undefined}>
           {NAZWY_RODZAJOW[r]}
         </Link>
       ))}
@@ -24,30 +22,68 @@ export function ZakladkiRodzaju({ rodzaj, adres }: { rodzaj: RodzajQuizu; adres:
   );
 }
 
-/** Rząd filtra „Temat” z „wszystkie” na początku; bez tematów nic nie rysuje. */
-export function FiltrTematow({
+/** Wybrane filtry listy (wartości z adresu, już sprawdzone). */
+export type WybraneFiltry = { miasto: string | null; lokal: string | null; tag: string | null };
+
+/**
+ * Rząd filtrów nad listą. `adres` składa adres strony z podanymi filtrami. Zmiana miasta zeruje lokal, a lokale
+ * w liście są pogrupowane według miast, gdy miast jest kilka. Lokal (rola) nie ma filtra lokali: dostaje pustą listę.
+ */
+export function FiltryListy({
+  lokale,
   tagi,
-  wybrany,
+  wybrane,
   adres,
+  podpisLokalu,
+  zBractwem = false,
 }: {
+  lokale: LokalAutor[];
   tagi: string[];
-  wybrany: string | null;
-  adres: (tag: string | null) => string;
+  wybrane: WybraneFiltry;
+  adres: (filtry: WybraneFiltry) => string;
+  /** „Lokal” w rozgrywkach, „Autor” w quizach */
+  podpisLokalu: string;
+  /** opcja „Bractwo” (quizy bez lokalu) */
+  zBractwem?: boolean;
 }) {
-  if (tagi.length === 0) return null;
+  const miasta = miastaLokali(lokale);
+  const { miasto, lokal, tag } = wybrane;
+  const zLokalem = (l: string | null) => adres({ ...wybrane, lokal: l });
+  const wMiescie = miasto ? lokale.filter((l) => l.miasto === miasto) : lokale;
+  const opcjeLokali: OpcjaFiltra[] = [
+    ...(zBractwem && !miasto ? [{ href: zLokalem(BRACTWO), napis: "Bractwo" }] : []),
+    ...wMiescie.map((l) => ({
+      href: zLokalem(l.id),
+      napis: l.nazwa,
+      grupa: miasta.length > 1 && !miasto ? (l.miasto ?? "Bez miasta") : null,
+    })),
+  ];
   return (
-    <div className="filtr-wiersz">
-      <span className="filtr-etykieta">Temat</span>
-      <p className="tagi" aria-label="Temat">
-        <Link href={adres(null)} className={`tag${wybrany ? "" : " wybrany"}`}>
-          wszystkie
-        </Link>
-        {tagi.map((t) => (
-          <Link key={t} href={adres(t)} className={`tag${wybrany === t ? " wybrany" : ""}`}>
-            {t}
-          </Link>
-        ))}
-      </p>
+    <div className="filtry">
+      {miasta.length > 1 && (
+        <Filtr
+          podpis="Miasto"
+          wszystkie={{ href: adres({ ...wybrane, miasto: null, lokal: null }), napis: "Wszystkie" }}
+          opcje={miasta.map((m) => ({ href: adres({ ...wybrane, miasto: m, lokal: null }), napis: m }))}
+          wybrana={miasto && adres({ ...wybrane, lokal: null })}
+        />
+      )}
+      {lokale.length > 0 && (
+        <Filtr
+          podpis={podpisLokalu}
+          wszystkie={{ href: zLokalem(null), napis: "Wszystkie" }}
+          opcje={opcjeLokali}
+          wybrana={lokal && zLokalem(lokal)}
+        />
+      )}
+      {tagi.length > 0 && (
+        <Filtr
+          podpis="Temat"
+          wszystkie={{ href: adres({ ...wybrane, tag: null }), napis: "Wszystkie" }}
+          opcje={tagi.map((t) => ({ href: adres({ ...wybrane, tag: t }), napis: t }))}
+          wybrana={tag && adres(wybrane)}
+        />
+      )}
     </div>
   );
 }

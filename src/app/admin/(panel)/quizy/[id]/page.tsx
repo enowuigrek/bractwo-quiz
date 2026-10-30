@@ -73,9 +73,6 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
           <Link href="/admin/quizy">← Quizy</Link>
         </p>
         <h1>{quiz.tytul}</h1>
-        <p className="pomocniczy">
-          Quiz Bractwa: możesz go uruchamiać w swoim lokalu, ale nie zmieniać.
-        </p>
         <section className="panel-sekcja">
           <h2>{etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
           {grupy.map(({ etap, zadania: wEtapie }) => (
@@ -191,7 +188,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         <UdostepnijLokalom quizId={quiz.id} udostepniony={!quiz.tylko_glowny} />
       )}
       {quiz.usunieto && (
-        <form action={przywrocQuiz.bind(null, quiz.id)} className="blad" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <form action={przywrocQuiz.bind(null, quiz.id)} className="blad quiz-w-koszu">
           Ten quiz jest w koszu: nie ma go na liście ani przy uruchamianiu gry.
           <button type="submit" className="przycisk-maly">
             Przywróć
@@ -204,12 +201,6 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
 
       <section className="panel-sekcja">
         <h2>{etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
-        {etapy.length > 0 && (
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            Przed każdym etapem TV pokazuje planszę z zasadami, a prowadzący startuje etap z pilota. Strzałka na granicy
-            etapu przenosi pytanie do sąsiedniego etapu.
-          </p>
-        )}
         {lista.length === 0 && etapy.length === 0 && <p className="lista-pusta">Quiz nie ma jeszcze pytań.</p>}
         {grupy.map(({ etap, zadania: wEtapie }) => (
           <div key={etap?.id ?? "bez-etapu"} className="etap-blok">
@@ -318,9 +309,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         )}
         {/* klasyczny pub quiz (bez etapów) zostaje bez etapów, a turniej ma etapy z szablonu */}
         {etapy.length > 0 && (
-          <div style={{ marginTop: 12 }}>
-            <NowyEtap quizId={quiz.id} />
-          </div>
+          <NowyEtap quizId={quiz.id} />
         )}
       </section>
 

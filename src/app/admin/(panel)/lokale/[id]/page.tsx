@@ -48,24 +48,12 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
         </section>
         <section className="karta">
           <h2>Ekran lokalu</h2>
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            Otwórz ten adres na TV w lokalu i zapisz w zakładkach. Gdy nie ma gry, ekran pokazuje plansze Bractwa, a gdy
-            uruchomisz grę w tym lokalu, sam przełączy się na nią. Kod QR pomaga przenieść adres z telefonu na TV.
-          </p>
           <div className="qr" dangerouslySetInnerHTML={{ __html: qrEkranu }} />
-          <div style={{ marginTop: 14 }}>
-            <LinkDoSkopiowania url={ekran} />
-          </div>
+          <LinkDoSkopiowania url={ekran} />
         </section>
         <section className="karta">
           <h2>Panel lokalu</h2>
-          <p className="pomocniczy" style={{ marginTop: 0 }}>
-            {glowny
-              ? ma
-                ? "Lokal loguje się do swojego panelu pod tym adresem i swoim hasłem. Widzi tylko swoje gry i quizy, a Twoje quizy bez kłódki może uruchamiać, bez zmieniania."
-                : "Lokal nie ma jeszcze hasła, więc nie zaloguje się do swojego panelu. Ustaw mu hasło na start; potem sam je zmieni."
-              : "Pod tym adresem logujesz się do panelu. Po zmianie hasła inne urządzenia trzeba zalogować od nowa."}
-          </p>
+          {!ma && <p className="blad">Lokal nie ma hasła, więc się nie zaloguje.</p>}
           <LinkDoSkopiowania url={panel} />
         </section>
         <section className="karta">

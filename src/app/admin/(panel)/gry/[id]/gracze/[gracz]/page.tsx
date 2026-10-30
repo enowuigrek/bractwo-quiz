@@ -63,8 +63,8 @@ export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[
           ← Gra {gra.kod} · {gra.quizy?.tytul ?? "quiz usunięty"}
         </Link>
       </p>
-      <h1 style={{ marginBottom: 4 }}>{ja.nick}</h1>
-      <p className="pomocniczy" style={{ marginTop: 0 }}>
+      <h1>{ja.nick}</h1>
+      <p className="pomocniczy">
         {ja.miejsce}. miejsce z {wyniki.length} · {ja.punkty.toLocaleString("pl-PL")} pkt · dobrze {ja.dobre}/
         {zadania.filter((z) => z.typ !== "ciekawostka").length}
         {ja.sredniCzasMs !== null && ` · średni czas ${sekundy(ja.sredniCzasMs)}`}

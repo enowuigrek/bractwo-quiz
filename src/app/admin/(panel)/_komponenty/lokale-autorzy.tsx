@@ -1,59 +1,29 @@
 /* eslint-disable @next/next/no-img-element -- loga lokali z bucketu Supabase */
-import Link from "next/link";
-
 /** Lokal w filtrach i znaczkach panelu głównego. */
-export type LokalAutor = { id: string; nazwa: string; logo_url: string | null };
+export type LokalAutor = { id: string; nazwa: string; logo_url: string | null; miasto?: string | null };
+
+/** Miasta lokali, bez powtórzeń i po kolei; filtr „Miasto” pojawia się dopiero przy dwóch. */
+export const miastaLokali = (lokale: LokalAutor[]) =>
+  [...new Set(lokale.map((l) => l.miasto).filter((m): m is string => !!m))].sort((a, b) => a.localeCompare(b, "pl"));
+
+/** Miasto z adresu (`?miasto=`) albo null (wszystkie). */
+export function wybraneMiasto(wartosc: string | string[] | undefined, lokale: LokalAutor[]) {
+  return typeof wartosc === "string" && miastaLokali(lokale).includes(wartosc) ? wartosc : null;
+}
 
 /** Wartość filtra `?lokal=` dla rzeczy Bractwa (bez lokalu: quizy założone przez głównego). */
 export const BRACTWO = "bractwo";
 
 /** Lokal z adresu (`?lokal=`) albo null (wszystkie). */
-export function wybranyLokal(wartosc: string | string[] | undefined, lokale: LokalAutor[], zBractwem: boolean) {
+export function wybranyLokal(
+  wartosc: string | string[] | undefined,
+  lokale: LokalAutor[],
+  zBractwem: boolean,
+  miasto: string | null = null,
+) {
   if (typeof wartosc !== "string") return null;
-  if (zBractwem && wartosc === BRACTWO) return BRACTWO;
-  return lokale.some((l) => l.id === wartosc) ? wartosc : null;
-}
-
-/**
- * Filtr „kto” u głównego (26.10): wszystkie, Bractwo (tylko w quizach) i każdy lokal z logo. `adres` składa
- * adres strony z wybranym filtrem (pozostałe filtry strony zostają).
- */
-export function FiltrLokali({
-  lokale,
-  wybrany,
-  adres,
-  zBractwem = false,
-  etykieta = "Kto",
-}: {
-  lokale: LokalAutor[];
-  wybrany: string | null;
-  adres: (lokal: string | null) => string;
-  zBractwem?: boolean;
-  /** Podpis rzędu filtra z lewej (29.10: rzędy filtrów podpisane i wyrównane, `.filtr-wiersz`). */
-  etykieta?: string;
-}) {
-  if (lokale.length === 0) return null;
-  return (
-    <div className="filtr-wiersz">
-      <span className="filtr-etykieta">{etykieta}</span>
-      <p className="tagi filtr-lokali" aria-label={etykieta}>
-        <Link href={adres(null)} className={`tag${wybrany ? "" : " wybrany"}`}>
-          wszyscy
-        </Link>
-        {zBractwem && (
-          <Link href={adres(BRACTWO)} className={`tag${wybrany === BRACTWO ? " wybrany" : ""}`}>
-            <img src="/loga/bractwo.svg" alt="" className="tag-logo logo-bractwo" /> Bractwo
-          </Link>
-        )}
-        {lokale.map((l) => (
-          <Link key={l.id} href={adres(l.id)} className={`tag${wybrany === l.id ? " wybrany" : ""}`}>
-            {l.logo_url && <img src={l.logo_url} alt="" className="tag-logo" />}
-            {l.nazwa}
-          </Link>
-        ))}
-      </p>
-    </div>
-  );
+  if (zBractwem && !miasto && wartosc === BRACTWO) return BRACTWO;
+  return lokale.some((l) => l.id === wartosc && (!miasto || l.miasto === miasto)) ? wartosc : null;
 }
 
 /** Znaczek autora w wierszu listy: logo lokalu (albo Bractwa), z nazwą w podpowiedzi. */

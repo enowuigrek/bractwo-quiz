@@ -63,7 +63,12 @@
   --r-card: 6px;     /* karty, panele, okna */
   --r-round: 50%;
 
-  /* Odstępy */
+  /* Odstępy. Skala (30.10): między elementami używamy tylko tych wartości, a w panelu odstęp ustawia rodzic
+     (rytm w panel.css), nie element. */
+  --o-1: 4px;   /* podpis nad polem */
+  --o-2: 8px;   /* okruchy → tytuł, elementy w jednym rzędzie */
+  --o-3: 12px;  /* nagłówek → treść, przyciski obok siebie */
+  --o-4: 16px;  /* zwykły odstęp między elementami */
   --gutter: 22px;
   --card-pad: 18px;
   --section-gap: 34px;

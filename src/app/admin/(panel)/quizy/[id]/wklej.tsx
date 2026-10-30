@@ -151,9 +151,6 @@ export function WklejPytania({ quizId, temat: domyslnyTemat }: { quizId: string;
         <button type="button" className="przycisk zloty" onClick={() => void kopiujPrompt()} disabled={!rodzaje.length}>
           {skopiowano ? <IkonaGotowe /> : <IkonaKopiuj />} {skopiowano ? "Skopiowano" : "Kopiuj prompt"}
         </button>
-        <p className="pomocniczy" style={{ margin: 0 }}>
-          Wklej go do czatu z AI (Claude, ChatGPT…), a odpowiedź wklej w kroku 2.
-        </p>
         <details className="wklej-podglad-promptu">
           <summary>Podgląd promptu</summary>
           <textarea className="pole wklej-pole" readOnly rows={10} value={prompt} aria-label="Prompt dla AI" />
