@@ -3392,6 +3392,11 @@ a.glowna-lokal:focus-visible {
     padding: 0;
   }
 
+  /* „Zakończ grę” pod kolumną sterowania, nie przez cały ekran */
+  .pilot-strona .pilot-dol {
+    max-width: 420px;
+  }
+
   .pilot {
     display: grid;
     grid-template-columns: 420px minmax(0, 1fr);
