@@ -8,13 +8,23 @@ import { poprawnyKod } from "@/lib/gra/kod";
  * Pole na kod gry na `/ekran` (TV bez ekranu lokalu). Sprawdzenie, czy gra istnieje, robi już strona docelowa.
  * `cel`: początek adresu, do którego doklejamy kod.
  */
-export function WpiszKod({ cel, przycisk }: { cel: string; przycisk: string }) {
+export function WpiszKod({
+  cel,
+  przycisk,
+  autoFocus = true,
+}: {
+  cel: string;
+  przycisk: string;
+  /** na `/ekran` nie: pilot TV zaczyna od listy lokali nad polem */
+  autoFocus?: boolean;
+}) {
   const router = useRouter();
   const [kod, ustawKod] = useState("");
   const [wysylam, ustawWysylam] = useState(false);
 
   return (
     <form
+      className="wpisz-kod"
       onSubmit={(e) => {
         e.preventDefault();
         if (!poprawnyKod(kod)) return;
@@ -37,9 +47,9 @@ export function WpiszKod({ cel, przycisk }: { cel: string; przycisk: string }) {
         spellCheck={false}
         placeholder="ABCD"
         maxLength={4}
-        autoFocus
+        autoFocus={autoFocus}
       />
-      <button type="submit" className="przycisk zloty" style={{ marginTop: 14 }} disabled={!poprawnyKod(kod) || wysylam}>
+      <button type="submit" className="przycisk zloty" disabled={!poprawnyKod(kod) || wysylam}>
         {przycisk}
       </button>
     </form>

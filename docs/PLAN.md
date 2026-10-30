@@ -10,7 +10,7 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 
 **Gdzie jesteśmy:** pierwszy prawdziwy quiz poszedł 28.10 w Piwiarni w Alejach (gra AZKJ, 9 graczy, piwny quiz). Działał, wyścig finału na TV zrobił największe wrażenie (szczegóły i ludzie: pamięć „piwiarnia-ludzie”). 29.10 poprawki po tej grze, porządki w wyglądzie panelu i finał przy małej grze. Zasady wyścigu Łukasz uznał za zamknięte („na wczorajszym teście poszło sprawiedliwie”).
 
-**Następny krok:** plany Łukasza z 30.10: strona główna `quiz.bractwopiwne.pl` (do ustalenia, co ma pokazywać), dopracowanie kont adminów, poprawki wyglądu (panel zrobiony 30.10, pilot jeszcze nie) i nowe gry (do omówienia). Nowy quiz „Wyścig po piwo” odłożony. Gdy wrócimy do nowego quizu: zasady układania pytań w `CLAUDE.md`, etapy z szablonu (`SZABLONY_ETAPOW`/`SZABLONY_QUIZU` w `src/lib/etapy.ts`) jak w piwnym (13, 9, 5, 6 pytań i pula ok. 30–35 zdań prawda/fałsz w finale), treść migracją, grafiki promptami w `scripts/grafiki.mjs`.
+**Następny krok:** plany Łukasza z 30.10: dopracowanie kont adminów i nowe gry (do omówienia). Zrobione 30.10: porządek wyglądu panelu i pilota, strona główna dla graczy. Nowy quiz „Wyścig po piwo” odłożony. Gdy wrócimy do nowego quizu: zasady układania pytań w `CLAUDE.md`, etapy z szablonu (`SZABLONY_ETAPOW`/`SZABLONY_QUIZU` w `src/lib/etapy.ts`) jak w piwnym (13, 9, 5, 6 pytań i pula ok. 30–35 zdań prawda/fałsz w finale), treść migracją, grafiki promptami w `scripts/grafiki.mjs`.
 
 **Zasady gry (wspólne dla każdego wyścigu, w funkcjach bazy):**
 - Punkty: 1000 za dobrą odpowiedź, spadek za czas do 200, mnożniki etapów ×1 / ×1,5 / ×2 / ×2 (`wewn.punkty_odpowiedzi`, kopia do opisu w `src/lib/gra/punktacja.ts`). Pub quiz bez etapów: waga rodzaju (`wewn.waga_typu`).
@@ -35,6 +35,12 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - Wygaszacz OLED: Łukasz klika OK na pilocie TV, przeglądarka sama tego nie zrobi.
 - Kwadrat ma testowe hasło lokalu; Piwiarnia i PPR hasła ustawia Łukasz.
 - W bazie nieużywane dla zgodności: `przerobki_ai`, `sesje.widok_rankingu`, `gracze_sesji`, `pijane_pytania_quizu`.
+
+### Strona główna dla graczy (30.10) ✅
+
+- `quiz.bractwopiwne.pl` jest teraz dla graczy (Łukasz): logo, pole na kod gry (`WpiszKod`, to samo co na `/ekran`, wielkie litery same) i „Najbliższe quizy”: gry w lokalach w poczekalni z godziną startu, od godziny przed startem wzwyż, bez gier bez lokalu i „tylko dla mnie” (logo lokalu, dzień i godzina, okazja albo rodzaj, miasto; odświeżane co minutę). Stopka: bractwopiwne.pl, „Ekran TV”, „Panel”, autor.
+- Lista ekranów lokali przeszła na `/ekran` (strona dla telewizora: lokale z logo i adresem, pod nimi kod gry). Obsługa na TV wchodzi przez „Ekran TV” w stopce albo od razu przez `/ekran`. Adres ekranu jest też na stronie lokalu w panelu.
+- Konta Bractwa na Instagramie nie ma w kodzie (`BRACTWO_INSTAGRAM` = null), więc w stopce jest link do bractwopiwne.pl.
 
 ### Porządek w panelu: rytm odstępów, zakładki, filtry rozwijane (30.10) ✅
 
@@ -805,7 +811,7 @@ Migracje `20261022185551_auto_wynik_i_gracze` i `20261022185614_po_usunieciu_gra
 ### Domena, strona główna i „Jak to działa” (22.10)
 
 - **Domena ✅:** `https://quiz.bractwopiwne.pl` działa. Rekord A `quiz` → `76.76.21.21` jest w strefie DNS na hostingu Hostido (konto host367070, DirectAdmin → Zarządzanie DNS). Panel domeny zostaje na „Przekierowanie na serwery DNS”, a MX Google są nietknięte. Certyfikat Let's Encrypt wystawił Vercel (`vercel certs issue`, sam się nie wystawił po dodaniu rekordu), `http://` przekierowuje na `https://`.
-- **Strona główna (dla obsługi):** lista ekranów lokali z logami i linkami `/ekran/<adres>` (ISR co 5 minut), a dla prowadzących „Panel obsługi”. Bez pola na kod gry, bo gracze skanują QR. Na TV pod QR jest pełny adres gry (`quiz.bractwopiwne.pl/KOD`) dla tych, którzy nie mogą skanować.
+- **Strona główna (dla obsługi, do 30.10; potem dla graczy, a ekrany na `/ekran`):** lista ekranów lokali z logami i linkami `/ekran/<adres>` (ISR co 5 minut), a dla prowadzących „Panel obsługi”. Bez pola na kod gry, bo gracze skanują QR. Na TV pod QR jest pełny adres gry (`quiz.bractwopiwne.pl/KOD`) dla tych, którzy nie mogą skanować.
 - **`/jak-to-dziala`:** była strona z opisem całości dla prowadzących. Usunięta tego samego dnia, za dużo czytania: zasady opisze Zbyszkowi Łukasz.
 - **Favicon:** logo Bractwa z bractwopiwne.pl (`src/app/favicon.ico` 32×32, `icon.png` 192×192, `apple-icon.png`) zamiast ikony Next.js. `favicon.ico` jest potrzebny osobno, bo część przeglądarek pobiera go bezpośrednio.
 

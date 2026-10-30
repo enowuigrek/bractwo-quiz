@@ -1652,23 +1652,39 @@ html:has(.kolumna) {
   padding-top: 10px;
 }
 
-/* Strona główna: kod gry, ekrany lokali, wejście dla prowadzących */
-.glowna h2.nadtytul {
-  margin: 0 0 4px;
+/* Strona główna dla graczy (page.tsx, 30.10): kod gry, najbliższe quizy, stopka z linkami */
+.glowna h1 {
+  margin: 0;
 }
 
-.glowna-sekcja + .glowna-sekcja {
+.glowna h2.nadtytul {
+  margin: 0;
+}
+
+.glowna-sekcja {
   margin-top: var(--section-gap);
-  padding-top: var(--card-pad);
-  border-top: 1px solid var(--kamien2);
+}
+
+.glowna-sekcja > * + * {
+  margin-top: var(--o-3);
+}
+
+/* pole kodu i przycisk (ta sama forma na `/ekran`) */
+.wpisz-kod {
+  display: grid;
+  gap: var(--o-3);
+}
+
+.wpisz-kod .etykieta {
+  margin: 0;
 }
 
 .glowna-lokale {
   list-style: none;
-  margin: 12px 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: var(--o-2);
 }
 
 .glowna-lokal {
@@ -1681,12 +1697,21 @@ html:has(.kolumna) {
   border-radius: var(--r-card);
   color: var(--piana);
   text-decoration: none;
+}
+
+/* ekrany lokali na `/ekran` to linki */
+a.glowna-lokal {
   transition: border-color 0.35s var(--ease-std);
 }
 
-.glowna-lokal:hover,
-.glowna-lokal:focus-visible {
+a.glowna-lokal:hover,
+a.glowna-lokal:focus-visible {
   border-color: var(--zloto);
+}
+
+.glowna-lokal-strzalka {
+  color: var(--zloto);
+  font-weight: var(--w-black);
 }
 
 .glowna-lokal-logo {
@@ -1718,20 +1743,39 @@ html:has(.kolumna) {
   overflow-wrap: anywhere;
 }
 
-.glowna-lokal-strzalka {
-  color: var(--zloto);
-  font-weight: var(--w-black);
+/* stopka na dole ekranu: linki do Bractwa i panelu, pod nimi autor */
+.kolumna:has(> .glowna-stopka) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
 }
 
-.glowna-przyciski {
+.glowna-stopka {
   display: grid;
-  gap: 10px;
-  margin-top: 12px;
+  justify-items: center;
+  gap: var(--o-3);
+  margin-top: auto;
+  padding-top: var(--section-gap);
 }
 
-.glowna-przyciski .przycisk {
-  text-align: center;
+.glowna-stopka nav {
+  display: flex;
+  gap: var(--o-4);
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+}
+
+.glowna-stopka nav a {
+  color: var(--szary);
   text-decoration: none;
+}
+
+.glowna-stopka nav a:hover {
+  color: var(--zloto);
+}
+
+.glowna-stopka .autor {
+  margin: 0;
 }
 
 /* Rodzaj pytania w odliczaniu na telefonie */
