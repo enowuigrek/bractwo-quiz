@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { wymagajGlownego } from "@/lib/admin";
+import { wymagajTworcy } from "@/lib/admin";
 import { LIMITY_PIJANE } from "@/lib/pijany";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
@@ -13,7 +13,7 @@ import type { StanFormularza } from "@/lib/typy";
  * Przeszkadzacze nie są przy pytaniach (idą według pozycji, src/lib/pijany.ts).
  */
 export async function zapiszPijanePytania(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  await wymagajGlownego();
+  await wymagajTworcy();
   let surowe: unknown;
   try {
     surowe = JSON.parse(String(dane.get("pytania") ?? "[]"));
@@ -74,7 +74,7 @@ const NA_OTWARCIE_S = 15;
 const SERIA_TESTU_S = 25;
 
 export async function testPijanegoFinalu(): Promise<void> {
-  await wymagajGlownego();
+  await wymagajTworcy();
   const db = supabaseAdmin();
 
   // quiz z finałem serią: najpierw Piwny quiz Bractwa, inaczej pierwszy, jaki jest

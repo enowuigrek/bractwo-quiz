@@ -66,6 +66,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       tagi: czytajTagi(tekst(dane, "tagi")),
       tylko_glowny: widziWszystko(rola) && !!dane.get("tylko_glowny"),
       lokal_id: lokalRoli(rola),
+      autor_konto_id: rola.konto.id,
     })
     .select("id")
     .single();
@@ -100,7 +101,7 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   return { ok: "Zapisano." };
 }
 
-/** Przełącznik „Tylko dla mnie” na stronie quizu: lokale przestają albo zaczynają widzieć quiz Bractwa. */
+/** Przełącznik „Tylko Bractwo” na stronie quizu: lokale przestają albo zaczynają widzieć quiz Bractwa. */
 export async function ustawWidocznoscQuizu(id: string, tylkoGlowny: boolean): Promise<void> {
   const rola = await wymagajAdmina();
   if (!widziWszystko(rola)) return;

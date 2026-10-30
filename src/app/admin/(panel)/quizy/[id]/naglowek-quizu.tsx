@@ -11,7 +11,7 @@ import { LIMITY } from "../limity";
 export const FORMULARZ_QUIZU = "quiz-naglowek";
 
 /** Tytuł, opis i tematy quizu w nagłówku. Ołówek otwiera edycję w miejscu. */
-export function NaglowekQuizu({ quiz }: { quiz: Quiz }) {
+export function NaglowekQuizu({ quiz, autor = null }: { quiz: Quiz; autor?: string | null }) {
   const [edycja, ustawEdycje] = useState(false);
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(async (poprzedni, dane) => {
     const wynik = await zapiszQuiz(quiz.id, poprzedni, dane);
@@ -80,6 +80,8 @@ export function NaglowekQuizu({ quiz }: { quiz: Quiz }) {
             </button>
           </div>
           {quiz.opis && <p className="pomocniczy quiz-naglowek-opis">{quiz.opis}</p>}
+          {/* kto założył quiz (konta osobowe, 30.10; starsze quizy bez autora) */}
+          {autor && <p className="pomocniczy">Autor: {autor}</p>}
           {quiz.tagi.length > 0 && (
             <p className="tagi">
               {quiz.tagi.map((t) => (

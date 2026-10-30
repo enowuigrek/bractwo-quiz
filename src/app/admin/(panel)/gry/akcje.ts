@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { lokalRoli, ukryteLokale, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { wymagajGry, wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { kontoInstagram } from "@/lib/instagram";
@@ -37,6 +37,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   if (!quiz_id) return { blad: "Wybierz quiz." };
   // lokal gra tylko u siebie, a quizy Bractwa może uruchamiać (bez zmieniania ich)
   if (lokalRoli(rola) && lokalRoli(rola) !== lokal_id) return { blad: "Możesz uruchomić grę tylko w swoim lokalu." };
+  if (ukryteLokale(rola).includes(lokal_id)) return { blad: "Wybierz lokal." };
   await wymagajQuizu(rola, quiz_id, true);
   if (czas_s !== null && (!Number.isInteger(czas_s) || czas_s < LIMITY.minCzas || czas_s > LIMITY.maxCzas)) {
     return { blad: "Wybierz czas na odpowiedź." };
@@ -170,6 +171,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       pijany_final,
       za_barem,
       tylko_glowny,
+      autor_konto_id: rola.konto.id,
     })
     .select("kod, host_token")
     .single<{ kod: string; host_token: string }>();
@@ -273,6 +275,7 @@ export async function zapiszNotatke(sesjaId: string, _: StanFormularza, dane: Fo
     .update({
       notatka: notatka || null,
       notatka_lokal_id: notatka ? (lokalRoli(rola) ?? null) : null,
+      notatka_konto_id: notatka ? rola.konto.id : null,
       notatka_zmieniono: notatka ? new Date().toISOString() : null,
     })
     .eq("id", sesjaId);

@@ -18,10 +18,12 @@ export type GraNaLiscie = {
   notatka: string | null;
   quizy: { tytul: string; tagi: string[]; etapy: { count: number }[] } | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
+  /** kto uruchomił (konta osobowe, 30.10) */
+  konta: { nazwa: string } | null;
 };
 
 export const ZAPYTANIE_GIER =
-  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, etapy(count)), lokale(nazwa, miasto, logo_url)";
+  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, etapy(count)), lokale(nazwa, miasto, logo_url), konta(nazwa)";
 
 /** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
 const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);
@@ -67,7 +69,7 @@ export function ListaGier({ gry, pusta, lokal = false }: { gry: GraNaLiscie[]; p
                 )}
               </div>
               <div className="lista-opis">
-                {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(kiedyGra(g)))]
+                {[g.lokale?.nazwa ?? "bez lokalu", g.okazja, data.format(new Date(kiedyGra(g))), g.konta?.nazwa]
                   .filter(Boolean)
                   .join(" · ")}
               </div>

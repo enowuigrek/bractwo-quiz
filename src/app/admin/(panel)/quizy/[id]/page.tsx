@@ -44,9 +44,9 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     await Promise.all([
       db
         .from("quizy")
-        .select("id, tytul, opis, utworzono, tylko_glowny, tagi, usunieto, lokal_id")
+        .select("id, tytul, opis, utworzono, tylko_glowny, tagi, usunieto, lokal_id, konta(nazwa)")
         .eq("id", id)
-        .maybeSingle<Quiz & { usunieto: string | null; lokal_id: string | null }>(),
+        .maybeSingle<Quiz & { usunieto: string | null; lokal_id: string | null; konta: { nazwa: string } | null }>(),
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
@@ -182,7 +182,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       <p className="okruchy">
         <Link href="/admin/quizy">← Quizy</Link>
       </p>
-      <NaglowekQuizu quiz={quiz} />
+      <NaglowekQuizu quiz={quiz} autor={quiz.konta?.nazwa ?? null} />
       {/* tylko główny decyduje, czy lokale widzą jego quiz (do grania); quizów lokali to nie dotyczy */}
       {widziWszystko(rola) && !quiz.lokal_id && (
         <UdostepnijLokalom quizId={quiz.id} udostepniony={!quiz.tylko_glowny} />

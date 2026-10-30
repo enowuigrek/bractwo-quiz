@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { filtrQuizow } from "@/lib/admin-dostep";
+import { filtrLokaliRoli, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { IkonaEdytuj, IkonaKlodka, IkonaKosz, IkonaOko } from "@/components/ikony";
 import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty/filtry-listy";
@@ -41,7 +41,9 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
   const glowny = widziWszystko(rola);
   // główny widzi, kto założył quiz (logo lokalu albo Bractwa), i filtruje po autorze (26.10)
   const { data: lokale } = glowny
-    ? await db.from("lokale").select("id, nazwa, logo_url, miasto").order("nazwa").returns<LokalAutor[]>()
+    ? await filtrLokaliRoli(db.from("lokale").select("id, nazwa, logo_url, miasto"), rola)
+        .order("nazwa")
+        .returns<LokalAutor[]>()
     : { data: [] as LokalAutor[] };
   const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);
   const autor = wybranyLokal(lokalZAdresu, lokale ?? [], true, miasto);
@@ -128,7 +130,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
                   <Link href={`/admin/quizy/${q.id}`}>{q.tytul}</Link>
                   {/* na liście same tytuły (26.10): liczba pytań, tematy i opis dopiero po wejściu w quiz */}
                   {glowny && q.tylko_glowny && (
-                    <span className="lista-klodka" title="Tylko dla mnie" aria-label="Tylko dla mnie">
+                    <span className="lista-klodka" title="Tylko Bractwo" aria-label="Tylko Bractwo">
                       {" "}
                       <IkonaKlodka />
                     </span>

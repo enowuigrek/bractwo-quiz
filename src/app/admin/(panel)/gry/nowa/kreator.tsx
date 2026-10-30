@@ -320,8 +320,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
               <fieldset>
                 <legend>Widoczność</legend>
                 <label className="przelacznik">
-                  <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (lokal nie zobaczy tej
-                  gry w swoim panelu)
+                  <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko Bractwo (bez panelu lokalu)
                 </label>
               </fieldset>
           )}

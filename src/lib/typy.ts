@@ -74,6 +74,9 @@ export type Sesja = {
   notatka?: string | null;
   /** autor notatki: lokal (null: Bractwo, panel główny) i kiedy ją zmieniono */
   notatka_lokal_id?: string | null;
+  /** Kto uruchomił grę i kto napisał notatkę (konta osobowe, 30.10). */
+  autor_konto_id?: string | null;
+  notatka_konto_id?: string | null;
   notatka_zmieniono?: string | null;
   /** faktyczny start: pierwsze wyjście z poczekalni (wyzwalacz w bazie, od 29.10) */
   wystartowano?: string | null;

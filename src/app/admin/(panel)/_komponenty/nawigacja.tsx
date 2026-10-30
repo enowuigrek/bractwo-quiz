@@ -6,10 +6,10 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { IkonaUstawienia } from "@/components/ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
-const POZYCJE = [
+const WSPOLNE = [
   { href: "/admin/gry", tekst: "Rozgrywki" },
   { href: "/admin/quizy", tekst: "Quizy" },
-] as const;
+];
 
 /**
  * `ustawienia`: lista lokali u głównego, strona własnego lokalu w panelu lokalu (wtedy zamiast zębatki logo lokalu).
@@ -17,11 +17,15 @@ const POZYCJE = [
 export function Nawigacja({
   ustawienia,
   lokal = null,
+  tworca = false,
 }: {
   ustawienia: string;
   lokal?: { nazwa: string; logo_url: string | null } | null;
+  /** twórca ma jeszcze zakładkę „Konta” (30.10) */
+  tworca?: boolean;
 }) {
   const sciezka = usePathname();
+  const POZYCJE = tworca ? [...WSPOLNE, { href: "/admin/konta", tekst: "Konta" }] : WSPOLNE;
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");
   const zeSciezki = uruchamianie ? -1 : POZYCJE.findIndex((p) => sciezka.startsWith(p.href));
   // kliknięta zakładka przejmuje pasek od razu, zanim wczyta się nowa strona; nowa ścieżka to kasuje

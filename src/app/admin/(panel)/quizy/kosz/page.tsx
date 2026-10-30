@@ -63,7 +63,7 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
                 <div className="lista-opis">
                   {widziWszystko(rola) && q.tylko_glowny && (
                     <>
-                      <IkonaKlodka /> tylko dla mnie ·{" "}
+                      <IkonaKlodka /> tylko Bractwo ·{" "}
                     </>
                   )}
                   {NAZWY_RODZAJOW[(q.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny"]} ·{" "}

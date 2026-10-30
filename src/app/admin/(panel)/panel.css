@@ -55,6 +55,28 @@ span.panel-logo-lokalu {
 
 .panel-wyloguj {
   grid-area: wyloguj;
+  display: flex;
+  align-items: center;
+  gap: var(--o-2);
+}
+
+.panel-wyloguj form {
+  margin: 0;
+}
+
+/* imię zalogowanego i rola obok „Wyloguj” (konta osobowe, 30.10) */
+.panel-konto {
+  max-width: 220px;
+  padding: 0 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+}
+
+.panel-konto span {
+  color: var(--szary);
+  font-weight: var(--w-semibold);
 }
 
 /* Telefon (do 959 px): logo i przycisk menu (menu.tsx, style w globals.css), bez paska zakładek i „Wyloguj” */
@@ -2495,4 +2517,69 @@ button.tag:hover:not(.wybrany) {
 
 .przeglad-brak {
   margin: 12px 0 0;
+}
+
+/* Konta (30.10): dostęp jako przełączniki jeden pod drugim, lokale z logo */
+.konto-role {
+  display: grid;
+  gap: var(--o-3);
+}
+
+.konto-role-logo {
+  height: 24px;
+  width: auto;
+  max-width: 48px;
+  object-fit: contain;
+}
+
+/* przycisk w formularzu w rzędzie `.przyciski` (np. „Zablokuj” obok „Usuń konto”) też na całą szerokość komórki */
+.panel .przyciski > form > :is(.przycisk, button) {
+  width: 100%;
+  min-width: 0;
+}
+
+/* „Działam jako” na stronie „Moje konto”: kafelki ról tej samej szerokości, wybrana wypełniona złotem */
+.kafelki-rol {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--o-3);
+}
+
+.kafelki-rol form {
+  display: grid;
+  margin: 0;
+}
+
+.kafelek-roli {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--o-2);
+  min-height: 112px;
+  padding: var(--o-4) var(--o-3);
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-black);
+  color: var(--piana);
+  background: var(--kamien2);
+  border: 0;
+  border-radius: var(--r-card);
+  cursor: pointer;
+  text-align: center;
+}
+
+.kafelek-roli:hover:not(.wybrana) {
+  background: var(--kamien3);
+}
+
+.kafelek-roli.wybrana {
+  background: linear-gradient(180deg, var(--zloto-jasne), var(--zloto));
+  color: var(--na-zlocie);
+}
+
+.kafelek-roli img {
+  height: 44px;
+  width: auto;
+  max-width: 100px;
+  object-fit: contain;
 }

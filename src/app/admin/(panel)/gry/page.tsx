@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { filtrGier } from "@/lib/admin-dostep";
+import { filtrLokaliRoli, filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty/filtry-listy";
 import { wybraneMiasto, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
@@ -15,7 +15,9 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const db = supabaseAdmin();
   // główny filtruje gry po lokalu (26.10); lokal i tak widzi tylko swoje
   const { data: lokale } = widziWszystko(rola)
-    ? await db.from("lokale").select("id, nazwa, logo_url, miasto").order("nazwa").returns<LokalAutor[]>()
+    ? await filtrLokaliRoli(db.from("lokale").select("id, nazwa, logo_url, miasto"), rola)
+        .order("nazwa")
+        .returns<LokalAutor[]>()
     : { data: [] as LokalAutor[] };
   const { lokal: lokalZAdresu, rodzaj: rodzajZAdresu, tag, miasto: miastoZAdresu } = await searchParams;
   const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);

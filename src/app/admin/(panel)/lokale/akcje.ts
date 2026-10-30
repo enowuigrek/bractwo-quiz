@@ -2,14 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import {
-  lokalRoli,
-  MIN_HASLO_LOKALU,
-  ustawHasloLokalu,
-  wymagajAdmina,
-  wymagajGlownego,
-  zaloguj,
-} from "@/lib/admin";
+import { jestTworca, lokalRoli, wymagajAdmina, wymagajTworcy } from "@/lib/admin";
 import { wymagajLokalu } from "@/lib/admin-dostep";
 import { SEGMENTY_PANELU } from "@/lib/adres-ekranu";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
@@ -35,6 +28,9 @@ export async function zapiszLokal(
     if (id !== lokal) return { blad: "To nie jest Twój lokal." };
     return zapiszSwojLokal(id, dane);
   }
+  // nowe lokale zakłada twórca; Bractwo zmienia istniejące (poza testowym)
+  if (!id && !jestTworca(rola)) return { blad: "Nowy lokal dodaje twórca." };
+  if (id) wymagajLokalu(rola, id);
   const db = supabaseAdmin();
 
   const nazwa = tekst(dane, "nazwa");
@@ -125,30 +121,8 @@ async function zapiszSwojLokal(id: string, dane: FormData): Promise<StanFormular
   return { ok: "Zapisano." };
 }
 
-/**
- * Hasło panelu lokalu (logowanie pod /admin/<adres_ekranu>): główny ustawia je każdemu lokalowi (na start i po
- * zgubieniu), lokal zmienia swoje. Zmiana wylogowuje lokal na innych urządzeniach.
- */
-export async function zmienHasloLokalu(id: string, _: StanFormularza, dane: FormData): Promise<StanFormularza> {
-  const rola = await wymagajAdmina();
-  wymagajLokalu(rola, id);
-  const haslo = String(dane.get("haslo") ?? "");
-  if (haslo.length < MIN_HASLO_LOKALU) return { blad: `Hasło musi mieć co najmniej ${MIN_HASLO_LOKALU} znaków.` };
-  if (haslo.length > 200) return { blad: "Hasło jest za długie." };
-  if (haslo !== String(dane.get("haslo2") ?? "")) return { blad: "Hasła się różnią." };
-  try {
-    await ustawHasloLokalu(id, haslo);
-    // lokal zmienił swoje hasło: nowe ciasteczko, żeby na tym urządzeniu został zalogowany
-    if (lokalRoli(rola) === id) await zaloguj(rola);
-  } catch (e) {
-    return { blad: (e as Error).message };
-  }
-  refresh();
-  return { ok: "Hasło zapisane." };
-}
-
 export async function usunLokal(id: string): Promise<void> {
-  await wymagajGlownego();
+  await wymagajTworcy();
   const db = supabaseAdmin();
   const { data } = await db.from("lokale").delete().eq("id", id).select("logo_url").maybeSingle();
   await usunGrafike(data?.logo_url);

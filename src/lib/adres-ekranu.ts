@@ -8,7 +8,16 @@ export const MAX_ADRES_EKRANU = 60;
  * Strony panelu pod `/admin/…`. Ten sam adres co ekran lokalu ma jego logowanie (`/admin/<adres_ekranu>`, 26.10),
  * więc lokal nie może mieć adresu jak strona panelu.
  */
-export const SEGMENTY_PANELU: readonly string[] = ["gry", "quizy", "lokale", "logowanie"];
+export const SEGMENTY_PANELU: readonly string[] = [
+  "gry",
+  "quizy",
+  "lokale",
+  "logowanie",
+  "rejestracja",
+  "haslo",
+  "konta",
+  "konto",
+];
 
 /** „Piwiarnia w Alejach” → „piwiarnia-w-alejach”. */
 export function adresZNazwy(nazwa: string): string {

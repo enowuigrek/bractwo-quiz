@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { adresAplikacji } from "@/lib/adres";
-import { maHasloLokalu, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { jestTworca, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { wymagajLokalu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
@@ -11,7 +11,6 @@ import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { LinkDoSkopiowania } from "../../gry/[id]/kopiuj";
 import { usunLokal } from "../akcje";
 import { FormularzLokalu } from "../formularz";
-import { FormularzHasla } from "../haslo";
 
 export const metadata: Metadata = { title: "Lokal · Bractwo Quiz" };
 
@@ -21,16 +20,21 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
   wymagajLokalu(rola, id);
   const glowny = widziWszystko(rola);
   const db = supabaseAdmin();
-  const [{ data: lokal }, { data: wszystkie }] = await Promise.all([
+  const [{ data: lokal }, { data: wszystkie }, { data: osoby }] = await Promise.all([
     db.from("lokale").select("id, nazwa, miasto, logo_url, adres_ekranu, instagram").eq("id", id).maybeSingle<Lokal>(),
     db.from("lokale").select("miasto"),
+    // osoby z dostępem do panelu tego lokalu (konta osobowe, 30.10)
+    db
+      .from("konta_role")
+      .select("konta(id, nazwa, email, zablokowane)")
+      .eq("rola", "lokal")
+      .eq("lokal_id", id)
+      .returns<{ konta: { id: string; nazwa: string; email: string; zablokowane: boolean } | null }[]>(),
   ]);
   if (!lokal) notFound();
 
   const adres = await adresAplikacji();
   const ekran = `${adres}/ekran/${lokal.adres_ekranu}`;
-  const panel = `${adres}/admin/${lokal.adres_ekranu}`;
-  const ma = await maHasloLokalu(lokal.id);
   // SVG z biblioteki qrcode; jedyne dane to adres, który sami złożyliśmy
   const qrEkranu = await QRCode.toString(ekran, { type: "svg", margin: 0, errorCorrectionLevel: "M" });
 
@@ -52,16 +56,33 @@ export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/
           <LinkDoSkopiowania url={ekran} />
         </section>
         <section className="karta">
-          <h2>Panel lokalu</h2>
-          {!ma && <p className="blad">Lokal nie ma hasła, więc się nie zaloguje.</p>}
-          <LinkDoSkopiowania url={panel} />
-        </section>
-        <section className="karta">
-          <h2>Hasło panelu</h2>
-          <FormularzHasla lokalId={lokal.id} ma={ma} />
+          <h2>Osoby</h2>
+          {osoby?.length ? (
+            <ul className="lista">
+              {osoby
+                .flatMap((o) => (o.konta ? [o.konta] : []))
+                .map((k) => (
+                  <li key={k.id}>
+                    <div className="lista-glowna">
+                      <div className="lista-tytul">
+                        {jestTworca(rola) ? <Link href={`/admin/konta/${k.id}`}>{k.nazwa}</Link> : k.nazwa}
+                      </div>
+                      <div className="lista-opis">{k.zablokowane ? "zablokowane" : k.email}</div>
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          ) : (
+            <p className="lista-pusta">Nikt nie ma jeszcze dostępu do panelu lokalu.</p>
+          )}
+          {jestTworca(rola) && (
+            <Link href={`/admin/konta/nowe?lokal=${lokal.id}`} className="przycisk-maly">
+              + Dodaj osobę
+            </Link>
+          )}
         </section>
       </div>
-      {glowny && (
+      {jestTworca(rola) && (
         <section className="panel-sekcja">
           <PrzyciskPotwierdz
             akcja={usunLokal.bind(null, lokal.id)}

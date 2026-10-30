@@ -10,7 +10,7 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 
 **Gdzie jesteśmy:** pierwszy prawdziwy quiz poszedł 28.10 w Piwiarni w Alejach (gra AZKJ, 9 graczy, piwny quiz). Działał, wyścig finału na TV zrobił największe wrażenie (szczegóły i ludzie: pamięć „piwiarnia-ludzie”). 29.10 poprawki po tej grze, porządki w wyglądzie panelu i finał przy małej grze. Zasady wyścigu Łukasz uznał za zamknięte („na wczorajszym teście poszło sprawiedliwie”).
 
-**Następny krok:** plany Łukasza z 30.10: dopracowanie kont adminów i nowe gry (do omówienia). Zrobione 30.10: porządek wyglądu panelu i pilota, strona główna dla graczy. Nowy quiz „Wyścig po piwo” odłożony. Gdy wrócimy do nowego quizu: zasady układania pytań w `CLAUDE.md`, etapy z szablonu (`SZABLONY_ETAPOW`/`SZABLONY_QUIZU` w `src/lib/etapy.ts`) jak w piwnym (13, 9, 5, 6 pytań i pula ok. 30–35 zdań prawda/fałsz w finale), treść migracją, grafiki promptami w `scripts/grafiki.mjs`.
+**Następny krok:** nowe gry (do omówienia z Łukaszem). Zrobione 30.10: porządek wyglądu panelu i pilota, strona główna dla graczy, konta osobowe z rolami. Nowy quiz „Wyścig po piwo” odłożony. Gdy wrócimy do nowego quizu: zasady układania pytań w `CLAUDE.md`, etapy z szablonu (`SZABLONY_ETAPOW`/`SZABLONY_QUIZU` w `src/lib/etapy.ts`) jak w piwnym (13, 9, 5, 6 pytań i pula ok. 30–35 zdań prawda/fałsz w finale), treść migracją, grafiki promptami w `scripts/grafiki.mjs`.
 
 **Zasady gry (wspólne dla każdego wyścigu, w funkcjach bazy):**
 - Punkty: 1000 za dobrą odpowiedź, spadek za czas do 200, mnożniki etapów ×1 / ×1,5 / ×2 / ×2 (`wewn.punkty_odpowiedzi`, kopia do opisu w `src/lib/gra/punktacja.ts`). Pub quiz bez etapów: waga rodzaju (`wewn.waga_typu`).
@@ -36,7 +36,7 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - Kwadrat ma testowe hasło lokalu; Piwiarnia i PPR hasła ustawia Łukasz.
 - W bazie nieużywane dla zgodności: `przerobki_ai`, `sesje.widok_rankingu`, `gracze_sesji`, `pijane_pytania_quizu`.
 
-### Konta osobowe w panelu (ustalenia 30.10, do zrobienia)
+### Konta osobowe w panelu (30.10) ✅
 
 - **Konto = osoba**, logowanie e-mailem i hasłem na jednej stronie `/admin` (adresy `/admin/<lokal>` znikną). E-mail dowolny: bractwowy albo prywatny (nie każdy właściciel lokalu ma adres Bractwa).
 - **Role nadaje Łukasz.** Konto może mieć kilka ról: twórca (Łukasz: wszystko, narzędzia techniczne, Kwadrat, konta), Bractwo (wszystkie lokale, gry i quizy, quizy Bractwa, gry w każdym lokalu; bez narzędzi technicznych i bez Kwadratu), lokal X (tylko swój lokal). Rola Bractwo tylko dla tych, którzy jej potrzebują (na start Zbyszko); lokal może mieć kilku ludzi (Piwiarnia ma 5–6 właścicieli, część w Bractwie, część nie, do panelu wejdą pewnie najwyżej 3).
@@ -44,7 +44,10 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - **Zakładanie kont:** Łukasz zakłada konto znanej osobie (e-mail i role) i dostaje jednorazowy link do ustawienia hasła, który wysyła sam (WhatsApp, mail). Ktoś może też założyć konto sam: wtedy czeka bez ról, aż Łukasz je nada. Reset hasła tym samym linkiem z panelu. Bez wysyłania maili przez aplikację na start.
 - **Kwadrat** dostaje znacznik lokalu testowego: widzi go tylko twórca (bez filtrów, list i „Najbliższych quizów” u innych).
 - **Autor:** przy grze, quizie i notatce zapisujemy osobę (i rolę, w której działała); w panelu widać „uruchomił Arzy (Piwiarnia)”.
-- Hasła lokali (`lokale_hasla`) i hasło główne z `.env` zostają do przejścia; potem wyłączamy.
+- Hasła lokali (`lokale_hasla`) wyłączone (nikt ich jeszcze nie używał), tabela zostaje w bazie; hasło główne z `.env` to awaryjne wejście na konto twórcy.
+- **Zrobione:** migracja `20261030075610_konta_osobowe` (`konta`, `konta_role`, `lokale.testowy` = Kwadrat, `autor_konto_id` przy grach i quizach, `notatka_konto_id`), konto Łukasza z rolą twórcy; logowanie e-mailem (`/admin/logowanie`), zakładanie konta (`/admin/rejestracja`), hasło z linku (`/admin/haslo/<token>`); „Konta” (lista z „Czekają na dostęp”, nowe konto z rolami i linkiem, zmiana ról, nowy link, blokada, usunięcie); „Moje konto” z kafelkami „Działam jako”, imieniem i zmianą hasła; imię i rola obok „Wyloguj” i w menu; strona lokalu pokazuje osoby z dostępem; „Kto uruchomił” przy grze i na liście rozgrywek, autor quizu i notatki. Boty, pijany finał, nowe i usuwane lokale tylko dla twórcy. „Tylko dla mnie” przemianowane na „tylko Bractwo”. Kwadrat zniknął z `/ekran` i „Najbliższych quizów”.
+- **Sprawdzone lokalnie:** wejście twórcy hasłem awaryjnym, konto z rolą Bractwo z linku (bez „Kont”, bez Kwadratu, strona Kwadratu 404, PPR i gra AZKJ widoczne, link drugi raz nieważny), rejestracja (konto bez ról nie wchodzi, komunikat), nadanie lokalu, „działam jako PPR” u twórcy (tylko gry PPR) i powrót. Konta testowe usunięte.
+- **Na produkcji po wdrożeniu:** Łukasz wchodzi swoim e-mailem i obecnym hasłem głównym, ustawia własne hasło na „Moim koncie”, zakłada konta Zbyszkowi (Bractwo), Arzy (Piwiarnia) i Kamilowi (PPR) i wysyła im linki.
 
 ### Strona główna dla graczy (30.10) ✅
 

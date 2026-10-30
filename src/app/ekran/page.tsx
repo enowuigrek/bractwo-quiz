@@ -19,6 +19,7 @@ export default async function Ekran() {
   const { data } = await supabaseAdmin()
     .from("lokale")
     .select("id, nazwa, miasto, logo_url, adres_ekranu")
+    .eq("testowy", false)
     .order("miasto")
     .order("nazwa")
     .returns<Pick<Lokal, "id" | "nazwa" | "miasto" | "logo_url" | "adres_ekranu">[]>();

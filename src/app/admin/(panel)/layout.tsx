@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LogoQuiz } from "@/components/logo-quiz";
-import { lokalRoli, wymagajAdmina } from "@/lib/admin";
+import { jestTworca, lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { wylogujAdmina } from "../akcje";
 import { MenuPanelu, type GraWMenu } from "./_komponenty/menu";
 import { filtrGier } from "@/lib/admin-dostep";
@@ -23,6 +23,12 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
         .maybeSingle<{ nazwa: string; logo_url: string | null }>()
     : { data: null };
   const ustawienia = lokalId ? `/admin/lokale/${lokalId}` : "/admin/lokale";
+  // kto i jako kto (konta osobowe, 30.10): obok „Wyloguj” i w menu, prowadzi do „Mojego konta” z „działam jako”
+  const konto = {
+    nazwa: rola.konto.nazwa,
+    jako: rola.typ === "tworca" ? "Twórca" : rola.typ === "bractwo" ? "Bractwo" : (lokal?.nazwa ?? "Lokal"),
+  };
+  const tworca = jestTworca(rola);
   // trwająca gra (najnowsza, którą ta rola widzi): w menu skrót do jej pilota zamiast „Uruchom quiz”
   const { data: trwa } = await filtrGier(
     db
@@ -65,14 +71,26 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
             ))}
           <LogoQuiz wysokosc={44} dopisek={lokal ? undefined : "panel"} />
         </Link>
-        <Nawigacja ustawienia={ustawienia} lokal={lokal} />
-        <form action={wylogujAdmina} className="panel-wyloguj">
-          <button type="submit" className="przycisk-maly">
-            Wyloguj
-          </button>
-        </form>
+        <Nawigacja ustawienia={ustawienia} lokal={lokal} tworca={tworca} />
+        <div className="panel-wyloguj">
+          <Link href="/admin/konto" className="przycisk-maly panel-konto" title={`${konto.nazwa}: ${konto.jako}`}>
+            {konto.nazwa} <span>· {konto.jako}</span>
+          </Link>
+          <form action={wylogujAdmina}>
+            <button type="submit" className="przycisk-maly">
+              Wyloguj
+            </button>
+          </form>
+        </div>
         {/* telefon: zamiast paska i „Wyloguj” samo menu obok logo */}
-        <MenuPanelu wyloguj={wylogujAdmina} gra={gra} ustawienia={ustawienia} lokal={lokal} />
+        <MenuPanelu
+          wyloguj={wylogujAdmina}
+          gra={gra}
+          ustawienia={ustawienia}
+          lokal={lokal}
+          konto={konto}
+          tworca={tworca}
+        />
       </header>
       <Powiadomienia rola={rola} />
       {children}

@@ -30,6 +30,8 @@ type GraZDanymi = Sesja & {
     logo_url: string | null;
     instagram: string | null;
   } | null;
+  /** kto uruchomił grę (konta osobowe, 30.10; starsze gry bez autora) */
+  konta: { nazwa: string } | null;
 };
 
 export default async function Gra({ params, searchParams }: PageProps<"/admin/gry/[id]">) {
@@ -53,7 +55,7 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
-    db.from("sesje").select("*, quizy(tytul, etapy(count)), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram)").eq("id", id).maybeSingle<GraZDanymi>(),
+    db.from("sesje").select("*, quizy(tytul, etapy(count)), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram), konta(nazwa)").eq("id", id).maybeSingle<GraZDanymi>(),
     db.from("gracze").select("id", { count: "exact", head: true }).eq("sesja_id", id),
   ]);
   if (!gra) notFound();
@@ -109,20 +111,27 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
     : pierwszePytanie
     ? new Date(pierwszePytanie.utworzono).getTime() - pierwszePytanie.czas_ms
     : null;
-  // autor notatki: lokal, który ją zapisał, albo Bractwo
-  const { data: lokalNotatki } = gra.notatka_lokal_id
-    ? await db
-        .from("lokale")
-        .select("nazwa, logo_url")
-        .eq("id", gra.notatka_lokal_id)
-        .maybeSingle<{ nazwa: string; logo_url: string | null }>()
-    : { data: null };
-  const autorNotatki: AutorNotatki = lokalNotatki
-    ? { nazwa: lokalNotatki.nazwa, logo: lokalNotatki.logo_url }
-    : { nazwa: "Bractwo Piwne", logo: "/loga/bractwo-biale.svg" };
+  // autor notatki: osoba (od 30.10) i lokal, w którego imieniu pisała, albo Bractwo
+  const [{ data: lokalNotatki }, { data: osobaNotatki }] = await Promise.all([
+    gra.notatka_lokal_id
+      ? db
+          .from("lokale")
+          .select("nazwa, logo_url")
+          .eq("id", gra.notatka_lokal_id)
+          .maybeSingle<{ nazwa: string; logo_url: string | null }>()
+      : Promise.resolve({ data: null }),
+    gra.notatka_konto_id
+      ? db.from("konta").select("nazwa").eq("id", gra.notatka_konto_id).maybeSingle<{ nazwa: string }>()
+      : Promise.resolve({ data: null }),
+  ]);
+  const autorNotatki: AutorNotatki = {
+    nazwa: [osobaNotatki?.nazwa, lokalNotatki?.nazwa ?? "Bractwo Piwne"].filter(Boolean).join(" · "),
+    logo: lokalNotatki ? lokalNotatki.logo_url : "/loga/bractwo-biale.svg",
+  };
   const daneGry: [string, string | null][] = [
     ["Lokal", gra.lokale ? `${gra.lokale.nazwa}${gra.lokale.miasto ? `, ${gra.lokale.miasto}` : ""}` : "bez lokalu"],
     ["Okazja", gra.okazja],
+    ["Kto uruchomił", gra.konta?.nazwa ?? null],
     ["Start ustawiony", godzina(gra.planowany_start, true)],
     ["Pierwszy gracz", godzina(dolaczyli[0]?.dolaczyl, !gra.planowany_start)],
     ["Ostatni gracz", dolaczyli.length > 1 ? godzina(dolaczyli[dolaczyli.length - 1].dolaczyl) : null],

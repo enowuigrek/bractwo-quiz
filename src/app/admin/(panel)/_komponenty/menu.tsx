@@ -43,12 +43,18 @@ export function MenuPanelu({
   gra = null,
   ustawienia = "/admin/lokale",
   lokal = null,
+  konto = null,
+  tworca = false,
 }: {
   wyloguj: () => Promise<void>;
+  /** zalogowana osoba i rola, w której działa (konta osobowe, 30.10); prowadzi do „Mojego konta” */
+  konto?: { nazwa: string; jako: string } | null;
+  /** twórca ma jeszcze „Konta” */
+  tworca?: boolean;
   gra?: GraWMenu | null;
   /** Lista lokali u głównego, strona własnego lokalu w panelu lokalu. */
   ustawienia?: string;
-  /** Panel lokalu: jego logo i nazwa na górze menu, prowadzą do ustawień lokalu (ekran, hasło, logo). */
+  /** Panel lokalu: jego logo i nazwa na górze menu, prowadzą do ustawień lokalu (ekran, osoby, logo). */
   lokal?: { nazwa: string; logo_url: string | null } | null;
 }) {
   const sciezka = usePathname();
@@ -107,7 +113,7 @@ export function MenuPanelu({
               {lokal.logo_url ? <img src={lokal.logo_url} alt="" /> : <span className="miniatura-pusta" aria-hidden />}
               <span className="panel-menu-gra-opis">
                 <strong>{lokal.nazwa}</strong>
-                <span className="panel-menu-gra-lokal">ekran lokalu, hasło, logo, Instagram</span>
+                <span className="panel-menu-gra-lokal">ekran lokalu, osoby, logo, Instagram</span>
               </span>
             </Link>
           </section>
@@ -142,8 +148,14 @@ export function MenuPanelu({
         {/* quizy i lokale bez nagłówka „Przygotowanie” (26.10: wisiał bez sensu), tylko oddzielone kreską od gry */}
         <section className="panel-menu-oddzielona">
           {pozycja("/admin/quizy", "Quizy", "pytania, etapy, kosz")}
-          {!lokal && pozycja("/admin/lokale", "Lokale", "logo, hasła, ekrany lokali")}
+          {!lokal && pozycja("/admin/lokale", "Lokale", "logo, ekrany lokali")}
+          {tworca && pozycja("/admin/konta", "Konta", "osoby i dostęp")}
         </section>
+        {konto && (
+          <section className="panel-menu-oddzielona">
+            {pozycja("/admin/konto", konto.nazwa, `działam jako: ${konto.jako}`)}
+          </section>
+        )}
         <form action={wyloguj} className="panel-menu-wyloguj">
           <button type="submit" className="przycisk">
             Wyloguj

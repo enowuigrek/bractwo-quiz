@@ -78,7 +78,7 @@ export function FormularzQuizu({ glowny, rodzaj }: { glowny: boolean; rodzaj: Ro
       {/* tylko główny: jego nowe quizy są domyślnie ukryte przed lokalami (zmiana później na stronie quizu) */}
       {glowny && (
         <label className="przelacznik">
-          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko dla mnie (lokale nie zobaczą tego quizu)
+          <input type="checkbox" name="tylko_glowny" defaultChecked /> tylko Bractwo (bez lokali)
         </label>
       )}
 

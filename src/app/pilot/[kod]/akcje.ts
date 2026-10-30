@@ -1,6 +1,6 @@
 "use server";
 
-import { rolaAdmina, widziWszystko } from "@/lib/admin";
+import { jestTworca, rolaAdmina } from "@/lib/admin";
 import type { PilotStan } from "@/lib/gra/typy";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 
@@ -10,7 +10,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
  */
 export async function dodajBoty(kod: string, token: string, ile: number): Promise<{ stan: PilotStan } | { blad: string }> {
   const rola = await rolaAdmina();
-  if (!rola || !widziWszystko(rola)) return { blad: "Boty dodaje tylko główny admin." };
+  if (!rola || !jestTworca(rola)) return { blad: "Boty dodaje tylko twórca." };
   const { data, error } = await supabaseAdmin().rpc("dodaj_boty", { p_kod: kod, p_host_token: token, p_ile: ile });
   if (error) return { blad: error.message };
   return { stan: data as PilotStan };
