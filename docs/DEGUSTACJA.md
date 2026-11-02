@@ -4,6 +4,10 @@ Trzeci rodzaj wieczoru obok „Wyścigu po piwo” i „Klasycznego pub quizu”
 
 **Najważniejsze (Łukasz, 02.11):** na kartce ktoś, kto się nie zna, nie wie, co napisać. Aplikacja go prowadzi: suwaki, kafelki do zaznaczenia i lista aromatów, które mogą się pojawić. Sugestie podpowiadają słowa, a potem widać, kto co poczuł.
 
+**Narzędzie, nie tylko zabawa:** każdy ocenia anonimowo, sam, bez sugerowania się innymi, a dopiero potem grupa widzi wspólny obraz i wyciąga wnioski. Piwowar dostaje rzetelną informację zwrotną, prowadzący degustację wie, co sala naprawdę wyczuła, a lokal widzi, które piwa jego goście lubią.
+
+**Terminy:** czwartek 5.11 Łukasz i Magda prowadzą degustację piw amerykańskich na ranczu (jeszcze bez aplikacji, obserwacja: jak wygląda taka degustacja, ile osób, piw i czasu, czy jest TV i zasięg). Spotkanie Bractwa z piwem domowym Łukasza 10.11: pierwsza wersja aplikacji ma być gotowa i sprawdzona wcześniej.
+
 ## Dwa motywy
 
 1. **Piwo domowe:** ktoś przynosi swoje piwo, a Bractwo je ocenia. Pełna karta z wadami („coś tu nie gra?”). Wynikiem jest raport dla piwowara: co poczuła sala, jakie wady zauważyła i ile osób, oraz notatki. Pierwszy test: piwo domowe Łukasza na najbliższym spotkaniu Bractwa.
@@ -60,7 +64,7 @@ Bez zmian: QR, kod, kapsle gości. Nagłówek TV mówi „Degustacja”, a obok 
 - **Telefon:** „Twoja degustacja”, wszystkie piwa z twoimi notatkami obok sali, do zrzutu. Na dole „Do zobaczenia na kolejnej degustacji. Piwu Cześć!”.
 
 ## Raport dla piwowara
-Strona z wynikami jednego piwa: wszystkie odpowiedzi zebrane w wykresy, wady z liczbą osób i notatki gości (bez imion albo z imionami, decyzja niżej). Ma osobny link do przekazania, bez logowania (jak link pilota), bo piwowar domowy nie musi mieć konta. W panelu jest na stronie gry.
+Strona z wynikami jednego piwa: wszystkie odpowiedzi zebrane w wykresy, wady z liczbą osób i notatki gości, anonimowo (bez imion, 02.11). Ma osobny link do przekazania, bez logowania (jak link pilota), bo piwowar domowy nie musi mieć konta. W panelu jest na stronie gry.
 
 ## Pilot
 Ten sam układ i zasada stałych przycisków:
@@ -96,10 +100,17 @@ Później: karta krótka i profile stylów dla wieczorów w lokalach, osobny lin
 ## Na później: ślepa degustacja
 Piwa pod numerami, goście poza kartą zgadują styl (wybór z 4) i moc (suwak jak w szacowaniu). Punkty liczy serwer: 1000 za styl, do 1000 za moc (im bliżej, tym więcej), bez punktów za czas. Na koniec podium gości („Najlepszy nos wieczoru”) obok podium piw.
 
+## Do sprawdzenia na ranczu (5.11)
+- ile osób, ile piw i ile czasu na jedno piwo,
+- czy prowadzący mówi przed nalaniem, w trakcie czy po,
+- czy jest telewizor albo rzutnik i czy telefony mają zasięg lub Wi-Fi,
+- o co ludzie pytają i czego nie umieją nazwać (to trafi na kafelki),
+- style piw amerykańskich, które się pojawią (pierwsze profile stylów).
+
 ## Decyzje dla Łukasza
-1. **Kiedy spotkanie Bractwa** z piwem domowym? Od tego zależy, ile zmieści się w pierwszej wersji.
-2. **Skala ocen:** gwiazdki 1–5 z połówkami czy 1–10?
-3. **Notatki w raporcie:** z imionami czy anonimowo?
-4. **Lista aromatów i wad:** czy powyższa jest dobra, czy coś dodać albo uprościć?
-5. **Muzyka:** cicha cały wieczór czy tylko w poczekalni i na podsumowaniu?
-6. **Kto może prowadzić:** Bractwo i lokale, jak quizy?
+Ustalone 02.11: spotkanie 10.11, oceny i notatki anonimowe.
+
+1. **Skala ocen:** gwiazdki 1–5 z połówkami czy 1–10?
+2. **Lista aromatów i wad:** czy powyższa jest dobra, czy coś dodać albo uprościć?
+3. **Muzyka:** cicha cały wieczór czy tylko w poczekalni i na podsumowaniu?
+4. **Kto może prowadzić:** Bractwo i lokale, jak quizy?
