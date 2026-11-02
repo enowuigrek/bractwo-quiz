@@ -30,6 +30,25 @@ export function wczytajMuzykePijana(): void {
 }
 
 /**
+ * Kołysanie tempa źródła przez `koniecS` sekund od teraz: średnie tempo zwalnia przez całą fazę, a wokół niego wolne
+ * falowanie, coraz głębsze. Zwraca oscylator fali (już grający), który trzeba zatrzymać razem ze źródłem. Też dla
+ * utworu z początkiem i pętlą (muzyka-petla.ts).
+ */
+export function kolysz(c: AudioContext, zrodlo: AudioBufferSourceNode, koniecS: number): OscillatorNode {
+  const t = c.currentTime;
+  zrodlo.playbackRate.setValueAtTime(1, t);
+  zrodlo.playbackRate.linearRampToValueAtTime(1 - ZWOLNIENIE, t + Math.max(1, koniecS));
+  const fala = c.createOscillator();
+  fala.frequency.value = 1 / OKRES_KOLYSANIA_S;
+  const glebokosc = c.createGain();
+  glebokosc.gain.setValueAtTime(0.008, t);
+  glebokosc.gain.linearRampToValueAtTime(GLEBOKOSC, t + Math.max(1, koniecS));
+  fala.connect(glebokosc).connect(zrodlo.playbackRate);
+  fala.start(t);
+  return fala;
+}
+
+/**
  * Gra utwór finału od sekundy `od` z kołysaniem tempa narastającym do `koniecS` sekund od teraz. Zwraca funkcję,
  * która go wycisza, albo null, gdy się nie da (utwór jeszcze się nie zdekodował albo przeglądarka nie pozwala
  * grać): wtedy zostaje zwykły odtwarzacz bez kołysania.
@@ -44,22 +63,13 @@ export async function zagrajMuzykePijana(od: () => number, glosnosc: number, kon
   const zrodlo = c.createBufferSource();
   zrodlo.buffer = b;
   zrodlo.loop = true;
-  // średnie tempo zwalnia przez całą fazę, a wokół niego wolne falowanie, coraz głębsze
-  zrodlo.playbackRate.setValueAtTime(1, t);
-  zrodlo.playbackRate.linearRampToValueAtTime(1 - ZWOLNIENIE, t + Math.max(1, koniecS));
-  const fala = c.createOscillator();
-  fala.frequency.value = 1 / OKRES_KOLYSANIA_S;
-  const glebokosc = c.createGain();
-  glebokosc.gain.setValueAtTime(0.008, t);
-  glebokosc.gain.linearRampToValueAtTime(GLEBOKOSC, t + Math.max(1, koniecS));
-  fala.connect(glebokosc).connect(zrodlo.playbackRate);
+  const fala = kolysz(c, zrodlo, koniecS);
 
   const glos = c.createGain();
   glos.gain.value = glosnosc;
   zrodlo.connect(glos).connect(c.destination);
   // ten sam moment utworu co w odtwarzaczu, który zaraz się zatrzyma
   zrodlo.start(t, od() % b.duration);
-  fala.start(t);
 
   let zatrzymana = false;
   return () => {

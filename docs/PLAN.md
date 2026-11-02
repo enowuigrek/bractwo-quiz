@@ -158,6 +158,13 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - **Sprawdzone lokalnie:** logowanie główne i lokalu „Dom” (złe hasło odrzucone), lista quizów lokalu (tylko Piwny jako quiz Bractwa), podgląd Piwnego, 404 na ukrytym quizie, na edycji pytań Piwnego i na cudzym lokalu, kreator lokalu, filtry i ikony u głównego. Na produkcji i na telefonie niesprawdzone. Lokal „Dom” ma testowe hasło lokalu z tego testu: ustaw własne na stronie lokalu. PPR i Piwiarnia w Alejach nie mają jeszcze haseł.
 - **Finał na TV:** lider (także w pijanym finale) bez złotej obwódki i złotego podpisu, podpis z nickiem stoi z lewej strony awatara (na wysokości środka), długi nick kończy się wielokropkiem; drogi zaczynają się dalej od lewej krawędzi (`START_X` 300 zamiast 130 w `drogi.tsx`), żeby podpis mieścił się na starcie.
 
+### Muzyka z początkiem i pętlą (02.11) ✅
+
+- **Po co:** pętla `<audio>` miała na końcu pliku wyciszenie, 2 s ciszy i wejście od nowa. Łukasz tnie utwory w Reaperze na początek i pętlę, a ta ma grać bez słyszalnego szwu do końca rundy.
+- **Jak:** `src/lib/gra/muzyka-petla.ts` pobiera `/muzyka/<nazwa>-start.mp3` i `-petla.mp3`, dekoduje w kontekście efektów i skleja w jeden bufor; jedno źródło Web Audio z `loop`, `loopStart` na końcu początku i `loopEnd` na końcu bufora. Grany utwór i następny (`nastepnyUtwor` w `muzyka.tsx`) siedzą w pamięci, reszta wylatuje (zdekodowana minuta to ok. 20 MB). Głośność jak w pijanym finale (`GLOSNOSC_PETLI`). Pijany finał kołysze tempo tego samego źródła (`kolysz` z `muzyka-pijana.ts`). Utwór bez tych plików gra po staremu.
+- **Format:** Chromium dekoduje MP3 z ffmpeg (`libmp3lame`) co do próbki, bez ciszy enkodera (sprawdzone 02.11 na tonie 132 423 próbek). Łukasz daje WAV, my konwertujemy: `ffmpeg -i etap-1-start.wav -c:a libmp3lame -b:a 192k public/muzyka/etap-1-start.mp3` (tak samo pętla) i usuwamy stary `etap-1.mp3`.
+- **Sprawdzone** na grze z botami z tonami testowymi: poczekalnia po staremu, pętla 1. etapu wczytana z góry i grana przez Web Audio (bufor 7 s, pętla od 4 s), „Zakończ grę” ją ucisza. **Niesprawdzone:** prawdziwe utwory na Samsungu i przejście pijanego finału z pętlą.
+
 ## Na 25.10: dźwięki i pijany finał
 
 ### Dźwięki (efekty na TV) ✅ zrobione, opis w „Efekty dźwiękowe na TV (25.10)”

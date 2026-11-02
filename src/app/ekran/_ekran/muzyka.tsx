@@ -4,25 +4,51 @@ import { useEffect, useRef, useState } from "react";
 import { naWybuch, odblokujDzwiek } from "@/lib/gra/dzwiek";
 import { GASNIECIE_S } from "@/lib/pijany";
 import { zagrajMuzykePijana } from "@/lib/gra/muzyka-pijana";
+import { gotowaPetla, wczytajPetle, zagrajPetle, type GranaPetla } from "@/lib/gra/muzyka-petla";
+import { kontekstEfektow } from "@/lib/gra/efekty";
 import type { StanSesji } from "@/lib/gra/typy";
 import { IkonaGlosnik } from "@/components/ikony";
 
 /**
  * Utwory na TV (instrumentalne, z Suno), w `public/muzyka/`. Brakujący plik po prostu nie gra, więc można
- * je dodawać po kolei. Podium gra raz, reszta w pętli (`petla`).
+ * je dodawać po kolei. Utwór z plikami `<nazwa>-start.mp3` i `<nazwa>-petla.mp3` gra przez Web Audio: początek raz,
+ * potem pętla bez szwu (muzyka-petla.ts, 02.11). Bez nich gra `<nazwa>.mp3`: podium raz, reszta w pętli (`petla`)
+ * z wyciszeniem i przerwą na końcu pliku.
  */
 const UTWORY = {
-  poczekalnia: { plik: "/muzyka/poczekalnia.mp3", petla: true },
-  etap1: { plik: "/muzyka/etap-1.mp3", petla: true },
-  etap2: { plik: "/muzyka/etap-2.mp3", petla: true },
-  etap3: { plik: "/muzyka/etap-3.mp3", petla: true },
+  poczekalnia: { nazwa: "poczekalnia", petla: true },
+  etap1: { nazwa: "etap-1", petla: true },
+  etap2: { nazwa: "etap-2", petla: true },
+  etap3: { nazwa: "etap-3", petla: true },
   // walka o finał (etap przed finałem): smyczki i trąbki, napięcie przed finałem
-  etap4: { plik: "/muzyka/etap-4.mp3", petla: true },
-  final: { plik: "/muzyka/final.mp3", petla: true },
-  podium: { plik: "/muzyka/podium.mp3", petla: false },
-} as const satisfies Record<string, { plik: string; petla: boolean }>;
+  etap4: { nazwa: "etap-4", petla: true },
+  final: { nazwa: "final", petla: true },
+  podium: { nazwa: "podium", petla: false },
+} as const satisfies Record<string, { nazwa: string; petla: boolean }>;
 
 type Utwor = keyof typeof UTWORY;
+
+const plikUtworu = (u: Utwor) => `/muzyka/${UTWORY[u].nazwa}.mp3`;
+
+/** Co zwykle gra po utworze: wczytujemy go z góry, żeby pętla była gotowa na następną rundę. */
+function nastepnyUtwor(u: Utwor, klasyczny: boolean): Utwor | null {
+  switch (u) {
+    case "poczekalnia":
+      return "etap1";
+    case "etap1":
+      return klasyczny ? "podium" : "etap2";
+    case "etap2":
+      return "etap3";
+    case "etap3":
+      return "etap4";
+    case "etap4":
+      return "final";
+    case "final":
+      return "podium";
+    case "podium":
+      return null;
+  }
+}
 
 const GLOSNOSC = 0.55;
 /**
@@ -30,6 +56,8 @@ const GLOSNOSC = 0.55;
  * więc ta sama liczba w Web Audio brzmi głośniej (26.10: przy 0,7 pijany finał wciąż był głośniejszy od finału).
  */
 const PIJANA_CISZEJ = 0.45;
+/** Utwór z początkiem i pętlą też gra przez Web Audio, więc z tą samą poprawką co pijany finał. */
+const GLOSNOSC_PETLI = GLOSNOSC * PIJANA_CISZEJ;
 /** Stary utwór cichnie przy zmianie tyle ms. Nowy wchodzi od razu na pełną głośność: utwory mają własne wstępy. */
 const PRZENIKANIE_MS = 1500;
 /**
@@ -73,6 +101,8 @@ type StanMuzyki = Pick<StanSesji, "faza" | "muzyka" | "etap" | "faza_od" | "faza
 type Wspolne = {
   odtwarzacze: HTMLAudioElement[];
   aktywny: HTMLAudioElement | null;
+  /** Utwór z początkiem i pętlą, grany przez Web Audio (wtedy `aktywny` jest pusty). */
+  petla: GranaPetla | null;
   grany: Utwor | null;
   przenikania: Map<HTMLAudioElement, number>;
   /** Muzyka urwana celowo (gaśnięcie przed wybuchem szklanki): gest jej nie wznawia, a cisza to nie blokada. */
@@ -93,6 +123,7 @@ function strona(): Wspolne {
     wspolne = {
       odtwarzacze,
       aktywny: null,
+      petla: null,
       grany: null,
       przenikania: new Map(),
       zatrzymana: false,
@@ -172,6 +203,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   const [cichoOd, ustawCichoOd] = useState<number | null>(null);
   const [prosba, ustawProsbe] = useState(false);
   const cel = stan.muzyka ? utworFazy(stan) : null;
+  const klasyczny = stan.klasyczny ?? (!!stan.quiz && stan.quiz.liczba_etapow === 0);
   // werble i koniec etapu: stary utwór urywa się od razu, bez wyciszania (werble: ekran gaśnie jak wyłączany
   // telewizor; koniec etapu: razem z dzwonkiem „ostatnia kolejka”, efekty.tsx)
   const twardo = useRef(false);
@@ -204,6 +236,8 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
         () => {
           if (a !== w.aktywny) return;
           w.slychac = false;
+          // bez starego pliku, ale z gotowym początkiem i pętlą, którym przeglądarka nie pozwoliła grać: prośba zostaje
+          if (w.grany && gotowaPetla(UTWORY[w.grany].nazwa)) return;
           ustawCichoOd(null);
         },
       ]);
@@ -228,6 +262,8 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
         if (w.zamontowane > 0) return;
         w.przenikania.forEach((id) => clearInterval(id));
         w.odtwarzacze.forEach((a) => a.pause());
+        w.petla?.zatrzymaj(PRZENIKANIE_MS);
+        w.petla = null;
         w.aktywny = null;
         w.grany = null;
       }, ZAPAS_WYMIANY_MS);
@@ -273,11 +309,42 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
           ustawCichoOd(0);
         });
 
+    const zgasPetle = (odRazu: boolean) => {
+      w.petla?.zatrzymaj(odRazu ? 0 : PRZENIKANIE_MS);
+      w.petla = null;
+    };
+
+    // utwór z początkiem i pętlą na Web Audio, gdy jest zdekodowany i przeglądarka pozwala grać; stary cichnie
+    const zagrajPetla = (utwor: Utwor): boolean => {
+      const p = gotowaPetla(UTWORY[utwor].nazwa);
+      if (!p) return false;
+      const grana = zagrajPetle(p, GLOSNOSC_PETLI);
+      if (!grana) {
+        // bez zgody na dźwięk: liczymy ciszę, w poczekalni wyjdzie prośba o OK
+        w.slychac = false;
+        ustawCichoOd((c) => c ?? Date.now());
+        return false;
+      }
+      const stary = w.aktywny;
+      w.aktywny = null;
+      if (stary) plynnie(stary, 0, () => stary.pause());
+      zgasPetle(false);
+      w.petla = grana;
+      w.zatrzymana = false;
+      w.slychac = true;
+      odblokujDzwiek();
+      ustawCichoOd(null);
+      ustawProsbe(false);
+      return true;
+    };
+
     const zagraj = (utwor: Utwor, wejscieMs = 0) => {
+      if (zagrajPetla(utwor)) return;
+      zgasPetle(false);
       const stary = w.aktywny;
       const a = w.odtwarzacze.find((o) => o !== stary) ?? w.odtwarzacze[0];
       clearInterval(w.przenikania.get(a));
-      const plik = UTWORY[utwor].plik;
+      const plik = plikUtworu(utwor);
       // zawsze wczytanie od nowa (także tego samego pliku), nigdy przewijanie (patrz WYCISZENIE_S)
       a.src = plik;
       a.volume = 0;
@@ -292,9 +359,10 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     };
 
     // ten sam utwór już gra (np. zapowiedź przeszła w poczekalnię): gra dalej, bez startu od nowa
-    const juzGra = cel !== null && cel === w.grany && !!w.aktywny && !w.aktywny.paused;
+    const juzGra = cel !== null && cel === w.grany && ((!!w.aktywny && !w.aktywny.paused) || !!w.petla);
     w.grany = cel;
     if (!cel) {
+      zgasPetle(twardo.current);
       const stary = w.aktywny;
       w.aktywny = null;
       if (stary && twardo.current) {
@@ -305,6 +373,15 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       }
       return;
     }
+    // początek i pętla tego utworu oraz następnego (z góry); gdy dekodowanie skończy się po starcie, a nic nie słychać
+    // (stary plik nie istnieje albo czekał na OK), utwór wchodzi od razu
+    const nastepny = nastepnyUtwor(cel, klasyczny);
+    const zostaw = [UTWORY[cel].nazwa, ...(nastepny ? [UTWORY[nastepny].nazwa] : [])];
+    let aktualne = true;
+    void wczytajPetle(UTWORY[cel].nazwa, zostaw).then((p) => {
+      if (aktualne && p && w.grany === cel && !w.petla && !w.slychac && !w.zatrzymana) zagrajPetla(cel);
+      if (nastepny) void wczytajPetle(UTWORY[nastepny].nazwa, zostaw);
+    });
     if (!juzGra) zagraj(cel);
 
     // pętla: tuż przed końcem pliku wyciszenie, po końcu chwila ciszy i ten sam utwór od początku
@@ -331,10 +408,21 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     // naraz, więc play() wolnego zatrzymywał grającą muzykę (25.10: OK na pilocie, żeby OLED nie gasł, ją wyłączał)
     const gest = () => {
       if (w.slychac) return;
+      // utwór z początkiem i pętlą: zgoda dla Web Audio (wznowienie kontekstu w geście) i start od początku
+      const petla = gotowaPetla(UTWORY[cel].nazwa);
+      if (petla && !w.zatrzymana) {
+        const c = kontekstEfektow();
+        void c
+          ?.resume()
+          .then(() => {
+            if (w.grany === cel && !w.petla && !w.slychac && !w.zatrzymana) zagrajPetla(cel);
+          })
+          .catch(() => undefined);
+      }
       const a = w.aktywny;
       for (const o of w.odtwarzacze) {
         if (o === a || !o.paused) continue;
-        if (!o.src) o.src = UTWORY[cel].plik;
+        if (!o.src) o.src = plikUtworu(cel);
         o.volume = 0;
         void o
           .play()
@@ -344,7 +432,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
           .catch(() => undefined);
       }
       // aktywny, który nie gra (stoi albo Safari po cichu go nie puścił): play() jeszcze raz, już w geście
-      if (a && !a.error && !w.slychac && !w.zatrzymana) void wystartuj(a);
+      if (a && !a.error && !w.slychac && !w.zatrzymana && !petla) void wystartuj(a);
     };
     for (const a of w.odtwarzacze) {
       a.addEventListener("timeupdate", petla);
@@ -352,6 +440,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     }
     for (const g of GESTY) window.addEventListener(g, gest);
     return () => {
+      aktualne = false;
       window.clearTimeout(przerwa);
       for (const a of w.odtwarzacze) {
         a.removeEventListener("timeupdate", petla);
@@ -359,7 +448,7 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
       }
       for (const g of GESTY) window.removeEventListener(g, gest);
     };
-  }, [cel]);
+  }, [cel, klasyczny]);
 
   // prośba po chwili ciszy; własny minutnik, bo `teraz` poza pytaniami i serią nie tyka
   useEffect(() => {
@@ -369,7 +458,11 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
   }, [cichoOd]);
 
   // muzyka pijanego finału na Web Audio (niżej): uciszenie i flaga startu, żeby nie startowała dwa razy
-  const kolysanie = useRef<{ zatrzymaj: (() => void) | null; startuje: boolean }>({ zatrzymaj: null, startuje: false });
+  const kolysanie = useRef<{ zatrzymaj: (() => void) | null; startuje: boolean; petla: boolean }>({
+    zatrzymaj: null,
+    startuje: false,
+    petla: false,
+  });
   const zatrzymajKolysanie = () => {
     kolysanie.current.zatrzymaj?.();
     kolysanie.current.zatrzymaj = null;
@@ -383,6 +476,8 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
         kolysanie.current.zatrzymaj?.();
         kolysanie.current.zatrzymaj = null;
         w.zatrzymana = true;
+        w.petla?.zatrzymaj(0);
+        w.petla = null;
         for (const a of w.odtwarzacze) {
           clearInterval(w.przenikania.get(a));
           a.pause();
@@ -400,10 +495,24 @@ export function MuzykaTv({ stan, teraz }: { stan: StanMuzyki; teraz: number }) {
     const a = w.aktywny;
     if (!pijany) {
       zatrzymajKolysanie();
+      kolysanie.current.petla = false;
       return;
     }
-    if (!a || w.grany !== "final" || !stan.faza_od || !stan.faza_do) return;
+    if (w.grany !== "final" || !stan.faza_od || !stan.faza_do) return;
     const do_ = Date.parse(stan.faza_do);
+    // utwór finału z początkiem i pętlą już gra na Web Audio: kołysze się w miejscu, urywa się z gaśnięciem
+    if (w.petla) {
+      if (do_ - teraz <= GASNIECIE_S * 1000) {
+        w.petla.zatrzymaj(0);
+        w.petla = null;
+        w.zatrzymana = true;
+      } else if (!kolysanie.current.petla) {
+        kolysanie.current.petla = true;
+        w.petla.kolysz((do_ - teraz) / 1000 - GASNIECIE_S);
+      }
+      return;
+    }
+    if (!a) return;
     // telefony gasną: muzyka urywa się razem z nimi, potem cisza i wybuch szklanki
     if (do_ - teraz <= GASNIECIE_S * 1000) {
       zatrzymajKolysanie();
