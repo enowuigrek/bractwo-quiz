@@ -9,7 +9,7 @@ export const zakres = ([od, do_]: [number, number]) => (od === do_ ? `${pkt(od)}
 
 /** Rodzaj pytania: co trzeba wiedzieć i przykłady częściowych odpowiedzi (ocena 0..1 jak `wewn.ocena`). */
 export const RODZAJE: Record<
-  Exclude<TypZadania, "ciekawostka">,
+  Exclude<TypZadania, "ciekawostka" | "piwo">,
   { zasady: string[]; czesciowe: { opis: string; ocena: number }[]; naglowek?: string }
 > = {
   wybor: {

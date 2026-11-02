@@ -16,7 +16,7 @@ import {
 } from "../_komponenty/lokale-autorzy";
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz, ustawWidocznoscQuizu } from "./akcje";
-import { nowyQuiz, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { nowyQuiz, rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Quizy · Bractwo Quiz" };
 
@@ -32,6 +32,7 @@ type QuizNaLiscie = {
   konta: Osoba | null;
   zadania: { count: number }[];
   etapy: { count: number }[];
+  degustacja: boolean;
 };
 
 const BLEDY: Record<string, string> = {
@@ -52,12 +53,12 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
   const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);
   const autor = wybranyLokal(lokalZAdresu, lokale ?? [], true, miasto);
   // dwie zakładki: wyścig po piwo (quiz z etapami) i klasyczny pub quiz (bez etapów); w każdej filtr tematów
-  const rodzaj: RodzajQuizu = rodzajZAdresu === "klasyczny" ? "klasyczny" : "wyscig";
+  const rodzaj = czytajRodzaj(rodzajZAdresu);
   let zapytanie = filtrQuizow(
     db
       .from("quizy")
       .select(
-        "id, tytul, opis, udostepniony, autor_konto_id, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(id, nazwa, zdjecie_url), zadania(count), etapy(count)",
+        "id, tytul, opis, udostepniony, autor_konto_id, tagi, lokal_id, lokale(id, nazwa, logo_url), konta(id, nazwa, zdjecie_url), zadania(count), etapy(count), degustacja",
       ),
     rola,
   ).is("usunieto", null);
@@ -74,14 +75,14 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
     rola,
     true,
   ).not("usunieto", "is", null);
-  const wRodzaju = (wszystkie ?? []).filter((q) => ((q.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny") === rodzaj);
+  const wRodzaju = (wszystkie ?? []).filter((q) => rodzajQuizu(q) === rodzaj);
   const tagi = wszystkieTagi(wRodzaju);
   const wybranyTag = typeof tag === "string" && tagi.includes(tag) ? tag : null;
   const data = wybranyTag ? wRodzaju.filter((q) => q.tagi.includes(wybranyTag)) : wRodzaju;
   const wybrane: WybraneFiltry = { miasto, lokal: autor, tag: wybranyTag };
   const adres = (r: RodzajQuizu, f: WybraneFiltry) =>
     `/admin/quizy?${new URLSearchParams({
-      ...(r === "klasyczny" ? { rodzaj: r } : {}),
+      ...(r !== "wyscig" ? { rodzaj: r } : {}),
       ...(f.miasto ? { miasto: f.miasto } : {}),
       ...(f.lokal ? { lokal: f.lokal } : {}),
       ...(f.tag ? { tag: f.tag } : {}),
@@ -94,12 +95,15 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
     <main>
       <div className="naglowek-strony">
         <h1>Quizy</h1>
-        <Link
-          href={rodzaj === "wyscig" ? "/admin/quizy/zasady" : "/admin/quizy/zasady/pub-quiz"}
-          className="przycisk-maly"
-        >
-          Zasady i punktacja
-        </Link>
+        {/* degustacja nie ma punktów, więc bez strony zasad */}
+        {rodzaj !== "degustacja" && (
+          <Link
+            href={rodzaj === "wyscig" ? "/admin/quizy/zasady" : "/admin/quizy/zasady/pub-quiz"}
+            className="przycisk-maly"
+          >
+            Zasady i punktacja
+          </Link>
+        )}
       </div>
       {typeof blad === "string" && BLEDY[blad] && (
         <p className="blad" role="alert">

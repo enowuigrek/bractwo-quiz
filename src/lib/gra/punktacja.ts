@@ -10,7 +10,7 @@ import type { TypZadania } from "../zadania";
  * (`wewn.waga_typu`, gdy etap nie podaje mnożnika). Prawda/fałsz za połowę (30.10): przy dwóch odpowiedziach
  * zgadywanie dawało średnio dwa razy więcej niż przy jednej z czterech.
  */
-export const WAGA_TYPU: Record<Exclude<TypZadania, "ciekawostka">, number> = {
+export const WAGA_TYPU: Record<Exclude<TypZadania, "ciekawostka" | "piwo">, number> = {
   wybor: 1,
   prawda_falsz: 0.5,
   wielokrotny: 1.5,

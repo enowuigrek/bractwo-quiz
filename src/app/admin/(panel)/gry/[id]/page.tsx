@@ -1,3 +1,5 @@
+import { RaportDegustacji, type PiwoRaportu } from "./raport-degustacji";
+import type { KartaPiwa } from "@/lib/degustacja";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Zakladki } from "../../_komponenty/zakladki";
@@ -23,7 +25,7 @@ import { TabelaWynikow } from "./tabela-wynikow";
 export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
 
 type GraZDanymi = Sesja & {
-  quizy: { tytul: string; etapy: { count: number }[] } | null;
+  quizy: { tytul: string; degustacja: boolean; etapy: { count: number }[] } | null;
   lokale: {
     nazwa: string;
     miasto: string | null;
@@ -56,10 +58,12 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
   const db = supabaseAdmin();
 
   const [{ data: gra }, { count: gracze }] = await Promise.all([
-    db.from("sesje").select("*, quizy(tytul, etapy(count)), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram), konta(nazwa)").eq("id", id).maybeSingle<GraZDanymi>(),
+    db.from("sesje").select("*, quizy(tytul, degustacja, etapy(count)), lokale(nazwa, miasto, adres_ekranu, logo_url, instagram), konta(nazwa)").eq("id", id).maybeSingle<GraZDanymi>(),
     db.from("gracze").select("id", { count: "exact", head: true }).eq("sesja_id", id),
   ]);
   if (!gra) notFound();
+  // degustacja (02.11): raport piw zamiast wyników i punktów
+  const degustacja = !!gra.quizy?.degustacja;
 
   const adres = await adresAplikacji();
   const linki = {
@@ -139,8 +143,8 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
     [gra.wystartowano ? "Start faktyczny" : "Pierwsze pytanie", godzina(startFaktyczny)],
     ["Koniec", !trwa ? godzina(gra.faza_od) : null],
     ["Graczy", `${gracze ?? 0}/${gra.max_graczy}`],
-    ["Czas na odpowiedź", gra.czas_s === null ? "bez limitu" : `${gra.czas_s} s`],
-    ["Bonus za szybkość", gra.bonus_czas ? "tak" : "nie"],
+    ["Czas na odpowiedź", degustacja ? null : gra.czas_s === null ? "bez limitu" : `${gra.czas_s} s`],
+    ["Bonus za szybkość", degustacja ? null : gra.bonus_czas ? "tak" : "nie"],
     ["Nagrody", gra.nagrody?.length ? gra.nagrody.map((n) => `${n.miejsce}. ${n.nagroda}`).join(", ") : null],
     ["Kranoprzejęcie", gra.browar_nazwa],
     // „każdy sam” to jedyny tryb od 26.10, więc piszemy tylko o drużynach (starsze gry)
@@ -170,6 +174,24 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
     zdjecie: g.zdjecie_url,
     odpadlPoEtapie: g.odpadl_po_etapie,
   }));
+  // raport degustacji: piwa i karty gości (z notatkami, bez imion)
+  const [{ data: piwaRaportu }, { data: kartyRaportu }] =
+    !trwa && degustacja
+      ? await Promise.all([
+          db
+            .from("zadania")
+            .select("id, tresc, grafika_url, dane")
+            .eq("quiz_id", gra.quiz_id)
+            .eq("typ", "piwo")
+            .order("nr")
+            .returns<PiwoRaportu[]>(),
+          db
+            .from("odpowiedzi")
+            .select("zadanie_id, dane")
+            .eq("sesja_id", gra.id)
+            .returns<{ zadanie_id: string; dane: KartaPiwa }[]>(),
+        ])
+      : [{ data: [] as PiwoRaportu[] }, { data: [] as { zadanie_id: string; dane: KartaPiwa }[] }];
   // SVG z biblioteki qrcode, bez danych od użytkownika poza adresem, który sami złożyliśmy
   const qrPilota = trwa ? await QRCode.toString(linki.pilot, { type: "svg", margin: 0, errorCorrectionLevel: "M" }) : null;
 
@@ -324,7 +346,14 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
         </section>
       )}
 
-      {!trwa && (
+      {!trwa && degustacja && (
+        <section className="panel-sekcja" id="wyniki">
+          <h2>Co poczuła sala</h2>
+          <RaportDegustacji piwa={piwaRaportu ?? []} karty={kartyRaportu ?? []} />
+        </section>
+      )}
+
+      {!trwa && !degustacja && (
         <section className="panel-sekcja" id="wyniki">
           <h2>Wyniki</h2>
           <Zakladki

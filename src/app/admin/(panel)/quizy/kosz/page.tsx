@@ -3,11 +3,11 @@ import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
 import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { NAZWY_RODZAJOW } from "@/lib/tagi";
+import { NAZWY_RODZAJOW, rodzajQuizu } from "@/lib/tagi";
 import { IkonaKosz, IkonaOkoPrzekreslone } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przywrocQuiz, usunQuizNaZawsze } from "../akcje";
-import { liczbaPytan } from "../limity";
+import { liczbaPiw, liczbaPytan } from "../limity";
 
 export const metadata: Metadata = { title: "Kosz · Bractwo Quiz" };
 
@@ -18,6 +18,7 @@ type QuizWKoszu = {
   usunieto: string;
   zadania: { count: number }[];
   etapy: { count: number }[];
+  degustacja: boolean;
 };
 
 const BLEDY: Record<string, string> = {
@@ -34,7 +35,7 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
   const { blad } = await searchParams;
   // lokal widzi w koszu tylko swoje quizy (quizów Bractwa nie usuwa)
   const { data, error } = await filtrQuizow(
-    supabaseAdmin().from("quizy").select("id, tytul, udostepniony, usunieto, zadania(count), etapy(count)"),
+    supabaseAdmin().from("quizy").select("id, tytul, udostepniony, usunieto, zadania(count), etapy(count), degustacja"),
     rola,
     true,
   )
@@ -66,8 +67,8 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
                       <IkonaOkoPrzekreslone /> prywatny ·{" "}
                     </>
                   )}
-                  {NAZWY_RODZAJOW[(q.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny"]} ·{" "}
-                  {liczbaPytan(q.zadania[0]?.count ?? 0)} · w koszu od{" "}
+                  {NAZWY_RODZAJOW[rodzajQuizu(q)]} ·{" "}
+                  {(q.degustacja ? liczbaPiw : liczbaPytan)(q.zadania[0]?.count ?? 0)} · w koszu od{" "}
                   {new Date(q.usunieto).toLocaleString("pl-PL", {
                     timeZone: "Europe/Warsaw",
                     day: "numeric",

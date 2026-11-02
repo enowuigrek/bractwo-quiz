@@ -116,6 +116,8 @@ export type StanSesji = {
     /** Pytania przed etapem finałowym (bez ciekawostek): według nich nalewa się szklanka wyścigu. */
     liczba_przed_finalem?: number;
     liczba_etapow: number;
+    /** Degustacja (02.11): same piwa do oceny, bez punktów. */
+    degustacja?: boolean;
     /** Maksimum punktów przed finałem (1000 × mnożnik za pytanie): skala wyścigu. */
     max_przed_finalem: number;
   } | null;

@@ -32,6 +32,8 @@ import { Kibicowanie } from "./kibic";
 import { czyKibic, Miejsce, Rozgrywka, ZmianaMiejsca, type Ja } from "./rozgrywka";
 import { UdostepnijWynik } from "./udostepnij";
 import { ZdjecieGracza } from "./zdjecie-gracza";
+import { DegustacjaGracza } from "./degustacja";
+import { czyDegustacja } from "@/lib/degustacja";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
@@ -370,6 +372,11 @@ function WGrze({
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan.faza), stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
+
+  // degustacja (02.11): karta, „ty i sala” i „Twoja degustacja” zamiast pytań, rankingu i medali
+  if (czyDegustacja(stan) && ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "koniec"].includes(stan.faza)) {
+    return <DegustacjaGracza stan={stan} ja={ja} />;
+  }
 
   // podium, tabela i koniec to jeden ekran, żeby medal i konfetti nie startowały od nowa przy przejściach
   if (stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {

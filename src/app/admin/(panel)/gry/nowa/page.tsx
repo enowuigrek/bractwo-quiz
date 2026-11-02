@@ -1,3 +1,4 @@
+import { rodzajQuizu } from "@/lib/tagi";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
@@ -16,7 +17,7 @@ export default async function NowaGra() {
   const zapytanieLokali = filtrLokaliRoli(db.from("lokale").select("id, nazwa, miasto, logo_url"), rola);
   const [{ data: lokale }, { data: quizy }] = await Promise.all([
     (lokalId ? zapytanieLokali.eq("id", lokalId) : zapytanieLokali).order("nazwa").returns<Lokal[]>(),
-    filtrQuizow(db.from("quizy").select("id, tytul, tagi, zadania(typ, etap_id), etapy(id, finalowy, seria)"), rola)
+    filtrQuizow(db.from("quizy").select("id, tytul, tagi, degustacja, zadania(typ, etap_id), etapy(id, finalowy, seria)"), rola)
       .is("usunieto", null)
       .order("utworzono", { ascending: false })
       .returns<
@@ -24,6 +25,7 @@ export default async function NowaGra() {
           id: string;
           tytul: string;
           tagi: string[];
+          degustacja: boolean;
           zadania: { typ: string; etap_id: string | null }[];
           etapy: { id: string; finalowy: boolean; seria: boolean }[];
         }[]
@@ -49,7 +51,7 @@ export default async function NowaGra() {
             ).length,
             final: q.etapy.some((e) => e.seria),
             tagi: q.tagi,
-            rodzaj: q.etapy.length ? "wyscig" : "klasyczny",
+            rodzaj: rodzajQuizu({ degustacja: q.degustacja, etapy: [{ count: q.etapy.length }] }),
             pijany: q.etapy.some((e) => e.finalowy && e.seria),
           }))}
         />

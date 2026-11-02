@@ -92,6 +92,7 @@ function scena(typ: TypZadania, t: number): Scena {
   switch (typ) {
     // ciekawostka nie ma odpowiedzi, więc nie ma czego pokazywać na telefonie (etap_json jej nie podaje)
     case "ciekawostka":
+    case "piwo":
       return { tresc: "", elementy: null, sciezka: [] };
     case "wybor": {
       const odp = ["Pils", "Weizen", "Koźlak", "IPA"];

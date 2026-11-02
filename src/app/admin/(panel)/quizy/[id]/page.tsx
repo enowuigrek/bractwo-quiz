@@ -24,6 +24,7 @@ import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
 import { PytanieNaLiscie } from "./rozwiazanie";
 import { BlokPijany } from "./blok-pijany";
 import type { PijanePytanie } from "@/lib/pijany";
+import { listaQuizow, rodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
 
@@ -44,9 +45,11 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     await Promise.all([
       db
         .from("quizy")
-        .select("id, tytul, opis, utworzono, tagi, usunieto, lokal_id, konta(nazwa)")
+        .select("id, tytul, opis, utworzono, tagi, usunieto, lokal_id, degustacja, konta(nazwa)")
         .eq("id", id)
-        .maybeSingle<Quiz & { usunieto: string | null; lokal_id: string | null; konta: { nazwa: string } | null }>(),
+        .maybeSingle<
+          Quiz & { usunieto: string | null; lokal_id: string | null; degustacja: boolean; konta: { nazwa: string } | null }
+        >(),
       db.from("zadania").select("*").eq("quiz_id", id).order("nr").returns<Zadanie[]>(),
       db.from("etapy").select("*").eq("quiz_id", id).order("nr").returns<Etap[]>(),
       db.from("sesje").select("id", { count: "exact", head: true }).eq("quiz_id", id).neq("faza", "koniec"),
@@ -60,6 +63,9 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         : Promise.resolve({ data: null }),
     ]);
   if (!quiz) notFound();
+  // degustacja (02.11): zamiast pytań piwa, bez etapów i bez pytań z AI
+  const degustacja = quiz.degustacja;
+  const powrot = listaQuizow(rodzajQuizu({ degustacja, etapy: [{ count: etapyZBazy?.length ?? 0 }] })).slice(0, -1);
   const lista = zadania ?? [];
   const etapy = etapyZBazy ?? [];
   // grupy do pokazania: pytania bez etapu (quiz bez etapów) i po kolei etapy z ich pytaniami
@@ -73,11 +79,11 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     return (
       <main>
         <p className="okruchy">
-          <Link href="/admin/quizy">← Quizy</Link>
+          <Link href={powrot}>← Quizy</Link>
         </p>
         <h1>{quiz.tytul}</h1>
         <section className="panel-sekcja">
-          <h2>{etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
+          <h2>{degustacja ? "Piwa" : etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
           {grupy.map(({ etap, zadania: wEtapie }) => (
             <div key={etap?.id ?? "bez-etapu"} className="etap-blok">
               {etap && (
@@ -130,7 +136,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       <ZadanieNaLiscie
         key={z.id}
         id={z.id}
-        edytor={{ quizId: quiz.id, typyEtapow, zadanie: z, etapy, domyslnyEtap: z.etap_id }}
+        edytor={{ quizId: quiz.id, typyEtapow, zadanie: z, etapy, domyslnyEtap: z.etap_id, degustacja }}
         naglowek={
           <>
             <span className="krok-nr" style={{ minWidth: "1.6em" }}>
@@ -162,7 +168,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
           </form>
           <PrzyciskPotwierdz
             akcja={usunZadanie.bind(null, quiz.id, z.id)}
-            pytanie={`Usunąć pytanie ${i + 1}?`}
+            pytanie={degustacja ? `Usunąć piwo „${z.tresc}”?` : `Usunąć pytanie ${i + 1}?`}
             tytul="Usuń"
             className="przycisk-maly ikona niebezpieczny"
           >
@@ -177,7 +183,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
   return (
     <main>
       <p className="okruchy">
-        <Link href="/admin/quizy">← Quizy</Link>
+        <Link href={powrot}>← Quizy</Link>
       </p>
       <NaglowekQuizu quiz={quiz} autor={quiz.konta?.nazwa ?? null} />
       {quiz.usunieto && (
@@ -193,8 +199,10 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       )}
 
       <section className="panel-sekcja">
-        <h2>{etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
-        {lista.length === 0 && etapy.length === 0 && <p className="lista-pusta">Quiz nie ma jeszcze pytań.</p>}
+        <h2>{degustacja ? "Piwa" : etapy.length ? "Etapy i pytania" : "Pytania"}</h2>
+        {lista.length === 0 && etapy.length === 0 && (
+          <p className="lista-pusta">{degustacja ? "Degustacja nie ma jeszcze piw." : "Quiz nie ma jeszcze pytań."}</p>
+        )}
         {grupy.map(({ etap, zadania: wEtapie }) => (
           <div key={etap?.id ?? "bez-etapu"} className="etap-blok">
             {etap && (
@@ -296,7 +304,17 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         {etapy.length === 0 && (
           <ol className="etap-brakujace">
             <li className="etap-brakujace-dodaj">
-              <NowePytanie napis="Dodaj pytanie" edytor={{ quizId: quiz.id, typyEtapow, etapy, domyslnyEtap: null, domyslnyTyp: ostatniTyp }} />
+              <NowePytanie
+                napis={degustacja ? "Dodaj piwo" : "Dodaj pytanie"}
+                edytor={{
+                  quizId: quiz.id,
+                  typyEtapow,
+                  etapy,
+                  domyslnyEtap: null,
+                  domyslnyTyp: degustacja ? "piwo" : ostatniTyp,
+                  degustacja,
+                }}
+              />
             </li>
           </ol>
         )}
@@ -307,7 +325,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       </section>
 
       {/* klasyczny quiz: pytania hurtem z tekstu (np. z AI według promptu) */}
-      {etapy.length === 0 && (
+      {etapy.length === 0 && !degustacja && (
         <section className="panel-sekcja">
           <h2>Pytania z AI</h2>
           <WklejPytania quizId={quiz.id} temat={[quiz.tytul, ...quiz.tagi].join(", ")} />

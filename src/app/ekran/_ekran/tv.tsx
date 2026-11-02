@@ -48,6 +48,11 @@ import { RESZTA_PODIUM_S } from "@/lib/gra/podium";
 import { NickiPoczekalni } from "./nicki";
 import { WstepTv } from "./wstep";
 import { ProstyTv, ScenaProsta } from "../_prosty/prosty";
+import { DegustacjaTv, type PiwoDegustacji } from "./degustacja";
+import { czyDegustacja, type KartyPiwa } from "@/lib/degustacja";
+
+/** Fazy degustacji, które rysuje `DegustacjaTv` (poczekalnia jak w quizie). */
+const FAZY_DEGUSTACJI = ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "koniec"];
 import { useTrybProsty } from "@/lib/gra/prosty";
 
 // Scena ma co najmniej 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo. Na ekranie
@@ -123,6 +128,9 @@ export function Tv({ kod, qr, host }: Props) {
   const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
   const [odpowiedzi, ustawOdpowiedzi] = useState<WierszOdpowiedzi[]>([]);
+  // degustacja: karty gości (anonimowo) i lista piw na podsumowanie
+  const [karty, ustawKarty] = useState<KartyPiwa[]>([]);
+  const [piwa, ustawPiwa] = useState<PiwoDegustacji[]>([]);
   // ostatni stan serii widziany na tym TV: stąd awatary ruszają w pijanym finale (baza nie wydaje już serii)
   const [ostatniaSeria, ustawOstatniaSerie] = useState<ZapamietanaSeria | null>(null);
   const [przesuniecie, ustawPrzesuniecie] = useState(0);
@@ -147,7 +155,15 @@ export function Tv({ kod, qr, host }: Props) {
         if (error) throw error;
         ustawOdpowiedzi(data as WierszOdpowiedzi[]);
       }
-      if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {
+      if (czyDegustacja(stan) && FAZY_DEGUSTACJI.includes(stan.faza)) {
+        const [k, p] = await Promise.all([
+          supabase().rpc("karty_degustacji", { p_kod: kod }),
+          stan.faza === "pytanie" || stan.faza === "wynik" ? Promise.resolve({ data: null, error: null }) : supabase().rpc("piwa_degustacji", { p_kod: kod }),
+        ]);
+        if (k.error) throw k.error;
+        ustawKarty(k.data as KartyPiwa[]);
+        if (p.data) ustawPiwa(p.data as PiwoDegustacji[]);
+      } else if (stan.faza === "ranking" || stan.faza === "podium" || stan.faza === "tabela" || stan.faza === "koniec") {
         const { data, error } = await supabase().rpc("ranking", { p_kod: kod });
         if (error) throw error;
         ustawRanking(data as WierszRankingu[]);
@@ -260,6 +276,8 @@ export function Tv({ kod, qr, host }: Props) {
                 browar: stan.browar,
               }}
             />
+          ) : czyDegustacja(stan) && FAZY_DEGUSTACJI.includes(stan.faza) ? (
+            <DegustacjaTv stan={stan} karty={karty} piwa={piwa} loga={<Loga lokal={stan.lokal} browar={stan.browar} />} />
           ) : stan.faza === "wstep" ? (
             // klasyczny pub quiz: plansza startowa z odliczaniem 10 s; wyścig: cała droga etapów
             quizKlasyczny(stan) ? (

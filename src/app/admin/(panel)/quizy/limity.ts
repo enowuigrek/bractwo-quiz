@@ -23,3 +23,11 @@ export function liczbaPytan(n: number): string {
   const r100 = n % 100;
   return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "pytania" : "pytań"}`;
 }
+
+/** „1 piwo”, „3 piwa”, „5 piw” (degustacja). */
+export function liczbaPiw(n: number): string {
+  if (n === 1) return "1 piwo";
+  const r10 = n % 10;
+  const r100 = n % 100;
+  return `${n} ${r10 >= 2 && r10 <= 4 && (r100 < 12 || r100 > 14) ? "piwa" : "piw"}`;
+}

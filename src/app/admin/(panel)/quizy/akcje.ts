@@ -18,7 +18,7 @@ import {
 } from "@/lib/etapy";
 import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
 import { czytajPytania } from "@/lib/import-pytan";
-import { czytajTagi } from "@/lib/tagi";
+import { czytajTagi, listaQuizow, rodzajQuizu } from "@/lib/tagi";
 import { LIMITY, liczbaPytan } from "./limity";
 
 function tekst(dane: FormData, pole: string): string {
@@ -29,17 +29,28 @@ function tekst(dane: FormData, pole: string): string {
 // Quizy
 // ---------------------------------------------------------------------------
 
+/** Rodzaj quizu z bazy (powrót na zakładkę jego rodzaju). */
+async function rodzajQuizuZBazy(id: string) {
+  const { data } = await supabaseAdmin()
+    .from("quizy")
+    .select("degustacja, etapy(count)")
+    .eq("id", id)
+    .maybeSingle<{ degustacja: boolean; etapy: { count: number }[] }>();
+  return rodzajQuizu(data ?? {});
+}
+
 export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<StanFormularza> {
   const rola = await wymagajAdmina();
   const tytul = tekst(dane, "tytul");
   if (!tytul) return { blad: "Podaj tytuł quizu." };
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
 
-  // etapy na sztywno z szablonu quizu (src/lib/etapy.ts), kreator ich nie zmienia
+  // etapy na sztywno z szablonu quizu (src/lib/etapy.ts), kreator ich nie zmienia; degustacja: same piwa, bez etapów
+  const degustacja = dane.get("szablon") === "degustacja";
   const szablonQuizu = SZABLONY_QUIZU.find((s) => s.klucz === dane.get("szablon"));
-  if (!szablonQuizu) return { blad: "Wybierz szablon quizu." };
+  if (!szablonQuizu && !degustacja) return { blad: "Wybierz szablon quizu." };
   const etapy = [];
-  for (const [i, e] of szablonQuizu.etapy.entries()) {
+  for (const [i, e] of (szablonQuizu?.etapy ?? []).entries()) {
     const szablon = SZABLONY_ETAPOW.find((s) => s.klucz === e.szablon);
     if (!szablon) return { blad: "Nieprawidłowe etapy." };
     etapy.push({
@@ -66,6 +77,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       tagi: czytajTagi(tekst(dane, "tagi")),
       lokal_id: lokalRoli(rola),
       autor_konto_id: rola.konto.id,
+      degustacja,
     })
     .select("id")
     .single();
@@ -93,8 +105,7 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   if (error) return { blad: `Nie udało się zapisać: ${error.message}` };
   // „Zapisz quiz” na dole edycji: zapis i powrót do listy, na zakładkę rodzaju tego quizu
   if (dane.get("wroc")) {
-    const { count: etapow } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", id);
-    redirect(etapow ? "/admin/quizy" : "/admin/quizy?rodzaj=klasyczny");
+    redirect(listaQuizow(await rodzajQuizuZBazy(id)).slice(0, -1));
   }
   refresh();
   return { ok: "Zapisano." };
@@ -122,8 +133,7 @@ export async function usunQuiz(id: string): Promise<void> {
   await wymagajQuizu(await wymagajAdmina(), id);
   const db = supabaseAdmin();
   // powrót na zakładkę rodzaju tego quizu (klasyczny = bez etapów)
-  const { count: etapow } = await db.from("etapy").select("id", { count: "exact", head: true }).eq("quiz_id", id);
-  const lista = etapow ? "/admin/quizy?" : "/admin/quizy?rodzaj=klasyczny&";
+  const lista = listaQuizow(await rodzajQuizuZBazy(id));
   const { error } = await db.from("quizy").update({ usunieto: new Date().toISOString() }).eq("id", id).is("usunieto", null);
   if (error) redirect(`${lista}blad=usuwanie`);
   redirect(`${lista}kosz=1`);
@@ -242,6 +252,20 @@ function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & 
     if (!opis) return { blad: "Wpisz tekst ciekawostki." };
     if (opis.length > 400) return { blad: "Tekst ciekawostki może mieć najwyżej 400 znaków." };
     return { tresc, typ, dane: { tekst: opis } };
+  }
+
+  // piwo na degustacji (02.11): nazwa w `tresc`, reszta opisu opcjonalna, bez rozwiązania
+  if (typ === "piwo") {
+    const pole = (k: string, max: number) =>
+      typeof surowe[k] === "string" ? (surowe[k] as string).trim().replace(/\s+/g, " ").slice(0, max) || null : null;
+    const mocTekst = typeof surowe.moc === "string" ? surowe.moc.trim().replace(",", ".") : "";
+    const moc = mocTekst ? Number(mocTekst) : null;
+    if (moc !== null && (!Number.isFinite(moc) || moc < 0 || moc > 70)) return { blad: "Moc to liczba od 0 do 70 (% alk.)." };
+    return {
+      tresc,
+      typ,
+      dane: { styl: pole("styl", 80), moc, browar: pole("browar", 80), historia: pole("historia", 300) },
+    };
   }
 
   // czas na odpowiedź ustawia się przy uruchamianiu gry albo w etapie, nie w pytaniu

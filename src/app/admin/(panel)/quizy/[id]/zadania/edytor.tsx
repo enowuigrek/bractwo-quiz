@@ -23,6 +23,8 @@ type Props = {
    * pary), więc edytor nie podsuwa innych. Brak etapu na liście: wszystkie rodzaje.
    */
   typyEtapow?: Record<string, TypZadania[]>;
+  /** Degustacja (02.11): same piwa, a piwo tylko w degustacji. */
+  degustacja?: boolean;
   /** Edytor rozwinięty na liście pytań (28.10): zapis zostaje na liście, bez przejścia na inną stronę. */
   naLiscie?: boolean;
   onZapisano?: () => void;
@@ -43,6 +45,7 @@ const OPISY: Record<TypZadania, string> = {
   pary: "Pary (prawa strona zostanie pomieszana)",
   szacowanie: "Liczba do odgadnięcia",
   ciekawostka: "Tekst ciekawostki (2–3 zdania pod tytułem, na TV obok grafiki)",
+  piwo: "O piwie",
 };
 
 const MIN_WIERSZY: Record<TypZadania, number> = {
@@ -53,6 +56,7 @@ const MIN_WIERSZY: Record<TypZadania, number> = {
   pary: 2,
   szacowanie: 0,
   ciekawostka: 0,
+  piwo: 0,
 };
 
 /** Pola szacowania jako tekst (przecinek albo kropka), zamiana na liczby na serwerze. */
@@ -78,6 +82,7 @@ function poczatek(zadanie?: Zadanie): { wiersze: string[][]; poprawna: number | 
       return { wiersze: [[""], [""], [""], [""]], poprawna: zadanie.dane.poprawna, zaznaczone: [] };
     case "szacowanie":
     case "ciekawostka":
+    case "piwo":
       return { wiersze: [[""], [""], [""], [""]], poprawna: null, zaznaczone: [] };
     case "wielokrotny":
       return { wiersze: zadanie.dane.odpowiedzi.map((o) => [o]), poprawna: null, zaznaczone: zadanie.dane.poprawna };
@@ -108,6 +113,7 @@ export function EdytorZadania({
   domyslnyEtap,
   domyslnyTyp,
   typyEtapow,
+  degustacja = false,
   naLiscie,
   onZapisano,
   onZwin,
@@ -135,9 +141,13 @@ export function EdytorZadania({
   const dozwolone = TYPY_ZADAN.filter(
     (t) =>
       t === zadanie?.typ ||
-      (t === "ciekawostka"
-        ? !!etap && !etap.seria
-        : !etap || !typyEtapow?.[etap.id]?.length || typyEtapow[etap.id].includes(t)),
+      (degustacja
+        ? t === "piwo"
+        : t === "piwo"
+          ? false
+          : t === "ciekawostka"
+            ? !!etap && !etap.seria
+            : !etap || !typyEtapow?.[etap.id]?.length || typyEtapow[etap.id].includes(t)),
   );
   const [typ, setTyp] = useState<TypZadania>(
     zadanie?.typ ?? (domyslnyTyp && dozwolone.includes(domyslnyTyp) ? domyslnyTyp : dozwolone[0]),
@@ -163,6 +173,16 @@ export function EdytorZadania({
   const [podpowiedzi, setPodpowiedzi] = useState<string[]>(() => zadanie?.dane.podpowiedzi ?? []);
   const [tekst, setTekst] = useState(zadanie?.typ === "ciekawostka" ? zadanie.dane.tekst : "");
   const [odslaniaj, setOdslaniaj] = useState(zadanie?.dane.odslaniaj ?? false);
+  const [piwo, setPiwo] = useState(() =>
+    zadanie?.typ === "piwo"
+      ? {
+          styl: zadanie.dane.styl ?? "",
+          moc: zadanie.dane.moc === null ? "" : liczbaNaTekst(zadanie.dane.moc),
+          browar: zadanie.dane.browar ?? "",
+          historia: zadanie.dane.historia ?? "",
+        }
+      : { styl: "", moc: "", browar: "", historia: "" },
+  );
 
   const powtorzoneA = powtorzenia(wiersze.map((w) => w.a));
   const powtorzoneB = typ === "pary" ? powtorzenia(wiersze.map((w) => w.b)) : new Set<number>();
@@ -178,6 +198,8 @@ export function EdytorZadania({
           ? liczba
           : typ === "ciekawostka"
             ? { tekst }
+          : typ === "piwo"
+            ? piwo
           : typ === "wielokrotny"
             ? { odpowiedzi: wiersze.map((w) => w.a), poprawna: [...zaznaczone].sort((x, y) => x - y) }
             : typ === "kolejnosc"
@@ -185,7 +207,8 @@ export function EdytorZadania({
               : { pary: wiersze.map((w) => [w.a, w.b]) };
   const dane = { ...daneTypu, podpowiedzi, odslaniaj };
   const zLiczbami = typ === "szacowanie";
-  const zWierszami = typ !== "prawda_falsz" && typ !== "ciekawostka" && !zLiczbami;
+  const zWierszami = typ !== "prawda_falsz" && typ !== "ciekawostka" && typ !== "piwo" && !zLiczbami;
+  const jestPiwo = typ === "piwo";
   // podgląd tolerancji: domyślnie ćwierć zakresu
   const zakres = Number(liczba.max.replace(",", ".")) - Number(liczba.min.replace(",", "."));
 
@@ -265,6 +288,7 @@ export function EdytorZadania({
         </div>
       )}
 
+      {!jestPiwo && (
       <fieldset>
         <legend>Rodzaj pytania</legend>
         {/* kafelki w kolorach rodzajów (`.rodzaj-pytania`, jak w pilocie i na liście pytań), wybrany wypełniony */}
@@ -278,9 +302,12 @@ export function EdytorZadania({
           ))}
         </div>
       </fieldset>
+      )}
 
       <div>
-        <label htmlFor={`${uid}-tresc`}>{typ === "ciekawostka" ? "Tytuł ciekawostki" : "Pytanie"}</label>
+        <label htmlFor={`${uid}-tresc`}>
+          {jestPiwo ? "Nazwa piwa" : typ === "ciekawostka" ? "Tytuł ciekawostki" : "Pytanie"}
+        </label>
         <textarea
           id={`${uid}-tresc`}
           name="tresc"
@@ -288,10 +315,48 @@ export function EdytorZadania({
           defaultValue={zadanie?.tresc}
           required
           maxLength={LIMITY.tresc}
-          rows={3}
+          rows={jestPiwo ? 1 : 3}
           autoFocus={!zadanie}
         />
       </div>
+
+      {jestPiwo && (
+        <div className="pola-liczby">
+          {(
+            [
+              ["styl", "Styl", "np. American IPA", 80],
+              ["moc", "Moc (% alk.)", "np. 6,5", 6],
+              ["browar", "Browar albo piwowar", "np. Łukasz (piwo domowe)", 80],
+            ] as const
+          ).map(([pole, napis, przyklad, max]) => (
+            <div key={pole}>
+              <label htmlFor={`${uid}-${pole}`}>{napis}</label>
+              <input
+                id={`${uid}-${pole}`}
+                className="pole"
+                inputMode={pole === "moc" ? "decimal" : "text"}
+                value={piwo[pole]}
+                onChange={(e) => setPiwo((p) => ({ ...p, [pole]: e.target.value }))}
+                placeholder={przyklad}
+                maxLength={max}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      {jestPiwo && (
+        <div>
+          <label htmlFor={`${uid}-historia`}>Historia piwa (na TV przy nalewaniu, opcjonalnie)</label>
+          <textarea
+            id={`${uid}-historia`}
+            className="pole"
+            value={piwo.historia}
+            onChange={(e) => setPiwo((p) => ({ ...p, historia: e.target.value }))}
+            maxLength={300}
+            rows={3}
+          />
+        </div>
+      )}
 
       {typ === "ciekawostka" && (
         <div>
@@ -469,10 +534,16 @@ export function EdytorZadania({
 
       <PoleGrafiki
         nazwa="grafika"
-        etykieta="Grafika do pytania (opcjonalnie)"
+        etykieta={jestPiwo ? "Etykieta albo zdjęcie butelki (opcjonalnie)" : "Grafika do pytania (opcjonalnie)"}
         obecna={zadanie?.grafika_url}
-        podpowiedz="Pokazuje się na TV i telefonach razem z pytaniem. PNG, JPG, WebP albo SVG, do 5 MB."
+        podpowiedz={
+          jestPiwo
+            ? undefined
+            : "Pokazuje się na TV i telefonach razem z pytaniem. PNG, JPG, WebP albo SVG, do 5 MB."
+        }
       />
+      {!jestPiwo && (
+      <>
       <label className="pole-wyboru">
         <input type="checkbox" checked={odslaniaj} onChange={(e) => setOdslaniaj(e.target.checked)} />
         <span>
@@ -516,11 +587,13 @@ export function EdytorZadania({
           </button>
         )}
       </fieldset>
+      </>
+      )}
 
       <KomunikatFormularza stan={stan} />
       <div className="edytor-przyciski">
         <button type="submit" className="przycisk zloty" disabled={trwa}>
-          {trwa ? "Zapisuję…" : zadanie ? "Zapisz pytanie" : "Dodaj pytanie"}
+          {trwa ? "Zapisuję…" : jestPiwo ? (zadanie ? "Zapisz piwo" : "Dodaj piwo") : zadanie ? "Zapisz pytanie" : "Dodaj pytanie"}
         </button>
         {naLiscie ? (
           <button type="button" className="przycisk" onClick={onZwin} disabled={trwa}>

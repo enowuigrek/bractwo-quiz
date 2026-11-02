@@ -19,6 +19,11 @@ const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
 /**
+ * Degustacja z automatem (testy z botami): ocenianie kończy się, gdy ocenią wszyscy (nie wcześniej niż po
+ * `ocenianie`), a najpóźniej po `ocenianieMax`; „co poczuła sala” stoi `wyniki` sekund.
+ */
+const DEGUSTACJA = { ocenianie: 10, ocenianieMax: 180, wyniki: 12 } as const;
+/**
  * Gra zapowiedziana na godzinę z automatem: godzina z kreatora to start quizu (26.10, Łukasz), a poczekalnia
  * z QR otwiera się tyle minut wcześniej, żeby gracze zdążyli dołączyć. To samo w bazie: `wewn.otworz_o_czasie`.
  */
@@ -52,6 +57,7 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
     case "etap":
       return plansza(PLANSZA.etap) ? "nastepne" : null;
     case "wynik":
+      if (stan.zadanie?.typ === "piwo") return s >= DEGUSTACJA.wyniki ? (stan.ostatnie_zadanie ? "podium" : "nastepne") : null;
       if (stan.zadanie?.typ === "ciekawostka") return plansza(PLANSZA.ciekawostka) ? "nastepne" : null;
       return s >= PO_PYTANIU.wynik ? "odpowiedzi" : null;
     case "odpowiedzi":
@@ -68,6 +74,10 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
     // w bazie zostaje `przygotuj`, choć pytanie już trwa (odsłania je zegar), więc oba
     case "przygotuj":
     case "pytanie":
+      if (stan.zadanie?.typ === "piwo") {
+        const wszyscy = stan.w_grze > 0 && stan.liczba_odpowiedzi >= stan.w_grze;
+        return (wszyscy && s >= DEGUSTACJA.ocenianie) || s >= DEGUSTACJA.ocenianieMax ? "wynik" : null;
+      }
       return !stan.faza_do && s >= BEZ_LIMITU_S ? "wynik" : null;
     case "werble":
       return s >= WERBLE_S ? "podium" : null;

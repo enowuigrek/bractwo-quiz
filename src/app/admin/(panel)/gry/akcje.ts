@@ -28,7 +28,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   // czas na odpowiedź dla wszystkich pytań; bonus za szybkość jest zawsze (bez limitu maleje przez 30–60 s),
   // a limit tylko odlicza czas, po którym nie da się już odpowiedzieć
   const czasPole = String(dane.get("czas_s") ?? "");
-  const czas_s = czasPole === "bez" ? null : Number(czasPole);
+  // degustacja nie ma pola czasu (piwa bez zegara): jak „bez limitu”
+  const czas_s = czasPole === "bez" || czasPole === "" ? null : Number(czasPole);
   const bonus_czas = true;
   // na razie najwyżej 20 graczy (MAX_GRACZY: tyle mieści ranking na TV na dwóch stronach)
   const max_graczy = Number(dane.get("max_graczy") || MAX_GRACZY);

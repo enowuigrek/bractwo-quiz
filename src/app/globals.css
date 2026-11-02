@@ -3834,6 +3834,12 @@ a.glowna-lokal:focus-visible {
   background: rgba(150, 160, 170, 0.12);
 }
 
+/* piwo na degustacji (02.11): bursztyn, inny niż złoto jednej odpowiedzi */
+.rodzaj-pytania.piwo {
+  --kolor-rodzaju: #e8914a;
+  background: rgba(232, 145, 74, 0.14);
+}
+
 /* ---- Wspólne elementy formularzy panelu i pilota (26.10: przeniesione z panel.css, bo nagrody w pilocie mają
    wyglądać jak w kreatorze gry): przełącznik, kafelki z ikoną, pola i zdjęcie nagrody, mały przycisk ---- */
 
@@ -4140,4 +4146,353 @@ button.kafelek {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* ---- Degustacja na telefonie (02.11, docs/DEGUSTACJA.md): karta krok po kroku, słowa na kafelkach, suwaki,
+   gwiazdki, „ty i sala” i „Twoja degustacja” ---- */
+
+.degustacja-nazwa {
+  margin-bottom: 4px;
+}
+
+.degustacja-opis {
+  margin: 0 0 var(--card-pad);
+  color: var(--szary);
+  font-size: var(--fs-small);
+}
+
+.karta-kroki {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.karta-kroki li {
+  flex: 1;
+}
+
+.karta-kroki button {
+  display: block;
+  width: 100%;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--kamien2);
+  cursor: pointer;
+}
+
+.karta-kroki .zrobiony button {
+  background: var(--bursztyn);
+}
+
+.karta-kroki .teraz button {
+  background: var(--zloto);
+}
+
+.karta-krok-nazwa {
+  margin: 0 0 12px;
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+}
+
+.karta-kolory {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.karta-kolor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  color: var(--piana);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  cursor: pointer;
+}
+
+.karta-kolor span {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-round);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.karta-kolor.wybrany {
+  border-color: var(--zloto);
+}
+
+.karta-opcje,
+.karta-slowa {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.karta-opcje {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.karta-opcje .slowo {
+  align-items: center;
+  text-align: center;
+}
+
+.karta-opcje-dwie {
+  grid-template-columns: 1fr 1fr;
+}
+
+.karta-grupa .etykieta {
+  margin-top: 12px;
+}
+
+.slowo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--w-semibold);
+  line-height: 1.25;
+  text-align: left;
+  color: var(--piana);
+  background: var(--kamien);
+  border: 2px solid var(--kamien2);
+  border-radius: var(--r-pole);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slowo small {
+  color: var(--szary);
+  font-size: var(--fs-micro);
+  font-weight: var(--w-regular);
+}
+
+.slowo.wybrane {
+  border-color: var(--zloto);
+  background: rgba(227, 172, 63, 0.16);
+}
+
+.slowo-wada.wybrane {
+  border-color: var(--czerwien);
+  background: rgba(226, 115, 90, 0.16);
+}
+
+.slowo-szerokie {
+  width: 100%;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.karta-suwak {
+  margin: 12px 0 4px;
+}
+
+.karta-suwak-nazwa {
+  margin: 0;
+  font-weight: var(--w-semibold);
+}
+
+.karta-suwak input[type="range"] {
+  width: 100%;
+  height: 40px;
+  accent-color: var(--zloto);
+}
+
+/* nieruszony suwak stoi pośrodku przygaszony: krok można pominąć */
+.karta-suwak.pusty input[type="range"] {
+  opacity: 0.45;
+}
+
+.karta-suwak-konce {
+  display: flex;
+  justify-content: space-between;
+  margin: -4px 0 0;
+  color: var(--szary);
+  font-size: var(--fs-xs);
+}
+
+.karta-pytanie {
+  display: block;
+  margin: var(--card-pad) 0 8px;
+  font-weight: var(--w-semibold);
+}
+
+.karta-nawigacja {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: var(--section-gap);
+}
+
+.karta-ocena {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.karta-ocena-liczba {
+  margin: 0;
+  min-width: 2.2em;
+  color: var(--zloto);
+  font-size: var(--fs-h1);
+  font-weight: var(--w-black);
+  text-align: right;
+}
+
+.gwiazdki {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.gwiazdki-wybor {
+  font-size: 46px;
+}
+
+.gwiazdka {
+  position: relative;
+  display: inline-block;
+}
+
+.gwiazdka-tlo {
+  color: var(--kamien2);
+}
+
+.gwiazdka-pelna {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--zloto);
+}
+
+.gwiazdka-pol {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gwiazdka-pol.lewa {
+  left: 0;
+}
+
+.gwiazdka-pol.prawa {
+  right: 0;
+}
+
+.karta-gotowa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: var(--card-pad);
+  text-align: center;
+  background: var(--kamien);
+  border-radius: var(--r-pole);
+}
+
+.karta-gotowa p {
+  margin: 0;
+}
+
+.karta-gotowa-napis {
+  color: var(--chmiel);
+  font-size: var(--fs-h3);
+  font-weight: var(--w-black);
+}
+
+.ty-i-sala-oceny {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ty-i-sala-oceny > div {
+  padding: 12px;
+  text-align: center;
+  background: var(--kamien);
+  border-radius: var(--r-pole);
+}
+
+.ty-i-sala-oceny .etykieta {
+  margin: 0;
+}
+
+.ty-i-sala-liczba {
+  margin: 4px 0 0;
+  font-size: 40px;
+  font-weight: var(--w-black);
+  line-height: 1;
+}
+
+.zloto {
+  color: var(--zloto);
+}
+
+.ty-i-sala-suwaki {
+  margin: var(--card-pad) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ty-i-sala-suwaki li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--kamien2);
+  font-size: var(--fs-small);
+}
+
+.ty-i-sala-suwaki span {
+  color: var(--szary);
+  text-align: right;
+}
+
+.twoja-degustacja {
+  margin: var(--card-pad) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.twoja-degustacja li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--kamien2);
+}
+
+.twoja-degustacja p {
+  margin: 0;
+}
+
+.twoja-degustacja-nazwa {
+  font-weight: var(--w-black);
+}
+
+.twoja-degustacja-notatka {
+  margin-top: 4px !important;
+  font-style: italic;
 }

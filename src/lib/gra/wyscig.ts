@@ -31,8 +31,11 @@ export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }):
  * Nazwa rodzaju gry dla graczy (nagłówek telefonu, grafika na pamiątkę), zamiast samego „Quiz” (26.10). Bez wczytanego
  * quizu: „Quiz”.
  */
-export function nazwaRodzaju(stan: { quiz: { liczba_etapow: number } | null } | null | undefined): string {
+export function nazwaRodzaju(
+  stan: { quiz: { liczba_etapow: number; degustacja?: boolean } | null } | null | undefined,
+): string {
   if (!stan?.quiz) return "Quiz";
+  if (stan.quiz.degustacja) return "Degustacja";
   return quizKlasyczny(stan) ? "Pub quiz" : "Wyścig po piwo";
 }
 

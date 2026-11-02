@@ -17,7 +17,7 @@ export type GraNaLiscie = {
   planowany_start: string | null;
   wystartowano: string | null;
   notatka: string | null;
-  quizy: { tytul: string; tagi: string[]; etapy: { count: number }[] } | null;
+  quizy: { tytul: string; tagi: string[]; degustacja: boolean; etapy: { count: number }[] } | null;
   lokal_id: string | null;
   lokale: { nazwa: string; miasto: string | null; logo_url: string | null } | null;
   /** kto uruchomił (konta osobowe, 30.10) */
@@ -25,7 +25,7 @@ export type GraNaLiscie = {
 };
 
 export const ZAPYTANIE_GIER =
-  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, etapy(count)), lokal_id, lokale(nazwa, miasto, logo_url), konta(id, nazwa, zdjecie_url)";
+  "id, kod, okazja, faza, utworzono, host_token, tylko_glowny, planowany_start, wystartowano, notatka, quizy(tytul, tagi, degustacja, etapy(count)), lokal_id, lokale(nazwa, miasto, logo_url), konta(id, nazwa, zdjecie_url)";
 
 /** Trwająca gra otwiera się od razu w pilocie (26.10), zakończona na stronie gry z wynikami. */
 const adresGry = (g: GraNaLiscie) => (g.faza === "koniec" ? `/admin/gry/${g.id}` : `/pilot/${g.kod}?t=${g.host_token}`);

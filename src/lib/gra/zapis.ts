@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/przegladarka";
  * (`on conflict do nothing`), a powtórka po udanym zapisie wraca jako „juz_odpowiedziano”.
  */
 export async function zapiszZPonowieniem(
-  funkcja: "zapisz_odpowiedz" | "zapisz_odpowiedz_serii",
+  funkcja: "zapisz_odpowiedz" | "zapisz_odpowiedz_serii" | "zapisz_karte",
   argumenty: Record<string, unknown>,
 ) {
   const przerwy = [400, 1200];

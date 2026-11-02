@@ -185,7 +185,7 @@ export default async function ZasadyWyscigu() {
                 <p className="zasady-opis">„{e.opis}”</p>
                 <ul className="zasady-lista">
                   {typy.flatMap((t) =>
-                    t === "ciekawostka"
+                    t === "ciekawostka" || t === "piwo"
                       ? []
                       : RODZAJE[t].zasady.map((z) => (
                           <li key={t + z}>{typy.length > 1 ? `${NAZWY_TYPOW[t]}: ${z}` : z}</li>
@@ -222,7 +222,7 @@ export default async function ZasadyWyscigu() {
                   </tbody>
                 </table>
                 {typy.map((t) =>
-                  t === "ciekawostka" ? null : (
+                  t === "ciekawostka" || t === "piwo" ? null : (
                     <TabelaCzesciowych key={t} typ={t} mnoznik={e.mnoznik} zNazwa={typy.length > 1} />
                   ),
                 )}

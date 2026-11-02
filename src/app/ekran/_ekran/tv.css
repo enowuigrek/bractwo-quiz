@@ -4261,3 +4261,339 @@
   position: relative;
   display: grid;
 }
+
+/* ---- Degustacja (02.11, docs/DEGUSTACJA.md): piwo z lewej, z prawej chmura na żywo albo „co poczuła sala”,
+   na koniec podium piw ---- */
+
+.tv-degustacja {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tv-piwo {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 620px minmax(0, 1fr);
+  gap: 80px;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.tv-piwo-lewa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.tv-piwo-etykieta {
+  width: 420px;
+  height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.tv-piwo.wynik .tv-piwo-etykieta {
+  width: 300px;
+  height: 300px;
+}
+
+.tv-piwo-etykieta.pusta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 220px;
+  background: var(--kamien);
+}
+
+.tv-piwo-nazwa {
+  margin: 28px 0 8px;
+  font-size: 72px;
+  font-weight: var(--w-black);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.tv-piwo.wynik .tv-piwo-nazwa {
+  font-size: 56px;
+}
+
+.tv-piwo-opis {
+  margin: 0;
+  color: var(--zloto);
+  font-size: 34px;
+  font-weight: var(--w-semibold);
+}
+
+.tv-piwo-historia {
+  margin: 24px 0 0;
+  color: var(--piana);
+  font-size: 30px;
+  line-height: 1.35;
+}
+
+.tv-piwo-prawa {
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tv-piwo-licznik {
+  margin: 0 0 40px;
+  color: var(--szary);
+  font-size: 44px;
+  font-weight: var(--w-semibold);
+}
+
+.tv-piwo-licznik strong {
+  color: var(--zloto);
+  font-size: 88px;
+  font-weight: var(--w-black);
+}
+
+.tv-chmura {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tv-chmura li {
+  margin: 6px 22px;
+  font-weight: var(--w-black);
+  line-height: 1.1;
+  color: var(--piana);
+}
+
+.tv-chmura li:nth-child(3n + 1) {
+  color: var(--zloto);
+}
+
+.tv-chmura-pusta {
+  margin: 0;
+  text-align: center;
+  color: var(--szary);
+  font-size: 40px;
+}
+
+.tv-sala {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tv-sala .tv-chmura {
+  margin: 24px 0;
+}
+
+.tv-sala-ocena {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.tv-sala-srednia {
+  margin: 0;
+  color: var(--zloto);
+  font-size: 170px;
+  font-weight: var(--w-black);
+  line-height: 0.9;
+}
+
+.tv-sala-podpis {
+  margin: 12px 0 0;
+  color: var(--szary);
+  font-size: 34px;
+}
+
+.tv-gwiazdki {
+  display: inline-flex;
+  font-size: 84px;
+  line-height: 1;
+}
+
+.tv-gwiazdka {
+  position: relative;
+  display: inline-block;
+}
+
+.tv-gwiazdka .tlo {
+  color: var(--kamien2);
+}
+
+.tv-gwiazdka .pelna {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--zloto);
+}
+
+.tv-sala-suwaki {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tv-suwak-sali {
+  display: grid;
+  grid-template-columns: 220px 200px minmax(0, 1fr) 200px;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0;
+  font-size: 28px;
+}
+
+.tv-suwak-nazwa {
+  font-weight: var(--w-black);
+}
+
+.tv-suwak-koniec {
+  color: var(--szary);
+  font-size: 24px;
+}
+
+.tv-suwak-koniec:last-child {
+  text-align: right;
+}
+
+.tv-suwak-os {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  height: 28px;
+}
+
+.tv-suwak-slupek {
+  border-radius: 4px;
+  background: var(--zloto);
+}
+
+.tv-suwak-srednia {
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  width: 6px;
+  margin-left: -3px;
+  border-radius: 3px;
+  background: var(--piana);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+.tv-sala-wady {
+  margin: 24px 0 0;
+  color: var(--czerwien);
+  font-size: 30px;
+  font-weight: var(--w-semibold);
+}
+
+.tv-podium-piw {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tv-podium-piw li {
+  display: grid;
+  grid-template-columns: 140px 90px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 0;
+  border-bottom: 2px solid var(--kamien2);
+  font-size: 52px;
+}
+
+.tv-podium-piw li:not([class]) {
+  grid-template-columns: 90px minmax(0, 1fr) auto;
+  padding-left: 168px;
+  font-size: 32px;
+}
+
+.tv-podium-piw-etykieta {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.tv-podium-piw-etykieta.pusta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  background: var(--kamien);
+}
+
+.tv-podium-piw-miejsce {
+  color: var(--szary);
+  font-weight: var(--w-black);
+}
+
+.miejsce-1 .tv-podium-piw-miejsce,
+.miejsce-1 .tv-podium-piw-ocena {
+  color: var(--zloto);
+}
+
+.miejsce-2 .tv-podium-piw-miejsce {
+  color: var(--srebro);
+}
+
+.miejsce-3 .tv-podium-piw-miejsce {
+  color: var(--braz);
+}
+
+.tv-podium-piw-nazwa {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: var(--w-black);
+}
+
+.tv-podium-piw-nazwa small {
+  color: var(--szary);
+  font-size: 0.6em;
+  font-weight: var(--w-semibold);
+}
+
+.tv-podium-piw-ocena {
+  font-size: 1.5em;
+  font-weight: var(--w-black);
+}
+
+/* jedno piwo (np. piwo domowe na spotkaniu): duża plansza zamiast listy */
+.tv-podium-piw.jedno li {
+  grid-template-columns: 300px minmax(0, 1fr) auto;
+  border: 0;
+  font-size: 64px;
+}
+
+.tv-podium-piw.jedno .tv-podium-piw-etykieta {
+  width: 300px;
+  height: 300px;
+}
+
+.tv-podium-piw.jedno .tv-podium-piw-miejsce {
+  display: none;
+}
+
+.tv-podium-piw-pozegnanie {
+  margin: 24px 0 0;
+  text-align: center;
+  color: var(--szary);
+  font-size: 34px;
+}

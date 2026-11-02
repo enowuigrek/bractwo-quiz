@@ -10,6 +10,7 @@ export const TYPY_ZADAN = [
   "pary",
   "szacowanie",
   "ciekawostka",
+  "piwo",
 ] as const;
 export type TypZadania = (typeof TYPY_ZADAN)[number];
 
@@ -51,6 +52,19 @@ export type DanePary = { lewe: string[]; prawe: string[]; poprawna: number[] };
  * i zegara. Nie liczy się do numeracji ani liczby pytań; pilot od razu przechodzi w fazę `wynik`.
  */
 export type DaneCiekawostka = { tekst: string };
+/**
+ * Piwo na degustacji (02.11, docs/DEGUSTACJA.md): `tresc` to nazwa, `grafika_url` etykieta albo butelka. Bez
+ * rozwiązania i punktów: goście wypełniają kartę (`KartaPiwa` w src/lib/degustacja.ts), ocenianie bez zegara.
+ */
+export type DanePiwo = {
+  styl: string | null;
+  /** Moc w % alk. */
+  moc: number | null;
+  /** Browar albo piwowar (piwo domowe). */
+  browar: string | null;
+  /** Krótka historia piwa albo słowo od piwowara, na TV przy nalewaniu. */
+  historia: string | null;
+};
 
 export type ZadanieDane =
   | { typ: "wybor"; dane: DaneWybor & Dodatki }
@@ -59,7 +73,8 @@ export type ZadanieDane =
   | { typ: "kolejnosc"; dane: DaneKolejnosc & Dodatki }
   | { typ: "pary"; dane: DanePary & Dodatki }
   | { typ: "szacowanie"; dane: DaneSzacowanie & Dodatki }
-  | { typ: "ciekawostka"; dane: DaneCiekawostka & Dodatki };
+  | { typ: "ciekawostka"; dane: DaneCiekawostka & Dodatki }
+  | { typ: "piwo"; dane: DanePiwo & Dodatki };
 
 /** Dane widziane przez TV i telefony: `poprawna` dochodzi dopiero od fazy `wynik`. */
 export type DaneWidoczne = {
@@ -80,6 +95,11 @@ export type DaneWidoczne = {
   przedzial?: boolean;
   /** Ciekawostka: tekst pod tytułem. */
   tekst?: string;
+  /** Piwo (degustacja). */
+  styl?: string | null;
+  moc?: number | null;
+  browar?: string | null;
+  historia?: string | null;
 };
 
 /** Odpowiedź gracza (kształt zależny od typu). */
@@ -99,6 +119,7 @@ export const NAZWY_TYPOW: Record<TypZadania, string> = {
   pary: "Pary",
   szacowanie: "Szacowanie liczby",
   ciekawostka: "Ciekawostka",
+  piwo: "Piwo",
 };
 
 /** Podpowiedź dla graczy na TV i telefonie. */
@@ -110,6 +131,7 @@ export const PODPOWIEDZI_TYPOW: Record<TypZadania, string> = {
   pary: "Połącz w pary",
   szacowanie: "Podaj liczbę: im bliżej, tym więcej punktów",
   ciekawostka: "Patrz na telewizor",
+  piwo: "Oceń piwo",
 };
 
 /** Odpowiedzi pytania prawda / fałsz (kolejność jak w `dane.odpowiedzi`). */
@@ -165,6 +187,8 @@ export function opisRozwiazania(z: ZadanieDane): string {
       return `Pary: ${z.dane.lewe.map((l, i) => `${l} – ${z.dane.prawe[z.dane.poprawna[i]]}`).join(", ")}`;
     case "ciekawostka":
       return z.dane.tekst;
+    case "piwo":
+      return opisPiwa(z.dane);
   }
 }
 
@@ -185,8 +209,14 @@ export function opisOdpowiedzi(z: ZadanieDane, o: DaneOdpowiedzi): string {
     case "pary":
       return z.dane.lewe.map((l, i) => `${l} – ${z.dane.prawe[o.pary?.[i] ?? -1] ?? "?"}`).join(", ");
     case "ciekawostka":
+    case "piwo":
       return "";
   }
+}
+
+/** Piwo jednym wierszem: „American IPA · 6,5% · Browar Kwadrat”. */
+export function opisPiwa(d: { styl?: string | null; moc?: number | null; browar?: string | null }): string {
+  return [d.styl, typeof d.moc === "number" ? `${liczbaZJednostka(d.moc)}%` : null, d.browar].filter(Boolean).join(" · ");
 }
 
 /** Ocena 0..1 jako ułamek do pokazania, np. „3/4”. `n` = liczba części pytania. */

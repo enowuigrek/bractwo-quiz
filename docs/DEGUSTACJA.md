@@ -1,5 +1,7 @@
 # Degustacja: scenariusz (szkic 02.11)
 
+> **Stan 02.11:** pierwsza wersja zrobiona (karta pełna, TV, pilot, raport dla piwowara w panelu; szczegóły w PLAN.md, „Degustacja: pierwsza wersja”). Ustalone przy budowie: gwiazdki 1–5 co pół, notatki anonimowe, w kreatorze bez czasu i nagród, muzyka jak w pub quizie (przełącznik w pilocie). Czeka: karta krótka i profile stylów, link raportu bez logowania, ślepa wersja, katalog piw.
+
 Trzeci rodzaj wieczoru obok „Wyścigu po piwo” i „Klasycznego pub quizu”. Ten sam układ co w quizie: TV w lokalu, telefony gości z kodem, pilot u prowadzącego, gry na listach w panelu. Zamiast pytań są piwa: goście je opisują i oceniają na telefonie, a TV pokazuje, co czuje sala.
 
 **Najważniejsze (Łukasz, 02.11):** na kartce ktoś, kto się nie zna, nie wie, co napisać. Aplikacja go prowadzi: suwaki, kafelki do zaznaczenia i lista aromatów, które mogą się pojawić. Sugestie podpowiadają słowa, a potem widać, kto co poczuł.

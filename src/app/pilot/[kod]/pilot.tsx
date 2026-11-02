@@ -19,8 +19,8 @@ import type { AkcjaPilota, FazaWidoczna, GraczPilota, PilotStan, ZadanieWidoczne
 import { supabase } from "@/lib/supabase/przegladarka";
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { bezPunktow, napisMnoznika } from "@/lib/etapy";
-import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
-import { liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
+import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka, opisPiwa, poprawnaSzacowania } from "@/lib/zadania";
+import { liczbaPiw, liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
 import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { NagrodyPilota } from "./nagrody";
@@ -197,7 +197,13 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
   const z = stan.zadanie;
   const liczba = stan.quiz?.liczba_zadan ?? 0;
   const druzyny = stan.tryb === "druzyny";
-  const nastepne = stan.ostatnie_zadanie
+  // degustacja (02.11): piwa zamiast pytań, ocenianie bez zegara zamyka prowadzący, na koniec podsumowanie
+  const degustacja = !!stan.quiz?.degustacja || (z ? z.typ === "piwo" : stan.nastepne_typ === "piwo");
+  const nastepne = degustacja
+    ? stan.ostatnie_zadanie
+      ? { akcja: "podium" as const, napis: "Podsumowanie" }
+      : { akcja: "nastepne" as const, napis: `Nalej piwo ${(z?.lp ?? 0) + 1}` }
+    : stan.ostatnie_zadanie
     ? { akcja: "podium" as const, napis: "Pokaż podium" }
     : {
         akcja: "nastepne" as const,
@@ -222,7 +228,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
       ? ["Gotowi do dalszej gry", `${stan.gotowi}/${stan.gotowi_z}`, stan.gotowi >= stan.gotowi_z]
       : poPytaniu
         ? [
-            wszyscy ? "Wszyscy odpowiedzieli" : "Odpowiedziało",
+            degustacja ? (wszyscy ? "Wszyscy ocenili" : "Oceniło") : wszyscy ? "Wszyscy odpowiedzieli" : "Odpowiedziało",
             `${stan.liczba_odpowiedzi}/${grajacy}`,
             wszyscy && ["przygotuj", "pytanie", "wynik"].includes(faza),
           ]
@@ -245,7 +251,9 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
         : faza === "przygotuj"
           ? `Start za ${sekundaOdliczania(doStartu)} s`
           : faza === "pytanie"
-            ? bezLimitu
+            ? degustacja
+              ? "Ocenianie trwa"
+              : bezLimitu
               ? "Bez limitu"
               : doKonca > 0
                 ? `Zostało ${Math.ceil(doKonca / 1000)} s`
@@ -261,13 +269,19 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
                     : "";
   // gdzie jesteśmy w quizie: w wyścigu etap i pytanie, w klasycznym samo pytanie (przed startem: ile pytań)
   const postep = !z
-    ? liczbaPytan(liczba)
-    : etap
+    ? degustacja
+      ? liczbaPiw(liczba)
+      : liczbaPytan(liczba)
+    : degustacja
+      ? `Piwo ${z.lp}/${liczba}`
+      : etap
       ? `Etap ${etap.nr}/${etap.liczba} · ${z.lp}/${liczba}`
       : `Pytanie ${z.lp}/${liczba}`;
   // rodzaj następnego pytania w kolorze (rodzaje się mieszają, prowadzący uprzedza graczy przed startem)
   const nastepnyRodzaj =
-    stan.nastepne_typ && ["poczekalnia", "wynik", "odpowiedzi", "ranking"].includes(faza) ? stan.nastepne_typ : null;
+    stan.nastepne_typ && !degustacja && ["poczekalnia", "wynik", "odpowiedzi", "ranking"].includes(faza)
+      ? stan.nastepne_typ
+      : null;
   const licznik = (
     <div className={`pilot-licznik${komplet ? " komplet" : ""}`} role="status">
       <p>
@@ -433,12 +447,32 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
                   )
                 }
               >
-                {liczba === 0 ? "Quiz nie ma pytań" : "Start quizu"}
+                {liczba === 0 ? (degustacja ? "Degustacja nie ma piw" : "Quiz nie ma pytań") : degustacja ? "Nalej piwo 1" : "Start quizu"}
+              </button>
+            )}
+
+            {/* degustacja: ocenianie zamyka prowadzący, po wynikach od razu następne piwo albo podsumowanie */}
+            {degustacja && faza === "pytanie" && (
+              <button
+                className={`przycisk ${wszyscy ? "pozytywny" : "zloty"}`}
+                disabled={wysylam}
+                onClick={() =>
+                  akcja("wynik", wszyscy ? undefined : "Nie wszyscy ocenili. Zamknąć ocenianie i pokazać wyniki?", {
+                    tak: "Pokaż wyniki",
+                  })
+                }
+              >
+                Pokaż wyniki
+              </button>
+            )}
+            {degustacja && faza === "wynik" && (
+              <button className="przycisk zloty" disabled={wysylam} onClick={() => akcja(nastepne.akcja)}>
+                {nastepne.napis}
               </button>
             )}
 
             {/* wynik pokazuje się sam po czasie albo gdy wszyscy odpowiedzą; ręcznie tylko wcześniej */}
-            {(faza === "przygotuj" || faza === "pytanie") &&
+            {!degustacja && (faza === "przygotuj" || faza === "pytanie") &&
               (bezLimitu ? (
                 <button
                   className={`przycisk ${wszyscy ? "pozytywny" : "zloty"}`}
@@ -481,6 +515,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
             )}
             {faza === "wynik" &&
               z?.typ !== "ciekawostka" &&
+              !degustacja &&
               (stan.ostatnie_zadanie ? (
                 <>
                   <button className={`przycisk ${wszyscy ? "pozytywny" : "zloty"}`} disabled={wysylam} onClick={() => akcja("podium")}>
@@ -536,7 +571,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
             )}
 
             {/* po ostatnim pytaniu obok podium jest pełna tabela */}
-            {stan.ostatnie_zadanie && (faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
+            {stan.ostatnie_zadanie && !degustacja && (faza === "wynik" || faza === "odpowiedzi" || faza === "ranking") && (
               <button className="przycisk" disabled={wysylam} onClick={() => akcja("tabela")}>
                 Pokaż pełną tabelę
               </button>
@@ -687,7 +722,19 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
             </section>
           )}
 
+          {/* degustacja: o piwie dla prowadzącego (styl, moc, browar i historia do opowiedzenia) */}
+          {z && degustacja && faza !== "podium" && faza !== "tabela" && faza !== "koniec" && (
+            <details className="karta karta-zwijana">
+              <summary className="etykieta">
+                Piwo {z.lp}/{liczba}: {z.tresc}
+              </summary>
+              {opisPiwa(z.dane) && <p className="pomocniczy">{opisPiwa(z.dane)}</p>}
+              {z.dane.historia && <p>{z.dane.historia}</p>}
+            </details>
+          )}
+
           {z &&
+            !degustacja &&
             faza !== "poczekalnia" &&
             faza !== "etap" &&
             faza !== "seria" &&

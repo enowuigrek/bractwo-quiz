@@ -1,10 +1,12 @@
-import { LITERY, liczbaZJednostka, NAZWY_TYPOW, poprawnaSzacowania, type ZadanieDane } from "@/lib/zadania";
+import { LITERY, liczbaZJednostka, NAZWY_TYPOW, opisPiwa, poprawnaSzacowania, type ZadanieDane } from "@/lib/zadania";
 
 /**
  * Pytanie na liście quizu pod treścią (30.10, Łukasz: „Poprawna: …” obok rodzaju zawijało się w bałagan): w pierwszym
  * wierszu rodzaj w swoim kolorze i dopiski, pod nim odpowiedzi jako kafelki z literą, poprawne zielone z ✓.
  */
 export function PytanieNaLiscie({ z }: { z: ZadanieDane }) {
+  // piwo na degustacji: bez plakietki rodzaju (w degustacji są same piwa), styl, moc i browar pod nazwą
+  if (z.typ === "piwo") return opisPiwa(z.dane) ? <p className="lista-opis">{opisPiwa(z.dane)}</p> : null;
   const dopiski = [
     z.dane.podpowiedzi?.length ? `podpowiedzi: ${z.dane.podpowiedzi.length}` : null,
     z.dane.odslaniaj ? "odsłaniana grafika" : null,
@@ -69,5 +71,7 @@ function Odpowiedzi({ z }: { z: ZadanieDane }) {
       );
     case "ciekawostka":
       return <p className="lista-opis pytanie-skrot-tekst">{z.dane.tekst}</p>;
+    case "piwo":
+      return opisPiwa(z.dane) ? <p className="lista-opis">{opisPiwa(z.dane)}</p> : null;
   }
 }

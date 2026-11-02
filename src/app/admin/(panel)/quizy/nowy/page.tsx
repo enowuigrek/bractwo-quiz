@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
-import { NAZWY_RODZAJOW, nowyQuiz } from "@/lib/tagi";
+import { NAZWY_RODZAJOW, listaQuizow, nowyQuiz, rodzajZAdresu as czytajRodzaj } from "@/lib/tagi";
 import { FormularzQuizu } from "../formularz-quizu";
 
 export const metadata: Metadata = { title: "Nowy quiz · Bractwo Quiz" };
@@ -10,11 +10,11 @@ export default async function NowyQuiz({ searchParams }: PageProps<"/admin/quizy
   await wymagajAdmina();
   const { rodzaj: rodzajZAdresu } = await searchParams;
   // rodzaj z zakładki listy quizów; w formularzu już się go nie zmienia
-  const rodzaj = rodzajZAdresu === "klasyczny" ? "klasyczny" : "wyscig";
+  const rodzaj = czytajRodzaj(rodzajZAdresu);
   return (
     <main>
       <p className="okruchy">
-        <Link href={rodzaj === "klasyczny" ? "/admin/quizy?rodzaj=klasyczny" : "/admin/quizy"}>
+        <Link href={listaQuizow(rodzaj).slice(0, -1)}>
           ← {NAZWY_RODZAJOW[rodzaj]}
         </Link>
       </p>

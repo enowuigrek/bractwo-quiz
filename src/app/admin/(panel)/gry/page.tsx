@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty/filtry-listy";
 import { wybraneMiasto, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
-import { wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 
 export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
 
@@ -23,7 +23,7 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);
   const lokal = wybranyLokal(lokalZAdresu, lokale ?? [], false, miasto);
   // ten sam układ co lista quizów (29.10): rodzaj quizu, a pod nim filtry „Kto” i „Temat”
-  const rodzaj: RodzajQuizu = rodzajZAdresu === "klasyczny" ? "klasyczny" : "wyscig";
+  const rodzaj = czytajRodzaj(rodzajZAdresu);
   let zapytanie = filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola, true);
   const jakoLokal = !!lokalRoli(rola);
   if (lokal) zapytanie = zapytanie.eq("lokal_id", lokal);
@@ -34,16 +34,14 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
     );
   const { data, error } = await zapytanie.order("utworzono", { ascending: false }).limit(100).returns<GraNaLiscie[]>();
 
-  const wRodzaju = (data ?? []).filter(
-    (g) => ((g.quizy?.etapy[0]?.count ?? 0) > 0 ? "wyscig" : "klasyczny") === rodzaj,
-  );
+  const wRodzaju = (data ?? []).filter((g) => rodzajQuizu(g.quizy ?? {}) === rodzaj);
   const tagi = wszystkieTagi(wRodzaju.map((g) => ({ tagi: g.quizy?.tagi ?? [] })));
   const wybranyTag = typeof tag === "string" && tagi.includes(tag) ? tag : null;
   const gry = wybranyTag ? wRodzaju.filter((g) => g.quizy?.tagi.includes(wybranyTag)) : wRodzaju;
   const wybrane: WybraneFiltry = { miasto, lokal, tag: wybranyTag };
   const adres = (r: RodzajQuizu, f: WybraneFiltry) =>
     `/admin/gry?${new URLSearchParams({
-      ...(r === "klasyczny" ? { rodzaj: r } : {}),
+      ...(r !== "wyscig" ? { rodzaj: r } : {}),
       ...(f.miasto ? { miasto: f.miasto } : {}),
       ...(f.lokal ? { lokal: f.lokal } : {}),
       ...(f.tag ? { tag: f.tag } : {}),

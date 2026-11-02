@@ -1,4 +1,4 @@
-import { NAZWY_RODZAJOW, type RodzajQuizu } from "@/lib/tagi";
+import { NAZWY_RODZAJOW, RODZAJE_QUIZOW, type RodzajQuizu } from "@/lib/tagi";
 import { Filtr, type OpcjaFiltra } from "./filtr";
 import { Zakladki } from "./zakladki";
 import { BRACTWO, miastaLokali, type LokalAutor } from "./lokale-autorzy";
@@ -9,12 +9,12 @@ import { BRACTWO, miastaLokali, type LokalAutor } from "./lokale-autorzy";
  * równe listy rozwijane (`Filtr`): miasto (gdy lokale są w kilku miastach), lokal i temat.
  */
 
-/** Zakładki „Wyścig po piwo / Pub quiz” (z przesuwanym paskiem, `Zakladki`). */
+/** Zakładki „Wyścig po piwo / Pub quiz / Degustacja” (z przesuwanym paskiem, `Zakladki`). */
 export function ZakladkiRodzaju({ rodzaj, adres }: { rodzaj: RodzajQuizu; adres: (r: RodzajQuizu) => string }) {
   return (
     <Zakladki
       etykieta="Rodzaj quizu"
-      pozycje={(["wyscig", "klasyczny"] as const).map((r) => ({
+      pozycje={RODZAJE_QUIZOW.map((r) => ({
         href: adres(r),
         napis: NAZWY_RODZAJOW[r],
         aktywna: rodzaj === r,

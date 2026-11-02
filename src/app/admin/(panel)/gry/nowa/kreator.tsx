@@ -7,8 +7,8 @@ import { bezResetu } from "../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../_komponenty/grafika";
 import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { KomunikatFormularza } from "../../_komponenty/stan";
-import { LIMITY, liczbaPytan } from "../../quizy/limity";
-import { NAZWY_RODZAJOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { LIMITY, liczbaPiw, liczbaPytan } from "../../quizy/limity";
+import { NAZWY_RODZAJOW, RODZAJE_QUIZOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
@@ -72,6 +72,8 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
   const doWyboru = temat ? wRodzaju.filter((q) => q.tagi.includes(temat)) : wRodzaju;
   const wybrany = quizy.find((q) => q.id === quiz);
   const klasyczny = wybrany?.rodzaj === "klasyczny";
+  // degustacja (02.11): bez czasu na odpowiedź i nagród, piwa ocenia się bez zegara i bez punktów
+  const degustacja = wybrany?.rodzaj === "degustacja";
   const [czas, setCzas] = useState<string>(LIMITY.domyslnyCzas === null ? "bez" : String(LIMITY.domyslnyCzas));
   const [ileNagrod, setIleNagrod] = useState(0);
   // pijany finał domyślnie włączony (od 26.10 włącza go też lokal)
@@ -155,7 +157,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
           </legend>
           {/* dwa przyciski jak zakładki rodzajów w Quizach (26.10, Łukasz: kafelki z ikonami nie pasowały) */}
           <div className="wybor-czasu quizy-rodzaje">
-            {(["wyscig", "klasyczny"] as const).map((r) => (
+            {RODZAJE_QUIZOW.map((r) => (
               <label key={r} className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}>
                 <input
                   type="radio"
@@ -215,7 +217,13 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
                 />
                 <strong>{q.tytul}</strong>
                 <span className="kafelek-opis">
-                  {q.pytania === 0 ? "brak pytań" : liczbaPytan(q.pytania)}
+                  {q.pytania === 0
+                    ? q.rodzaj === "degustacja"
+                      ? "brak piw"
+                      : "brak pytań"
+                    : q.rodzaj === "degustacja"
+                      ? liczbaPiw(q.pytania)
+                      : liczbaPytan(q.pytania)}
                   {q.final && " i finał"}
                   {q.tagi.length > 0 && ` · ${q.tagi.join(", ")}`}
                 </span>
@@ -233,6 +241,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             <input id="okazja" name="okazja" className="pole" placeholder="np. Dzień Porteru" maxLength={80} />
           </div>
 
+          {!degustacja && (
           <fieldset>
             <legend>Czas na odpowiedź</legend>
             {/* równe przyciski; „∞” to bez limitu (kto szybciej, ten więcej, aż odpowiedzą wszyscy) */}
@@ -260,6 +269,9 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
             </div>
           </fieldset>
 
+          )}
+
+          {!degustacja && (
           <fieldset>
             <legend>Nagrody</legend>
             <label className="przelacznik">
@@ -314,6 +326,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
               </>
             )}
           </fieldset>
+          )}
 
           {/* tylko główny: jego gry są domyślnie ukryte przed panelem lokalu, w którym grał */}
           {glowny && (

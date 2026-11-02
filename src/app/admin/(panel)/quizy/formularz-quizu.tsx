@@ -62,7 +62,7 @@ export function FormularzQuizu({ rodzaj }: { rodzaj: RodzajQuizu }) {
           id="tytul"
           name="tytul"
           className="pole"
-          placeholder="np. Portery i stouty"
+          placeholder={rodzaj === "degustacja" ? "np. Spotkanie Bractwa, piwa domowe" : "np. Portery i stouty"}
           required
           maxLength={LIMITY.tytul}
         />
@@ -78,7 +78,7 @@ export function FormularzQuizu({ rodzaj }: { rodzaj: RodzajQuizu }) {
 
       <KomunikatFormularza stan={stan} />
       <button type="submit" className="przycisk zloty" disabled={trwa}>
-        {trwa ? "Tworzę…" : "Utwórz quiz i dodaj pytania"}
+        {trwa ? "Tworzę…" : rodzaj === "degustacja" ? "Utwórz degustację i dodaj piwa" : "Utwórz quiz i dodaj pytania"}
       </button>
     </form>
   );
