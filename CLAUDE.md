@@ -5,6 +5,7 @@ Aplikacja quizowa Bractwa Piwnego. Zanim zaczniesz pracę, przeczytaj:
 - `docs/DESIGN-SYSTEM.md` + `docs/tokens.css`: wygląd (rejestr „kręgowy” na TV i telefonach)
 - `docs/POMYSLY.md`: rzeczy na później, poza MVP
 - `docs/TEST.md`: lista przed eventem i scenariusz testu z telefonami
+- `docs/DEGUSTACJA.md`: scenariusz degustacji (trzeci rodzaj wieczoru, w przygotowaniu)
 
 Zasady:
 - Rozmawiamy, piszemy UI i commity po polsku.
