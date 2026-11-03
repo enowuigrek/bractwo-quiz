@@ -58,6 +58,8 @@ export const widziWszystko = (rola: Rola) => rola.typ !== "lokal";
 export const jestTworca = (rola: Rola) => rola.typ === "tworca";
 /** Zmienia pytania pijanego finału (włączyć go w swojej grze może każdy). */
 export const mozePijanyFinal = jestTworca;
+/** Degustacja (02.11): na razie tylko twórca, dopóki jej nie skończymy (03.11); inni nie widzą zakładki ani kafelka. */
+export const mozeDegustacje = jestTworca;
 /** Lokal, w którego imieniu działa zalogowany, albo null (twórca, Bractwo). */
 export const lokalRoli = (rola: Rola): string | null => (rola.typ === "lokal" ? rola.lokalId : null);
 /** Lokale, których rola nie widzi (lokal testowy u Bractwa). */

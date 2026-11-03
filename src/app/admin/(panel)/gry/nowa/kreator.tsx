@@ -8,7 +8,7 @@ import { PoleGrafiki } from "../../_komponenty/grafika";
 import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { LIMITY, liczbaPiw, liczbaPytan } from "../../quizy/limity";
-import { NAZWY_RODZAJOW, RODZAJE_QUIZOW, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { NAZWY_RODZAJOW, rodzajeQuizow, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
@@ -27,7 +27,7 @@ export type QuizDoWyboru = {
 };
 
 /** `glowny`: zalogowany głównym hasłem (src/lib/admin.ts) ustawia widoczność gry; lokal dostaje tylko swój lokal. */
-type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean };
+type Props = { lokale: Lokal[]; quizy: QuizDoWyboru[]; glowny: boolean; zDegustacja: boolean };
 
 /** „1 lokal”, „3 lokale”, „5 lokali”. */
 function liczbaLokali(n: number): string {
@@ -52,7 +52,7 @@ function isoStartu(data: string, godzina: string): string {
 }
 
 /** Uruchamianie gry krokami (kafelki): miasto → lokal → rodzaj → quiz (z tematem), potem szczegóły. */
-export function Kreator({ lokale, quizy, glowny }: Props) {
+export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
   const miasta = [...new Set(lokale.map((p) => p.miasto).filter((m): m is string => !!m))].sort((a, b) =>
@@ -157,7 +157,7 @@ export function Kreator({ lokale, quizy, glowny }: Props) {
           </legend>
           {/* dwa przyciski jak zakładki rodzajów w Quizach (26.10, Łukasz: kafelki z ikonami nie pasowały) */}
           <div className="wybor-czasu quizy-rodzaje">
-            {RODZAJE_QUIZOW.map((r) => (
+            {rodzajeQuizow(zDegustacja).map((r) => (
               <label key={r} className={`wybor-czasu-opcja${rodzaj === r ? " wybrana" : ""}`}>
                 <input
                   type="radio"

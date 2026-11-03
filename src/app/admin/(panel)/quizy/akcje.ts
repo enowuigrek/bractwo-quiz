@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { jestTworca, lokalRoli, wymagajAdmina } from "@/lib/admin";
+import { jestTworca, lokalRoli, mozeDegustacje, wymagajAdmina } from "@/lib/admin";
 import { wymagajQuizu } from "@/lib/admin-dostep";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
@@ -46,7 +46,7 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
 
   // etapy na sztywno z szablonu quizu (src/lib/etapy.ts), kreator ich nie zmienia; degustacja: same piwa, bez etapów
-  const degustacja = dane.get("szablon") === "degustacja";
+  const degustacja = mozeDegustacje(rola) && dane.get("szablon") === "degustacja";
   const szablonQuizu = SZABLONY_QUIZU.find((s) => s.klucz === dane.get("szablon"));
   if (!szablonQuizu && !degustacja) return { blad: "Wybierz szablon quizu." };
   const etapy = [];

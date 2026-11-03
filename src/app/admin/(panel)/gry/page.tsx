@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { lokalRoli, mozeDegustacje, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli, filtrGier } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty/filtry-listy";
@@ -23,7 +23,7 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);
   const lokal = wybranyLokal(lokalZAdresu, lokale ?? [], false, miasto);
   // ten sam układ co lista quizów (29.10): rodzaj quizu, a pod nim filtry „Kto” i „Temat”
-  const rodzaj = czytajRodzaj(rodzajZAdresu);
+  const rodzaj = czytajRodzaj(rodzajZAdresu, mozeDegustacje(rola));
   let zapytanie = filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola, true);
   const jakoLokal = !!lokalRoli(rola);
   if (lokal) zapytanie = zapytanie.eq("lokal_id", lokal);
@@ -58,7 +58,7 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
           ▶ Uruchom quiz
         </Link>
       </div>
-      <ZakladkiRodzaju rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
+      <ZakladkiRodzaju zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
       <FiltryListy
         lokale={lokale ?? []}
         tagi={tagi}

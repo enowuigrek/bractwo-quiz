@@ -1,7 +1,7 @@
 import { rodzajQuizu } from "@/lib/tagi";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { lokalRoli, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { lokalRoli, mozeDegustacje, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
@@ -41,8 +41,11 @@ export default async function NowaGra() {
       <section className="karta">
         <Kreator
           glowny={widziWszystko(rola)}
+          zDegustacja={mozeDegustacje(rola)}
           lokale={lokale ?? []}
-          quizy={(quizy ?? []).map((q) => ({
+          quizy={(quizy ?? [])
+            .filter((q) => mozeDegustacje(rola) || !q.degustacja)
+            .map((q) => ({
             id: q.id,
             tytul: q.tytul,
             // pytania, które zobaczy każdy: bez ciekawostek i bez puli finału serią (29.10: „66 pytań” liczyło pulę)

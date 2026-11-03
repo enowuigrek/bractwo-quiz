@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { jestTworca, lokalRoli, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
+import { jestTworca, lokalRoli, mozeDegustacje, mozePijanyFinal, widziWszystko, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { IkonaEdytuj, IkonaKosz, IkonaOko, IkonaOkoPrzekreslone } from "@/components/ikony";
@@ -53,7 +53,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
   const miasto = wybraneMiasto(miastoZAdresu, lokale ?? []);
   const autor = wybranyLokal(lokalZAdresu, lokale ?? [], true, miasto);
   // dwie zakładki: wyścig po piwo (quiz z etapami) i klasyczny pub quiz (bez etapów); w każdej filtr tematów
-  const rodzaj = czytajRodzaj(rodzajZAdresu);
+  const rodzaj = czytajRodzaj(rodzajZAdresu, mozeDegustacje(rola));
   let zapytanie = filtrQuizow(
     db
       .from("quizy")
@@ -117,7 +117,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         </p>
       )}
 
-      <ZakladkiRodzaju rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
+      <ZakladkiRodzaju zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
       <FiltryListy
         lokale={lokale ?? []}
         tagi={tagi}

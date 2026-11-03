@@ -31,9 +31,13 @@ export const NAZWY_RODZAJOW: Record<RodzajQuizu, string> = {
 export const nowyQuiz = (rodzaj: RodzajQuizu) =>
   `${rodzaj === "degustacja" ? "Nowa" : "Nowy"} ${NAZWY_RODZAJOW[rodzaj].toLowerCase()}`;
 
-/** Rodzaj z adresu (`?rodzaj=`), domyślnie wyścig. */
-export function rodzajZAdresu(wartosc: unknown): RodzajQuizu {
-  return wartosc === "klasyczny" || wartosc === "degustacja" ? wartosc : "wyscig";
+/** Rodzaje, które rola widzi: degustacja tylko z `mozeDegustacje` (03.11). */
+export const rodzajeQuizow = (zDegustacja: boolean): readonly RodzajQuizu[] =>
+  zDegustacja ? RODZAJE_QUIZOW : RODZAJE_QUIZOW.filter((r) => r !== "degustacja");
+
+/** Rodzaj z adresu (`?rodzaj=`), domyślnie wyścig (także degustacja dla roli, która jej nie widzi). */
+export function rodzajZAdresu(wartosc: unknown, zDegustacja: boolean): RodzajQuizu {
+  return wartosc === "klasyczny" || (zDegustacja && wartosc === "degustacja") ? wartosc : "wyscig";
 }
 
 /** Rodzaj quizu z jego wiersza: znacznik degustacji, a bez niego etapy. */
