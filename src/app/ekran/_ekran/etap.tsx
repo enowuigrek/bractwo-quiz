@@ -134,11 +134,13 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             {stan.finalisci && (
               <motion.div className="tv-etap-final" {...wejscie(4)}>
                 <p className="tv-etykieta">W finale grają</p>
-                <ul>
+                {/* więcej niż trójka (JOWES: piątka, 18.11): mniejsze awatary i lista w kilku rzędach, żeby nie wchodziła
+                    pod telefon z przykładem */}
+                <ul className={stan.finalisci.length > 3 ? "wielu" : undefined}>
                   {stan.finalisci.map((f, i) => (
                     <li key={f.nick}>
                       <span className="tv-etap-final-miejsce">{i + 1}.</span>
-                      <Awatar nick={f.nick} zdjecie={f.zdjecie} rozmiar={110} />
+                      <Awatar nick={f.nick} zdjecie={f.zdjecie} rozmiar={stan.finalisci!.length > 3 ? 70 : 110} />
                       <span>{f.nick}</span>
                     </li>
                   ))}

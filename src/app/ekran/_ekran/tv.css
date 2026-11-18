@@ -2764,6 +2764,27 @@
   color: var(--zloto);
 }
 
+/* więcej niż trzech finalistów (etap.tsx): kilka rzędów, mniejsze nicki, nick w jednej linii */
+.tv-etap-final ul.wielu {
+  flex-wrap: wrap;
+  gap: 18px 40px;
+}
+
+.tv-etap-final ul.wielu li {
+  gap: 14px;
+  font-size: 34px;
+  white-space: nowrap;
+}
+
+.tv-etap.ciasno-2 .tv-etap-final ul.wielu li {
+  font-size: 32px;
+}
+
+.tv-etap.ciasno-2 .tv-etap-final ul.wielu .awatar {
+  width: 64px !important;
+  height: 64px !important;
+}
+
 .tv-etap-final .tv-podpowiedz {
   margin: 0;
   font-size: 30px;
