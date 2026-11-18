@@ -72,7 +72,7 @@ export async function wynikiGry(
   sesjaId: string,
   opcje: { kod?: string; zadaniaSerii?: Set<string> } = {},
 ): Promise<WynikGracza[]> {
-  const [{ data: gracze }, { data: odpowiedzi }, { data: ranking }, { data: odpadli }] = await Promise.all([
+  const [{ data: gracze }, { data: odpowiedzi }, { data: ranking, error: bladRankingu }, { data: odpadli }] = await Promise.all([
     db
       .from("gracze")
       .select("id, nick, nagroda_odebrana, zdjecie_url")
@@ -83,7 +83,7 @@ export async function wynikiGry(
       .select("gracz_id, zadanie_id, czas_ms, poprawna, punkty")
       .eq("sesja_id", sesjaId)
       .returns<Pick<OdpowiedzGracza, "gracz_id" | "zadanie_id" | "czas_ms" | "poprawna" | "punkty">[]>(),
-    opcje.kod ? db.rpc("ranking", { p_kod: opcje.kod }) : Promise.resolve({ data: null }),
+    opcje.kod ? db.rpc("ranking", { p_kod: opcje.kod }) : Promise.resolve({ data: null, error: null }),
     db.rpc("odpadniecia", { p_sesja_id: sesjaId }),
   ]);
   const odpadlGracz = new Map(
@@ -92,6 +92,9 @@ export async function wynikiGry(
       { etap: o.etap_nr, nazwa: o.etap_nazwa, miejsce: Number(o.miejsce) },
     ]),
   );
+  // bez rankingu z bazy miejsca liczą się z samych punktów, czyli bez wyniku finału: błąd ma być widać w logach
+  // (18.11: service_role nie miał prawa do `ranking` i podium stało w kolejności sprzed finału)
+  if (bladRankingu) console.error("ranking gry", sesjaId, bladRankingu.message);
   // `ranking` zwraca jsonb: tablicę wierszy jak na TV
   const wierszeRankingu = (Array.isArray(ranking) ? ranking : []) as { nick: string; miejsce: number }[];
   const miejsceZRankingu = new Map<string, number>(wierszeRankingu.map((r) => [r.nick, r.miejsce]));

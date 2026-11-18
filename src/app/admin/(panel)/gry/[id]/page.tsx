@@ -17,6 +17,8 @@ import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { usunieciGry, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../wyniki";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
+import { motywZadania } from "@/lib/motyw-serwer";
+import { NAZWY_NEUTRALNE } from "@/lib/motyw";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { Notatki, type AutorNotatki } from "./notatki";
 import { PrzegladPytan, type GraczPrzegladu } from "./przeglad-pytan";
@@ -39,6 +41,7 @@ type GraZDanymi = Sesja & {
 
 export default async function Gra({ params, searchParams }: PageProps<"/admin/gry/[id]">) {
   const rola = await wymagajAdmina();
+  const neutralny = (await motywZadania()) === "neutralny";
   const { id } = await params;
   const widokPytan = (await searchParams).widok === "pytania";
   // z pilota (udostepnij.tsx) przychodzi kod gry zamiast id: najnowsza gra z tym kodem
@@ -369,7 +372,16 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
               dane={{
                 tytul: gra.quizy?.tytul ?? "Quiz",
                 // bez okazji rodzaj gry, jak na grafice gracza
-                okazja: gra.okazja ?? ((gra.quizy?.etapy[0]?.count ?? 0) > 0 ? "Wyścig po piwo" : "Pub quiz"),
+                // motyw neutralny (JOWES): nazwy bez piwa i pubu
+                okazja:
+                  gra.okazja ??
+                  ((gra.quizy?.etapy[0]?.count ?? 0) > 0
+                    ? neutralny
+                      ? NAZWY_NEUTRALNE.wyscig
+                      : "Wyścig po piwo"
+                    : neutralny
+                      ? NAZWY_NEUTRALNE.klasyczny
+                      : "Pub quiz"),
                 lokal: gra.lokale ? { nazwa: gra.lokale.nazwa, logo_url: gra.lokale.logo_url } : null,
                 browar: gra.browar_nazwa ? { nazwa: gra.browar_nazwa, logo_url: gra.browar_logo_url } : null,
                 data: new Date(gra.faza_od ?? gra.utworzono).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw" }),
