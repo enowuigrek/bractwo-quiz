@@ -5,11 +5,11 @@ import type { AkcjaPilota, PilotStan } from "./typy";
 import { STRONA_RANKINGU_S, stronyRankingu, tylkoCzolowka } from "./wyscig";
 
 /**
- * Plansza (wstęp, etap, ciekawostka): dalej dopiero, gdy wszyscy kliknęli „Gotowy”, i nie wcześniej niż po tylu
- * sekundach. Bez limitu czasu (26.10, Łukasz: nie puszczać bez wszystkich; zaginionego gracza prowadzący usuwa,
- * a czekanie to okazja na przerwę).
+ * Plansza (wstęp, etap, ciekawostka): dalej, gdy wszyscy kliknęli „Gotowy”, sekundę po wejściu planszy (18.11,
+ * Łukasz: komplet „Gotowy” = przeczytane, nie trzymać ekranu dłużej). Bez limitu czasu (26.10: nie puszczać bez
+ * wszystkich; zaginionego gracza prowadzący usuwa, a czekanie to okazja na przerwę).
  */
-const PLANSZA = { wstep: 5, etap: 6, ciekawostka: 6 } as const;
+const PLANSZA_PO_GOTOWYCH_S = 1;
 /**
  * Ile sekund trwa każdy krok po pytaniu (25.10 skrócone, Łukasz: za długo). Wyścig musi zmieścić jazdę i zamianę
  * torów (ok. 3,5 s, `ekran/_ekran/wyscig.tsx`). Do tego dochodzi do 1,5 s, zanim TV zapyta o krok (/api/auto).
@@ -49,7 +49,7 @@ export function otwarcieAutomatu(stan: { auto: boolean; planowany_start: string 
  */
 export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null {
   const s = stan.faza_od ? (teraz - Date.parse(stan.faza_od)) / 1000 : 0;
-  const plansza = (min: number) => stan.gotowi >= stan.gotowi_z && s >= min;
+  const plansza = () => stan.gotowi >= stan.gotowi_z && s >= PLANSZA_PO_GOTOWYCH_S;
   switch (stan.faza) {
     case "poczekalnia": {
       // zapowiedź na godzinę: poczekalnia (QR na TV) chwilę przed, a o tej godzinie start, jeśli ktoś dołączył
@@ -61,16 +61,12 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
     case "wstep":
       // plansza startowa klasycznego quizu kończy się sama po odliczaniu (`dokoncz_pytanie`)
       if (stan.faza_do) return null;
-      return plansza(PLANSZA.wstep) ? "nastepne" : null;
+      return plansza() ? "nastepne" : null;
     case "etap":
-      return plansza(PLANSZA.etap) ? "nastepne" : null;
+      return plansza() ? "nastepne" : null;
     case "wynik":
       if (stan.zadanie?.typ === "piwo") return s >= DEGUSTACJA.wyniki ? (stan.ostatnie_zadanie ? "podium" : "nastepne") : null;
-      // plansza z dłuższym tekstem (np. ściąga w punktach) stoi dłużej: ok. 20 znaków na sekundę czytania
-      if (stan.zadanie?.typ === "ciekawostka") {
-        const czytanie = Math.ceil((stan.zadanie.dane?.tekst?.length ?? 0) / 20);
-        return plansza(Math.max(PLANSZA.ciekawostka, czytanie)) ? "nastepne" : null;
-      }
+      if (stan.zadanie?.typ === "ciekawostka") return plansza() ? "nastepne" : null;
       return s >= PO_PYTANIU.wynik ? "odpowiedzi" : null;
     case "odpowiedzi":
     {
