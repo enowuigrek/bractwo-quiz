@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Werble } from "@/components/werble";
-import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
+import { krokiFinalu, META_FINALU, metaFinalu } from "@/lib/gra/final";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import { zapiszZPonowieniem } from "@/lib/gra/zapis";
 import type { PytanieSerii, StanSesji, ZapisOdpowiedzi, ZadanieWidoczne } from "@/lib/gra/typy";
@@ -27,9 +27,9 @@ const UTRUDNIENIA = ["drzenie", "zamiana", "mgla", "dryf", "zanikanie", "ucieczk
 /** Te działają na przyciskach prawda/fałsz; przy innym rodzaju pytania zamiast nich drży treść. */
 const NA_PRZYCISKACH: readonly string[] = ["zamiana", "ucieczka"];
 
-function utrudnienie(kroki: number, ktore: number, typ: string): string | null {
+function utrudnienie(kroki: number, ktore: number, typ: string, meta = META_FINALU): string | null {
   // od połowy drogi do szklanki (własne kroki z przewagą), co pytanie inny przeszkadzacz
-  if (kroki < META_FINALU / 2) return null;
+  if (kroki < meta / 2) return null;
   const efekt = UTRUDNIENIA[ktore % UTRUDNIENIA.length];
   return typ !== "prawda_falsz" && NA_PRZYCISKACH.includes(efekt) ? "drzenie" : efekt;
 }
@@ -38,10 +38,10 @@ function utrudnienie(kroki: number, ktore: number, typ: string): string | null {
  * Ile trwa ocena po odpowiedzi w finale (błysk tła, puls albo drżenie przycisku); przyciski stoją wtedy
  * zablokowane. Krótko w pierwszej połowie drogi, a od utrudnień coraz dłużej: 0,4 s → 1 s tuż przed szklanką.
  */
-function czasOceny(kroki: number): number {
-  const polowa = META_FINALU / 2;
+function czasOceny(kroki: number, meta = META_FINALU): number {
+  const polowa = meta / 2;
   if (kroki < polowa) return 400;
-  return Math.round(Math.min(1000, 600 + (400 * (kroki - polowa)) / Math.max(1, META_FINALU - 1 - polowa)));
+  return Math.round(Math.min(1000, 600 + (400 * (kroki - polowa)) / Math.max(1, meta - 1 - polowa)));
 }
 
 type Ocena = { id: string; dane: DaneOdpowiedzi; dobrze: boolean; ms: number };
@@ -135,7 +135,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     const wynik = data as ZapisOdpowiedzi;
     if (wynik.przyjeta && e?.finalowy && wynik.poprawna !== undefined && pytania) {
       const id = teraz_.id;
-      const ms = czasOceny(mojeKroki);
+      const ms = czasOceny(mojeKroki, metaFinalu(stan));
       ustawOcena({ id, dane, dobrze: wynik.poprawna, ms });
       setTimeout(() => {
         ustawOdpowiedziane((l) => [...l, id]);
@@ -158,7 +158,7 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
     onWyslij: (d: DaneOdpowiedzi) => void odpowiedz(d),
   };
   // tylko w finale: od połowy pytań utrudnienia (numer pytania w serii, nie liczba odpowiedzi gracza)
-  const efekt = e?.finalowy ? utrudnienie(mojeKroki, ktore, z.typ) : null;
+  const efekt = e?.finalowy ? utrudnienie(mojeKroki, ktore, z.typ, metaFinalu(stan)) : null;
 
   return (
     <>

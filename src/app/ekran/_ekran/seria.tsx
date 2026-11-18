@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MotionConfig } from "motion/react";
-import { naDrodzeFinalu } from "@/lib/gra/final";
+import { metaFinalu, naDrodzeFinalu } from "@/lib/gra/final";
 import type { SeriaGracz, StanSesji } from "@/lib/gra/typy";
 import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
@@ -12,7 +12,7 @@ import { useNeutralny } from "@/components/motyw";
 
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
- * do pełnej szklanki. Każda dobra odpowiedź to krok; w finale 12 kroków z przewagą 0–4 według punktów
+ * do pełnej szklanki. Każda dobra odpowiedź to krok; w finale `metaFinalu` kroków (domyślnie 12) z przewagą 0–4 według punktów
  * sprzed finału, a zła cofa o krok (src/lib/gra/final.ts), w zwykłej serii dobre / liczba pytań. Przed startem odliczanie
  * w nagłówku (drogi i gracze zostają widoczne), po nim w tym samym miejscu czas do końca serii.
  * Dane: `StanSesji.seria`, odświeżane po każdej odpowiedzi. W trybie „Pijany finał” pod koniec awatary drżą,
@@ -26,9 +26,9 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : teraz;
   const przedStartem = teraz < od;
-  // finał: wyścig na 12 kroków z przewagą (src/lib/gra/final.ts); zwykła seria: dobre / liczba pytań
+  // finał: wyścig na `metaFinalu` kroków z przewagą (src/lib/gra/final.ts); zwykła seria: dobre / liczba pytań
   // z pijanym finałem nikt nie dobiega do szklanki: wyścig ma wyglądać, jakby trwał dalej
-  const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g, stan.pijany_final) : Math.min(1, g.dobre / n));
+  const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g, stan.pijany_final, metaFinalu(stan)) : Math.min(1, g.dobre / n));
   const najlepszy = Math.max(0, ...gracze.map(naDrodze));
 
   // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie

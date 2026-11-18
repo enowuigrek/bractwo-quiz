@@ -118,6 +118,8 @@ export type StanSesji = {
     liczba_etapow: number;
     /** Ilu wchodzi do finału (`quizy.finalistow`, 18.11; brak = 3). */
     finalistow?: number;
+    /** Ile kroków do mety w finale (`quizy.meta_finalu`, 18.11; brak = 12). */
+    meta_finalu?: number | null;
     /** Degustacja (02.11): same piwa do oceny, bez punktów. */
     degustacja?: boolean;
     /** Maksimum punktów przed finałem (1000 × mnożnik za pytanie): skala wyścigu. */

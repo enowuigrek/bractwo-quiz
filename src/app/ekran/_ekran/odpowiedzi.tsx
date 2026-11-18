@@ -6,7 +6,7 @@ import { Awatar } from "@/components/awatar";
 import { sekundy } from "@/lib/czas";
 import type { StanSesji, WierszOdpowiedzi, WierszRankingu, ZadanieWidoczne } from "@/lib/gra/typy";
 import { OdpowiedziSzacowania } from "./szacowanie";
-import { META_FINALU } from "@/lib/gra/final";
+import { metaFinalu } from "@/lib/gra/final";
 import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/lib/zadania";
 
 /**
@@ -331,7 +331,7 @@ export function TabelaTv({
                     <span className="dobre">✓ {w.final.dobre}</span>
                     <span className="zle">✗ {w.final.zle}</span>
                     <span className="kroki">
-                      {Math.min(META_FINALU, Math.round(w.final.kroki))}/{META_FINALU}
+                      {Math.min(metaFinalu(stan), Math.round(w.final.kroki))}/{metaFinalu(stan)}
                     </span>
                   </span>
                 )}

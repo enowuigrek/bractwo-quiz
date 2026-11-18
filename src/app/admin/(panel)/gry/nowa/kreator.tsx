@@ -240,7 +240,7 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
         <>
           <div>
             <label htmlFor="okazja">Nazwa (opcjonalnie, widać ją na TV)</label>
-            <input id="okazja" name="okazja" className="pole" placeholder="np. Dzień Porteru" maxLength={80} />
+            <input id="okazja" name="okazja" className="pole" placeholder={neutralny ? "np. Forum PS" : "np. Dzień Porteru"} maxLength={80} />
           </div>
 
           {!degustacja && (
@@ -342,8 +342,9 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
               </fieldset>
           )}
 
-              {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału) */}
-              {wybrany?.pijany && (
+              {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału); w motywie neutralnym
+                  (JOWES) wcale: bez pola gra idzie bez pijanego finału */}
+              {wybrany?.pijany && !neutralny && (
                 <fieldset>
                   <legend>Pijany finał</legend>
                   <label className="przelacznik">
@@ -422,8 +423,9 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
             />
           </div>
 
-          {/* wydarzenie (kranoprzejęcie; grafika na poczekalnię wyłączona 26.10) tylko w wyścigu: klasyczny pub quiz to mniejsza impreza */}
-          {!klasyczny && (
+          {/* wydarzenie (kranoprzejęcie; grafika na poczekalnię wyłączona 26.10) tylko w wyścigu: klasyczny pub quiz to mniejsza
+              impreza; w motywie neutralnym (JOWES) bez kranoprzejęcia */}
+          {!klasyczny && !neutralny && (
             <fieldset>
               <legend>Wydarzenie</legend>
               <label className="przelacznik">

@@ -5,8 +5,12 @@
 
 import type { SeriaGracz } from "./typy";
 
-/** Musi się zgadzać z `wewn.meta_finalu()` w bazie. */
+/** Domyślna meta finału: musi się zgadzać z `wewn.meta_finalu(sesja)` w bazie (quiz bez `meta_finalu`). */
 export const META_FINALU = 12;
+
+/** Ile kroków do mety w tej grze (`quizy.meta_finalu`, 18.11: JOWES 10; brak = `META_FINALU`). */
+export const metaFinalu = (stan: { quiz: { meta_finalu?: number | null } | null } | null | undefined): number =>
+  stan?.quiz?.meta_finalu ?? META_FINALU;
 
 /** Przewaga na starcie: krok za tyle punktów przewagi nad najsłabszym finalistą (`wewn.ustaw_start_finalu`). */
 export const PUNKTOW_NA_KROK = 2500;
@@ -36,10 +40,10 @@ export const KROK_FINALU = DROGA_PRZED_META / (META_FINALU - 1);
  * Położenie na drodze 0..1 (1 = przy szklance, tylko po dobiegnięciu do mety). `bezMety`: gra z pijanym finałem,
  * gdzie po serii wyścig udaje, że trwa dalej, więc nawet zwycięzca stoi krok przed szklanką (26.10, Łukasz).
  */
-export function naDrodzeFinalu(g: PostepFinalisty, bezMety = false): number {
+export function naDrodzeFinalu(g: PostepFinalisty, bezMety = false, meta = META_FINALU): number {
   const kroki = krokiFinalu(g);
-  if (kroki >= META_FINALU) return bezMety ? DROGA_PRZED_META : 1;
-  return (DROGA_PRZED_META * Math.max(0, kroki)) / (META_FINALU - 1);
+  if (kroki >= meta) return bezMety ? DROGA_PRZED_META : 1;
+  return (DROGA_PRZED_META * Math.max(0, kroki)) / (meta - 1);
 }
 
 /**

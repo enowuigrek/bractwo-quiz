@@ -3,7 +3,7 @@
 
 import { useSyncExternalStore } from "react";
 import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
-import { META_FINALU, ilu_finalistow, krokiFinalu, miejsceZWyscigu } from "@/lib/gra/final";
+import { ilu_finalistow, metaFinalu, krokiFinalu, miejsceZWyscigu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
@@ -618,15 +618,15 @@ function Seria({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       <ul className="pr-final">
         {gracze.map((g) => {
           // z pijanym finałem nikt nie dobiega do mety (wyścig udaje, że trwa dalej)
-          const kroki = Math.min(stan.pijany_final ? META_FINALU - 1 : META_FINALU, krokiFinalu(g));
+          const kroki = Math.min(stan.pijany_final ? metaFinalu(stan) - 1 : metaFinalu(stan), krokiFinalu(g));
           return (
             <li key={g.nick}>
               <span className="pr-nick">{g.nick}</span>
               <span className="pr-pasek">
-                <span style={{ width: `${(100 * kroki) / META_FINALU}%` }} />
+                <span style={{ width: `${(100 * kroki) / metaFinalu(stan)}%` }} />
               </span>
               <span className="pr-punkty">
-                {kroki}/{META_FINALU}
+                {kroki}/{metaFinalu(stan)}
               </span>
             </li>
           );
@@ -681,7 +681,7 @@ function Tabela({ stan, ranking, tytul }: { stan: StanSesji; ranking: WierszRank
             {w.final && (
               <span className="pr-final-wynik">
                 <span className="pr-dobre">✓ {w.final.dobre}</span> <span className="pr-zle">✗ {w.final.zle}</span>{" "}
-                {Math.min(META_FINALU, Math.round(w.final.kroki))}/{META_FINALU}
+                {Math.min(metaFinalu(stan), Math.round(w.final.kroki))}/{metaFinalu(stan)}
               </span>
             )}
             <span className="pr-punkty">{w.punkty.toLocaleString("pl-PL")}</span>

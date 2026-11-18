@@ -15,7 +15,7 @@ import {
 import { useBezWygaszacza, useNowaWersja } from "@/lib/ekran-tv";
 import { sekundy } from "@/lib/czas";
 import { useDzwiekOdblokowany } from "@/lib/gra/dzwiek";
-import { naDrodzeFinalu } from "@/lib/gra/final";
+import { metaFinalu, naDrodzeFinalu } from "@/lib/gra/final";
 import { nastrojFazy, type Nastroj } from "@/lib/gra/nastroj";
 import type { GraczNaLiscie, SeriaGracz, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
@@ -738,7 +738,7 @@ function graczePijani(stan: StanSesji, seria: ZapamietanaSeria | null, gracze: G
   const n = Math.max(1, stan.etap?.liczba_pytan ?? 1);
   if (seria && seria.etap === (stan.etap?.id ?? null)) {
     const naDrodze = (g: SeriaGracz) =>
-      stan.etap?.finalowy ? naDrodzeFinalu(g, stan.pijany_final) : Math.min(1, g.dobre / n);
+      stan.etap?.finalowy ? naDrodzeFinalu(g, stan.pijany_final, metaFinalu(stan)) : Math.min(1, g.dobre / n);
     const najlepszy = Math.max(0, ...seria.gracze.map(naDrodze));
     return seria.gracze.map((g) => ({
       nick: g.nick,

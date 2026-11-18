@@ -21,7 +21,7 @@ import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
 import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import { LITERY, NAZWY_TYPOW, jedenWybor, liczbaZJednostka, opisPiwa, poprawnaSzacowania } from "@/lib/zadania";
 import { liczbaPiw, liczbaPytan } from "@/app/admin/(panel)/quizy/limity";
-import { krokiFinalu, META_FINALU } from "@/lib/gra/final";
+import { krokiFinalu, metaFinalu } from "@/lib/gra/final";
 import { GraczePilota } from "./gracze";
 import { NagrodyPilota } from "./nagrody";
 import { useAutoProwadzenie } from "./auto";
@@ -685,7 +685,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
             <section className="karta">
               <p className="etykieta etykieta-z-czasem">
                 <span>
-                  {etap.nazwa} · {etap.finalowy ? `wyścig do ${META_FINALU} kroków` : `seria ${etap.liczba_pytan} pyt.`}
+                  {etap.nazwa} · {etap.finalowy ? `wyścig do ${metaFinalu(stan)} kroków` : `seria ${etap.liczba_pytan} pyt.`}
                 </span>
                 <span className="gra-kod">
                   {stan.faza_od && teraz < Date.parse(stan.faza_od)
@@ -699,8 +699,8 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
                 {(stan.seria ?? []).map((g) =>
                   // finał: kroki do szklanki (przewaga, +1 za dobrą, −1 za złą), zwykła seria: odpowiedzi z liczby pytań
                   etap.finalowy ? (
-                    <li key={g.nick} className={krokiFinalu(g) >= META_FINALU ? "poprawna" : undefined}>
-                      {g.nick}: {Math.round(krokiFinalu(g) * 10) / 10}/{META_FINALU} kroków (przewaga {g.start ?? 0}),{" "}
+                    <li key={g.nick} className={krokiFinalu(g) >= metaFinalu(stan) ? "poprawna" : undefined}>
+                      {g.nick}: {Math.round(krokiFinalu(g) * 10) / 10}/{metaFinalu(stan)} kroków (przewaga {g.start ?? 0}),{" "}
                       {g.odpowiedzi} odpowiedzi
                     </li>
                   ) : (
