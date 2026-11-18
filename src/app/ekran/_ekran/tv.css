@@ -4752,8 +4752,21 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.tv-ciekawostka-tekst {
+.tv-ciekawostka-tekst p {
+  margin: 0;
   white-space: pre-line;
+}
+
+.tv-ciekawostka-tekst p + p {
+  margin-top: 0.7em;
+}
+
+/* akapit od „> ” (uwaga, pułapka): w ramce z paskiem w kolorze akcentu */
+.tv-ciekawostka-tekst .tv-ramka {
+  padding: 0.5em 0.8em;
+  border-left: 6px solid var(--zloto);
+  border-radius: 8px;
+  background: var(--kamien);
 }
 
 .tv-ciekawostka-tekst.dlugi {
@@ -4798,4 +4811,14 @@
 .tv-odp-lista.dlugie .tv-odp {
   font-size: 32px;
   line-height: 1.25;
+}
+
+/* pogrubienia w tekście planszy (`**…**`) */
+.tv-ciekawostka-tekst strong {
+  font-weight: var(--w-black);
+  color: var(--zloto);
+}
+
+[data-motyw="neutralny"] .tv-ciekawostka-tekst strong {
+  color: #b86a00;
 }
