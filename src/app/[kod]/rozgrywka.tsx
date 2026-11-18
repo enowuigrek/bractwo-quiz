@@ -332,6 +332,9 @@ export function Rozgrywka({
         </p>
       )}
 
+      {/* wyjaśnienie poprawnej odpowiedzi (`dane.wyjasnienie`, 18.11), jak na TV; baza podaje je od fazy wyniku */}
+      {z.dane.wyjasnienie && <p className="gra-wyjasnienie">{z.dane.wyjasnienie}</p>}
+
       {/* gdy TV pokazuje, kto jak odpowiedział, telefon to samo zamiast rozwiązania (26.10) */}
       {faza === "odpowiedzi" ? (
         <OdpowiedziGraczy kod={stan.kod} zadanieId={z.id} nick={ja.nick} typ={z.typ} />

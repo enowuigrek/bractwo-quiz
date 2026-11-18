@@ -4634,3 +4634,14 @@ button.kafelek {
 [data-motyw="neutralny"] .gra-ja {
   color: #1f1f1f;
 }
+
+/* wyjaśnienie poprawnej odpowiedzi na telefonie (rozgrywka.tsx), jak `.tv-wyjasnienie` na TV */
+.gra-wyjasnienie {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 5px solid var(--zloto);
+  border-radius: 8px;
+  background: var(--kamien);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+}
