@@ -24,8 +24,19 @@ export async function generateMetadata(): Promise<Metadata> {
   // podstrony podają sam swój tytuł, a nazwę aplikacji (według motywu) dokleja szablon
   const nazwa = NAZWA_APLIKACJI[motyw];
   const title = { default: nazwa, template: `%s · ${nazwa}` };
-  if (motyw === "neutralny") return { title, description: "Quiz na żywo" };
-  return { title, description: "Quiz Bractwa Piwnego – Piwu Cześć!" };
+  // ikony według motywu (pliki w public/ikony, nie w app/, bo ikony z plików w app/ wygrywają z metadanymi)
+  if (motyw === "neutralny") {
+    return {
+      title,
+      description: "Quiz na żywo",
+      icons: { icon: "/ikony/jowes.png", apple: "/ikony/jowes-apple.png" },
+    };
+  }
+  return {
+    title,
+    description: "Quiz Bractwa Piwnego – Piwu Cześć!",
+    icons: { icon: [{ url: "/favicon.ico", sizes: "32x32" }, "/ikony/bractwo.png"], apple: "/ikony/bractwo-apple.png" },
+  };
 }
 
 export async function generateViewport(): Promise<Viewport> {
