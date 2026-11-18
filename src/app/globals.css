@@ -4623,3 +4623,14 @@ button.kafelek {
 .gra-ciekawostka-tekst {
   margin-top: var(--o-3, 16px);
 }
+
+/* nagłówek gracza w trakcie gry (awatar + nick, gracz.tsx): odstęp między awatarem a nickiem */
+.gra-ja {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-motyw="neutralny"] .gra-ja {
+  color: #1f1f1f;
+}
