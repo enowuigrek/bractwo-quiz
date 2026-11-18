@@ -458,14 +458,28 @@ function Poczekalnia({
           {/* nagrody widać na starcie: tu ze zdjęciami, potem tylko nazwa przy szklance i podium */}
           {stan.nagrody && (
             <ul className="tv-nagrody-start">
-              {stan.nagrody.map((n) => (
-                <li key={n.miejsce}>
-                  {n.zdjecie && <img src={n.zdjecie} alt="" />}
+              {/* podium po kolei, a nagrody za dalsze miejsca (pocieszenia) jednym wierszem, żeby się mieściło */}
+              {stan.nagrody
+                .filter((n) => n.miejsce <= 3)
+                .map((n) => (
+                  <li key={n.miejsce}>
+                    {n.zdjecie && <img src={n.zdjecie} alt="" />}
+                    <span>
+                      <strong>{n.miejsce}.</strong> {n.nagroda}
+                    </span>
+                  </li>
+                ))}
+              {stan.nagrody.some((n) => n.miejsce > 3) && (
+                <li>
                   <span>
-                    <strong>{n.miejsce}.</strong> {n.nagroda}
+                    <strong>
+                      {Math.min(...stan.nagrody.filter((n) => n.miejsce > 3).map((n) => n.miejsce))}.–
+                      {Math.max(...stan.nagrody.map((n) => n.miejsce))}.
+                    </strong>{" "}
+                    {stan.nagrody.find((n) => n.miejsce > 3)?.nagroda}
                   </span>
                 </li>
-              ))}
+              )}
             </ul>
           )}
 

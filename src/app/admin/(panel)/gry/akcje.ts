@@ -81,9 +81,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
     db
       .from("quizy")
-      .select("udostepniony, usunieto")
+      .select("udostepniony, usunieto, nagrody")
       .eq("id", quiz_id)
-      .maybeSingle<{ udostepniony: boolean; usunieto: string | null }>(),
+      .maybeSingle<{ udostepniony: boolean; usunieto: string | null; nagrody: Nagroda[] | null }>(),
     db
       .from("etapy")
       .select("id", { count: "exact", head: true })
@@ -162,7 +162,8 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
       czas_s,
       bonus_czas,
       max_graczy,
-      nagrody: nagrody.length ? nagrody : null,
+      // bez nagród z kreatora: nagrody domyślne quizu (`quizy.nagrody`, 18.11, np. JOWES z nagrodami pocieszenia)
+      nagrody: nagrody.length ? nagrody : (quiz?.nagrody ?? null),
       browar_nazwa,
       browar_logo_url,
       browar_instagram: browar_nazwa ? browar_instagram : null,

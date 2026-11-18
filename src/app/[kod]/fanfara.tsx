@@ -146,6 +146,10 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
       <p className="nadtytul">{nick}</p>
       <h1>{faza === "koniec" ? "Koniec gry" : "Koniec quizu!"}</h1>
       {moj && <Miejsce moj={moj} />}
+      {/* nagroda za miejsce za podium (pocieszenie z nagród domyślnych quizu, 18.11) */}
+      {moj && nagroda && (
+        <KartaNagrody nagroda={nagroda} nick={nick} kod={kod} token={token} odebrana={moj.nagroda_odebrana} />
+      )}
       <p>
         {faza === "podium"
           ? "Na telewizorze podium. Brawa dla najlepszych!"

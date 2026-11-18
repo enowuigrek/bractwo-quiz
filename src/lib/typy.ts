@@ -60,7 +60,8 @@ export type Etap = {
  * Nagroda za miejsce w grze. `instrukcja`: jak odebrać, np. „Pokaż ten ekran barmanowi”.
  * `zdjecie`: zdjęcie nagrody z bucketu (`grafiki/nagrody/…`), do pokazania na TV.
  */
-export type Nagroda = { miejsce: 1 | 2 | 3; nagroda: string; instrukcja: string | null; zdjecie?: string | null };
+/** Nagroda za miejsce: z kreatora 1–3, z nagród domyślnych quizu (`quizy.nagrody`) także dalsze (pocieszenia). */
+export type Nagroda = { miejsce: number; nagroda: string; instrukcja: string | null; zdjecie?: string | null };
 
 export type Faza = "poczekalnia" | "pytanie" | "wynik" | "odpowiedzi" | "ranking" | "podium" | "tabela" | "koniec";
 
