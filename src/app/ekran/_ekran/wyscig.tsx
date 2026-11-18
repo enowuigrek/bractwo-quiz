@@ -186,7 +186,11 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
     // z całej listy, nie ze strony rankingu
     const fin = ilu_finalistow(stan);
     const nicki = stan.finalisci?.map((f) => f.nick) ?? wszyscy.slice(0, fin).map((w) => w.nick);
-    const finalisci = wszyscy.filter((w) => nicki.includes(w.nick)).slice(0, fin);
+    // drogi w kolejności finalistów, jak w serii (18.11): każdy zostaje na swojej drodze, miejsce mówi podpis
+    const finalisci = nicki
+      .map((nick) => wszyscy.find((w) => w.nick === nick))
+      .filter((w): w is WierszRankingu => !!w)
+      .slice(0, fin);
     return (
       <MotionConfig reducedMotion="user">
         <div className="tv-wyscig">
