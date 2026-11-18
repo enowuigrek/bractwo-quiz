@@ -29,7 +29,7 @@ export function wzgledemKreski(
 
 /**
  * Najbliższe odcięcie, które kogoś wyrzuci (bieżący etap albo któryś dalej przed finałem): po którym etapie,
- * ilu gra dalej i czy to wejście do finałowej trójki. Null: nikt już nie odpada (albo trwa finał).
+ * ilu gra dalej i czy to wejście do finału (`ilu_finalistow`). Null: nikt już nie odpada (albo trwa finał).
  */
 export function najblizszeOdciecie(stan: StanSesji): { poEtapie: number; ile: number; final: boolean } | null {
   if (!stan.etap || stan.etap.finalowy) return null;
@@ -38,7 +38,7 @@ export function najblizszeOdciecie(stan: StanSesji): { poEtapie: number; ile: nu
   for (const e of plan) {
     if (e.nr < stan.etap.nr || e.finalowy) continue;
     if (final && e.nr === final.nr - 1) {
-      if (stan.w_grze > 3) return { poEtapie: e.nr, ile: 3, final: true };
+      if (stan.w_grze > ilu_finalistow(stan)) return { poEtapie: e.nr, ile: ilu_finalistow(stan), final: true };
     } else if (e.przechodzi !== null && stan.w_grze > e.przechodzi) {
       return { poEtapie: e.nr, ile: e.przechodzi, final: false };
     }
@@ -48,7 +48,7 @@ export function najblizszeOdciecie(stan: StanSesji): { poEtapie: number; ile: nu
 
 /**
  * Ilu gra w każdym etapie i ilu przechodzi dalej (plansza wstępu, 28.10): od wszystkich grających, po etapie z progiem
- * zostaje próg, przed finałem trójka, w finale grają ci, którzy weszli. `dalej` null: nikt po tym etapie nie odpada.
+ * zostaje próg, przed finałem finaliści (`ilu_finalistow`), w finale grają ci, którzy weszli. `dalej` null: nikt po tym etapie nie odpada.
  */
 export function liczbyEtapow(stan: StanSesji): { nr: number; graja: number; dalej: number | null }[] {
   const plan = stan.plan_etapow ?? [];
@@ -56,7 +56,7 @@ export function liczbyEtapow(stan: StanSesji): { nr: number; graja: number; dale
   let graja = stan.w_grze;
   return plan.map((e) => {
     const teraz = graja;
-    const prog = e.finalowy ? null : final && e.nr === final.nr - 1 ? 3 : e.przechodzi;
+    const prog = e.finalowy ? null : final && e.nr === final.nr - 1 ? ilu_finalistow(stan) : e.przechodzi;
     const dalej = prog !== null && teraz > prog ? prog : null;
     if (dalej !== null) graja = dalej;
     return { nr: e.nr, graja: teraz, dalej };
