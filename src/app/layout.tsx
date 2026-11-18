@@ -29,13 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       title,
       description: "Quiz na żywo",
-      icons: { icon: "/ikony/jowes.png", apple: "/ikony/jowes-apple.png" },
+      icons: { icon: [{ url: "/ikony/jowes.ico", sizes: "32x32" }, "/ikony/jowes.png"], apple: "/ikony/jowes-apple.png" },
     };
   }
   return {
     title,
     description: "Quiz Bractwa Piwnego – Piwu Cześć!",
-    icons: { icon: [{ url: "/favicon.ico", sizes: "32x32" }, "/ikony/bractwo.png"], apple: "/ikony/bractwo-apple.png" },
+    icons: { icon: [{ url: "/ikony/bractwo.ico", sizes: "32x32" }, "/ikony/bractwo.png"], apple: "/ikony/bractwo-apple.png" },
   };
 }
 
