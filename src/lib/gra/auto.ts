@@ -2,7 +2,7 @@
 // (src/app/pilot/[kod]/auto.tsx) i trasy /api/auto, którą co chwilę woła TV (karta pilota w tle prawie stoi).
 
 import type { AkcjaPilota, PilotStan } from "./typy";
-import { STRONA_RANKINGU_S, stronyRankingu } from "./wyscig";
+import { STRONA_RANKINGU_S, stronyRankingu, tylkoCzolowka } from "./wyscig";
 
 /**
  * Plansza (wstęp, etap, ciekawostka): dalej dopiero, gdy wszyscy kliknęli „Gotowy”, i nie wcześniej niż po tylu
@@ -15,8 +15,14 @@ const PLANSZA = { wstep: 5, etap: 6, ciekawostka: 6 } as const;
  * torów (ok. 3,5 s, `ekran/_ekran/wyscig.tsx`). Do tego dochodzi do 1,5 s, zanim TV zapyta o krok (/api/auto).
  */
 const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 7 } as const;
-/** Odpowiedzi graczy z wyjaśnieniem poprawnej odpowiedzi (`dane.wyjasnienie`): dłużej, żeby sala zdążyła przeczytać. */
-const ODPOWIEDZI_Z_WYJASNIENIEM_S = 14;
+/**
+ * Odpowiedzi graczy z wyjaśnieniem poprawnej odpowiedzi (`dane.wyjasnienie`): dłużej, żeby sala zdążyła przeczytać,
+ * według długości (18.11, Łukasz: stałe 14 s było za długo przy krótkim wyjaśnieniu): podstawa plus ok. 1 s na
+ * 20 znaków, najwyżej `max`.
+ */
+const WYJASNIENIE = { podstawa: 6, znakowNaSekunde: 20, max: 12 } as const;
+/** Ranking dużej gry: jedna strona z czołówką 15 (`tylkoCzolowka`), po animacji ok. 4,5 s na przeczytanie (18.11). */
+const RANKING_CZOLOWKI_S = 8;
 /** Pytanie bez limitu czasu: po tylu sekundach automat sam pokazuje wynik. */
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
@@ -67,12 +73,22 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
       }
       return s >= PO_PYTANIU.wynik ? "odpowiedzi" : null;
     case "odpowiedzi":
-      return s >= (stan.zadanie?.dane?.wyjasnienie ? ODPOWIEDZI_Z_WYJASNIENIEM_S : PO_PYTANIU.odpowiedzi) ? "ranking" : null;
+    {
+      const wyjasnienie = stan.zadanie?.dane?.wyjasnienie;
+      const czas = wyjasnienie
+        ? Math.min(WYJASNIENIE.max, WYJASNIENIE.podstawa + Math.ceil(wyjasnienie.length / WYJASNIENIE.znakowNaSekunde))
+        : PO_PYTANIU.odpowiedzi;
+      return s >= czas ? "ranking" : null;
+    }
     case "ranking":
       // każda kolejna strona rankingu (po 10 graczy) to dłuższe czekanie
       if (
         s <
-        (stan.ostatnie_w_etapie ? PO_PYTANIU.rankingKoniecEtapu : PO_PYTANIU.ranking) +
+        (stan.ostatnie_w_etapie
+          ? PO_PYTANIU.rankingKoniecEtapu
+          : tylkoCzolowka(stan.liczba_graczy)
+            ? RANKING_CZOLOWKI_S
+            : PO_PYTANIU.ranking) +
           (stronyRankingu(stan.liczba_graczy) - 1) * STRONA_RANKINGU_S
       )
         return null;
