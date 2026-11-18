@@ -4704,3 +4704,19 @@
     transform: scale(1.02) rotate(2.5deg);
   }
 }
+
+/* jasny motyw: dymki z odpowiedziami na osi szacowania jasne (tekst jest już ciemny z `--piana`) */
+[data-motyw="neutralny"] .tv-os-odp-podpis {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+[data-motyw="neutralny"] .tv-os-odp-gracz .awatar {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* podpisy graczy na drogach finału */
+[data-motyw="neutralny"] .drogi-finalu-podpis {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
