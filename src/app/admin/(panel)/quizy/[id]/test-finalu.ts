@@ -11,7 +11,7 @@ const BOTOW = 12;
 const NA_OTWARCIE_S = 10;
 
 /**
- * Test samego finału (18.11, JOWES): gra bez lokalu (nie zajmuje ekranu lokalu) z botami, od razu na planszy finału
+ * Test samego finału (18.11, JOWES): gra z botami, od razu na planszy finału
  * tego quizu, z automatem. Boty nie mają punktów z etapów, więc przewagę na starcie losujemy. Otwiera pilota tej gry
  * (stamtąd ekran TV i „Zakończ grę”). Jak `testPijanegoFinalu`, ale zwykły finał dowolnego quizu z finałem serią.
  */
@@ -38,9 +38,22 @@ export async function testFinalu(quizId: string): Promise<void> {
     .maybeSingle<{ nr: number }>();
   if (!pierwsze) throw new Error("Finał nie ma pytań.");
 
+  // ekran lokalu quizu (np. JOWES) pokazuje test, ale tylko gdy w tym lokalu nie trwa inna gra: test w trakcie
+  // prawdziwej gry nie może przejąć ekranu (wtedy gra bez lokalu, ekran pod /tv/KOD)
+  const { data: quiz } = await db.from("quizy").select("lokal_id").eq("id", quizId).maybeSingle<{ lokal_id: string | null }>();
+  let lokal: string | null = quiz?.lokal_id ?? null;
+  if (lokal) {
+    const { count } = await db
+      .from("sesje")
+      .select("id", { count: "exact", head: true })
+      .eq("lokal_id", lokal)
+      .neq("faza", "koniec");
+    if (count) lokal = null;
+  }
+
   const { data: gra, error } = await db
     .from("sesje")
-    .insert({ quiz_id: quizId, okazja: "Test finału", pijany_final: false })
+    .insert({ quiz_id: quizId, okazja: "Test finału", pijany_final: false, lokal_id: lokal })
     .select("id, kod, host_token")
     .single<{ id: string; kod: string; host_token: string }>();
   if (error || !gra) throw new Error(`Nie udało się założyć gry: ${error?.message}`);
