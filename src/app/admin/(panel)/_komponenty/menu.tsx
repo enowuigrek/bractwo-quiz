@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useNeutralny } from "@/components/motyw";
+import { slowaLokalu } from "@/lib/motyw";
 
 /**
  * Menu panelu na telefonie (26.10, Łukasz: zakładki, „Uruchom”, ustawienia i „Wyloguj” w jednym rzędzie robiły
@@ -105,7 +106,7 @@ export function MenuPanelu({
       <nav id="panel-menu-szuflada" className="panel-menu-szuflada" aria-label="Panel" inert={!otwarte}>
         {lokal && (
           <section>
-            <p className="etykieta">{neutralny ? "Moja organizacja" : "Mój lokal"}</p>
+            <p className="etykieta">{slowaLokalu(neutralny).moj}</p>
             <Link
               href={ustawienia}
               onClick={zamknij}

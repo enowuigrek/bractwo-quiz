@@ -12,6 +12,16 @@ export const LOGO_NEUTRALNE: string | null = "/loga/jowes/jowes.png";
 /** Nazwy rodzajów quizu w motywie neutralnym (zamiast „Wyścig po piwo” i „Pub quiz”). */
 export const NAZWY_NEUTRALNE = { wyscig: "Wyścig", klasyczny: "Quiz klasyczny" } as const;
 
+/**
+ * Słowa na lokal w panelu (18.11): w Bractwie lokal, w motywie neutralnym organizacja (firma, nie knajpa). Jedno
+ * źródło dla zakładek, menu i tytułów stron.
+ */
+export const SLOWA_LOKALU = {
+  bractwo: { lokal: "Lokal", lokale: "Lokale", moj: "Mój lokal", ustawienia: "Ustawienia lokalu" },
+  neutralny: { lokal: "Organizacja", lokale: "Organizacje", moj: "Moja organizacja", ustawienia: "Ustawienia organizacji" },
+} as const;
+export const slowaLokalu = (neutralny: boolean) => SLOWA_LOKALU[neutralny ? "neutralny" : "bractwo"];
+
 /** Nazwa aplikacji w tytule strony. */
 export const NAZWA_APLIKACJI: Record<Motyw, string> = { bractwo: "Bractwo Quiz", neutralny: "Quiz" };
 

@@ -3,12 +3,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli } from "@/lib/admin-dostep";
+import { motywZadania } from "@/lib/motyw-serwer";
+import { slowaLokalu } from "@/lib/motyw";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { IkonaEdytuj } from "@/components/ikony";
 
-export const metadata: Metadata = { title: "Lokale" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: slowaLokalu((await motywZadania()) === "neutralny").lokale };
+}
 
 export default async function Lokale() {
   // panel lokalu: od razu ustawienia własnego lokalu
