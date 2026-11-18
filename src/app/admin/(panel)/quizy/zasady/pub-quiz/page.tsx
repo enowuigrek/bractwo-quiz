@@ -6,7 +6,7 @@ import { WAGA_TYPU, oknoMs, przedzial } from "@/lib/gra/punktacja";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { RODZAJE, TabelaCzesciowych, WykresSzybkosci, pkt } from "../wspolne";
 
-export const metadata: Metadata = { title: "Zasady pub quizu · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Zasady pub quizu" };
 
 /** Kolejność rodzajów na stronie (jak w edytorze pytań, bez ciekawostki). */
 const KOLEJNOSC = ["wybor", "prawda_falsz", "wielokrotny", "szacowanie", "kolejnosc", "pary"] as const;

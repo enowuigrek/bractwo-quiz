@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { testPijanegoFinalu } from "./akcje";
 import { FormularzPijany } from "./formularz";
 
-export const metadata: Metadata = { title: "Pijany finał · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Pijany finał" };
 
 /** Pytania pijanego finału: wspólne dla wszystkich gier, w których przy uruchamianiu włączono ten tryb. */
 export default async function PijanyFinal() {

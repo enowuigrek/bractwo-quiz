@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Etap, Quiz, Zadanie } from "@/lib/typy";
 import { EdytorZadania } from "../edytor";
 
-export const metadata: Metadata = { title: "Pytanie · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Pytanie" };
 
 /** `/admin/quizy/[id]/zadania/nowe` dodaje pytanie, a z identyfikatorem edytuje istniejące. */
 export default async function StronaZadania({

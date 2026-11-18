@@ -7,7 +7,7 @@ import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { ustawBlokade, usunKonto } from "../akcje";
 import { FormularzKonta, NowyLink, type KontoDoEdycji, type LokalDoWyboru } from "../formularz";
 
-export const metadata: Metadata = { title: "Konto · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Konto" };
 
 /** Konto osoby (tylko twórca): imię, e-mail, dostęp, link do hasła, blokada i usunięcie. */
 export default async function Konto({ params }: PageProps<"/admin/konta/[id]">) {

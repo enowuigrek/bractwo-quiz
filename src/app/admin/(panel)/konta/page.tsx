@@ -3,7 +3,7 @@ import Link from "next/link";
 import { wymagajTworcy } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 
-export const metadata: Metadata = { title: "Konta · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Konta" };
 
 type KontoNaLiscie = {
   id: string;

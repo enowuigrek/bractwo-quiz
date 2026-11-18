@@ -5,11 +5,10 @@ import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { WpiszKod } from "./wpisz-kod";
-import { NAZWA_APLIKACJI } from "@/lib/motyw";
 import { motywZadania } from "@/lib/motyw-serwer";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: `Ekran · ${NAZWA_APLIKACJI[await motywZadania()]}` };
+  return { title: "Ekran" };
 }
 
 // lista lokali zmienia się rzadko: odświeżamy ją co 5 minut zamiast przy każdym wejściu

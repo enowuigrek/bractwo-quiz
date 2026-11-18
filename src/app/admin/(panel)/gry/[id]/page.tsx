@@ -22,7 +22,7 @@ import { Notatki, type AutorNotatki } from "./notatki";
 import { PrzegladPytan, type GraczPrzegladu } from "./przeglad-pytan";
 import { TabelaWynikow } from "./tabela-wynikow";
 
-export const metadata: Metadata = { title: "Gra · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Gra" };
 
 type GraZDanymi = Sesja & {
   quizy: { tytul: string; degustacja: boolean; etapy: { count: number }[] } | null;

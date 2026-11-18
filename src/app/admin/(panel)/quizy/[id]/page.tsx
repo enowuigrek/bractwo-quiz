@@ -26,7 +26,7 @@ import { BlokPijany } from "./blok-pijany";
 import type { PijanePytanie } from "@/lib/pijany";
 import { listaQuizow, rodzajQuizu } from "@/lib/tagi";
 
-export const metadata: Metadata = { title: "Quiz · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Quiz" };
 
 export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[id]">) {
   const rola = await wymagajAdmina();

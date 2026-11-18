@@ -27,9 +27,13 @@ export const NAZWY_RODZAJOW: Record<RodzajQuizu, string> = {
   degustacja: "Degustacja",
 };
 
+/** Nazwa rodzaju; w motywie neutralnym (src/lib/motyw.ts) wyścig bez piwa. */
+export const nazwaRodzajuQuizu = (rodzaj: RodzajQuizu, neutralny = false) =>
+  neutralny && rodzaj === "wyscig" ? "Wyścig" : NAZWY_RODZAJOW[rodzaj];
+
 /** „Nowy wyścig po piwo”, „Nowy pub quiz”, „Nowa degustacja”: przycisk i nagłówek nowego quizu z nazwy zakładki (30.10). */
-export const nowyQuiz = (rodzaj: RodzajQuizu) =>
-  `${rodzaj === "degustacja" ? "Nowa" : "Nowy"} ${NAZWY_RODZAJOW[rodzaj].toLowerCase()}`;
+export const nowyQuiz = (rodzaj: RodzajQuizu, neutralny = false) =>
+  `${rodzaj === "degustacja" ? "Nowa" : "Nowy"} ${nazwaRodzajuQuizu(rodzaj, neutralny).toLowerCase()}`;
 
 /** Rodzaje, które rola widzi: degustacja tylko z `mozeDegustacje` (03.11). */
 export const rodzajeQuizow = (zDegustacja: boolean): readonly RodzajQuizu[] =>

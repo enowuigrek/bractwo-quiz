@@ -9,7 +9,7 @@ import type { Lokal } from "@/lib/typy";
 import { ZnaczekOsoby, type Osoba } from "../../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "../../gry/lista-gier";
 
-export const metadata: Metadata = { title: "Lokal · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Lokal" };
 
 const data = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Warsaw" });
 

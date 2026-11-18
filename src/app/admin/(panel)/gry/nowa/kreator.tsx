@@ -8,10 +8,11 @@ import { PoleGrafiki } from "../../_komponenty/grafika";
 import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { LIMITY, liczbaPiw, liczbaPytan } from "../../quizy/limity";
-import { NAZWY_RODZAJOW, rodzajeQuizow, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { nazwaRodzajuQuizu, rodzajeQuizow, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
+import { useNeutralny } from "@/components/motyw";
 
 export type QuizDoWyboru = {
   id: string;
@@ -53,6 +54,7 @@ function isoStartu(data: string, godzina: string): string {
 
 /** Uruchamianie gry krokami (kafelki): miasto → lokal → rodzaj → quiz (z tematem), potem szczegóły. */
 export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
+  const neutralny = useNeutralny();
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
   const miasta = [...new Set(lokale.map((p) => p.miasto).filter((m): m is string => !!m))].sort((a, b) =>
@@ -171,7 +173,7 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
                     setAuto(r === "klasyczny");
                   }}
                 />
-                {NAZWY_RODZAJOW[r]}
+                {nazwaRodzajuQuizu(r, neutralny)}
               </label>
             ))}
           </div>

@@ -8,7 +8,7 @@ import type { Etap, Zadanie } from "@/lib/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "../../../gry/lista-gier";
 
-export const metadata: Metadata = { title: "Statystyki quizu · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Statystyki quizu" };
 
 type StatPytania = {
   zadanie_id: string;

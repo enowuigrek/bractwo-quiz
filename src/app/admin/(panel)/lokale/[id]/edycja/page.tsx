@@ -12,7 +12,7 @@ import { LinkDoSkopiowania } from "../../../gry/[id]/kopiuj";
 import { usunLokal } from "../../akcje";
 import { FormularzLokalu } from "../../formularz";
 
-export const metadata: Metadata = { title: "Ustawienia lokalu · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Ustawienia lokalu" };
 
 export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/[id]/edycja">) {
   const rola = await wymagajAdmina();

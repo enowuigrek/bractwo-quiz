@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { poprawnyKod } from "@/lib/gra/kod";
 import { Gracz } from "./gracz";
-import { NAZWA_APLIKACJI } from "@/lib/motyw";
-import { motywZadania } from "@/lib/motyw-serwer";
 
 export async function generateMetadata({ params }: PageProps<"/[kod]">): Promise<Metadata> {
   const { kod } = await params;
-  return { title: `${kod.toUpperCase()} · ${NAZWA_APLIKACJI[await motywZadania()]}` };
+  return { title: kod.toUpperCase() };
 }
 
 export default async function StronaGracza({ params }: PageProps<"/[kod]">) {

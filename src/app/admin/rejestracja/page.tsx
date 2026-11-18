@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { FormularzRejestracji } from "../logowanie/formularz";
 
-export const metadata: Metadata = { title: "Nowe konto · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Nowe konto" };
 
 /** Zakładanie konta osobowego: bez ról, aż Łukasz nada dostęp na stronie „Konta”. */
 export default function Rejestracja() {

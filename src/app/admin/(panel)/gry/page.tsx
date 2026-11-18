@@ -7,8 +7,9 @@ import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty
 import { wybraneMiasto, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
 import { rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
+import { motywZadania } from "@/lib/motyw-serwer";
 
-export const metadata: Metadata = { title: "Rozgrywki · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Rozgrywki" };
 
 export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
   const rola = await wymagajAdmina();
@@ -58,7 +59,7 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
           ▶ Uruchom quiz
         </Link>
       </div>
-      <ZakladkiRodzaju zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
+      <ZakladkiRodzaju neutralny={(await motywZadania()) === "neutralny"} zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
       <FiltryListy
         lokale={lokale ?? []}
         tagi={tagi}

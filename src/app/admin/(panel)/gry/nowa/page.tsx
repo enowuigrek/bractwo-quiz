@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Kreator } from "./kreator";
 
-export const metadata: Metadata = { title: "Uruchom quiz · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Uruchom quiz" };
 
 export default async function NowaGra() {
   const rola = await wymagajAdmina();

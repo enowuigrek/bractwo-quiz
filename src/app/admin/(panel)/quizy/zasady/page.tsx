@@ -10,7 +10,7 @@ import { IkonaPuchar } from "@/components/ikony";
 import { IkonaEtapu } from "@/components/ikony-etapow";
 import { RODZAJE, TabelaCzesciowych, WykresSzybkosci, pkt } from "./wspolne";
 
-export const metadata: Metadata = { title: "Zasady wyścigu po piwo · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Zasady wyścigu" };
 
 
 type EtapWyscigu = SzablonEtapu & { pytania: number };

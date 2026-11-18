@@ -21,8 +21,11 @@ const nunito = Nunito({
 
 export async function generateMetadata(): Promise<Metadata> {
   const motyw = await motywZadania();
-  if (motyw === "neutralny") return { title: NAZWA_APLIKACJI.neutralny, description: "Quiz na żywo" };
-  return { title: NAZWA_APLIKACJI.bractwo, description: "Quiz Bractwa Piwnego – Piwu Cześć!" };
+  // podstrony podają sam swój tytuł, a nazwę aplikacji (według motywu) dokleja szablon
+  const nazwa = NAZWA_APLIKACJI[motyw];
+  const title = { default: nazwa, template: `%s · ${nazwa}` };
+  if (motyw === "neutralny") return { title, description: "Quiz na żywo" };
+  return { title, description: "Quiz Bractwa Piwnego – Piwu Cześć!" };
 }
 
 export async function generateViewport(): Promise<Viewport> {

@@ -4516,6 +4516,7 @@ button.kafelek {
   --srebro: #9aa3ab;
   --chmiel: #4f8f1a;
   --czerwien: #d4553b;
+  --czerwien-tlo: #d4553b;
   /* nagłówki i tekst w Nunito jak na jowes.pl (layout.tsx); wąskie napisy zostają w Open Sans, Nunito nie ma zwężenia */
   --font: var(--font-nunito), "Open Sans", Arial, sans-serif;
   color-scheme: light;

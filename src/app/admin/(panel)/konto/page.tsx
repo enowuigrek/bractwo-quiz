@@ -6,7 +6,7 @@ import { przelaczRole, wylogujAdmina } from "../../akcje";
 import { ZnaczekOsoby } from "../_komponenty/lokale-autorzy";
 import { FormularzProfilu, FormularzZmianyHasla } from "./formularz";
 
-export const metadata: Metadata = { title: "Moje konto · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Moje konto" };
 
 /** Moje konto (30.10): „działam jako” (gdy jest z czego wybrać), imię i hasło. */
 export default async function MojeKonto() {

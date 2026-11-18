@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LogoQuiz } from "@/components/logo-quiz";
 import { FormularzLogowania } from "./formularz";
 
-export const metadata: Metadata = { title: "Logowanie · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Logowanie" };
 
 /** Jedno logowanie dla wszystkich (konta osobowe, 30.10): twórca, Bractwo i lokale. */
 export default function Logowanie() {

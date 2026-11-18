@@ -8,7 +8,7 @@ import { LITERY, liczbaCzesci, opisOdpowiedzi, opisRozwiazania, ulamek } from "@
 import { sekundy } from "@/lib/czas";
 import { wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../../../wyniki";
 
-export const metadata: Metadata = { title: "Gracz · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Gracz" };
 
 /** Historia gracza w grze: pytanie po pytaniu, co odpowiedział, w jakim czasie i za ile punktów. */
 export default async function HistoriaGracza({ params }: PageProps<"/admin/gry/[id]/gracze/[gracz]">) {

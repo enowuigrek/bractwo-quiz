@@ -8,7 +8,7 @@ import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { IkonaEdytuj } from "@/components/ikony";
 
-export const metadata: Metadata = { title: "Lokale · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Lokale" };
 
 export default async function Lokale() {
   // panel lokalu: od razu ustawienia własnego lokalu

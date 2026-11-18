@@ -4,7 +4,7 @@ import { wymagajTworcy } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FormularzKonta, type LokalDoWyboru } from "../formularz";
 
-export const metadata: Metadata = { title: "Nowe konto · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Nowe konto" };
 
 export default async function NoweKonto({ searchParams }: PageProps<"/admin/konta/nowe">) {
   await wymagajTworcy();

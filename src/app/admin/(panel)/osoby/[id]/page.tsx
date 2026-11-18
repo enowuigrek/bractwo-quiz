@@ -9,7 +9,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { Podpis, ZnaczekOsoby } from "../../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "../../gry/lista-gier";
 
-export const metadata: Metadata = { title: "Osoba · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Osoba" };
 
 const data = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Warsaw" });
 

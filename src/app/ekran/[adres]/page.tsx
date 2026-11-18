@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps<"/ekran/[adres]">):
     ? "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze w lokalu: plansze, zapowiedź i gra pokażą się same."
     : "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze: gra pokaże się sama.";
   return {
-    title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()} · ${nazwa}`,
+    title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()}`,
     description: opis,
     metadataBase: new URL(await adresAplikacji()),
     openGraph: { title: tytul, description: opis, siteName: nazwa, locale: "pl_PL", type: "website" },

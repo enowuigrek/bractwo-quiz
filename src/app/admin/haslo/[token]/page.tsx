@@ -4,7 +4,7 @@ import { LogoQuiz } from "@/components/logo-quiz";
 import { kontoZLinku } from "@/lib/admin";
 import { FormularzHaslaZLinku } from "../../logowanie/formularz";
 
-export const metadata: Metadata = { title: "Hasło · Bractwo Quiz", robots: { index: false } };
+export const metadata: Metadata = { title: "Hasło", robots: { index: false } };
 
 /** Jednorazowy link od Łukasza (nowe konto albo reset hasła), ważny 7 dni. */
 export default async function HasloZLinku({ params }: PageProps<"/admin/haslo/[token]">) {

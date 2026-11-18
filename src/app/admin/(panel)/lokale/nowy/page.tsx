@@ -4,7 +4,7 @@ import { wymagajTworcy } from "@/lib/admin";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { FormularzLokalu } from "../formularz";
 
-export const metadata: Metadata = { title: "Nowy lokal · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Nowy lokal" };
 
 export default async function NowyLokal() {
   await wymagajTworcy();

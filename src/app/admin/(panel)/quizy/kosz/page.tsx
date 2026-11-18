@@ -3,13 +3,14 @@ import Link from "next/link";
 import { wymagajAdmina } from "@/lib/admin";
 import { filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { NAZWY_RODZAJOW, rodzajQuizu } from "@/lib/tagi";
+import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 import { IkonaKosz, IkonaOkoPrzekreslone } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przywrocQuiz, usunQuizNaZawsze } from "../akcje";
 import { liczbaPiw, liczbaPytan } from "../limity";
+import { motywZadania } from "@/lib/motyw-serwer";
 
-export const metadata: Metadata = { title: "Kosz · Bractwo Quiz" };
+export const metadata: Metadata = { title: "Kosz" };
 
 type QuizWKoszu = {
   id: string;
@@ -31,6 +32,7 @@ const BLEDY: Record<string, string> = {
  * z pytaniami i grafikami). Najnowsze na górze.
  */
 export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kosz">) {
+  const neutralny = (await motywZadania()) === "neutralny";
   const rola = await wymagajAdmina();
   const { blad } = await searchParams;
   // lokal widzi w koszu tylko swoje quizy (quizów Bractwa nie usuwa)
@@ -67,7 +69,7 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
                       <IkonaOkoPrzekreslone /> prywatny ·{" "}
                     </>
                   )}
-                  {NAZWY_RODZAJOW[rodzajQuizu(q)]} ·{" "}
+                  {nazwaRodzajuQuizu(rodzajQuizu(q), neutralny)} ·{" "}
                   {(q.degustacja ? liczbaPiw : liczbaPytan)(q.zadania[0]?.count ?? 0)} · w koszu od{" "}
                   {new Date(q.usunieto).toLocaleString("pl-PL", {
                     timeZone: "Europe/Warsaw",
