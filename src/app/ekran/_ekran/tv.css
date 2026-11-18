@@ -3616,7 +3616,7 @@
 
 .wyscig-kreska.spadek {
   background: var(--czerwien-tlo);
-  color: var(--piana);
+  color: var(--na-czerwieni, var(--piana));
 }
 
 @keyframes plakietka-kreski {

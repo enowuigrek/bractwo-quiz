@@ -57,9 +57,10 @@ export function UdostepnijPilota({ kod, token }: { kod: string; token: string })
 
           <section>
             <h3>Przekaż pilota</h3>
-            <p className="pomocniczy">Nie pokazuj graczom: link prowadzi do pilota.</p>
+            {/* ostrzeżenie pod linkiem: oba kody QR zaczynają się na tej samej wysokości (18.11) */}
             {qrPilota && <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />}
             <LinkDoSkopiowania url={pilot} />
+            <p className="pomocniczy">Nie pokazuj graczom: link prowadzi do pilota.</p>
           </section>
 
           <section>

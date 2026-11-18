@@ -129,7 +129,10 @@ input.pole[type="time"] {
   background: var(--chmiel);
 }
 
+/* tekst na czerwieni: w Bractwie kremowy (--piana), w motywie neutralnym biały (--na-czerwieni), bo tam --piana to
+   ciemny tekst na jasnym tle (18.11: „Zakończ grę” i kosze miały ciemny napis) */
 .przycisk.niebezpieczny {
+  color: var(--na-czerwieni, var(--piana));
   background: var(--czerwien-tlo);
 }
 
@@ -1633,6 +1636,7 @@ html:has(.kolumna) {
 }
 
 .przycisk-zdjecie.pilot-usun {
+  color: var(--na-czerwieni, var(--piana));
   background: var(--czerwien-tlo);
 }
 
@@ -3535,7 +3539,7 @@ a.glowna-lokal:focus-visible {
 
 .dymek.zly {
   background: var(--czerwien-tlo);
-  color: var(--piana);
+  color: var(--na-czerwieni, var(--piana));
   white-space: normal;
   width: max-content;
   max-width: calc(100vw - 32px);
@@ -4117,6 +4121,7 @@ button.kafelek {
 }
 
 .przycisk-maly.niebezpieczny {
+  color: var(--na-czerwieni, var(--piana));
   background: var(--czerwien-tlo);
 }
 
@@ -4547,6 +4552,7 @@ button.kafelek {
   --chmiel: #4f8f1a;
   --czerwien: #d4553b;
   --czerwien-tlo: #d4553b;
+  --na-czerwieni: #fff;
   /* nagłówki i tekst w Nunito jak na jowes.pl (layout.tsx); wąskie napisy zostają w Open Sans, Nunito nie ma zwężenia */
   --font: var(--font-nunito), "Open Sans", Arial, sans-serif;
   color-scheme: light;
