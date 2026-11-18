@@ -55,6 +55,7 @@ import { czyDegustacja, type KartyPiwa } from "@/lib/degustacja";
 const FAZY_DEGUSTACJI = ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "koniec"];
 import { useTrybProsty } from "@/lib/gra/prosty";
 import { LogoBractwa } from "@/components/logo-bractwa";
+import { TekstPlanszy } from "@/components/tekst-planszy";
 import { PiwuCzesc, useNeutralny } from "@/components/motyw";
 
 // Scena ma co najmniej 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo. Na ekranie
@@ -331,15 +332,6 @@ export function Tv({ kod, qr, host }: Props) {
  * Na planszach, na których gracze klikają „Gotowy” (wstęp, etap, ciekawostka), ile osób już kliknęło (od 26.10 także
  * bez automatu). Przy automacie gra rusza, gdy klikną wszyscy (src/app/pilot/[kod]/auto.tsx).
  */
-/** Tekst planszy z pogrubieniami: fragmenty w `**gwiazdkach**` są pogrubione (18.11, plansze JOWES). */
-function ZPogrubieniem({ tekst }: { tekst: string }) {
-  return (
-    <>
-      {tekst.split("**").map((kawalek, i) => (i % 2 ? <strong key={i}>{kawalek}</strong> : kawalek))}
-    </>
-  );
-}
-
 function GotowiTv({ stan }: { stan: StanSesji }) {
   const plansza =
     stan.faza === "wstep" || stan.faza === "etap" || (stan.faza === "wynik" && stan.zadanie?.typ === "ciekawostka");
@@ -527,24 +519,12 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             <p className="tv-okazja tv-ciekawostka-etykieta">Ciekawostka</p>
             <h1>{z.tresc}</h1>
             {z.dane.tekst && (
-              // akapity oddziela pusta linia; akapit od „> ” (uwaga, pułapka) stoi w ramce (18.11, plansze JOWES)
-              <div
+              <TekstPlanszy
+                tekst={z.dane.tekst}
                 className={`tv-ciekawostka-tekst${
                   z.dane.tekst.length > 900 ? " bardzo-dlugi" : z.dane.tekst.length > 380 ? " dlugi" : ""
                 }`}
-              >
-                {z.dane.tekst.split(/\n\s*\n/).map((akapit, i) =>
-                  akapit.startsWith("> ") ? (
-                    <p key={i} className="tv-ramka">
-                      <ZPogrubieniem tekst={akapit.slice(2)} />
-                    </p>
-                  ) : (
-                    <p key={i}>
-                      <ZPogrubieniem tekst={akapit} />
-                    </p>
-                  ),
-                )}
-              </div>
+              />
             )}
           </section>
         </div>

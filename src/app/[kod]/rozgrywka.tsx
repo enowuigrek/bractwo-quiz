@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { sekundy } from "@/lib/czas";
+import { TekstPlanszy } from "@/components/tekst-planszy";
 import { rozmycie } from "@/lib/gra/dodatki";
 import { fazaTeraz, komunikatBledu, sekundaOdliczania } from "@/lib/gra/nasluch";
 import type { MojWynik, StanSesji, WierszRankingu, ZapisOdpowiedzi } from "@/lib/gra/typy";
@@ -77,10 +78,10 @@ export function Rozgrywka({
   if (z.typ === "ciekawostka") {
     return (
       <>
-        <p className="nadtytul">Ciekawostka</p>
+        <p className="nadtytul gra-ciekawostka-etykieta">Ciekawostka</p>
         <h2 className="gra-pytanie">{z.tresc}</h2>
         {z.grafika_url && <img src={z.grafika_url} alt="" className="gra-grafika" />}
-        {z.dane.tekst && <p>{z.dane.tekst}</p>}
+        {z.dane.tekst && <TekstPlanszy tekst={z.dane.tekst} className="gra-ciekawostka-tekst" />}
         <Gotowy stan={stan} token={ja.token} />
       </>
     );

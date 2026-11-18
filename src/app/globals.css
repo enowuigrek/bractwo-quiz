@@ -4587,3 +4587,39 @@ button.kafelek {
 [data-motyw="neutralny"] .odpowiedzi-graczy li.ja span {
   color: #1f1f1f;
 }
+
+/* Tekst planszy (components/tekst-planszy.tsx) na telefonie i TV: akapity, pogrubienia (`**…**`), uwaga w ramce
+   (akapit od „> ”). Rozmiary fontu na TV ustawia tv.css (.tv-ciekawostka-tekst). */
+.tekst-planszy p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.tekst-planszy p + p {
+  margin-top: 0.7em;
+}
+
+.tekst-planszy .tv-ramka {
+  padding: 0.5em 0.8em;
+  border-left: 5px solid var(--zloto);
+  border-radius: 8px;
+  background: var(--kamien);
+}
+
+.tekst-planszy strong {
+  font-weight: var(--w-black);
+  color: var(--zloto);
+}
+
+[data-motyw="neutralny"] .tekst-planszy strong {
+  color: #b86a00;
+}
+
+/* telefon: plansza w motywie neutralnym bez napisu „Ciekawostka” (plansze to nie tylko ciekawostki) */
+[data-motyw="neutralny"] .gra-ciekawostka-etykieta {
+  display: none;
+}
+
+.gra-ciekawostka-tekst {
+  margin-top: var(--o-3, 16px);
+}
