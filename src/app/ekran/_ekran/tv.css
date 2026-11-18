@@ -3179,53 +3179,53 @@
   translate: -50% -50%;
 }
 
-/* motyw neutralny: zamiast szklanki pytanie prowadzącego w serii finału (seria.tsx, 18.11) */
-[data-motyw="neutralny"] .tv-seria .drogi-finalu-szklanka {
-  left: 1600px;
-  width: 330px;
-}
-
-.seria-pytanie {
-  padding: 22px 24px;
-  background: #fff;
-  border: 2px solid var(--zloto);
-  border-radius: var(--r-card);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  animation: wjazd-pytania-serii 0.4s ease-out both;
-}
-
-.seria-pytanie-kto {
+/* motyw neutralny: chmurki z pytaniem każdego finalisty na końcu jego drogi (seria.tsx, ChmurkiPytan, 18.11) */
+.seria-chmurka {
+  position: absolute;
+  z-index: 3;
+  left: 1394px;
+  width: 360px;
+  translate: 0 -50%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 0 0 14px;
-  font-size: 26px;
-  font-weight: var(--w-black);
-  color: var(--zloto);
+  padding: 10px 16px;
+  background: #fff;
+  border: 2px solid var(--zloto);
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  animation: wjazd-chmurki 0.35s ease-out both;
 }
 
-.seria-pytanie-kto span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* dzióbek w stronę drogi */
+.seria-chmurka::before {
+  content: "";
+  position: absolute;
+  left: -11px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  background: #fff;
+  border-left: 2px solid var(--zloto);
+  border-bottom: 2px solid var(--zloto);
+  transform: rotate(45deg);
 }
 
-.seria-pytanie-tresc {
+.seria-chmurka p {
   margin: 0;
-  font-size: 32px;
+  font-size: 21px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 26px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--linii, 4);
+  overflow: hidden;
 }
 
-.seria-pytanie-tresc.dlugie {
-  font-size: 27px;
-}
-
-@keyframes wjazd-pytania-serii {
+@keyframes wjazd-chmurki {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateX(14px);
   }
 }
 

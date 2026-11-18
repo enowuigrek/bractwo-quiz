@@ -44,7 +44,7 @@ Każdy punkt to kandydat na **opcję marki albo quizu**: co JOWES wyłączył al
 | 2.3a | **Boty w pilocie** | Tylko twórca. | Każde zalogowane konto (Zbyszko testuje sam). | Opcja roli albo marki. Uwaga na boty w prawdziwej grze. | |
 | 2.4 | **Nagrody w kreatorze i pilocie** | Wybór nagród przy grze, karta nagród w pilocie. | Brak, gra bierze nagrody z quizu. | Opcja quizu: „nagrody stałe z quizu” zamiast wpisywania przy każdej grze. Może się przydać i w Bractwie przy cyklicznych quizach. | |
 | 2.5 | **„Gracie o: …”** przy szklance | Jest. | Nie ma (nie ma szklanki). | Wynika ze szklanki (2.7). | |
-| 2.5a | **Pytanie lidera w finale** (prośba Zbyszka) | Brak, w tym miejscu szklanka. | W miejscu szklanki karta z prowadzącym i pytaniem, nad którym teraz siedzi (sama treść, bez odpowiedzi). | W Bractwie można by ją dać pod drogami albo obok szklanki. Do sprawdzenia na TV. | |
+| 2.5a | **Pytania w finale na TV** (prośba Zbyszka) | Brak, w tym miejscu szklanka. | Przy każdej drodze chmurka z pytaniem, nad którym gracz teraz siedzi (sama treść, bez odpowiedzi). | W Bractwie można by ją dać pod drogami albo obok szklanki. Do sprawdzenia na TV. | |
 | 2.6 | **„Piwu Cześć!”** na końcu | Jest. | Nie ma. | Pożegnanie jako tekst marki. | |
 
 ### Wygląd

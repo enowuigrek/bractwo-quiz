@@ -4,11 +4,10 @@ import { useState } from "react";
 import { MotionConfig } from "motion/react";
 import { metaFinalu, naDrodzeFinalu } from "@/lib/gra/final";
 import type { SeriaGracz, StanSesji } from "@/lib/gra/typy";
-import { DrogiFinalu } from "./drogi";
+import { DrogiFinalu, drogi } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { OkrzykiNaDrogach } from "./okrzyki";
 import { IkonaMegafon } from "@/components/ikony";
-import { Awatar } from "@/components/awatar";
 import { useNeutralny } from "@/components/motyw";
 
 /**
@@ -32,10 +31,6 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g, stan.pijany_final, metaFinalu(stan)) : Math.min(1, g.dobre / n));
   const najlepszy = Math.max(0, ...gracze.map(naDrodze));
   const neutralny = useNeutralny();
-  // motyw neutralny (JOWES, 18.11, prośba Zbyszka): w miejscu szklanki pytanie, nad którym siedzi prowadzący
-  // (wszyscy mają tę samą kolejność pytań, więc jedno pytanie zamiast listy); bez prowadzącego z pytaniem: pierwszy, kto je ma
-  const zPytaniem = gracze.filter((g) => g.pytanie);
-  const lider = zPytaniem.find((g) => naDrodze(g) === Math.max(...zPytaniem.map(naDrodze))) ?? null;
 
   // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie
   // danych, w czasie renderu, jak zaleca React dla wartości wyprowadzonych z poprzednich propsów)
@@ -65,30 +60,20 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 
         <DrogiFinalu
           nad={
-            <OkrzykiNaDrogach
-              okrzyki={stan.okrzyki ?? []}
-              gracze={gracze}
-              polozenie={gracze.map(naDrodze)}
-              teraz={teraz}
-            />
+            <>
+              <OkrzykiNaDrogach
+                okrzyki={stan.okrzyki ?? []}
+                gracze={gracze}
+                polozenie={gracze.map(naDrodze)}
+                teraz={teraz}
+              />
+              {/* motyw neutralny (JOWES, 18.11, prośba Zbyszka): przy każdej drodze chmurka z pytaniem gracza */}
+              {neutralny && !przedStartem && <ChmurkiPytan gracze={gracze} />}
+            </>
           }
           opoznienie={0}
           trwanie={0.9}
-          szklanka={
-            neutralny ? (
-              lider && !przedStartem ? (
-                <div className="seria-pytanie" key={lider.pytanie}>
-                  <p className="seria-pytanie-kto">
-                    <Awatar nick={lider.nick} zdjecie={lider.zdjecie} rozmiar={44} />
-                    <span>{lider.nick}</span>
-                  </p>
-                  <p className={`seria-pytanie-tresc${(lider.pytanie?.length ?? 0) > 90 ? " dlugie" : ""}`}>{lider.pytanie}</p>
-                </div>
-              ) : null
-            ) : (
-              <Szklanka przed={1} teraz={1} doKonca={0} />
-            )
-          }
+          szklanka={neutralny ? null : <Szklanka przed={1} teraz={1} doKonca={0} />}
           gracze={gracze.map((g) => ({
             nick: g.nick,
             zdjecie: g.zdjecie,
@@ -112,6 +97,33 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         />
       </div>
     </MotionConfig>
+  );
+}
+
+/**
+ * Chmurki z pytaniem każdego finalisty (motyw neutralny, 18.11): po prawej, na końcu jego drogi (tam, gdzie w Bractwie
+ * stoi szklanka), na wysokości drogi, z dzióbkiem w jej stronę. Sama treść pytania, bez rozwiązania (`stan_sesji`).
+ * Wysokość chmurki z odstępu między drogami, a treść ucina się do tylu linii, ile się zmieści.
+ */
+function ChmurkiPytan({ gracze }: { gracze: SeriaGracz[] }) {
+  const lista = drogi(gracze.length);
+  const odstep = lista.length > 1 ? lista[1].od.y - lista[0].od.y : 200;
+  const wysokosc = Math.min(170, odstep - 12);
+  const linii = Math.max(1, Math.floor((wysokosc - 24) / 26));
+  return (
+    <>
+      {gracze.map((g, i) =>
+        g.pytanie ? (
+          <div
+            key={`${g.nick}:${g.pytanie}`}
+            className="seria-chmurka"
+            style={{ top: lista[i].od.y, maxHeight: wysokosc, "--linii": linii } as React.CSSProperties}
+          >
+            <p>{g.pytanie}</p>
+          </div>
+        ) : null,
+      )}
+    </>
   );
 }
 
