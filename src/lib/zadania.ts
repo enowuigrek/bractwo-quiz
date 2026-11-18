@@ -18,7 +18,8 @@ export type TypZadania = (typeof TYPY_ZADAN)[number];
  * Dodatki do pytania każdego typu: podpowiedzi odsłaniane po kolei w trakcie pytania (baza wysyła tylko
  * te, których czas już minął, w `ZadanieWidoczne.podpowiedzi`) i grafika, która na TV wyostrza się z czasem.
  */
-export type Dodatki = { podpowiedzi?: string[]; odslaniaj?: boolean };
+/** Dodatki każdego pytania; `wyjasnienie` pokazują TV i telefon po odsłonięciu odpowiedzi (18.11). */
+export type Dodatki = { podpowiedzi?: string[]; odslaniaj?: boolean; wyjasnienie?: string };
 
 /** Jedna poprawna odpowiedź (indeks). Odpowiedź gracza: `{ odpowiedz: 2 }`. */
 export type DaneWybor = { odpowiedzi: string[]; poprawna: number };

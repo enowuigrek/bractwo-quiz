@@ -3,9 +3,11 @@ export const LIMITY = {
   tytul: 120,
   opis: 500,
   tresc: 300,
-  odpowiedz: 120,
+  odpowiedz: 200,
   minOdpowiedzi: 2,
-  maxOdpowiedzi: 6,
+  maxOdpowiedzi: 8,
+  /** Wyjaśnienie poprawnej odpowiedzi (`dane.wyjasnienie`, 18.11). */
+  wyjasnienie: 600,
   maxPodpowiedzi: 4,
   minCzas: 5,
   maxCzas: 300,

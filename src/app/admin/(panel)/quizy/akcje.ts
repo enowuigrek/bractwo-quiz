@@ -229,7 +229,11 @@ function odczytajZadanie(dane: FormData): { blad: string } | ({ tresc: string } 
   }
   const dodatki = odczytajDodatki(surowe);
   if ("blad" in dodatki) return dodatki;
-  return { ...wynik, dane: { ...wynik.dane, ...dodatki } } as { tresc: string } & ZadanieDane;
+  // wyjaśnienie poprawnej odpowiedzi (18.11): z pola edytora, bez niego zapis kasował wyjaśnienie z migracji
+  const wyjasnienie = tekst(dane, "wyjasnienie");
+  if (wyjasnienie.length > LIMITY.wyjasnienie) return { blad: `Wyjaśnienie może mieć najwyżej ${LIMITY.wyjasnienie} znaków.` };
+  const zWyjasnieniem = wyjasnienie && wynik.typ !== "ciekawostka" && wynik.typ !== "piwo" ? { wyjasnienie } : {};
+  return { ...wynik, dane: { ...wynik.dane, ...dodatki, ...zWyjasnieniem } } as { tresc: string } & ZadanieDane;
 }
 
 function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & ZadanieDane) {
@@ -250,7 +254,7 @@ function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & 
   if (typ === "ciekawostka") {
     const opis = typeof surowe.tekst === "string" ? surowe.tekst.trim().replace(/\s+/g, " ") : "";
     if (!opis) return { blad: "Wpisz tekst ciekawostki." };
-    if (opis.length > 400) return { blad: "Tekst ciekawostki może mieć najwyżej 400 znaków." };
+    if (opis.length > 1500) return { blad: "Tekst ciekawostki może mieć najwyżej 1500 znaków." };
     return { tresc, typ, dane: { tekst: opis } };
   }
 

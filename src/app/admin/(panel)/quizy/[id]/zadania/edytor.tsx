@@ -35,7 +35,8 @@ type Props = {
 type Wiersz = { klucz: number; a: string; b: string };
 
 /** Najdłuższy tekst ciekawostki (mieści się na TV obok grafiki). */
-const LIMITY_CIEKAWOSTKI = 400;
+/** Tekst planszy: dłuższe ściągi w punktach (plansze JOWES, 18.11) mieszczą się na TV mniejszym fontem. */
+const LIMITY_CIEKAWOSTKI = 1500;
 
 const OPISY: Record<TypZadania, string> = {
   wybor: "Odpowiedzi (kliknij literę poprawnej)",
@@ -368,7 +369,7 @@ export function EdytorZadania({
             onChange={(e) => setTekst(e.target.value)}
             required
             maxLength={LIMITY_CIEKAWOSTKI}
-            rows={4}
+            rows={8}
           />
         </div>
       )}
@@ -588,6 +589,21 @@ export function EdytorZadania({
         )}
       </fieldset>
       </>
+      )}
+
+      {/* wyjaśnienie poprawnej odpowiedzi (TV i telefon po odsłonięciu, 18.11); zapis bez niego by je kasował */}
+      {typ !== "ciekawostka" && !jestPiwo && (
+        <div>
+          <label htmlFor={`${uid}-wyjasnienie`}>Wyjaśnienie po odpowiedzi</label>
+          <textarea
+            id={`${uid}-wyjasnienie`}
+            name="wyjasnienie"
+            className="pole"
+            defaultValue={zadanie?.dane.wyjasnienie ?? ""}
+            maxLength={LIMITY.wyjasnienie}
+            rows={3}
+          />
+        </div>
       )}
 
       <KomunikatFormularza stan={stan} />
