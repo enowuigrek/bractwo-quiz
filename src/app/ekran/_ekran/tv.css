@@ -3179,6 +3179,56 @@
   translate: -50% -50%;
 }
 
+/* motyw neutralny: zamiast szklanki pytanie prowadzącego w serii finału (seria.tsx, 18.11) */
+[data-motyw="neutralny"] .tv-seria .drogi-finalu-szklanka {
+  left: 1600px;
+  width: 330px;
+}
+
+.seria-pytanie {
+  padding: 22px 24px;
+  background: #fff;
+  border: 2px solid var(--zloto);
+  border-radius: var(--r-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: wjazd-pytania-serii 0.4s ease-out both;
+}
+
+.seria-pytanie-kto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-size: 26px;
+  font-weight: var(--w-black);
+  color: var(--zloto);
+}
+
+.seria-pytanie-kto span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seria-pytanie-tresc {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.seria-pytanie-tresc.dlugie {
+  font-size: 27px;
+}
+
+@keyframes wjazd-pytania-serii {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
 .drogi-finalu-szklanka .wyscig-szklanka-opis,
 .drogi-finalu-szklanka .wyscig-szklanka-nagroda {
   display: none;

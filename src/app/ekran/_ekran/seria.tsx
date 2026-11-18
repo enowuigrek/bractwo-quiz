@@ -8,6 +8,7 @@ import { DrogiFinalu } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { OkrzykiNaDrogach } from "./okrzyki";
 import { IkonaMegafon } from "@/components/ikony";
+import { Awatar } from "@/components/awatar";
 import { useNeutralny } from "@/components/motyw";
 
 /**
@@ -30,6 +31,11 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   // z pijanym finałem nikt nie dobiega do szklanki: wyścig ma wyglądać, jakby trwał dalej
   const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g, stan.pijany_final, metaFinalu(stan)) : Math.min(1, g.dobre / n));
   const najlepszy = Math.max(0, ...gracze.map(naDrodze));
+  const neutralny = useNeutralny();
+  // motyw neutralny (JOWES, 18.11, prośba Zbyszka): w miejscu szklanki pytanie, nad którym siedzi prowadzący
+  // (wszyscy mają tę samą kolejność pytań, więc jedno pytanie zamiast listy); bez prowadzącego z pytaniem: pierwszy, kto je ma
+  const zPytaniem = gracze.filter((g) => g.pytanie);
+  const lider = zPytaniem.find((g) => naDrodze(g) === Math.max(...zPytaniem.map(naDrodze))) ?? null;
 
   // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie
   // danych, w czasie renderu, jak zaleca React dla wartości wyprowadzonych z poprzednich propsów)
@@ -68,7 +74,21 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
           }
           opoznienie={0}
           trwanie={0.9}
-          szklanka={<Szklanka przed={1} teraz={1} doKonca={0} />}
+          szklanka={
+            neutralny ? (
+              lider && !przedStartem ? (
+                <div className="seria-pytanie" key={lider.pytanie}>
+                  <p className="seria-pytanie-kto">
+                    <Awatar nick={lider.nick} zdjecie={lider.zdjecie} rozmiar={44} />
+                    <span>{lider.nick}</span>
+                  </p>
+                  <p className={`seria-pytanie-tresc${(lider.pytanie?.length ?? 0) > 90 ? " dlugie" : ""}`}>{lider.pytanie}</p>
+                </div>
+              ) : null
+            ) : (
+              <Szklanka przed={1} teraz={1} doKonca={0} />
+            )
+          }
           gracze={gracze.map((g) => ({
             nick: g.nick,
             zdjecie: g.zdjecie,

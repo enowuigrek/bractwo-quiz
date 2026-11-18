@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { jestTworca, rolaAdmina } from "@/lib/admin";
+import { motywZadania } from "@/lib/motyw-serwer";
 import { poprawnyKod } from "@/lib/gra/kod";
 import { NaglowekPanelu } from "@/app/admin/(panel)/_komponenty/naglowek-panelu";
 import { Pilot } from "./pilot";
@@ -27,7 +28,13 @@ export default async function StronaPilota({ params, searchParams }: PageProps<"
       <div className="pilot-strona">
         <NaglowekPanelu rola={rola} />
         <main className="kolumna kolumna-pilot">
-          <Pilot kod={kod} tokenZAdresu={token} boty={jestTworca(rola)} naglowek={false} />
+          {/* boty: twórca, a na adresie JOWES każde zalogowane konto (18.11, Zbyszko testuje sam) */}
+          <Pilot
+            kod={kod}
+            tokenZAdresu={token}
+            boty={jestTworca(rola) || (await motywZadania()) === "neutralny"}
+            naglowek={false}
+          />
         </main>
       </div>
     );

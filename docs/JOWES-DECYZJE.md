@@ -41,8 +41,10 @@ Każdy punkt to kandydat na **opcję marki albo quizu**: co JOWES wyłączył al
 | 2.1 | **Nazwy etapów** | Nazwy z szablonu („Na jedno”, „Jednak więcej”…). | Tylko numery („Etap 1”…), w panelu bez pola nazwy. | Ustawienie quizu: „nazwy etapów: pokazuj / tylko numery”. Nazwy w Bractwie zostają, bo budują klimat. | |
 | 2.2 | **Pijany finał** | Jest, domyślnie włączony w kreatorze. | Wyłączony (nie ma go w kreatorze, serwer go odrzuca). | Opcja marki („dostępne tryby”). W Bractwie bez zmian. | |
 | 2.3 | **Kranoprzejęcie** (gościnny browar) | Jest w kreatorze. | Ukryte. | Opcja marki. | |
+| 2.3a | **Boty w pilocie** | Tylko twórca. | Każde zalogowane konto (Zbyszko testuje sam). | Opcja roli albo marki. Uwaga na boty w prawdziwej grze. | |
 | 2.4 | **Nagrody w kreatorze i pilocie** | Wybór nagród przy grze, karta nagród w pilocie. | Brak, gra bierze nagrody z quizu. | Opcja quizu: „nagrody stałe z quizu” zamiast wpisywania przy każdej grze. Może się przydać i w Bractwie przy cyklicznych quizach. | |
 | 2.5 | **„Gracie o: …”** przy szklance | Jest. | Nie ma (nie ma szklanki). | Wynika ze szklanki (2.7). | |
+| 2.5a | **Pytanie lidera w finale** (prośba Zbyszka) | Brak, w tym miejscu szklanka. | W miejscu szklanki karta z prowadzącym i pytaniem, nad którym teraz siedzi (sama treść, bez odpowiedzi). | W Bractwie można by ją dać pod drogami albo obok szklanki. Do sprawdzenia na TV. | |
 | 2.6 | **„Piwu Cześć!”** na końcu | Jest. | Nie ma. | Pożegnanie jako tekst marki. | |
 
 ### Wygląd

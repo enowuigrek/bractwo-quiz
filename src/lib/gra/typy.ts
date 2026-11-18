@@ -210,6 +210,8 @@ export type SeriaGracz = {
   kroki?: number;
   /** Ile okrzyków dostał od kibiców. */
   doping?: number;
+  /** Treść pytania, nad którym teraz siedzi (bez rozwiązania; `stan_sesji`, 18.11). Null: przed startem albo koniec puli. */
+  pytanie?: string | null;
 };
 
 /** Okrzyk kibica w serii finału (`kibicuj`); `haslo` to numer z `HASLA` w src/lib/gra/okrzyki.ts. */
