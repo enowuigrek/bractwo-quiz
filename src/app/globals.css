@@ -4551,3 +4551,11 @@ button.kafelek {
 [data-motyw="neutralny"] .gra-loga-gospodarzy .gra-logo {
   display: none;
 }
+
+/* motyw neutralny: kolumna strony na szerokim ekranie (globals.css, @media) biała z lekkim cieniem zamiast granatowej */
+@media (min-width: 960px) {
+  [data-motyw="neutralny"] .kolumna:not(.kolumna-pilot) {
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  }
+}
