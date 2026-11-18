@@ -4674,6 +4674,11 @@ button.kafelek {
   line-height: 1.4;
 }
 
+/* odstęp od pytania pod wyjaśnieniem (18.11, Łukasz: ramka stykała się z treścią pytania) */
+.gra-wyjasnienie + * {
+  margin-top: 20px;
+}
+
 /* lista kafelków w planszy (akapit z linii od „- ”, np. uczestnicy Forum JOWES): pigułki w rzędach */
 .tekst-planszy-kafelki {
   display: flex;
