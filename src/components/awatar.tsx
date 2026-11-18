@@ -28,7 +28,8 @@ export function Awatar({ nick, zdjecie, rozmiar, className, kolor }: Props) {
       height: rozmiar,
       padding: Math.max(2, Math.round(rozmiar * BRZEG_KAPSLA)),
       backgroundImage: tloKapsla(kolorKapsla),
-    };
+      "--kolor-awatara": `#${kolorKapsla}`,
+    } as React.CSSProperties;
     return <img src={obraz} alt="" className={klasa} style={styl} />;
   }
   const litera = Array.from(nick.trim())[0]?.toLocaleUpperCase("pl") ?? "";
@@ -37,7 +38,8 @@ export function Awatar({ nick, zdjecie, rozmiar, className, kolor }: Props) {
     height: rozmiar,
     fontSize: Math.round(rozmiar * 0.56),
     backgroundImage: tloKapsla(kolorKapsla),
-  };
+    "--kolor-awatara": `#${kolorKapsla}`,
+  } as React.CSSProperties;
   return (
     <span aria-hidden className={`${klasa} awatar-litera`} style={styl}>
       {litera}

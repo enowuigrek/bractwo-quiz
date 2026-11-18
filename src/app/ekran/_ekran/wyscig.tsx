@@ -11,6 +11,7 @@ import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
+import { useNeutralny } from "@/components/motyw";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
 const START_S = 0.8;
@@ -28,6 +29,7 @@ const STREFA_PX = 56;
  * Grafiki szklanki i lady: public/grafiki, generowane skryptem scripts/grafiki.mjs.
  */
 export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
+  const neutralny = useNeutralny();
   const z = stan.zadanie;
   const n = stan.quiz?.liczba_zadan ?? 0;
   const lp = z?.lp ?? 0;
@@ -172,7 +174,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
 
   const naglowek = (
     <header className="tv-ranking-gora">
-      <h1>{etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
+      <h1>{neutralny ? (etap?.finalowy ? "Finał" : "Wyścig") : etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
       {z && <p className="tv-okazja">{`${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}</p>}
     </header>
   );
@@ -198,7 +200,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         {naglowek}
         <KoniecEtapu stan={stan} />
 
-        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${szklanka}px` }}>
+        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${neutralny ? (nagroda ? 300 : 0) : szklanka}px` }}>
           {/* nowa strona: tory od nowa (klucz) ze stanem sprzed pytania na tej stronie, potem jazda i zamiana torów
               jak na pierwszej (30.10) */}
           <motion.div
@@ -248,12 +250,15 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
             </div>
           </motion.div>
 
-          <Szklanka
-            przed={nalanieSzklanki(stan.quiz, lp - 1)}
-            teraz={nalanieSzklanki(stan.quiz, lp)}
-            doKonca={Math.max(0, n - lp)}
-            nagroda={nagroda}
-          />
+          {/* motyw neutralny: bez szklanki, tory na całą szerokość (z kolumną tylko na nagrodę) */}
+          {(!neutralny || nagroda) && (
+            <Szklanka
+              przed={nalanieSzklanki(stan.quiz, lp - 1)}
+              teraz={nalanieSzklanki(stan.quiz, lp)}
+              doKonca={Math.max(0, n - lp)}
+              nagroda={nagroda}
+            />
+          )}
         </div>
       </div>
     </MotionConfig>
@@ -304,6 +309,7 @@ export function Szklanka({
   /** Nazwa nagrody za 1. miejsce: o nią toczy się wyścig. */
   nagroda?: string | null;
 }) {
+  const neutralny = useNeutralny();
   return (
     <div className="wyscig-szklanka" aria-hidden>
       <div className="wyscig-szklo">
@@ -314,7 +320,7 @@ export function Szklanka({
           Gracie o: <strong>{nagroda}</strong>
         </p>
       )}
-      <p className="wyscig-szklanka-opis">{doKonca ? "" : "Nalane!"}</p>
+      <p className="wyscig-szklanka-opis">{doKonca || neutralny ? "" : "Nalane!"}</p>
     </div>
   );
 }

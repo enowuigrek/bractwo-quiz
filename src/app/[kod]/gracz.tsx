@@ -34,6 +34,8 @@ import { UdostepnijWynik } from "./udostepnij";
 import { ZdjecieGracza } from "./zdjecie-gracza";
 import { DegustacjaGracza } from "./degustacja";
 import { czyDegustacja } from "@/lib/degustacja";
+import { LogoBractwa } from "@/components/logo-bractwa";
+import { PiwuCzesc, useNeutralny } from "@/components/motyw";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
@@ -50,6 +52,7 @@ function widoczni(gracze: GraczNaLiscie[], ja: string): GraczNaLiscie[] {
 }
 
 export function Gracz({ kod }: { kod: string }) {
+  const neutralny = useNeutralny();
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [bladGry, ustawBladGry] = useState<string | null>(null);
@@ -162,7 +165,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!stan || sprawdzamToken) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan)} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, neutralny)} />
         <p className="pomocniczy">Łączę z grą…</p>
       </>
     );
@@ -171,11 +174,11 @@ export function Gracz({ kod }: { kod: string }) {
   if (!ja) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan)} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, neutralny)} />
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
-            <p className="pomocniczy">Do zobaczenia na kolejnym quizie. Piwu Cześć!</p>
+            <p className="pomocniczy">Do zobaczenia na kolejnym quizie.<PiwuCzesc /></p>
           </>
         ) : !stan.poczekalnia_otwarta ? (
           <>
@@ -214,7 +217,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   return (
     <>
-      <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan)} />
+      <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, neutralny)} />
       <WGrze
         stan={stan}
         ja={ja}
@@ -250,7 +253,7 @@ function Naglowek({
         {browar?.logo_url && <img src={browar.logo_url} alt={browar.nazwa} className="gra-logo" />}
       </span>
       <span className="logo-quiz-napis gra-napis-quiz">{napis}</span>
-      <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo gra-logo" />
+      <LogoBractwa className="gra-logo" />
     </header>
   );
 }
@@ -372,6 +375,7 @@ function WGrze({
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan.faza), stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
+  const neutralny = useNeutralny();
 
   // degustacja (02.11): karta, „ty i sala” i „Twoja degustacja” zamiast pytań, rankingu i medali
   if (czyDegustacja(stan) && ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "koniec"].includes(stan.faza)) {
@@ -456,7 +460,7 @@ function WGrze({
       <>
         <p className="nadtytul">{ja.nick}</p>
         <h1>Zaraz zaczynamy!</h1>
-        <p>Patrz na telewizor: prowadzący opowie, jak wygląda wyścig po piwo.</p>
+        <p>Patrz na telewizor: prowadzący opowie, jak wygląda {neutralny ? "wyścig" : "wyścig po piwo"}.</p>
         <Gotowy stan={stan} token={ja.token} />
       </>
     );
@@ -547,6 +551,7 @@ function WGrze({
  * Grafikę na pamiątkę może pobrać od razu (26.10), z miejscem z chwili odpadnięcia.
  */
 function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSesji }) {
+  const neutralny = useNeutralny();
   return (
     <>
       <p className="nadtytul gra-ja">
@@ -562,7 +567,7 @@ function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSe
       <UdostepnijWynik
         wynik={{
           tytul: stan.quiz?.tytul ?? "Quiz",
-          okazja: stan.okazja ?? nazwaRodzaju(stan),
+          okazja: stan.okazja ?? nazwaRodzaju(stan, neutralny),
           lokal: stan.lokal,
           browar: stan.browar,
           data: new Date().toLocaleDateString("pl-PL"),

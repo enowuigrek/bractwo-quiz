@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { supabaseAdmin } from "./supabase/serwer";
+import { motywZadania } from "./motyw-serwer";
 
 const CIASTECZKO = "bq_admin";
 // 30 dni: prowadzący loguje się w domu i w lokalu nie musi wpisywać hasła na telefonie.
@@ -47,7 +48,13 @@ export type Konto = { id: string; nazwa: string; email: string; zdjecie_url: str
 export type Rola =
   | { typ: "tworca"; konto: Konto }
   | { typ: "bractwo"; konto: Konto; testowe: string[] }
-  | { typ: "lokal"; konto: Konto; lokalId: string };
+  | {
+      typ: "lokal";
+      konto: Konto;
+      lokalId: string;
+      /** Panel na adresie motywu neutralnego (src/lib/motyw.ts, np. JOWES): tylko quizy swojego lokalu, bez Bractwa. */
+      tylkoSwoje?: boolean;
+    };
 
 /** Rola nadana kontu (`konta_role`) albo wybrana w „działam jako”. */
 export type RolaKonta = { rola: "tworca" } | { rola: "bractwo" } | { rola: "lokal"; lokalId: string };
@@ -303,7 +310,10 @@ export const rolaAdmina = cache(async (): Promise<Rola | null> => {
   if (!mozeDzialacJako(konto, rola)) return null;
   const k: Konto = { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url };
   if (rola.rola === "tworca") return { typ: "tworca", konto: k };
-  if (rola.rola === "lokal") return { typ: "lokal", konto: k, lokalId: rola.lokalId };
+  if (rola.rola === "lokal") {
+    const tylkoSwoje = (await motywZadania()) === "neutralny";
+    return { typ: "lokal", konto: k, lokalId: rola.lokalId, tylkoSwoje };
+  }
   const { data } = await supabaseAdmin().from("lokale").select("id").eq("testowy", true).returns<{ id: string }[]>();
   return { typ: "bractwo", konto: k, testowe: (data ?? []).map((l) => l.id) };
 });

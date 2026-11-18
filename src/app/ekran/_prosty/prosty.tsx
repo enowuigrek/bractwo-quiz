@@ -14,6 +14,8 @@ import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowania } from "@/lib/zadania";
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
+import { LogoBractwa } from "@/components/logo-bractwa";
+import { useNeutralny } from "@/components/motyw";
 
 // Prosty ekran TV dla starszych przeglądarek telewizorów (src/lib/gra/prosty.ts: kiedy się włącza). Te same dane
 // i ta sama gra co pełny ekran (pobiera je Tv w ekran/_ekran/tv.tsx, muzyka i efekty grają jak zwykle), tylko bez
@@ -65,7 +67,7 @@ function Loga({ lokal }: { lokal: Lokal }) {
   return (
     <div className="pr-loga">
       {lokal?.logo_url && <img src={lokal.logo_url} alt={lokal.nazwa} className="pr-logo-lokalu" />}
-      <img src="/loga/bractwo-biale.svg" alt="Bractwo Piwne" className="pr-logo-bractwa" />
+      <LogoBractwa biale className="pr-logo-bractwa" />
     </div>
   );
 }
@@ -629,6 +631,7 @@ function Seria({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 }
 
 function Podium({ stan, ranking, koniec = false }: { stan: StanSesji; ranking: WierszRankingu[]; koniec?: boolean }) {
+  const neutralny = useNeutralny();
   const trojka = ranking.slice(0, 3);
   // po finale miejsce trójki dał wyścig: bez punktów, jak na głównym ekranie
   const finalistow = stan.finalisci?.length;
@@ -653,7 +656,7 @@ function Podium({ stan, ranking, koniec = false }: { stan: StanSesji; ranking: W
       </ol>
       <p className="pr-opis">
         {[stan.okazja, stan.quiz?.tytul, stan.lokal?.nazwa].filter(Boolean).join(" · ")}
-        {koniec ? " · Piwu Cześć!" : ""}
+        {koniec && !neutralny ? " · Piwu Cześć!" : ""}
       </p>
     </div>
   );

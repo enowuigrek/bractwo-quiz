@@ -4597,3 +4597,66 @@
   color: var(--szary);
   font-size: 34px;
 }
+
+/* ===== Motyw neutralny (src/lib/motyw.ts): jasny jak strona JOWES, bez drewnianej lady ===== */
+[data-motyw="neutralny"] .wyscig-lada {
+  background: linear-gradient(180deg, #fff, #eef0f3);
+  box-shadow:
+    inset 0 0 0 1px #dfe3e8,
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* tło: białe z ciepłym pomarańczowym światłem, logo w tle w kolorze i bardzo blade, bez ciemnych brzegów baru */
+[data-motyw="neutralny"] .tv-tlo-lokalu {
+  background: radial-gradient(ellipse at 50% 40%, #fff 0%, #fff8ec 60%, #ffeccc 100%);
+}
+
+[data-motyw="neutralny"] .tv-tlo-logo {
+  opacity: 0.07;
+  filter: none;
+}
+
+[data-motyw="neutralny"] .tv-tlo-ciemne-brzegi,
+[data-motyw="neutralny"] .tv-smuga {
+  display: none;
+}
+
+[data-motyw="neutralny"] .tv-blask {
+  background: radial-gradient(circle, rgba(255, 170, 30, 0.12) 0%, rgba(255, 170, 30, 0.05) 35%, transparent 65%);
+}
+
+/* kod QR ma ciemne moduły: tło zawsze białe (w ciemnym motywie było kremowe `--piana`) */
+[data-motyw="neutralny"] .tv-qr {
+  background: #fff;
+  box-shadow: 0 0 0 2px #e1e4e8, 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.logo-motywu {
+  display: block;
+  object-fit: contain;
+}
+
+/* jasny motyw JOWES: elementy TV z kolorami pod ciemne tło wpisanymi na sztywno */
+[data-motyw="neutralny"] .tv-gotowi {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+[data-motyw="neutralny"] .tv-gotowi-z {
+  color: var(--szary);
+}
+
+[data-motyw="neutralny"] .tv-gotowi.wszyscy {
+  background: color-mix(in srgb, var(--chmiel) 14%, #fff);
+}
+
+[data-motyw="neutralny"] .tv-odp-slupek {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-motyw="neutralny"] .tv-koniec-etapu {
+  background: color-mix(in srgb, var(--zloto) 14%, #fff);
+}
+
+[data-motyw="neutralny"] .tv-os-odp-kreska {
+  background: rgba(0, 0, 0, 0.3);
+}

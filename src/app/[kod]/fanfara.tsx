@@ -15,6 +15,7 @@ import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { IkonaMegafon } from "@/components/ikony";
 import { adresZdjecia } from "@/lib/kapsel";
+import { PiwuCzesc, useNeutralny } from "@/components/motyw";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 
@@ -47,6 +48,7 @@ type Props = {
  * (wcześniej bęben i werble), a pierwsza trójka dostaje medal i konfetti.
  */
 export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod, token, nagrody, zdjecie }: Props) {
+  const neutralny = useNeutralny();
   const miejsce = moj?.miejsce ?? null;
   const nagroda = nagrody?.find((n) => n.miejsce === miejsce) ?? null;
   const [odslonieto, ustawOdslonieto] = useState(faza !== "podium");
@@ -74,7 +76,7 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
       wynik={{
         tytul: stan.quiz?.tytul ?? "Quiz",
         // nad tytułem okazja, a bez niej rodzaj gry (26.10: zamiast „Quiz Bractwa Piwnego”)
-        okazja: stan.okazja ?? nazwaRodzaju(stan),
+        okazja: stan.okazja ?? nazwaRodzaju(stan, neutralny),
         lokal: stan.lokal,
         browar: stan.browar,
         data: new Date().toLocaleDateString("pl-PL"),
@@ -97,7 +99,7 @@ export function KoniecGracza({ stan, faza, fazaOd, przesuniecie, moj, nick, kod,
           <IkonaMegafon /> {kibicowalo(kibice)}!
         </p>}
       <p className="podziekowanie">
-        Dzięki za grę, <strong className="gra-kod">{nick}</strong>! Piwu Cześć!
+        Dzięki za grę, <strong className="gra-kod">{nick}</strong>!<PiwuCzesc />
       </p>
       <p className="autor">
         <span className="autor-etykieta">Aplikację zrobił</span>

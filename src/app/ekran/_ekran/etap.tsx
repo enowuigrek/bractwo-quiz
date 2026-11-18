@@ -9,6 +9,7 @@ import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { IkonaPuchar } from "@/components/ikony";
+import { useNeutralny } from "@/components/motyw";
 
 /**
  * Plansza etapu na TV (faza `etap`): który to etap, nazwa i zasady, mnożnik i czas, a obok telefon,
@@ -17,6 +18,7 @@ import { IkonaPuchar } from "@/components/ikony";
  * Prowadzący tłumaczy i startuje etap z pilota, więc plansza czeka bez limitu.
  */
 export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
+  const neutralny = useNeutralny();
   const e = stan.etap;
   // gdy opis z finalistami nie mieści się w wysokości ekranu, plansza zmniejsza się o stopień (25.10: na planszy finału
   // lista finalistów wypadała pod ekran); stopień liczony od nowa dla każdej planszy
@@ -100,7 +102,7 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
               {(e.seria || e.czas_s) && (
                 <li>{e.seria ? `${e.czas_s ?? 60} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>
               )}
-              {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
+              {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie {neutralny ? "do mety" : "do piwa"}</li>}
               {/* w finale bez liczby pytań: seria prawda/fałsz leci szybko, a liczba tylko straszy */}
               {!e.finalowy && <li>{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} ${e.liczba_pytan % 10 >= 2 && e.liczba_pytan % 10 <= 4 && (e.liczba_pytan % 100 < 12 || e.liczba_pytan % 100 > 14) ? "pytania" : "pytań"}`}</li>}
             </motion.ul>

@@ -49,7 +49,9 @@ export function filtrQuizow<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, wla
   if (jestTworca(rola)) return zapytanie;
   if (!lokal) return zapytanie.or(`and(${widocznyQuiz(rola)},or(${filtrBractwa(rola)}))`);
   const swoje = `and(lokal_id.eq.${lokal},${widocznyQuiz(rola)})`;
-  return zapytanie.or(wlasne ? swoje : `${swoje},and(lokal_id.is.null,udostepniony.is.true)`);
+  // na adresie motywu neutralnego (np. JOWES) lokal nie widzi quizów Bractwa
+  const tylkoSwoje = wlasne || (rola.typ === "lokal" && rola.tylkoSwoje);
+  return zapytanie.or(tylkoSwoje ? swoje : `${swoje},and(lokal_id.is.null,udostepniony.is.true)`);
 }
 
 /**

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { grafikaWyniku, udostepnij, type DaneWyniku } from "@/lib/grafika-wyniku";
 import { BRACTWO_INSTAGRAM } from "@/lib/konta";
+import { useNeutralny } from "@/components/motyw";
 
 type Props = {
   wynik: DaneWyniku;
@@ -18,7 +19,8 @@ type Props = {
 export function UdostepnijWynik({ wynik, konta }: Props) {
   const [trwa, ustawTrwa] = useState(false);
   const [komunikat, ustawKomunikat] = useState<string | null>(null);
-  const oznaczenia = [...new Set([BRACTWO_INSTAGRAM, ...konta].filter((k): k is string => !!k))].map((k) => `@${k}`);
+  const neutralny = useNeutralny();
+  const oznaczenia = [...new Set([neutralny ? null : BRACTWO_INSTAGRAM, ...konta].filter((k): k is string => !!k))].map((k) => `@${k}`);
 
   const tekstPosta = [`${wynik.miejsce}. miejsce w quizie ${wynik.tytul}!`, ...oznaczenia].join(" ");
   const nazwa = `quiz-${wynik.miejsce}-miejsce.png`;
@@ -43,6 +45,9 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
       ustawKomunikat(oznaczenia.join(" "));
     }
   }
+
+  // motyw neutralny: bez grafiki na pamiątkę (jest na niej logo Bractwa i „Piwu Cześć!”)
+  if (neutralny) return null;
 
   return (
     <section className="udostepnij" aria-label="Wynik na pamiątkę">

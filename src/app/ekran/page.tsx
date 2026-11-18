@@ -5,8 +5,12 @@ import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { WpiszKod } from "./wpisz-kod";
+import { NAZWA_APLIKACJI } from "@/lib/motyw";
+import { motywZadania } from "@/lib/motyw-serwer";
 
-export const metadata: Metadata = { title: "Ekran · Bractwo Quiz" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: `Ekran · ${NAZWA_APLIKACJI[await motywZadania()]}` };
+}
 
 // lista lokali zmienia się rzadko: odświeżamy ją co 5 minut zamiast przy każdym wejściu
 export const revalidate = 300;
@@ -23,7 +27,8 @@ export default async function Ekran() {
     .order("miasto")
     .order("nazwa")
     .returns<Pick<Lokal, "id" | "nazwa" | "miasto" | "logo_url" | "adres_ekranu">[]>();
-  const lokale = data ?? [];
+  // motyw neutralny: bez listy lokali Bractwa, tylko kod gry
+  const lokale = (await motywZadania()) === "neutralny" ? [] : (data ?? []);
 
   return (
     <main className="kolumna glowna">

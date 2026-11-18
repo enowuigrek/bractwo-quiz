@@ -4496,3 +4496,49 @@ button.kafelek {
   margin-top: 4px !important;
   font-style: italic;
 }
+
+/* ===== Motyw neutralny (src/lib/motyw.ts, 18.11): quiz bez piwa i Bractwa, np. firmowy ===== */
+
+/* jasny motyw jak strona JOWES (jowes.pl): białe tło, ciemnoszary tekst, pomarańcz z logo zamiast złota */
+[data-motyw="neutralny"] {
+  --bg: #fff;
+  --kamien: #f3f4f6;
+  --kamien2: #e1e4e8;
+  --kamien3: #e9ecef;
+  --pole: #fff;
+  --piana: #333;
+  --szary: #6b6b6b;
+  --zloto: #e58e00;
+  --zloto-jasne: #ffb21a;
+  --zloto-blask: #ffc94a;
+  --bursztyn: #f07d00;
+  --na-zlocie: #331f00;
+  --srebro: #9aa3ab;
+  --chmiel: #4f8f1a;
+  --czerwien: #d4553b;
+  /* nagłówki i tekst w Nunito jak na jowes.pl (layout.tsx); wąskie napisy zostają w Open Sans, Nunito nie ma zwężenia */
+  --font: var(--font-nunito), "Open Sans", Arial, sans-serif;
+  color-scheme: light;
+}
+
+/* telefon gracza i TV mają własne ciemne powierzchnie (.ekran-gracza, .tv): w motywie JOWES jasne */
+[data-motyw="neutralny"] .ekran-gracza,
+[data-motyw="neutralny"] .tv {
+  --kamien: #f3f4f6;
+  --kamien2: #e1e4e8;
+  --kamien3: #e9ecef;
+  --pole: #fff;
+}
+
+/* awatary: kółko jak logo JOWES zamiast kapsla z ząbkami: kolorowy pierścień, cienka biała szczelina i kolorowe
+   wnętrze (litera albo selfie, które przy `padding` z awatar.tsx zaczyna się na 76% promienia) */
+[data-motyw="neutralny"] .awatar {
+  background-image: radial-gradient(
+    circle closest-side,
+    var(--kolor-awatara, var(--zloto)) 0 80%,
+    #fff 80% 87%,
+    var(--kolor-awatara, var(--zloto)) 87% 100%,
+    transparent 100%
+  ) !important;
+  background-color: transparent;
+}

@@ -33,10 +33,12 @@ export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }):
  */
 export function nazwaRodzaju(
   stan: { quiz: { liczba_etapow: number; degustacja?: boolean } | null } | null | undefined,
+  /** Motyw neutralny (src/lib/motyw.ts): „Wyścig” bez piwa. */
+  neutralny = false,
 ): string {
   if (!stan?.quiz) return "Quiz";
   if (stan.quiz.degustacja) return "Degustacja";
-  return quizKlasyczny(stan) ? "Pub quiz" : "Wyścig po piwo";
+  return quizKlasyczny(stan) ? "Pub quiz" : neutralny ? "Wyścig" : "Wyścig po piwo";
 }
 
 /**

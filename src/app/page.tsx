@@ -2,6 +2,7 @@
 import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { WpiszKod } from "./ekran/wpisz-kod";
+import { motywZadania } from "@/lib/motyw-serwer";
 
 // zapowiedzi zmieniają się rzadko: odświeżamy co minutę zamiast przy każdym wejściu
 export const revalidate = 60;
@@ -46,7 +47,9 @@ async function zapowiedziane() {
  * (30.10, Łukasz): obsługa ma swoje adresy w zakładkach, a graczy to tylko myli.
  */
 export default async function Home() {
-  const zapowiedzi = await zapowiedziane();
+  const neutralny = (await motywZadania()) === "neutralny";
+  // motyw neutralny: bez zapowiedzi quizów Bractwa i linku do Bractwa
+  const zapowiedzi = neutralny ? [] : await zapowiedziane();
 
   return (
     <main className="kolumna glowna">
@@ -92,9 +95,11 @@ export default async function Home() {
       )}
 
       <footer className="glowna-stopka">
-        <a href="https://bractwopiwne.pl" target="_blank" rel="noopener" className="glowna-bractwo">
-          bractwopiwne.pl
-        </a>
+        {!neutralny && (
+          <a href="https://bractwopiwne.pl" target="_blank" rel="noopener" className="glowna-bractwo">
+            bractwopiwne.pl
+          </a>
+        )}
         <p className="autor">
           <span className="autor-etykieta">Aplikacja</span>
           <a href="https://lukasznowak.dev" target="_blank" rel="noopener">

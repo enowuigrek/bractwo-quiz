@@ -6,6 +6,9 @@ import { Awatar } from "@/components/awatar";
 import type { WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Loga } from "./tv";
+import { LogoBractwa } from "@/components/logo-bractwa";
+import { useNeutralny } from "@/components/motyw";
+import { LOGO_NEUTRALNE } from "@/lib/motyw";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
 const ZMIANA_MS = 10_000;
@@ -31,6 +34,7 @@ const STOPNIE = [1, 0, 2];
  * u góry jest lokal × browar (Bractwo ma wtedy swoją osobną planszę).
  */
 export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }: Props) {
+  const neutralny = useNeutralny();
   const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   const liczbaPlansz = ostatnia ? 4 : 3;
   const [licznik, ustawLicznik] = useState(0);
@@ -47,7 +51,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
           <div className="plansza-srodek plansza-zapowiedz">
             <div className="plansza-loga">
               {!zapowiedz.browar && (
-                <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo-duze" />
+                <LogoBractwa className="tv-logo-bractwo-duze" />
               )}
               <Loga lokal={lokal} browar={zapowiedz.browar} />
             </div>
@@ -56,7 +60,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
                 .filter(Boolean)
                 .join(" · ")}
             </p>
-            <h1 className="plansza-tytul">{zapowiedz.tytul ?? "Quiz Bractwa Piwnego"}</h1>
+            <h1 className="plansza-tytul">{zapowiedz.tytul ?? (neutralny ? "Quiz" : "Quiz Bractwa Piwnego")}</h1>
             {zapowiedz.planowany_start && doStartu !== null && (
               <p className="plansza-start">
                 <span>
@@ -70,10 +74,10 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
         {nr === 0 && !zapowiedz && (
           <div className="plansza-srodek">
             <div className="plansza-loga">
-              <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo tv-logo-bractwo-duze" />
+              <LogoBractwa className="tv-logo-bractwo-duze" />
               <Loga lokal={lokal} />
             </div>
-            <h1 className="plansza-tytul">Quiz Bractwa Piwnego</h1>
+            <h1 className="plansza-tytul">{neutralny ? "Quiz" : "Quiz Bractwa Piwnego"}</h1>
             <p className="tv-okazja">Wkrótce start · {lokal.nazwa}</p>
           </div>
         )}
@@ -115,7 +119,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
         )}
         {nr === 2 && (
           <div className="plansza-srodek">
-            <img src="/loga/bractwo.svg" alt="Bractwo Piwne" className="logo-bractwo plansza-logo-duze" />
+            {neutralny && !LOGO_NEUTRALNE ? <Loga lokal={lokal} /> : <LogoBractwa className="plansza-logo-duze" />}
           </div>
         )}
       </div>

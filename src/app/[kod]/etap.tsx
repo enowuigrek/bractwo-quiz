@@ -4,9 +4,11 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { czyKibic } from "./rozgrywka";
 import { IkonaPuchar } from "@/components/ikony";
+import { useNeutralny } from "@/components/motyw";
 
 /** Telefon w fazie `etap`: nazwa i zasady etapu, mnożnik, a w finale trójki: grasz czy kibicujesz. */
 export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
+  const neutralny = useNeutralny();
   const e = stan.etap;
   if (!e) return <p className="pomocniczy">Za chwilę start.</p>;
   const kibic = czyKibic(stan, nick);
@@ -27,7 +29,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
         {e.mnoznik !== 1 && !bezPunktow(e) && <li className="zloty">Punkty {napisMnoznika(e.mnoznik)}</li>}
         {/* bez limitu nic: że szybciej = więcej punktów, mówi opis etapu */}
         {e.czas_s && <li>{e.seria ? `${e.czas_s} s na całą serię` : `${e.czas_s} s na odpowiedź`}</li>}
-        {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie do piwa</li>}
+        {e.seria && <li className="zloty">Seria: kto pierwszy dobiegnie {neutralny ? "do mety" : "do piwa"}</li>}
         {e.typy.map((t) => (
           <li key={t}>{NAZWY_TYPOW[t]}</li>
         ))}

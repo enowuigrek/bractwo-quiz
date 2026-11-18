@@ -101,11 +101,32 @@ export function wznowEfekty(): void {
   if (c && c.state !== "running") void c.resume().catch(() => undefined);
 }
 
+/**
+ * Nagrania „barowe” (kapsel, brzęk szkła, dzwonek, nalewanie piwa): w motywie neutralnym (src/lib/motyw.ts, atrybut
+ * `data-motyw` na `<html>`) grają zamiast nich pliki z `public/dzwieki/neutralne/` o tej samej nazwie, a bez pliku
+ * synteza (nalewanie bez pliku milczy).
+ */
+const PIWNE_PLIKI: ReadonlySet<string> = new Set([
+  "pop",
+  "ding",
+  "dzwonek",
+  "nalewanie",
+  "nalewanie-2",
+  "nalewanie-3",
+  "nalewanie-4",
+  "nalewanie-5",
+]);
+
+function adresPliku(nazwa: string): string {
+  const neutralny = typeof document !== "undefined" && document.documentElement.dataset.motyw === "neutralny";
+  return neutralny && PIWNE_PLIKI.has(nazwa) ? `/dzwieki/neutralne/${nazwa}.mp3` : `/dzwieki/${nazwa}.mp3`;
+}
+
 /** Plik, wczytany raz; `null`, gdy go nie ma (wtedy synteza). */
 function plik(nazwa: string): Promise<AudioBuffer | null> {
   let p = pliki.get(nazwa);
   if (!p) {
-    p = fetch(`/dzwieki/${nazwa}.mp3`)
+    p = fetch(adresPliku(nazwa))
       .then((r) => (r.ok ? r.arrayBuffer() : null))
       .then((b) => (b && ctx ? ctx.decodeAudioData(b) : null))
       .catch(() => null);

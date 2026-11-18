@@ -7,6 +7,8 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { EkranLokalu } from "../_ekran/ekran-lokalu";
 import { Tv } from "../_ekran/tv";
 import "../_ekran/tv.css";
+import { NAZWA_APLIKACJI } from "@/lib/motyw";
+import { motywZadania } from "@/lib/motyw-serwer";
 
 type Lokal = { nazwa: string; logo_url: string | null };
 
@@ -25,14 +27,18 @@ export async function generateMetadata({ params }: PageProps<"/ekran/[adres]">):
   const lokal = await lokalPoAdresie(adres);
   // podgląd linku (Messenger itp.): tytuł z lokalem i miniatura z opengraph-image.tsx
   const tytul = lokal ? `Ekran quizu · ${lokal.nazwa}` : `Ekran gry ${adres.toUpperCase()}`;
-  const opis = lokal
+  const neutralny = (await motywZadania()) === "neutralny";
+  const nazwa = NAZWA_APLIKACJI[neutralny ? "neutralny" : "bractwo"];
+  const opis = neutralny
+    ? "Otwórz ten link na telewizorze: gra pokaże się sama."
+    : lokal
     ? "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze w lokalu: plansze, zapowiedź i gra pokażą się same."
     : "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze: gra pokaże się sama.";
   return {
-    title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()} · Bractwo Quiz`,
+    title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()} · ${nazwa}`,
     description: opis,
     metadataBase: new URL(await adresAplikacji()),
-    openGraph: { title: tytul, description: opis, siteName: "Bractwo Quiz", locale: "pl_PL", type: "website" },
+    openGraph: { title: tytul, description: opis, siteName: nazwa, locale: "pl_PL", type: "website" },
   };
 }
 

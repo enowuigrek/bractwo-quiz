@@ -1,4 +1,7 @@
+"use client";
 /* eslint-disable @next/next/no-img-element -- dawne ikony etapów z /public, gdyby któryś quiz miał własną */
+
+import { useNeutralny } from "./motyw";
 
 // Ikony etapów (26.10, Łukasz: grafiki z AI wyglądały przypadkowo): proste liniowe ikony jak reszta aplikacji
 // (`src/components/ikony.tsx`), złotą linią (`currentColor`). W bazie zostaje adres dawnej grafiki (`etapy.ikona`),
@@ -83,6 +86,51 @@ function Klepsydra() {
   );
 }
 
+/** Motyw neutralny zamiast szklanki „Na jedno”: tarcza. */
+function Tarcza() {
+  return (
+    <svg {...linia}>
+      <circle cx="30" cy="34" r="22" />
+      <circle cx="30" cy="34" r="13" />
+      <circle cx="30" cy="34" r="4" fill="currentColor" fillOpacity={0.35} />
+      <path d="M30 34L52 12" />
+      <path d="M46 10l6 2 2 6" />
+    </svg>
+  );
+}
+
+/** Motyw neutralny zamiast deski ze szklankami „Jednak więcej”: stos kart. */
+function Karty() {
+  return (
+    <svg {...linia}>
+      <rect x="10" y="22" width="34" height="34" rx="4" />
+      <path d="M18 14h30a4 4 0 0 1 4 4v30" />
+      <path d="M26 6h26a4 4 0 0 1 4 4v26" />
+      <path d="M19 34h16M19 42h10" />
+    </svg>
+  );
+}
+
+/** Motyw neutralny zamiast menzurki „Ile?”: suwak z podziałką. */
+function Suwak() {
+  return (
+    <svg {...linia}>
+      <path d="M8 36h48" />
+      <path d="M8 44v4M18 44v6M28 44v4M38 44v6M48 44v4M56 44v4" />
+      <path d="M38 36v0" />
+      <circle cx="38" cy="36" r="6" fill="currentColor" fillOpacity={0.35} />
+      <path d="M33 14h10l-5 8z" fill="currentColor" fillOpacity={0.35} />
+    </svg>
+  );
+}
+
+/** Ikony kojarzące się z piwem i laboratorium piwowara, podmieniane w motywie neutralnym (src/lib/motyw.ts). */
+const IKONY_NEUTRALNE: Record<string, () => React.ReactElement> = {
+  "na-jedno": Tarcza,
+  "jednak-wiecej": Karty,
+  ile: Suwak,
+};
+
 const IKONY: Record<string, () => React.ReactElement> = {
   "na-jedno": Pinta,
   "jednak-wiecej": Deska,
@@ -94,7 +142,8 @@ const IKONY: Record<string, () => React.ReactElement> = {
 /** Ikona etapu z `etapy.ikona` (adres grafiki): liniowa, gdy znamy nazwę, inaczej sam obrazek. */
 export function IkonaEtapu({ ikona, className }: { ikona: string; className: string }) {
   const nazwa = ikona.split("/").pop()?.replace(/\.[a-z]+$/, "") ?? "";
-  const Ikona = IKONY[nazwa];
+  const neutralny = useNeutralny();
+  const Ikona = (neutralny && IKONY_NEUTRALNE[nazwa]) || IKONY[nazwa];
   if (!Ikona) return <img src={ikona} alt="" className={className} />;
   return (
     <span className={`${className} ikona-etapu`}>

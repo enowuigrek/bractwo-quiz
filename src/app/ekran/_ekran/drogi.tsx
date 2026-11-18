@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Awatar } from "@/components/awatar";
+import { useNeutralny } from "@/components/motyw";
 
 // Plansza finału: równe drewniane drogi z lewej, równoległe i blisko siebie (od 26.10; wcześniej zbiegały się
 // pod szklanką), a szklanka po prawej na środku wysokości, na wprost dróg.
@@ -109,13 +110,18 @@ export function DrogiFinalu({
  * Same drogi i szklanka, bez graczy (pijany finał rysuje graczy sam, pijany.tsx).
  */
 export function PlanszaDrog({ lista, szklanka }: { lista: Droga[]; szklanka: React.ReactNode }) {
+  const neutralny = useNeutralny();
   return (
     <>
       <svg className="drogi-finalu-svg" viewBox={`0 0 ${SZER} ${WYS}`} aria-hidden>
         <defs>
           {/* jedna grafika lady na całą planszę: drobne kafelki dawały widoczne szwy */}
           <pattern id="lada-drogi" patternUnits="userSpaceOnUse" width={SZER} height={1173}>
-            <image href="/grafiki/lada.webp" width={SZER} height={1173} preserveAspectRatio="xMidYMid slice" />
+            {neutralny ? (
+              <rect width={SZER} height={1173} fill="#1c1f26" />
+            ) : (
+              <image href="/grafiki/lada.webp" width={SZER} height={1173} preserveAspectRatio="xMidYMid slice" />
+            )}
           </pattern>
           <radialGradient id="poswiata-drogi">
             <stop offset="0" stopColor="#e3ac3f" stopOpacity="0.45" />
