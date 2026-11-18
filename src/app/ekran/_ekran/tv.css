@@ -4853,13 +4853,18 @@
   -webkit-line-clamp: 3;
 }
 
-/* kafelki w planszy na TV (lista uczestników): większe niż na telefonie, ale 40+ nazw mieści się w kilku rzędach */
+/* kafelki w planszy na TV (lista uczestników): równa siatka w 3 kolumnach, 40+ nazw mieści się na ekranie */
 .tv-ciekawostka-tekst .tekst-planszy-kafelki {
-  gap: 14px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
 }
 
 .tv-ciekawostka-tekst .tekst-planszy-kafelki li {
-  padding: 10px 22px;
-  font-size: 26px;
+  padding: 6px 18px;
+  font-size: 22px;
   font-weight: var(--w-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
