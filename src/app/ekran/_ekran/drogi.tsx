@@ -118,7 +118,7 @@ export function PlanszaDrog({ lista, szklanka }: { lista: Droga[]; szklanka: Rea
           {/* jedna grafika lady na całą planszę: drobne kafelki dawały widoczne szwy */}
           <pattern id="lada-drogi" patternUnits="userSpaceOnUse" width={SZER} height={1173}>
             {neutralny ? (
-              <rect width={SZER} height={1173} fill="#1c1f26" />
+              <rect width={SZER} height={1173} fill="#f3f4f6" />
             ) : (
               <image href="/grafiki/lada.webp" width={SZER} height={1173} preserveAspectRatio="xMidYMid slice" />
             )}

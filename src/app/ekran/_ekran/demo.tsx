@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useNeutralny } from "@/components/motyw";
 import { NAZWY_TYPOW, PODPOWIEDZI_TYPOW, type TypZadania } from "@/lib/zadania";
 
 // Animowany telefon na planszy etapu: palec sam pokazuje, jak odpowiada się w danym typie pytania.
@@ -87,7 +88,7 @@ function Zatwierdz({ blysk }: { blysk: boolean }) {
 
 type Scena = { tresc: string; elementy: React.ReactNode; sciezka: Punkt[] };
 
-function scena(typ: TypZadania, t: number): Scena {
+function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
   const poStuku = (chwila: number) => t > chwila + 0.02;
   switch (typ) {
     // ciekawostka nie ma odpowiedzi, więc nie ma czego pokazywać na telefonie (etap_json jej nie podaje)
@@ -95,9 +96,10 @@ function scena(typ: TypZadania, t: number): Scena {
     case "piwo":
       return { tresc: "", elementy: null, sciezka: [] };
     case "wybor": {
-      const odp = ["Pils", "Weizen", "Koźlak", "IPA"];
+      // motyw neutralny (src/lib/motyw.ts): przykłady bez piwa
+      const odp = neutralny ? ["Mars", "Jowisz", "Wenus", "Merkury"] : ["Pils", "Weizen", "Koźlak", "IPA"];
       return {
-        tresc: "Które z tych piw warzy się z pszenicy?",
+        tresc: neutralny ? "Która z tych planet jest największa?" : "Które z tych piw warzy się z pszenicy?",
         elementy: odp.map((o, i) => (
           <Kafel
             key={o}
@@ -120,7 +122,7 @@ function scena(typ: TypZadania, t: number): Scena {
     case "prawda_falsz": {
       const srodek = (i: number) => ({ x: 20 + 80 + i * 180, y: 350 });
       return {
-        tresc: "Porter bałtycki to piwo ciemne.",
+        tresc: neutralny ? "Wieloryb jest ssakiem." : "Porter bałtycki to piwo ciemne.",
         // jak na telefonie w serii: płaskie koła, zielone ✓ i czerwone ✗, bez napisów
         elementy: ["prawda", "falsz"].map((o, i) => (
           <div
@@ -141,10 +143,10 @@ function scena(typ: TypZadania, t: number): Scena {
       };
     }
     case "wielokrotny": {
-      const odp = ["Cascade", "Pils", "Citra", "Monachijski"];
+      const odp = neutralny ? ["Jabłko", "Marchew", "Gruszka", "Ziemniak"] : ["Cascade", "Pils", "Citra", "Monachijski"];
       const zaznaczone = [poStuku(0.22), false, poStuku(0.42), false];
       return {
-        tresc: "Które z nich to chmiele?",
+        tresc: neutralny ? "Które z nich to owoce?" : "Które z nich to chmiele?",
         elementy: (
           <>
             {odp.map((o, i) => (
@@ -174,9 +176,9 @@ function scena(typ: TypZadania, t: number): Scena {
     }
     case "kolejnosc": {
       // bez etapów warzenia: to pytanie jest w quizie o piwie, a plansza nie może zdradzać odpowiedzi
-      const odp = ["Kufel 0,5 l", "Kieliszek", "Beczka", "Puszka 0,33 l"];
+      const odp = neutralny ? ["Kot", "Mysz", "Słoń", "Pies"] : ["Kufel 0,5 l", "Kieliszek", "Beczka", "Puszka 0,33 l"];
       // właściwa kolejność kafelków i chwile stuknięć
-      const kolej = [1, 3, 0, 2];
+      const kolej = neutralny ? [1, 0, 3, 2] : [1, 3, 0, 2];
       const chwile = [0.16, 0.3, 0.44, 0.58];
       const numer = (i: number) => {
         const k = kolej.indexOf(i);
@@ -261,7 +263,7 @@ function scena(typ: TypZadania, t: number): Scena {
       const liczba = Math.round(v * 20);
       const kciukX = 40 + v * 300;
       return {
-        tresc: "Ile kufli wypije dziś stolik nr 3?",
+        tresc: neutralny ? "Ile minut potrwa dziś przerwa na kawę?" : "Ile kufli wypije dziś stolik nr 3?",
         elementy: (
           <>
             <p className="demo-liczba">{liczba}</p>
@@ -289,7 +291,8 @@ function scena(typ: TypZadania, t: number): Scena {
 export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
   const { t, nr } = useCykl();
   const typ = typy[nr % typy.length] ?? "wybor";
-  const { tresc, elementy, sciezka } = scena(typ, t);
+  const neutralny = useNeutralny();
+  const { tresc, elementy, sciezka } = scena(typ, t, neutralny);
   const p = palec(sciezka, t);
   return (
     <figure className="demo">

@@ -4720,3 +4720,28 @@
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
+
+/* jasny motyw: telefon z animacją na planszy etapu (demo.tsx) z jasnym ekranem jak prawdziwy telefon gracza
+   w motywie JOWES; ramka zostaje ciemna jak obudowa */
+[data-motyw="neutralny"] .demo-telefon {
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+[data-motyw="neutralny"] .demo-ekran {
+  background: #fff;
+}
+
+[data-motyw="neutralny"] .demo-palec {
+  background: rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.15);
+}
+
+[data-motyw="neutralny"] .demo-palec.stuka {
+  background: rgba(229, 142, 0, 0.6);
+}
+
+/* finał: bez złotej poświaty pod szklanką (szklanki w motywie neutralnym nie ma) */
+[data-motyw="neutralny"] .drogi-finalu-poswiata {
+  display: none;
+}
