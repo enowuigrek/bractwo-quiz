@@ -1,6 +1,6 @@
 # Quizy JOWES – eksport z aplikacji
 
-Stan na 18.11.2026, 16:25:44. Poprawne odpowiedzi oznaczone ✓.
+Stan na 18.11.2026, 17:04:48. Poprawne odpowiedzi oznaczone ✓.
 
 ---
 
@@ -529,27 +529,17 @@ _Wyjaśnienie:_ Czas na Seniora („Razem łatwiej!” – Taksówka Społeczna,
 
 Forum Współpracy Przedsiębiorstw Społecznych, 19.11.2026
 
-- Pytań: 35, plansz: 3
+- Pytań: 38, plansz: 4
 - Do finału wchodzi: 5 osób
 - Nagrody: 1. Grant marketingowy 500 zł; 2. Grant marketingowy 500 zł; 3. Grant marketingowy 500 zł; 4. Nagroda pocieszenia; 5. Nagroda pocieszenia
 
-### Etap 1: Jedno
+### Etap 1
 
 Jedna dobra odpowiedź. Im szybciej, tym więcej punktów.
 
 Mnożnik punktów: ×1
 
-**1. Jaki jest adres naszej strony internetowej?**  
-_Jedna odpowiedź · 20 s_
-
-- A. jowes.org
-- B. jowes.com
-- C. jowes.pl ✓
-- D. jowes.czestochowa.pl
-
-_Wyjaśnienie:_ Oficjalna strona to jowes.pl – tam są aktualności, baza PES, zespół i nabory dotacji.
-
-**2. Czym działalność odpłatna pożytku publicznego różni się od działalności gospodarczej w fundacji lub stowarzyszeniu?**  
+**1. Czym działalność odpłatna pożytku publicznego różni się od działalności gospodarczej w fundacji lub stowarzyszeniu?**  
 _Jedna odpowiedź · 40 s_
 
 - A. Niczym – to dwie nazwy tej samej działalności.
@@ -575,7 +565,7 @@ _Wyjaśnienie:_ Działalność odpłatna to zadania pożytku publicznego za opł
 > 
 > Przykład: warsztat kosztuje 50 zł od osoby. Bilet za **50 zł = odpłatna**, za **80 zł = gospodarcza**.
 
-**3. Ile wynosi oprocentowanie preferencyjnej pożyczki BGK dla Podmiotów Ekonomii Społecznej?**  
+**2. Ile wynosi oprocentowanie preferencyjnej pożyczki BGK dla Podmiotów Ekonomii Społecznej?**  
 _Jedna odpowiedź · 20 s_
 
 - A. 0,25% ✓
@@ -589,7 +579,7 @@ _Wyjaśnienie:_ Stałe 0,25% w skali roku, bez prowizji i bez kosztów administr
 >
 > **Preferencyjna pożyczka BGK** • „Na start” (1. rok): max 2 × 100 tys. zł, spłata do 5 lat. • „Na rozwój”: do **2 mln zł**, spłata do 7 lat (do **10 lat** powyżej 400 tys. zł). • Oprocentowanie **0,25%** stałe, bez prowizji i opłat. • Karencja do 6 miesięcy, **weksel obowiązkowo**.
 
-**4. Kto jest właściwy do nadania statusu przedsiębiorstwa społecznego?**  
+**3. Kto jest właściwy do nadania statusu przedsiębiorstwa społecznego?**  
 _Jedna odpowiedź · 25 s_
 
 - A. Prezydent miasta właściwy dla siedziby organizacji
@@ -599,7 +589,7 @@ _Jedna odpowiedź · 25 s_
 
 _Wyjaśnienie:_ Status PS nadaje wojewoda w drodze decyzji administracyjnej, według siedziby podmiotu – u nas to Wojewoda Śląski.
 
-**5. Rozwiń właściwie skrót: CIS**  
+**4. Rozwiń właściwie skrót: CIS**  
 _Jedna odpowiedź · 20 s_
 
 - A. Taxus – rodzaj roślin z rodziny cisowatych
@@ -609,7 +599,7 @@ _Jedna odpowiedź · 20 s_
 
 _Wyjaśnienie:_ Centrum Integracji Społecznej to placówka realizująca program reintegracji społeczno-zawodowej dla osób zagrożonych wykluczeniem społecznym.
 
-**6. Do kiedy przedsiębiorstwo społeczne musi złożyć coroczne sprawozdanie, aby utrzymać status PS?**  
+**5. Do kiedy przedsiębiorstwo społeczne musi złożyć coroczne sprawozdanie, aby utrzymać status PS?**  
 _Jedna odpowiedź · 20 s_
 
 - A. Do 31 grudnia
@@ -619,17 +609,7 @@ _Jedna odpowiedź · 20 s_
 
 _Wyjaśnienie:_ Do 31 marca roku następującego po roku sprawozdawczym. Niezłożenie sprawozdania grozi utratą statusu PS. A 31 czerwca w ogóle nie istnieje!
 
-**7. Jak się nazywa obowiązkowy organ w przedsiębiorstwie społecznym, który m.in. zapoznaje się z wynikami działalności i opiniuje planowane działania PS?**  
-_Jedna odpowiedź · 30 s_
-
-- A. Organ opiniujący
-- B. Rada kolegialna
-- C. Organ konsultacyjno-doradczy ✓
-- D. Zebranie przedsiębiorstwa społecznego
-
-_Wyjaśnienie:_ To organ konsultacyjno-doradczy – element demokratycznego zarządzania w PS. Daje pracownikom wpływ na działalność przedsiębiorstwa.
-
-**8. Wskaż przedsiębiorstwa społeczne z naszego subregionu realizujące usługi społeczne z zakresu kultury.**  
+**6. Wskaż przedsiębiorstwa społeczne z naszego subregionu realizujące usługi społeczne z zakresu kultury.**  
 _Jedna odpowiedź · 40 s_
 
 - A. Stowarzyszenie Muzeum 303 im. ppłk. pil. Jana Zumbacha, Fundacja Gutenberg na rzecz Kultury i Nauki ✓
@@ -639,7 +619,7 @@ _Jedna odpowiedź · 40 s_
 
 _Wyjaśnienie:_ Usługi z zakresu kultury realizują Stowarzyszenie Muzeum 303 im. ppłk. pil. Jana Zumbacha i Fundacja Gutenberg na rzecz Kultury i Nauki.
 
-**9. Co oznacza skrót BUR?**  
+**7. Co oznacza skrót BUR?**  
 _Jedna odpowiedź · 20 s_
 
 - A. Biuro Usług Regionalnych
@@ -649,23 +629,23 @@ _Jedna odpowiedź · 20 s_
 
 _Wyjaśnienie:_ BUR to Baza Usług Rozwojowych prowadzona przez PARP – szkolenia i doradztwo z dofinansowaniem. Szkolenia z możliwością dofinansowania realizuje też uczestnik Forum – Invelion Sp. z o.o.
 
-**10. Które z wymienionych przedsiębiorstw społecznych działają na rzecz ekologii i zrównoważonego rozwoju?**  
+**8. Które z wymienionych przedsiębiorstw społecznych działają na rzecz ekologii i zrównoważonego rozwoju?**  
 _Jedna odpowiedź · 35 s_
 
 - A. Invelion Sp. z o.o., Fundacja Talbota
-- B. Spółdzielnia Socjalna „Jasne, że zmiana”, VERTO Biuro Rachunkowe Sp. z o.o.
-- C. Fundacja Kreatywna Przestrzeń, Stowarzyszenie Muzeum 303
+- B. Spółdzielnia Socjalna „Jasne, że zmiana”, Stowarzyszenie Wzajemnej Pomocy „Agape”
+- C. Fundacja Kreatywna Przestrzeń, Fundacja Twoja Zagata
 - D. Fundacja Eko-Logiczna, Fundacja Rething ✓
 
-_Wyjaśnienie:_ Ekologią i zrównoważonym rozwojem zajmują się Fundacja Eko-Logiczna i Fundacja Rething.
+_Wyjaśnienie:_ Ekologią zajmują się Fundacja Eko-Logiczna i Fundacja Rething. „Agape” pomaga osobom w kryzysie, a Twoja Zagata prowadzi ranczo z edukacją i animacjami dla dzieci.
 
-### Etap 2: Więcej
+### Etap 2
 
 Dobrych odpowiedzi może być więcej. Zaznacz wszystkie, za złe tracisz część punktów pytania.
 
 Mnożnik punktów: ×1,5
 
-**11. Zaznacz WSZYSTKIE lokale gastronomiczne z subregionu północnego, które prowadzą podmioty ekonomii społecznej.**  
+**9. Zaznacz WSZYSTKIE lokale gastronomiczne z subregionu północnego, które prowadzą podmioty ekonomii społecznej.**  
 _Kilka dobrych · 40 s_
 
 - A. Pieczone Kopytko ✓
@@ -684,9 +664,9 @@ _Kilka dobrych · 40 s_
 > **Niebo w Mieście** · Częstochowa, ul. Targowa 1
 > Restauracja i kawiarnia z **kuchnią włoską w zabytkowej kamienicy**. Imprezy okolicznościowe i dowóz.
 > 
-> > **Pułapka z pytania:** Alternatywa 21 (ul. Przemysłowa 14/16) to klubokawiarnia prowadzona przez **ZAZ, a nie przez PS**. Art of Dining status PS **dopiero uzyska** – trzymamy kciuki!
+> > **Dobrze wiedzieć:** podmiot ekonomii społecznej to nie zawsze przedsiębiorstwo społeczne. Klubokawiarnię Alternatywa 21 prowadzi **ZAZ**, a Fundacja Art of Dining status PS **dopiero uzyska** – trzymamy kciuki!
 
-**12. Które formy wsparcia JOWES organizuje cyklicznie? Zaznacz wszystkie poprawne.**  
+**10. Które formy wsparcia JOWES organizuje cyklicznie? Zaznacz wszystkie poprawne.**  
 _Kilka dobrych · 30 s_
 
 - A. Rajd Podmiotów Ekonomii Społecznej ✓
@@ -696,31 +676,31 @@ _Kilka dobrych · 30 s_
 
 _Wyjaśnienie:_ Wszystkie cztery! Rajd PES, NGO w Akcji, Forum Współpracy Przedsiębiorstw Społecznych (właśnie na nim jesteśmy) i NGO Marketing Days – coroczne spotkanie o marketingu, organizowane od 2015 roku.
 
-**13. Które z tych podmiotów prowadzą zakład aktywności zawodowej (ZAZ)? Zaznacz wszystkie poprawne.**  
+**11. Które z tych podmiotów prowadzą jednostkę reintegracyjną – zakład aktywności zawodowej (ZAZ) albo centrum integracji społecznej (CIS)? Zaznacz wszystkie poprawne.**  
 _Kilka dobrych · 35 s_
 
 - A. Stowarzyszenie YAVA ✓
 - B. VERTO Biuro Rachunkowe Sp. z o.o.
 - C. Klubokawiarnia Alternatywa 21 ✓
-- D. Fundacja Rething
+- D. Fundacja „Przyjaciel z Sercem” ✓
 - E. Premium Tour Szymczyk Sp. z o.o.
 - F. Fundacja Q Marzeniom
 
-_Wyjaśnienie:_ Stowarzyszenie YAVA prowadzi ZAZ, w którym pracuje 29 osób z niepełnosprawnością znaczną i umiarkowaną (a do tego Środowiskowy Dom Samopomocy i ośrodek dla osób z chorobą Alzheimera). Klubokawiarnię Alternatywa 21 też prowadzi ZAZ.
+_Wyjaśnienie:_ YAVA prowadzi ZAZ, w którym pracuje 29 osób z niepełnosprawnością znaczną i umiarkowaną. Klubokawiarnię Alternatywa 21 też prowadzi ZAZ. Fundacja „Przyjaciel z Sercem” prowadzi CIS – Centrum Integracji Społecznej.
 
-**14. Kto zadba o Wasze zdrowie i dobrą formę? Zaznacz wszystkie poprawne.**  
+**12. Kto zadba o Wasze zdrowie i dobrą formę? Zaznacz wszystkie poprawne.**  
 _Kilka dobrych · 35 s_
 
 - A. Kinesis Sp. z o.o. ✓
 - B. Sin-Bud Sp. z o.o.
 - C. Fundacja Doktor Elsner ✓
-- D. VERTO Biuro Rachunkowe Sp. z o.o.
+- D. Fundacja „Rozwijamy Talenty”
 - E. Fundacja Propagowania Zdrowego Odżywiania MIDEX ✓
 - F. Eco Renewal Sp. z o.o.
 
-_Wyjaśnienie:_ Kinesis – fizjoterapia, rehabilitacja i siłownia; Doktor Elsner – dietetyka kliniczna i profilaktyka zdrowotna; MIDEX – edukacja o zdrowym odżywianiu.
+_Wyjaśnienie:_ Kinesis – fizjoterapia, rehabilitacja i siłownia; Doktor Elsner – dietetyka kliniczna i profilaktyka; MIDEX – edukacja o zdrowym odżywianiu. „Rozwijamy Talenty” to edukacja i kultura.
 
-**15. Które z tych podmiotów mają ofertę dla seniorów? Zaznacz wszystkie poprawne.**  
+**13. Które z tych podmiotów mają ofertę dla seniorów? Zaznacz wszystkie poprawne.**  
 _Kilka dobrych · 40 s_
 
 - A. Fundacja Czas na Seniora ✓
@@ -731,18 +711,46 @@ _Kilka dobrych · 40 s_
 
 _Wyjaśnienie:_ Czas na Seniora („Razem łatwiej!” – Taksówka Społeczna, „Złota Rączka”), MIMAWI (zajęcia aktywizacyjne dla seniorów), Premium Tour Szymczyk (turystyka dla seniorów)
 
-### Etap 3: Ile?
+### Etap 3
 
 Podaj liczbę. Trafienie to pełne punkty, a im bliżej, tym więcej.
 
 Mnożnik punktów: ×2
 
-**16. Ile osób co najmniej musi zatrudniać przedsiębiorstwo społeczne?**  
+**14. Ile osób co najmniej musi zatrudniać przedsiębiorstwo społeczne?**  
 _Szacowanie liczby · 25 s_
 
 - Poprawna: **3** (suwak 1–10, krok 1)
 
-_Wyjaśnienie:_ Minimum 3 osoby na umowę o pracę lub spółdzielczą umowę o pracę, co najmniej na 1/2 etatu. Co najmniej 30% zatrudnionych to osoby z grup zagrożonych wykluczeniem.
+_Wyjaśnienie:_ Minimum 3 osoby na umowę o pracę lub spółdzielczą umowę o pracę, co najmniej na ¼ etatu. Co najmniej 30% zatrudnionych to osoby z grup zagrożonych wykluczeniem.
+
+**15. Ile procent zatrudnionych w PS muszą co najmniej stanowić osoby z grup zagrożonych wykluczeniem?**  
+_Szacowanie liczby · 25 s_
+
+- Poprawna: **30** (suwak 0–100, krok 5)
+
+_Wyjaśnienie:_ Co najmniej 30% pracowników PS to m.in. osoby bezrobotne, z niepełnosprawnościami, młodzi do 30 lat i osoby 50+.
+
+**16. Ile tysięcy złotych wynosi łączne wsparcie JOWES na utworzenie i utrzymanie jednego pełnoetatowego miejsca pracy w naborze 2026?**  
+_Szacowanie liczby · 25 s_
+
+- Poprawna: **87** (suwak 40–150, krok 1)
+
+_Wyjaśnienie:_ 43 814 zł na utworzenie + 43 254 zł na utrzymanie przez 12 miesięcy = 87 068 zł.
+
+> **Plansza: Skąd się bierze 87 068 zł?**
+>
+> 43 814 zł – utworzenie miejsca pracy (wyposażenie, sprzęt, adaptacja, środki obrotowe)
+> + 43 254 zł – utrzymanie: pełny etat przez 12 miesięcy (wynagrodzenie, składki, czynsz, media)
+> = **87 068 zł na jedno pełnoetatowe miejsce pracy**
+> 
+> • Obie stawki bierze się **tylko łącznie**.
+> • Trwałość: 12 miesięcy utrzymania + 6 miesięcy po finansowaniu = **18 miesięcy**.
+> • Niepełny etat: ¾ etatu – 32 441 zł, ½ etatu – 21 627 zł.
+> • Jeden PS może w naborze dostać wsparcie na **maks. 5 miejsc pracy**.
+> • Dodatkowo: refundacja Indywidualnego Planu Reintegracji do **10 800 zł**.
+> 
+> > Kwoty to stawki jednostkowe po indeksacji – źródło: jowes.pl/dotacje2026.
 
 **17. Ile miejsc pracy w PES/PS JOWES pomógł utworzyć w samym 2026 roku?**  
 _Szacowanie liczby · 25 s_
@@ -758,7 +766,7 @@ _Szacowanie liczby · 25 s_
 
 _Wyjaśnienie:_ 570 miejsc pracy i ponad 28,6 mln zł dotacji dla NGO we wszystkich czterech edycjach JOWES (od 2013 r.). Sam obecny projekt (od 2024 r.) to już 177 miejsc pracy.
 
-### Etap 4: Poukładaj
+### Etap 4
 
 Połącz pary i ułóż kolejność. Punkty za każdy dobry kawałek, a do finału wchodzi tylko piątka.
 
@@ -774,21 +782,37 @@ _Pary · 45 s_
 
 _Wyjaśnienie:_ Pełny skład i role: jowes.pl/nasz-zespol.
 
-**20. Połącz podmiot ekonomii społecznej z jego branżą.**  
-_Pary · 40 s_
+**20. Kto czym się zajmuje? Część 1**  
+_Pary · 45 s_
 
 - Fundacja Algiz → Wczesne wspomaganie rozwoju dzieci
 - Adullam Sp. z o.o. → Usługi porządkowe i ogrodnicze
-- Niebo w mieście Sp. z o.o. → Gastronomia
+- Fundacja Dzieci Wuja Toma → Terapie dzieci z niepełnosprawnościami
+- VERTO Biuro Rachunkowe Sp. z o.o. → Księgowość i rachunkowość
 
-**21. Kto czym się zajmuje? Połącz uczestnika Forum z jego działalnością.**  
+_Wyjaśnienie:_ Algiz – wczesne wspomaganie rozwoju dzieci, Adullam – usługi porządkowe i ogrodnicze, Dzieci Wuja Toma – terapie dzieci z niepełnosprawnościami, VERTO – księgowość, kadry i płace (ok. 60% klientów to NGO i PS).
+
+**21. Kto czym się zajmuje? Część 2**  
 _Pary · 45 s_
 
-- VERTO Biuro Rachunkowe Sp. z o.o. → Księgowość i rachunkowość
-- Fundacja Dzieci Wuja Toma → Terapie dzieci z niepełnosprawnościami
+- Fundacja Muzyki Niezależnej → Nagłośnienie koncertów i wydawnictwo muzyczne
+- Fundacja Propagowania Zdrowego Odżywiania MIDEX → Wędliny, garmażeria i catering
+- Fundacja Doktor Elsner → Dietetyka kliniczna i profilaktyka zdrowotna
 - Fundacja Kreatywna Przestrzeń → Szycie i znakowanie odzieży dla firm
 
-**22. Jakie są etapy uzyskiwania dotacji w JOWES? Ułóż je we właściwej kolejności.**  
+_Wyjaśnienie:_ Muzyka Niezależna – obsługa wydarzeń i wydawnictwo; MIDEX – produkcja spożywcza, catering, edukacja żywieniowa; Doktor Elsner – zdrowie funkcjonalne i dietetyka; Kreatywna Przestrzeń – szycie dla firm, a z zarobku finansuje warsztaty dla dzieci.
+
+**22. Kto czym się zajmuje? Część 3**  
+_Pary · 45 s_
+
+- Osikowa Dolina Sp. z o.o. → Dekoracje i warsztaty z drewna topoli osiki
+- Fundacja „Dzikie Serce” → Pracownia rękodzieła i warsztaty artystyczne
+- Fundacja Ecostructure → Budownictwo szkieletowe i ekologiczne
+- Niebo w Mieście Sp. z o.o. → Restauracja z kuchnią włoską
+
+_Wyjaśnienie:_ Osikowa Dolina – dekoracje z wiórków osikowych; Dzikie Serce – rękodzieło i warsztaty; Ecostructure – budownictwo szkieletowe i ekologiczne; Niebo w Mieście – restauracja i kawiarnia w zabytkowej kamienicy.
+
+**23. Jakie są etapy uzyskiwania dotacji w JOWES? Ułóż je we właściwej kolejności.**  
 _Kolejność · 40 s_
 
 1. Formularz Pomysłu
@@ -798,49 +822,41 @@ _Kolejność · 40 s_
 
 _Wyjaśnienie:_ Najpierw Formularz Pomysłu, potem biznesplan, podpisanie umowy i na końcu przelew środków.
 
-**23. Połącz uczestnika Forum z jego ofertą.**  
-_Pary · 45 s_
-
-- Fundacja Muzyki Niezależnej → Nagłośnienie koncertów i wydawnictwo muzyczne
-- Fundacja Propagowania Zdrowego Odżywiania MIDEX → Wędliny, garmażeria i catering
-- Fundacja Doktor Elsner → Dietetyka kliniczna i profilaktyka zdrowotna
-
-**24. Kto czym się zajmuje? Część 3 – połącz uczestnika Forum z jego ofertą.**  
-_Pary · 45 s_
-
-- Osikowa Dolina Sp. z o.o. → Dekoracje i warsztaty z drewna topoli osiki
-- Fundacja „Dzikie Serce” → Pracownia rękodzieła i warsztaty artystyczne
-- Fundacja Ecostructure → Budownictwo szkieletowe i ekologiczne
-
-### Etap 5: Ostatnia prosta (finał)
+### Etap 5 (finał)
 
 Punkty z etapów zamieniły się na pozycję startową: lider ma kilka kroków przewagi. Teraz liczy się już tylko wyścig do mety: dobra odpowiedź to krok naprzód, zła to krok w tył, więc nie klikaj na oślep. Kto pierwszy dobiegnie, wygrywa.
 
-Mnożnik punktów: ×2, seria 120 s, w grze 14 zdań z puli
+Mnożnik punktów: ×2, seria 120 s, w grze 15 zdań z puli
 
-**25. Dominika Kasiura jest doradcą biznesowym w JOWES.**  
+**24. Dominika Kasiura jest doradcą biznesowym w JOWES.**  
 _Prawda / fałsz · 20 s_
 
 - Prawda ✓
 - Fałsz
 
-**26. JOWES prowadzi Agencja Rozwoju Regionalnego w Częstochowie.**  
+**25. JOWES prowadzi Agencja Rozwoju Regionalnego w Częstochowie.**  
 _Prawda / fałsz · 20 s_
 
 - Prawda ✓
 - Fałsz
 
-**27. JOWES działa w powiatach częstochowskim, kłobuckim i lublinieckim.**  
+**26. JOWES działa w powiatach częstochowskim, kłobuckim i lublinieckim.**  
 _Prawda / fałsz · 20 s_
 
 - Prawda
 - Fałsz ✓
 
-**28. Trwałość miejsca pracy z dotacji JOWES to łącznie 24 miesiące.**  
+**27. Strona internetowa JOWES to jowes.org.**  
 _Prawda / fałsz · 20 s_
 
 - Prawda
 - Fałsz ✓
+
+**28. JOWES mieści się w Kamienicy Kupieckiej.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda ✓
+- Fałsz
 
 **29. Obecny projekt JOWES objął już wsparciem 241 PES.**  
 _Prawda / fałsz · 20 s_
@@ -848,38 +864,58 @@ _Prawda / fałsz · 20 s_
 - Prawda ✓
 - Fałsz
 
-**30. Trasa koncertowa Fundacji Muzyki Niezależnej to „Analogowy horyzont dźwięku”.**  
-_Prawda / fałsz · 20 s_
-
-- Prawda ✓
-- Fałsz
-
-**31. Kinesis prowadzi siłownię i treningi funkcjonalne.**  
-_Prawda / fałsz · 20 s_
-
-- Prawda ✓
-- Fałsz
-
-**32. Fundacja Kuźnia Pomysłów prowadzi zajęcia z alpakami.**  
-_Prawda / fałsz · 20 s_
-
-- Prawda ✓
-- Fałsz
-
-**33. Premium Tour Szymczyk organizuje m.in. wyjazdy dla osób z niepełnosprawnością.**  
-_Prawda / fałsz · 20 s_
-
-- Prawda ✓
-- Fałsz
-
-**34. Fundacja Czas na Seniora prowadzi biuro rachunkowe.**  
+**30. Trwałość miejsca pracy z dotacji JOWES to łącznie 24 miesiące.**  
 _Prawda / fałsz · 20 s_
 
 - Prawda
 - Fałsz ✓
 
-**35. JOWES mieści się w Kamienicy Kupieckiej**  
+**31. Każde przedsiębiorstwo społeczne musi mieć organ konsultacyjno-doradczy.**  
 _Prawda / fałsz · 20 s_
 
 - Prawda ✓
 - Fałsz
+
+**32. Fundacja Kinesis i Kinesis Sp. z o.o. to ta sama organizacja.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda
+- Fałsz ✓
+
+**33. Fundacja Kuźnia Pomysłów prowadzi zajęcia z alpakami.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda ✓
+- Fałsz
+
+**34. Stowarzyszenie Wzajemnej Pomocy „Agape” powstało w 1993 r. z inicjatywy osób, które same przeszły kryzys.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda ✓
+- Fałsz
+
+**35. Fundacja Czas na Seniora prowadzi biuro rachunkowe.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda
+- Fałsz ✓
+
+**36. Spółdzielnia Socjalna „Jasne, że dom i wnętrze” działa w branży remontowo-budowlanej.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda ✓
+- Fałsz
+
+**37. Stowarzyszenie Pomocy Osobom z Autyzmem i Stowarzyszenie „Druga Szansa” działają w branży remontowo-budowlanej.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda
+- Fałsz ✓
+
+**38. Fundacja Projekt: Rozwój świadczy usługi sprzątania i organizuje atrakcje dla dzieci.**  
+_Prawda / fałsz · 20 s_
+
+- Prawda ✓
+- Fałsz
+
+---
