@@ -4,6 +4,10 @@ import { Awatar } from "@/components/awatar";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
 import { celSzacowania, liczbaZJednostka, poprawnaSzacowania, przedzialSzacowania } from "@/lib/zadania";
 
+/** Odstęp kropek w stosie (px sceny) i najwyższy stos: dalej kropki zachodzą na siebie, zamiast rosnąć w górę. */
+const KROK_KROPKI = 30;
+const STOS_PX = 240;
+
 /**
  * Szacowanie na TV: oś od `min` do `max`. W trakcie pytania pusta (z zakresem), po wyniku każda podana
  * liczba to kropka (te same liczby piętrzą się w górę), a złota kreska z napisem to poprawna liczba
@@ -28,7 +32,9 @@ export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean })
   // złota kreska poprawnej tylko trochę ponad najwyższy stos kropek, nie do góry pola: plakietka z liczbą stoi wtedy
   // tuż nad kropkami i nie wchodzi na treść pytania (25.10)
   const najwyzszy = kropki.reduce((m, k) => Math.max(m, k.wysokosc + 1), 0);
-  const kreska = Math.min(300, Math.max(110, 18 + najwyzszy * 30 + 30));
+  // przy dużej grupie (18.11) stos kropek ma najwyżej `STOS_PX`: kropki stają gęściej zamiast wchodzić na pytanie
+  const krok = Math.min(KROK_KROPKI, STOS_PX / Math.max(1, najwyzszy));
+  const kreska = Math.min(300, Math.max(110, 18 + najwyzszy * krok + 30));
 
   return (
     <div className="tv-os">
@@ -38,7 +44,7 @@ export function OsLiczbowa({ z, wynik }: { z: ZadanieWidoczne; wynik: boolean })
           <span
             key={i}
             className="tv-os-kropka"
-            style={{ left: gdzie(x), bottom: 18 + wysokosc * 30, animationDelay: `${0.2 + i * 0.05}s` }}
+            style={{ left: gdzie(x), bottom: 18 + wysokosc * krok, animationDelay: `${0.2 + i * 0.05}s` }}
           />
         ))}
         {wynik && zakres && zakres[1] > zakres[0] && (
