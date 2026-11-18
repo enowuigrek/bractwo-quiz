@@ -14,7 +14,8 @@ import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/li
  * Wiersze płyną w dół kolumny (1–5 po lewej, 6–10 obok), jak w tabeli wyników.
  */
 function kolumny(n: number): number {
-  return n <= 5 ? 1 : n <= 12 ? 2 : 3;
+  // 18.11: do 70 graczy (JOWES), od 37 cztery kolumny
+  return n <= 5 ? 1 : n <= 12 ? 2 : n <= 36 ? 3 : 4;
 }
 
 /**
@@ -263,7 +264,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
 /** Pełna tabela wyników po grze: wszyscy gracze z miejscem i punktami. */
 export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
   const wiersze = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
-  const k = wiersze.length <= 10 ? 1 : wiersze.length <= 20 ? 2 : 3;
+  const k = wiersze.length <= 10 ? 1 : wiersze.length <= 20 ? 2 : wiersze.length <= 45 ? 3 : 4;
   const druzyny = stan.tryb === "druzyny";
 
   return (

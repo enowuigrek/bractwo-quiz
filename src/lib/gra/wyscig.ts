@@ -22,7 +22,7 @@ export const stronyRankingu = (n: number) => Math.max(1, Math.ceil(n / NA_STRONI
 export const naStronieRankingu = (n: number) => Math.max(1, Math.ceil(n / stronyRankingu(n)));
 
 /** Domyślny i największy limit graczy w grze (26.10: na razie 20, bo tyle mieści ranking na dwóch stronach). */
-export const MAX_GRACZY = 20;
+export const MAX_GRACZY = 70;
 
 /** Klasyczny pub quiz: quiz bez etapów (bez finału, szklanki i wyścigu, src/lib/tagi.ts). */
 export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }): boolean {
