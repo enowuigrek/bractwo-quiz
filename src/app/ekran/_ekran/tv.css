@@ -1651,6 +1651,12 @@
   width: auto;
 }
 
+/* logo JOWES jest szerokie (koło z napisem): na wysokości 560 px wychodziło za scenę (18.11) */
+[data-motyw="neutralny"] .plansza-logo-duze {
+  width: 1300px;
+  height: auto;
+}
+
 
 .plansze-kropki {
   list-style: none;
