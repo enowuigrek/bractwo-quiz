@@ -1,3 +1,5 @@
+import { NAZWY_NEUTRALNE } from "@/lib/motyw";
+
 // Tematyczne oznaczenia quizów (`quizy.tagi`): wpisywane po przecinku w panelu, do filtrowania listy quizów
 // i wyboru quizu przy uruchamianiu gry.
 
@@ -27,9 +29,9 @@ export const NAZWY_RODZAJOW: Record<RodzajQuizu, string> = {
   degustacja: "Degustacja",
 };
 
-/** Nazwa rodzaju; w motywie neutralnym (src/lib/motyw.ts) wyścig bez piwa. */
+/** Nazwa rodzaju; w motywie neutralnym (src/lib/motyw.ts) bez piwa i pubu. */
 export const nazwaRodzajuQuizu = (rodzaj: RodzajQuizu, neutralny = false) =>
-  neutralny && rodzaj === "wyscig" ? "Wyścig" : NAZWY_RODZAJOW[rodzaj];
+  neutralny && rodzaj !== "degustacja" ? NAZWY_NEUTRALNE[rodzaj] : NAZWY_RODZAJOW[rodzaj];
 
 /** „Nowy wyścig po piwo”, „Nowy pub quiz”, „Nowa degustacja”: przycisk i nagłówek nowego quizu z nazwy zakładki (30.10). */
 export const nowyQuiz = (rodzaj: RodzajQuizu, neutralny = false) =>

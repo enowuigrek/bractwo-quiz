@@ -9,6 +9,9 @@ export type Motyw = "bractwo" | "neutralny";
 /** Logo motywu neutralnego (stoi tam, gdzie w motywie Bractwa logo Bractwa). `null` = bez logo. */
 export const LOGO_NEUTRALNE: string | null = "/loga/jowes/jowes.png";
 
+/** Nazwy rodzajów quizu w motywie neutralnym (zamiast „Wyścig po piwo” i „Pub quiz”). */
+export const NAZWY_NEUTRALNE = { wyscig: "Wyścig", klasyczny: "Quiz klasyczny" } as const;
+
 /** Nazwa aplikacji w tytule strony. */
 export const NAZWA_APLIKACJI: Record<Motyw, string> = { bractwo: "Bractwo Quiz", neutralny: "Quiz" };
 

@@ -1,3 +1,5 @@
+import { NAZWY_NEUTRALNE } from "@/lib/motyw";
+
 // Wyścig zamiast tabeli rankingu. Położenie zależy tylko od własnych punktów w stałej skali (część maksimum
 // do zdobycia przed finałem), więc zła odpowiedź = stoisz w miejscu, a szybka dobra = większy krok niż wolna.
 // Do 24.10 skala szła za liderem i przesuwała wszystkich, także tych, którzy odpowiedzieli źle.
@@ -33,12 +35,13 @@ export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }):
  */
 export function nazwaRodzaju(
   stan: { quiz: { liczba_etapow: number; degustacja?: boolean } | null } | null | undefined,
-  /** Motyw neutralny (src/lib/motyw.ts): „Wyścig” bez piwa. */
+  /** Motyw neutralny (src/lib/motyw.ts): nazwy bez piwa i pubu (`NAZWY_NEUTRALNE`). */
   neutralny = false,
 ): string {
   if (!stan?.quiz) return "Quiz";
   if (stan.quiz.degustacja) return "Degustacja";
-  return quizKlasyczny(stan) ? "Pub quiz" : neutralny ? "Wyścig" : "Wyścig po piwo";
+  if (quizKlasyczny(stan)) return neutralny ? NAZWY_NEUTRALNE.klasyczny : "Pub quiz";
+  return neutralny ? NAZWY_NEUTRALNE.wyscig : "Wyścig po piwo";
 }
 
 /**
