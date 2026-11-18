@@ -49,8 +49,8 @@ type Migawka = {
 
 /**
  * Efekty dźwiękowe na TV (src/lib/gra/efekty.ts), wyzwalane zmianami tego, co TV i tak już wie (faza, zegar,
- * liczba graczy, postęp serii), bez nowych komunikatów z bazy. Grają razem z muzyką i wyłącza je ten sam
- * przełącznik w pilocie (`stan.muzyka`). Pierwszy stan po wczytaniu strony niczego nie odtwarza (TV
+ * liczba graczy, postęp serii), bez nowych komunikatów z bazy. Grają też przy muzyce wyłączonej w pilocie
+ * (`stan.muzyka` wycisza samą muzykę, 18.11, Łukasz). Pierwszy stan po wczytaniu strony niczego nie odtwarza (TV
  * przeładowany w trakcie pytania nie gra zaległych dźwięków). Ekran lokalu między grami jest cichy.
  */
 export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
@@ -104,7 +104,7 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
       werble.current();
       werble.current = null;
     }
-    if (!p || !stan.muzyka) return;
+    if (!p) return;
     // inne pytanie: to nie jest ciąg dalszy poprzedniego (np. pilot przeskoczył)
     const nowaFaza = p.zadanie !== b.zadanie;
 
