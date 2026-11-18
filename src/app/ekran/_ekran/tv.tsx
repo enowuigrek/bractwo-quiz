@@ -517,7 +517,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
             {z.dane.tekst && (
               <p
                 className={`tv-ciekawostka-tekst${
-                  z.dane.tekst.length > 700 ? " bardzo-dlugi" : z.dane.tekst.length > 380 ? " dlugi" : ""
+                  z.dane.tekst.length > 900 ? " bardzo-dlugi" : z.dane.tekst.length > 380 ? " dlugi" : ""
                 }`}
               >
                 {z.dane.tekst}
