@@ -65,15 +65,10 @@ export function BotyPilota({
       <p className="etykieta">
         Boty do testów{stan.boty ? ` · ${stan.boty}` : ""}
       </p>
-      {/* 20 naraz do testów dużych gier (18.11, limit graczy 70) */}
-      <div className="przyciski">
-        <button type="button" className="przycisk" disabled={wysylam} onClick={() => void dodaj(4)}>
-          {wysylam ? "Dodaję…" : "Dodaj 4 boty"}
-        </button>
-        <button type="button" className="przycisk" disabled={wysylam} onClick={() => void dodaj(20)}>
-          {wysylam ? "Dodaję…" : "Dodaj 20 botów"}
-        </button>
-      </div>
+      {/* jeden przycisk, 20 naraz (18.11, limit graczy 70; dwa obok siebie wychodziły poza wąską kolumnę pilota) */}
+      <button type="button" className="przycisk" disabled={wysylam} onClick={() => void dodaj(20)}>
+        {wysylam ? "Dodaję…" : "Dodaj 20 botów"}
+      </button>
       {blad && (
         <p className="blad" role="alert">
           {blad}
