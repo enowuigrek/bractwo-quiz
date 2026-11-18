@@ -4783,3 +4783,13 @@
   line-height: 1.35;
   color: var(--piana);
 }
+
+/* długa treść pytania (tv.tsx): mniejszy font, żeby 7–8 odpowiedzi nie wchodziło na tytuł (18.11, pytania JOWES) */
+.tv h1.tv-tresc.dluga {
+  font-size: 52px;
+}
+
+.tv h1.tv-tresc.bardzo-dluga {
+  font-size: 44px;
+  line-height: 1.15;
+}

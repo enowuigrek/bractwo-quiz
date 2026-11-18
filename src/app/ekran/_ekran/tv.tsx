@@ -581,7 +581,8 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         </div>
       ) : null}
 
-      <h1 className="tv-tresc">{z.tresc}</h1>
+      {/* długa treść (np. pytania JOWES na 2–3 linie) mniejszym fontem, żeby zostało miejsce na odpowiedzi */}
+      <h1 className={`tv-tresc${z.tresc.length > 110 ? " bardzo-dluga" : z.tresc.length > 70 ? " dluga" : ""}`}>{z.tresc}</h1>
       {z.typ !== "wybor" && !wynik && !zEtapami && <p className="tv-typ-podpowiedz">{PODPOWIEDZI_TYPOW[z.typ]}</p>}
       {z.podpowiedzi.length > 0 && (
         <ol className="tv-podpowiedzi">
