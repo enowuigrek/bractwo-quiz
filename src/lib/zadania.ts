@@ -166,7 +166,8 @@ export function celSzacowania(dane: DaneWidoczne): string {
   return dane.przedzial || typeof dane.poprawna_do === "number" ? "Celuj w widełki" : "Celuj w konkretną liczbę";
 }
 
-export const LITERY = "ABCDEF";
+/** Litery odpowiedzi; edytor daje do 6, ale quiz z migracji może mieć więcej (JOWES: 7–8, 18.11). */
+export const LITERY = "ABCDEFGHIJ";
 
 export function czyTypZadania(typ: unknown): typ is TypZadania {
   return typeof typ === "string" && (TYPY_ZADAN as readonly string[]).includes(typ);
