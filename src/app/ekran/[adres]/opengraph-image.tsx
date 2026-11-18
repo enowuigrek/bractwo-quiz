@@ -1,11 +1,14 @@
 import { ImageResponse } from "next/og";
 import { adresAplikacji } from "@/lib/adres";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
+import { LOGO_NEUTRALNE } from "@/lib/motyw";
+import { motywZadania } from "@/lib/motyw-serwer";
 
 // Miniatura linku do ekranu (Messenger, WhatsApp, SMS): logo Bractwa i lokalu na ciemnym tle ze złotą poświatą,
-// pod nimi „Quiz Bractwa Piwnego” i nazwa lokalu. Dla kodu gry samo logo Bractwa i kod.
+// pod nimi „Quiz Bractwa Piwnego” i nazwa lokalu. Dla kodu gry samo logo Bractwa i kod. W motywie neutralnym
+// (src/lib/motyw.ts, np. JOWES) jasne tło, samo logo motywu i „Quiz” (18.11).
 
-export const alt = "Quiz Bractwa Piwnego";
+export const alt = "Quiz";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -53,12 +56,14 @@ export default async function Miniatura({ params }: { params: Promise<{ adres: s
     .eq("adres_ekranu", adres.toLowerCase())
     .maybeSingle<{ nazwa: string; logo_url: string | null }>();
 
-  const tytul = "Quiz Bractwa Piwnego";
-  const podpis = lokal ? lokal.nazwa : `Gra ${adres.toUpperCase()}`;
+  const neutralny = (await motywZadania()) === "neutralny";
+  const tytul = neutralny ? "Quiz na żywo" : "Quiz Bractwa Piwnego";
+  const podpis = neutralny ? "Ekran do wyświetlania quizu" : lokal ? lokal.nazwa : `Gra ${adres.toUpperCase()}`;
   // logo lokalu tylko z naszych plików (PNG albo SVG; WebP generator nie umie)
   const [bractwo, logoLokalu, gruby, polgruby] = await Promise.all([
-    obrazek("/loga/bractwo.svg", baza),
-    lokal?.logo_url && /\.(png|svg|jpe?g)$/i.test(lokal.logo_url) ? obrazek(lokal.logo_url, baza) : null,
+    neutralny ? (LOGO_NEUTRALNE ? obrazek(LOGO_NEUTRALNE, baza) : null) : obrazek("/loga/bractwo.svg", baza),
+    // w motywie neutralnym logo motywu wystarczy (logo lokalu to to samo koło)
+    !neutralny && lokal?.logo_url && /\.(png|svg|jpe?g)$/i.test(lokal.logo_url) ? obrazek(lokal.logo_url, baza) : null,
     openSans(800, tytul),
     openSans(600, podpis),
   ]);
@@ -77,19 +82,27 @@ export default async function Miniatura({ params }: { params: Promise<{ adres: s
         alignItems: "center",
         justifyContent: "center",
         gap: 36,
-        background: "radial-gradient(ellipse 70% 60% at 50% 38%, #3a2a10 0%, #140e07 55%, #000000 100%)",
-        color: PIANA,
+        background: neutralny
+          ? "radial-gradient(ellipse 70% 60% at 50% 38%, #ffffff 0%, #fff8ec 55%, #ffe3b8 100%)"
+          : "radial-gradient(ellipse 70% 60% at 50% 38%, #3a2a10 0%, #140e07 55%, #000000 100%)",
+        color: neutralny ? "#333333" : PIANA,
         fontFamily: "Open Sans",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 80 }}>
-        {bractwo && <img src={bractwo} alt="" height={230} style={{ objectFit: "contain" }} />}
+        {bractwo &&
+          (neutralny ? (
+            // logo JOWES 446×124: stałe proporcje, generator nie zgaduje szerokości
+            <img src={bractwo} alt="" width={612} height={170} style={{ objectFit: "contain" }} />
+          ) : (
+            <img src={bractwo} alt="" height={230} style={{ objectFit: "contain" }} />
+          ))}
         {logoLokalu && (
           <img src={logoLokalu} alt="" width={260} height={260} style={{ objectFit: "contain", borderRadius: 130 }} />
         )}
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-        <div style={{ fontSize: 68, fontWeight: 800, color: ZLOTO }}>{tytul}</div>
+        <div style={{ fontSize: 68, fontWeight: 800, color: neutralny ? "#e58e00" : ZLOTO }}>{tytul}</div>
         <div style={{ fontSize: 42, fontWeight: 600 }}>{podpis}</div>
       </div>
     </div>,
