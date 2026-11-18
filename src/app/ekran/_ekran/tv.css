@@ -4868,3 +4868,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* jasny motyw: dymki okrzyków kibiców w finale białe (tło `--piana` jest tu ciemnym kolorem tekstu) */
+[data-motyw="neutralny"] .okrzyk-dymek {
+  background: #fff;
+  color: #333;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+[data-motyw="neutralny"] .okrzyk-kibic {
+  color: #b86a00;
+}

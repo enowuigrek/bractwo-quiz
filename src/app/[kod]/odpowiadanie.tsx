@@ -12,6 +12,11 @@ type Props = {
   wyslana: DaneOdpowiedzi | null;
   zablokowane: boolean;
   onWyslij: (dane: DaneOdpowiedzi) => void;
+  /**
+   * Bieżący, jeszcze niezatwierdzony wybór (18.11): gdy skończy się czas przed „Zatwierdź”, telefon wysyła go sam
+   * (rozgrywka.tsx), żeby połączone pary, zaznaczone odpowiedzi albo przesunięty suwak się liczyły.
+   */
+  onSzkic?: (dane: DaneOdpowiedzi | null) => void;
 };
 
 /** Prawda / fałsz: dwa duże przyciski, jedno stuknięcie wysyła odpowiedź. */
@@ -56,7 +61,7 @@ function naKrok(x: number, min: number, max: number, krok: number): number {
 }
 
 /** Szacowanie: suwak z dużą liczbą i przyciskami −/+, potem „Zatwierdź”. */
-export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij }: Props) {
+export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij, onSzkic }: Props) {
   const min = z.dane.min ?? 0;
   const max = z.dane.max ?? 100;
   const krok = z.dane.krok ?? 1;
@@ -64,6 +69,7 @@ export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij }: Props) {
   const [ruszona, ustawRuszona] = useState(false);
   const pokaz = wyslana?.liczba ?? wartosc;
   const koniec = !!wyslana || zablokowane;
+  useEffect(() => onSzkic?.(ruszona ? { liczba: wartosc } : null), [ruszona, wartosc, onSzkic]);
   const zmien = (x: number) => {
     ustaw(naKrok(x, min, max, krok));
     ustawRuszona(true);
@@ -122,8 +128,12 @@ export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij }: Props) {
 }
 
 /** Wielokrotny wybór: zaznacz kafelki, potem „Zatwierdź”. */
-export function OdpowiedzWielokrotna({ z, wyslana, zablokowane, onWyslij }: Props) {
+export function OdpowiedzWielokrotna({ z, wyslana, zablokowane, onWyslij, onSzkic }: Props) {
   const [zaznaczone, ustaw] = useState<number[]>([]);
+  useEffect(
+    () => onSzkic?.(zaznaczone.length ? { odpowiedzi: [...zaznaczone].sort((a, b) => a - b) } : null),
+    [zaznaczone, onSzkic],
+  );
   const wybrane = wyslana?.odpowiedzi ?? zaznaczone;
   const koniec = !!wyslana || zablokowane;
   return (
@@ -258,7 +268,7 @@ function useLiniePar(polaczone: (number | null)[]) {
 }
 
 /** Pary: stuknij lewy, potem prawy. Para dostaje wspólny numer i kolor; stuknięcie sparowanego rozłącza. */
-export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
+export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij, onSzkic }: Props) {
   const lewe = z.dane.lewe ?? [];
   const prawe = z.dane.prawe ?? [];
   const [pary, ustawPary] = useState<(number | null)[]>(() => lewe.map(() => null));
@@ -267,6 +277,11 @@ export function OdpowiedzPary({ z, wyslana, zablokowane, onWyslij }: Props) {
   const polaczone = wyslana?.pary ?? pary;
   const koniec = !!wyslana || zablokowane;
   const komplet = pary.every((p) => p !== null);
+  // szkic: niepołączone jako -1 (baza liczy je jako złe, `wewn.ocena`)
+  useEffect(
+    () => onSzkic?.(pary.some((p) => p !== null) ? { pary: pary.map((p) => p ?? -1) } : null),
+    [pary, onSzkic],
+  );
   const { siatka, linie } = useLiniePar(polaczone);
 
   // lewy i z prawym k w parę (oba tracą wcześniejsze pary)

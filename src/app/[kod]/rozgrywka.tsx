@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- grafiki pytań z bucketu Supabase */
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { sekundy } from "@/lib/czas";
 import { TekstPlanszy } from "@/components/tekst-planszy";
 import { rozmycie } from "@/lib/gra/dodatki";
@@ -66,6 +66,21 @@ export function Rozgrywka({
 
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
+
+  // szkic niezatwierdzonej odpowiedzi (pary, kilka dobrych, szacowanie; 18.11): gdy skończy się czas przed
+  // „Zatwierdź”, wysyłamy go sam (baza przyjmuje odpowiedź do sekundy po czasie), żeby zrobione się liczyło
+  const szkic = useRef<{ zadanieId: string; dane: DaneOdpowiedzi } | null>(null);
+  const wyslijSzkic = useRef<() => void>(() => undefined);
+  const idZadania = z?.id ?? null;
+  const onSzkic = useCallback(
+    (dane: DaneOdpowiedzi | null) => {
+      szkic.current = dane && idZadania ? { zadanieId: idZadania, dane } : null;
+    },
+    [idZadania],
+  );
+  useEffect(() => {
+    if (czasMinal) wyslijSzkic.current();
+  }, [czasMinal, idZadania]);
   const kibic = czyKibic(stan, ja.nick);
   // plansza etapu pokazała już, jak odpowiadać, więc bez podpowiedzi rodzaju pytania
   const zEtapami = (stan.quiz?.liczba_etapow ?? 0) > 0;
@@ -135,8 +150,15 @@ export function Rozgrywka({
     );
   }
 
-  async function odpowiedz(dane: DaneOdpowiedzi) {
-    if (!z || wysylam || moja !== null || czasMinal) return;
+  wyslijSzkic.current = () => {
+    const s = szkic.current;
+    if (!z || !s || s.zadanieId !== z.id || moja !== null || wysylam) return;
+    szkic.current = null;
+    void odpowiedz(s.dane, true);
+  };
+
+  async function odpowiedz(dane: DaneOdpowiedzi, poCzasie = false) {
+    if (!z || wysylam || moja !== null || (czasMinal && !poCzasie)) return;
     const zadanieId = z.id;
     ustawWyslana({ zadanieId, dane, czasMs: null });
     ustawWysylam(true);
@@ -213,6 +235,7 @@ export function Rozgrywka({
             wyslana={moja}
             zablokowane={czasMinal || wysylam}
             onWyslij={(d) => void odpowiedz(d)}
+            onSzkic={onSzkic}
           />
         ) : z.typ === "wielokrotny" ? (
           <OdpowiedzWielokrotna
@@ -221,6 +244,7 @@ export function Rozgrywka({
             wyslana={moja}
             zablokowane={czasMinal || wysylam}
             onWyslij={(d) => void odpowiedz(d)}
+            onSzkic={onSzkic}
           />
         ) : z.typ === "kolejnosc" ? (
           <OdpowiedzKolejnosc
@@ -237,6 +261,7 @@ export function Rozgrywka({
             wyslana={moja}
             zablokowane={czasMinal || wysylam}
             onWyslij={(d) => void odpowiedz(d)}
+            onSzkic={onSzkic}
           />
         ) : (
           <ol className="odp-lista">

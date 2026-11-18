@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Awatar } from "@/components/awatar";
 import { HasloKibica } from "@/components/haslo-kibica";
 import { komunikatBledu } from "@/lib/gra/nasluch";
-import { HASLA, ODSTEP_OKRZYKOW_MS } from "@/lib/gra/okrzyki";
+import { HASLA, HASLA_NEUTRALNE, ODSTEP_OKRZYKOW_MS } from "@/lib/gra/okrzyki";
+import { useNeutralny } from "@/components/motyw";
 import type { StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import type { Ja } from "./rozgrywka";
@@ -18,6 +19,7 @@ type Wynik = { przyjety: boolean; powod?: string; za_ms?: number; wyslane?: numb
  * (pilnuje `kibicuj` w bazie, tu tylko przyciski czekają). `teraz`: zegar serwera.
  */
 export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; teraz: number }) {
+  const neutralny = useNeutralny();
   const finalisci = stan.finalisci ?? [];
   const [wybrany, ustawWybrany] = useState(0);
   const [wolneOd, ustawWolneOd] = useState(0);
@@ -103,7 +105,7 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
             key={i}
             className="odp kibic-haslo"
             disabled={zablokowane}
-            aria-label={`${HASLA[i][0]}${f.nick}${HASLA[i][1]}`}
+            aria-label={`${(neutralny ? HASLA_NEUTRALNE : HASLA)[i][0]}${f.nick}${(neutralny ? HASLA_NEUTRALNE : HASLA)[i][1]}`}
             onClick={() => void kibicuj(i)}
           >
             <HasloKibica haslo={i} nick={f.nick} />
