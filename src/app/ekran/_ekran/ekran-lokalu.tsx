@@ -83,7 +83,8 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
       type: "svg",
       margin: 0,
       errorCorrectionLevel: "M",
-      color: { dark: "#000000", light: "#f4ecd8" },
+      // jasne pola przezroczyste: kod bierze tło ramki (kremowe w Bractwie, białe w motywie neutralnym, 18.11)
+      color: { dark: "#000000", light: "#00000000" },
     }).then((svg) => {
       if (aktualny) ustawQr({ kod, svg });
     });

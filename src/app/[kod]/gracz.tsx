@@ -246,6 +246,17 @@ function Naglowek({
   /** Rodzaj gry: „Wyścig po piwo” albo „Pub quiz” (`nazwaRodzaju`). */
   napis?: string;
 }) {
+  // bez logo gospodarzy napis idzie na lewo, zamiast wisieć na środku (18.11). Motyw neutralny (JOWES) nie pokazuje
+  // logo lokalu w nagłówku (jest w tle), więc tam też zostaje jedno logo z prawej
+  const neutralny = useNeutralny();
+  if (neutralny || (!lokal?.logo_url && !browar?.logo_url)) {
+    return (
+      <header className="gra-naglowek">
+        <span className="logo-quiz-napis gra-napis-quiz">{napis}</span>
+        <LogoBractwa className="gra-logo" />
+      </header>
+    );
+  }
   return (
     <header className="gra-naglowek trzy">
       <span className="gra-loga-gospodarzy">

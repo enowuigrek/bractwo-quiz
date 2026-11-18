@@ -473,7 +473,8 @@ function Poczekalnia({
                 <li>
                   <span>
                     <strong>
-                      {Math.min(...stan.nagrody.filter((n) => n.miejsce > 3).map((n) => n.miejsce))}.–
+                      {/* „4–5.”: kropka tylko na końcu zakresu (18.11) */}
+                      {Math.min(...stan.nagrody.filter((n) => n.miejsce > 3).map((n) => n.miejsce))}–
                       {Math.max(...stan.nagrody.map((n) => n.miejsce))}.
                     </strong>{" "}
                     {stan.nagrody.find((n) => n.miejsce > 3)?.nagroda}

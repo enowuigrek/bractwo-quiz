@@ -4669,6 +4669,25 @@
   box-shadow: 0 0 0 2px #e1e4e8, 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
+/* nagrody w poczekalni (JOWES, 18.11): każda w ramce, równe kolumny wyrównane do góry, mniejszy font, żeby długie
+   nazwy („Grant marketingowy 500 zł”) nie rozpychały wiersza */
+[data-motyw="neutralny"] .tv-nagrody-start {
+  gap: 16px;
+  align-items: stretch;
+}
+
+[data-motyw="neutralny"] .tv-nagrody-start li {
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: flex-start;
+  padding: 16px 20px;
+  font-size: 26px;
+  line-height: 1.25;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid var(--zloto);
+  border-radius: var(--r-card);
+}
+
 .logo-motywu {
   display: block;
   object-fit: contain;
