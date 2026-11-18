@@ -171,6 +171,22 @@ input.pole[type="time"] {
   gap: 0.5em;
 }
 
+/* motyw neutralny przy dużym logo (logo-quiz.tsx): napis pod szerokim logo JOWES, logo nie szersze niż ekran */
+.logo-quiz-pod {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25em;
+  max-width: 100%;
+}
+
+.logo-quiz-pod .logo-motywu {
+  max-width: 100%;
+}
+
+.logo-quiz-pod .logo-quiz-napis {
+  white-space: nowrap;
+}
+
 .logo-quiz-napis {
   color: var(--zloto);
   font-weight: var(--w-black);

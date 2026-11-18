@@ -22,7 +22,11 @@ type Props = {
 export function LogoQuiz({ wysokosc = 72, dopisek, priorytet }: Props) {
   const neutralny = useNeutralny();
   return (
-    <span className="logo-quiz" style={{ fontSize: Math.round(wysokosc * 0.42) }}>
+    // motyw neutralny: logo JOWES jest szerokie, więc przy dużym logo napis „Quiz” stoi pod nim
+    <span
+      className={`logo-quiz${neutralny && wysokosc >= 60 ? " logo-quiz-pod" : ""}`}
+      style={{ fontSize: Math.round(wysokosc * 0.42) }}
+    >
       {!neutralny ? (
         <Image
           src="/loga/bractwo.svg"
