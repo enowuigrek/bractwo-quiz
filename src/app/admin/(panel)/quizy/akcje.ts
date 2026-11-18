@@ -263,7 +263,19 @@ function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & 
 
   // ciekawostka: sam tekst pod tytułem (grafika jak w każdym pytaniu), bez odpowiedzi
   if (typ === "ciekawostka") {
-    const opis = typeof surowe.tekst === "string" ? surowe.tekst.trim().replace(/\s+/g, " ") : "";
+    // nowe linie zostają (18.11): plansza rozpoznaje po nich akapity, punkty „• ”, ramkę „> ” i kafelki „- ”
+    // (wcześniej zamiana na spacje kasowała cały układ przy każdej edycji w panelu); spacje w linii i puste linie ponad
+    // jedną zwijamy
+    const opis =
+      typeof surowe.tekst === "string"
+        ? surowe.tekst
+            .replace(/\r\n?/g, "\n")
+            .split("\n")
+            .map((l) => l.replace(/[ \t]+/g, " ").trim())
+            .join("\n")
+            .replace(/\n{3,}/g, "\n\n")
+            .trim()
+        : "";
     if (!opis) return { blad: "Wpisz tekst ciekawostki." };
     if (opis.length > 1500) return { blad: "Tekst ciekawostki może mieć najwyżej 1500 znaków." };
     return { tresc, typ, dane: { tekst: opis } };
