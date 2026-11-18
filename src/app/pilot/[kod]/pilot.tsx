@@ -31,6 +31,7 @@ import { BotyPilota, useBoty } from "./boty";
 import { UdostepnijPilota } from "./udostepnij";
 import { MenuPanelu, type GraWMenu } from "@/app/admin/(panel)/_komponenty/menu";
 import { wylogujAdmina } from "@/app/admin/akcje";
+import { useNeutralny } from "@/components/motyw";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
@@ -63,6 +64,7 @@ type Props = {
 };
 
 export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
+  const neutralny = useNeutralny();
   // zalogowany ma nad pilotem nagłówek panelu (30.10); z przekazanego linku bez logowania samo logo i menu
   const naglowekPilota = (gra?: GraWMenu) => (naglowek ? <NaglowekPilota gra={gra} /> : null);
   // Token z linku zapisujemy w localStorage i usuwamy z paska adresu,
@@ -625,8 +627,9 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
 
         <div className="pilot-podglad">
 
-          {/* nagrody można ustawić albo zmienić aż do startu quizu (26.10) */}
-          {faza === "poczekalnia" && (
+          {/* nagrody można ustawić albo zmienić aż do startu quizu (26.10); w motywie neutralnym (JOWES) nagrody są
+              na stałe z quizu, także za miejsca za podium, których ta karta nie zna */}
+          {faza === "poczekalnia" && !neutralny && (
             <details className="karta karta-zwijana">
               <summary className="etykieta">
                 Nagrody · {stan.nagrody?.length ? (stan.nagrody.length === 3 ? "pierwsza trójka" : "1. miejsce") : "brak"}

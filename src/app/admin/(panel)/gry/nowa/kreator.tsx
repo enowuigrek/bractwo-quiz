@@ -273,7 +273,9 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
 
           )}
 
-          {!degustacja && (
+          {/* motyw neutralny (np. JOWES): bez nagród w kreatorze, gra bierze nagrody domyślne quizu (`quizy.nagrody`) */}
+          {neutralny && <input type="hidden" name="nagrody" value={0} />}
+          {!degustacja && !neutralny && (
           <fieldset>
             <legend>Nagrody</legend>
             <label className="przelacznik">
