@@ -4852,3 +4852,14 @@
   font-size: 72px !important;
   -webkit-line-clamp: 3;
 }
+
+/* kafelki w planszy na TV (lista uczestników): większe niż na telefonie, ale 40+ nazw mieści się w kilku rzędach */
+.tv-ciekawostka-tekst .tekst-planszy-kafelki {
+  gap: 14px 16px;
+}
+
+.tv-ciekawostka-tekst .tekst-planszy-kafelki li {
+  padding: 10px 22px;
+  font-size: 26px;
+  font-weight: var(--w-semibold);
+}
