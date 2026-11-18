@@ -23,6 +23,7 @@ import type { TypZadania } from "@/lib/zadania";
 import { NowePytanie, ZadanieNaLiscie } from "./zadanie-na-liscie";
 import { PytanieNaLiscie } from "./rozwiazanie";
 import { BlokPijany } from "./blok-pijany";
+import { testFinalu } from "./test-finalu";
 import type { PijanePytanie } from "@/lib/pijany";
 import { listaQuizow, rodzajQuizu } from "@/lib/tagi";
 
@@ -186,6 +187,14 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         <Link href={powrot}>← Quizy</Link>
       </p>
       <NaglowekQuizu quiz={quiz} autor={quiz.konta?.nazwa ?? null} wyscig={etapy.some((e) => e.finalowy)} />
+      {/* test samego finału z botami (18.11): gra bez lokalu, od razu finał, potem pilot tej gry */}
+      {!quiz.usunieto && etapy.some((e) => e.finalowy && e.seria) && (
+        <form action={testFinalu.bind(null, quiz.id)}>
+          <button type="submit" className="przycisk-maly">
+            Test finału
+          </button>
+        </form>
+      )}
       {quiz.usunieto && (
         <form action={przywrocQuiz.bind(null, quiz.id)} className="blad quiz-w-koszu">
           Ten quiz jest w koszu: nie ma go na liście ani przy uruchamianiu gry.

@@ -8,7 +8,8 @@ import { Pilot } from "./pilot";
 
 export async function generateMetadata({ params }: PageProps<"/pilot/[kod]">): Promise<Metadata> {
   const { kod } = await params;
-  return { title: `Pilot ${kod.toUpperCase()} · Bractwo Quiz`, robots: { index: false } };
+  // nazwa aplikacji dopisuje szablon tytułu z layoutu (według motywu)
+  return { title: `Pilot ${kod.toUpperCase()}`, robots: { index: false } };
 }
 
 export default async function StronaPilota({ params, searchParams }: PageProps<"/pilot/[kod]">) {
