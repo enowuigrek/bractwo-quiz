@@ -45,7 +45,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
     await Promise.all([
       db
         .from("quizy")
-        .select("id, tytul, opis, utworzono, tagi, usunieto, lokal_id, degustacja, konta(nazwa)")
+        .select("id, tytul, opis, utworzono, tagi, usunieto, lokal_id, degustacja, finalistow, meta_finalu, konta(nazwa)")
         .eq("id", id)
         .maybeSingle<
           Quiz & { usunieto: string | null; lokal_id: string | null; degustacja: boolean; konta: { nazwa: string } | null }
@@ -185,7 +185,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
       <p className="okruchy">
         <Link href={powrot}>← Quizy</Link>
       </p>
-      <NaglowekQuizu quiz={quiz} autor={quiz.konta?.nazwa ?? null} />
+      <NaglowekQuizu quiz={quiz} autor={quiz.konta?.nazwa ?? null} wyscig={etapy.some((e) => e.finalowy)} />
       {quiz.usunieto && (
         <form action={przywrocQuiz.bind(null, quiz.id)} className="blad quiz-w-koszu">
           Ten quiz jest w koszu: nie ma go na liście ani przy uruchamianiu gry.
@@ -209,6 +209,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
               <NaglowekEtapu
                 quizId={quiz.id}
                 etap={etap}
+                finalistow={quiz.finalistow ?? 3}
                 pytan={wEtapie.length}
                 plan={
                   <span className="etap-plan">
@@ -320,7 +321,7 @@ export default async function EdycjaQuizu({ params }: PageProps<"/admin/quizy/[i
         )}
         {/* klasyczny pub quiz (bez etapów) zostaje bez etapów, a turniej ma etapy z szablonu */}
         {etapy.length > 0 && (
-          <NowyEtap quizId={quiz.id} />
+          <NowyEtap quizId={quiz.id} finalistow={quiz.finalistow ?? 3} />
         )}
       </section>
 

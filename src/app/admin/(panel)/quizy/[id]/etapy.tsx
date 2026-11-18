@@ -17,6 +17,7 @@ import { bezResetu } from "../../_komponenty/bez-resetu";
 import { IkonaEdytuj } from "@/components/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { dodajEtap, zapiszEtap } from "../akcje";
+import { useNeutralny } from "@/components/motyw";
 
 type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy" | "seria" | "plan_pytan" | "typ_domyslny">;
 
@@ -35,14 +36,19 @@ const PUSTY: Pola = {
 function FormularzEtapu({
   quizId,
   etap,
+  finalistow = 3,
   onGotowe,
   onAnuluj,
 }: {
   quizId: string;
   etap?: Etap;
+  /** Ilu wchodzi do finału (`quizy.finalistow`). */
+  finalistow?: number;
   onGotowe: () => void;
   onAnuluj?: () => void;
 }) {
+  // motyw neutralny (JOWES, 18.11): etapy są tylko ponumerowane, więc bez nazwy (w bazie zostaje, bo jest wymagana)
+  const neutralny = useNeutralny();
   const [pola, ustawPola] = useState<Pola>(etap ?? PUSTY);
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(async (poprzedni, dane) => {
     const wynik = etap ? await zapiszEtap(quizId, etap.id, poprzedni, dane) : await dodajEtap(quizId, poprzedni, dane);
@@ -81,25 +87,29 @@ function FormularzEtapu({
                   })
                 }
               >
-                {s.nazwa}
+                {neutralny ? (s.finalowy ? "Finał" : NAZWY_TYPOW[s.typy[0]]) : s.nazwa}
               </button>
             ))}
           </div>
         </div>
       )}
-      <div>
-        <label htmlFor={`nazwa-${id}`}>Nazwa etapu</label>
-        <input
-          id={`nazwa-${id}`}
-          name="nazwa"
-          className="pole"
-          value={pola.nazwa}
-          onChange={(e) => zmien({ nazwa: e.target.value })}
-          required
-          maxLength={LIMITY_ETAPU.nazwa}
-          placeholder="np. Rozgrzewka"
-        />
-      </div>
+      {neutralny ? (
+        <input type="hidden" name="nazwa" value={pola.nazwa || "Etap"} />
+      ) : (
+        <div>
+          <label htmlFor={`nazwa-${id}`}>Nazwa etapu</label>
+          <input
+            id={`nazwa-${id}`}
+            name="nazwa"
+            className="pole"
+            value={pola.nazwa}
+            onChange={(e) => zmien({ nazwa: e.target.value })}
+            required
+            maxLength={LIMITY_ETAPU.nazwa}
+            placeholder="np. Rozgrzewka"
+          />
+        </div>
+      )}
       <div>
         <label htmlFor={`opis-${id}`}>Zasady na planszy etapu (jedno, dwa zdania)</label>
         <textarea
@@ -184,7 +194,8 @@ function FormularzEtapu({
           onChange={(e) => zmien({ finalowy: e.target.checked })}
         />
         <span>
-          <strong>Finał trójki:</strong> odpowiadają tylko trzej najlepsi, reszta kibicuje. Najlepiej jako ostatni etap.
+          <strong>Finał:</strong> odpowiada tylko {finalistow} najlepszych, reszta kibicuje. Najlepiej jako ostatni
+          etap.
         </span>
       </label>
       <KomunikatFormularza stan={stan} />
@@ -203,7 +214,7 @@ function FormularzEtapu({
 }
 
 /** „+ Dodaj etap” pod listą pytań quizu z etapami: rozwija formularz z szablonami. */
-export function NowyEtap({ quizId }: { quizId: string }) {
+export function NowyEtap({ quizId, finalistow }: { quizId: string; finalistow?: number }) {
   const [otwarty, ustawOtwarty] = useState(false);
   if (!otwarty) {
     return (
@@ -212,7 +223,14 @@ export function NowyEtap({ quizId }: { quizId: string }) {
       </button>
     );
   }
-  return <FormularzEtapu quizId={quizId} onGotowe={() => ustawOtwarty(false)} onAnuluj={() => ustawOtwarty(false)} />;
+  return (
+    <FormularzEtapu
+      quizId={quizId}
+      finalistow={finalistow}
+      onGotowe={() => ustawOtwarty(false)}
+      onAnuluj={() => ustawOtwarty(false)}
+    />
+  );
 }
 
 /**
@@ -222,6 +240,7 @@ export function NowyEtap({ quizId }: { quizId: string }) {
 export function NaglowekEtapu({
   quizId,
   etap,
+  finalistow = 3,
   akcje,
   pytan,
   plan,
@@ -229,6 +248,8 @@ export function NaglowekEtapu({
 }: {
   quizId: string;
   etap: Etap;
+  /** Ilu wchodzi do finału (`quizy.finalistow`). */
+  finalistow?: number;
   akcje: React.ReactNode;
   /** Ile pytań etap ma teraz. */
   pytan: number;
@@ -237,10 +258,12 @@ export function NaglowekEtapu({
   /** Pytania etapu i miejsca na nowe: chowają się po zwinięciu. */
   children?: React.ReactNode;
 }) {
+  const neutralny = useNeutralny();
   const [edycja, ustawEdycje] = useState(false);
   const [zwiniety, ustawZwiniety] = useState(false);
   const naglowek = edycja ? (
     <FormularzEtapu
+      finalistow={finalistow}
       quizId={quizId}
       etap={etap}
       onGotowe={() => ustawEdycje(false)}
@@ -256,7 +279,7 @@ export function NaglowekEtapu({
             aria-expanded={!zwiniety}
             onClick={() => ustawZwiniety((z) => !z)}
           >
-            <span className="etap-nr">Etap {etap.nr}</span> {etap.nazwa}
+            <span className="etap-nr">Etap {etap.nr}</span> {!neutralny && etap.nazwa}
           </button>
         </h3>
         <p className="etap-znaczki">
@@ -264,7 +287,7 @@ export function NaglowekEtapu({
           <span className="znaczek">
             {etap.seria ? `${etap.czas_s ?? 60} s na serię` : etap.czas_s ? `${etap.czas_s} s` : "czas jak w grze"}
           </span>
-          {etap.finalowy && <span className="znaczek aktywny">finał trójki</span>}
+          {etap.finalowy && <span className="znaczek aktywny">finał {finalistow} najlepszych</span>}
           {etap.seria && <span className="znaczek aktywny">seria</span>}
           <span className={`znaczek${etap.plan_pytan && pytan >= etap.plan_pytan ? " aktywny" : ""}`}>
             pytania {pytan}

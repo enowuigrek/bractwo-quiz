@@ -97,10 +97,21 @@ export async function zapiszQuiz(id: string, _: StanFormularza, dane: FormData):
   if (tytul.length > LIMITY.tytul) return { blad: `Tytuł może mieć najwyżej ${LIMITY.tytul} znaków.` };
   if (opis.length > LIMITY.opis) return { blad: `Opis może mieć najwyżej ${LIMITY.opis} znaków.` };
 
+  // finał (quiz z etapami): ilu wchodzi i ile kroków do mety; pola są tylko w quizie z finałem (18.11)
+  const final: { finalistow?: number; meta_finalu?: number } = {};
+  if (dane.has("finalistow")) {
+    const finalistow = Number(tekst(dane, "finalistow"));
+    const meta = Number(tekst(dane, "meta_finalu"));
+    if (!Number.isInteger(finalistow) || finalistow < 2 || finalistow > 8) return { blad: "Do finału może wejść od 2 do 8 osób." };
+    if (!Number.isInteger(meta) || meta < 4 || meta > 20) return { blad: "Meta finału może mieć od 4 do 20 kroków." };
+    final.finalistow = finalistow;
+    final.meta_finalu = meta;
+  }
+
   const db = supabaseAdmin();
   const { error } = await db
     .from("quizy")
-    .update({ tytul, opis: opis || null, tagi: czytajTagi(tekst(dane, "tagi")) })
+    .update({ tytul, opis: opis || null, tagi: czytajTagi(tekst(dane, "tagi")), ...final })
     .eq("id", id);
   if (error) return { blad: `Nie udało się zapisać: ${error.message}` };
   // „Zapisz quiz” na dole edycji: zapis i powrót do listy, na zakładkę rodzaju tego quizu

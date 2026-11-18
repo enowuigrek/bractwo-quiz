@@ -20,6 +20,9 @@ export type Quiz = {
   tylko_glowny: boolean;
   /** Tematyczne oznaczenia do filtrowania (src/lib/tagi.ts). */
   tagi: string[];
+  /** Ilu wchodzi do finału (2–8, brak = 3) i ile kroków do mety (4–20, brak = 12); jedno miejsce dla gry i ekranów (18.11). */
+  finalistow?: number | null;
+  meta_finalu?: number | null;
 };
 
 import type { TypZadania, ZadanieDane } from "./zadania";
