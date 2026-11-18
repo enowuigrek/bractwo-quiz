@@ -2104,9 +2104,22 @@ a.glowna-lokal:focus-visible {
   border-color: var(--czerwien);
 }
 
-.odpowiedzi-graczy-ramka.ja {
-  border-width: 3px;
-  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 12%, transparent);
+/* ramka z grupą gracza: to samo jasne tło co werdykt u góry (`.werdykt.dobrze` / `.zle` / `.czesciowo`, 18.11) */
+.odpowiedzi-graczy-ramka.dobrze.ja {
+  background: rgba(143, 182, 58, 0.12);
+}
+
+.odpowiedzi-graczy-ramka.czesciowo.ja {
+  background: rgba(227, 172, 63, 0.1);
+}
+
+.odpowiedzi-graczy-ramka.zle.ja {
+  background: rgba(226, 115, 90, 0.1);
+}
+
+/* pozostałe ramki bez szarego tła, żeby kolor obramowania był ten sam co w werdykcie */
+.odpowiedzi-graczy-ramka:not(.ja) {
+  background: transparent;
 }
 
 .odpowiedzi-graczy-etykieta {
