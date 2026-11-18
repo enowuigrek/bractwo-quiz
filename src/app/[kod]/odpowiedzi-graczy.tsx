@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Awatar } from "@/components/awatar";
 import type { WierszOdpowiedzi } from "@/lib/gra/typy";
 import type { TypZadania } from "@/lib/zadania";
 import { supabase } from "@/lib/supabase/przegladarka";
 
 /**
- * Po pytaniu, gdy TV pokazuje, kto jak odpowiedział (faza `odpowiedzi`), telefon pokazuje to samo (26.10): trzy
- * grupy w kolorach (dobrze, częściowo, źle i bez odpowiedzi), w każdej kapsle z nickami, Twój wyróżniony.
+ * Po pytaniu, gdy TV pokazuje, kto jak odpowiedział (faza `odpowiedzi`), telefon pokazuje ile osób (26.10, od 18.11
+ * bez nicków): trzy grupy w kolorach (dobrze, częściowo, źle i bez odpowiedzi), grupa z Tobą wyróżniona.
  * Te same dane co TV (`odpowiedzi_zadania`). W szacowaniu środkowa grupa to „Blisko”, nie „Częściowo” (28.10).
  */
 export function OdpowiedziGraczy({
@@ -50,25 +49,17 @@ export function OdpowiedziGraczy({
     },
   ].filter((g) => g.lista.length > 0 || g.klasa === "dobrze");
 
+  // same liczby (18.11): listy nicków przy dużej grupie były za długie, pełne listy są na TV
   return (
     <div className="odpowiedzi-graczy">
       {grupy.map((g) => (
-        <section key={g.klasa} className={`odpowiedzi-graczy-ramka ${g.klasa}`}>
+        <section
+          key={g.klasa}
+          className={`odpowiedzi-graczy-ramka ${g.klasa}${g.lista.some((o) => o.nick === nick) ? " ja" : ""}`}
+        >
           <p className="odpowiedzi-graczy-etykieta">
             {g.tytul} <span>{g.lista.length}</span>
           </p>
-          {g.lista.length === 0 ? (
-            <p className="odpowiedzi-graczy-pusto">Nikt.</p>
-          ) : (
-            <ul>
-              {g.lista.map((o) => (
-                <li key={o.nick} className={o.nick === nick ? "ja" : undefined}>
-                  <Awatar nick={o.nick} zdjecie={o.zdjecie} rozmiar={24} />
-                  <span>{o.nick}</span>
-                </li>
-              ))}
-            </ul>
-          )}
         </section>
       ))}
     </div>
