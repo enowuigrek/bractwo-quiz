@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useNeutralny } from "@/components/motyw";
 
 /**
  * Menu panelu na telefonie (26.10, Łukasz: zakładki, „Uruchom”, ustawienia i „Wyloguj” w jednym rzędzie robiły
@@ -59,6 +60,7 @@ export function MenuPanelu({
 }) {
   const sciezka = usePathname();
   const [otwarte, ustawOtwarte] = useState(false);
+  const neutralny = useNeutralny();
   const zamknij = () => ustawOtwarte(false);
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");
 
@@ -103,7 +105,7 @@ export function MenuPanelu({
       <nav id="panel-menu-szuflada" className="panel-menu-szuflada" aria-label="Panel" inert={!otwarte}>
         {lokal && (
           <section>
-            <p className="etykieta">Mój lokal</p>
+            <p className="etykieta">{neutralny ? "Moja organizacja" : "Mój lokal"}</p>
             <Link
               href={ustawienia}
               onClick={zamknij}

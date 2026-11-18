@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
+import { useNeutralny } from "@/components/motyw";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
 const WSPOLNE = [
@@ -22,10 +23,11 @@ export function Nawigacja({
   tworca?: boolean;
 }) {
   const sciezka = usePathname();
+  const neutralny = useNeutralny();
   // lokale to zwykła zakładka (30.10, Łukasz: zębatka „Ustawienia” prowadziła tylko do lokali); lokal ma „Mój lokal”
   const POZYCJE = [
     ...WSPOLNE,
-    { href: ustawienia, tekst: lokal ? "Mój lokal" : "Lokale" },
+    { href: ustawienia, tekst: lokal ? (neutralny ? "Moja organizacja" : "Mój lokal") : "Lokale" },
     ...(tworca ? [{ href: "/admin/konta", tekst: "Konta" }] : []),
   ];
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");

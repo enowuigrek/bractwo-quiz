@@ -3,10 +3,12 @@ import { lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { filtrGier, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./gry/lista-gier";
+import { motywZadania } from "@/lib/motyw-serwer";
 
 export default async function Panel() {
   const rola = await wymagajAdmina();
   const lokalId = lokalRoli(rola);
+  const neutralny = (await motywZadania()) === "neutralny";
   const db = supabaseAdmin();
   const [lokale, quizy, trwajace] = await Promise.all([
     // główny: liczba lokali; lokal: adres swojego ekranu
@@ -42,7 +44,7 @@ export default async function Panel() {
             <Link href="/admin/quizy">Quizy: {quizy.count}</Link> ·{" "}
             {lokalId ? (
               <>
-                <Link href={`/admin/lokale/${lokalId}`}>Mój lokal (logo, hasło)</Link>
+                <Link href={`/admin/lokale/${lokalId}`}>{neutralny ? "Moja organizacja" : "Mój lokal"} (logo, hasło)</Link>
                 {mojEkran && (
                   <>
                     {" "}
