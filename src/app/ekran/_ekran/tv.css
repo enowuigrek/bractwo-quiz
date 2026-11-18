@@ -4773,12 +4773,13 @@
 
 /* wyjaśnienie poprawnej odpowiedzi pod odpowiedziami, po odsłonięciu (`dane.wyjasnienie`) */
 .tv-wyjasnienie {
+  flex: none;
   margin: 20px 0 0;
   padding: 16px 24px;
   border-left: 6px solid var(--zloto);
   border-radius: 8px;
   background: var(--kamien);
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.35;
   color: var(--piana);
 }

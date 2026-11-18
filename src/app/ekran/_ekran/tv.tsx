@@ -672,9 +672,6 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         )}
       </div>
 
-      {/* wyjaśnienie po odsłonięciu odpowiedzi (`dane.wyjasnienie`, baza podaje je dopiero w fazie wyniku) */}
-      {wynik && z.dane.wyjasnienie && <p className="tv-wyjasnienie">{z.dane.wyjasnienie}</p>}
-
       <footer className="tv-pytanie-dol">
         {wynik ? (
           <>

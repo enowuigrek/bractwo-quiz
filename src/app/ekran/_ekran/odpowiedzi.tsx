@@ -185,6 +185,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             <p className="tv-okazja">Pytanie {z.lp}</p>
           </header>
           <OdpowiedziSzacowania z={z} odpowiedzi={odpowiedzi} />
+          {z.dane.wyjasnienie && <p className="tv-wyjasnienie">{z.dane.wyjasnienie}</p>}
         </div>
       </MotionConfig>
     );
@@ -198,6 +199,9 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           {z && <p className="tv-okazja">Pytanie {z.lp}</p>}
         </header>
         {z && <DobraOdpowiedz z={z} />}
+        {/* wyjaśnienie poprawnej odpowiedzi (`dane.wyjasnienie`, 18.11): tu, a nie na ekranie wyniku, gdzie przy długim
+            pytaniu z wieloma odpowiedziami brakowało miejsca */}
+        {z?.dane.wyjasnienie && <p className="tv-wyjasnienie">{z.dane.wyjasnienie}</p>}
 
         <section className="tv-odpowiedzi-ramka dobrze">
           <p className="tv-odpowiedzi-etykieta">

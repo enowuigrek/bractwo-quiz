@@ -15,6 +15,8 @@ const PLANSZA = { wstep: 5, etap: 6, ciekawostka: 6 } as const;
  * torów (ok. 3,5 s, `ekran/_ekran/wyscig.tsx`). Do tego dochodzi do 1,5 s, zanim TV zapyta o krok (/api/auto).
  */
 const PO_PYTANIU = { wynik: 4, odpowiedzi: 4, ranking: 4.5, rankingKoniecEtapu: 7 } as const;
+/** Odpowiedzi graczy z wyjaśnieniem poprawnej odpowiedzi (`dane.wyjasnienie`): dłużej, żeby sala zdążyła przeczytać. */
+const ODPOWIEDZI_Z_WYJASNIENIEM_S = 14;
 /** Pytanie bez limitu czasu: po tylu sekundach automat sam pokazuje wynik. */
 const BEZ_LIMITU_S = 45;
 const WERBLE_S = 7;
@@ -58,10 +60,14 @@ export function nastepnyKrok(stan: PilotStan, teraz: number): AkcjaPilota | null
       return plansza(PLANSZA.etap) ? "nastepne" : null;
     case "wynik":
       if (stan.zadanie?.typ === "piwo") return s >= DEGUSTACJA.wyniki ? (stan.ostatnie_zadanie ? "podium" : "nastepne") : null;
-      if (stan.zadanie?.typ === "ciekawostka") return plansza(PLANSZA.ciekawostka) ? "nastepne" : null;
+      // plansza z dłuższym tekstem (np. ściąga w punktach) stoi dłużej: ok. 20 znaków na sekundę czytania
+      if (stan.zadanie?.typ === "ciekawostka") {
+        const czytanie = Math.ceil((stan.zadanie.dane?.tekst?.length ?? 0) / 20);
+        return plansza(Math.max(PLANSZA.ciekawostka, czytanie)) ? "nastepne" : null;
+      }
       return s >= PO_PYTANIU.wynik ? "odpowiedzi" : null;
     case "odpowiedzi":
-      return s >= PO_PYTANIU.odpowiedzi ? "ranking" : null;
+      return s >= (stan.zadanie?.dane?.wyjasnienie ? ODPOWIEDZI_Z_WYJASNIENIEM_S : PO_PYTANIU.odpowiedzi) ? "ranking" : null;
     case "ranking":
       // każda kolejna strona rankingu (po 10 graczy) to dłuższe czekanie
       if (
