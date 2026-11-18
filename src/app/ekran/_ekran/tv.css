@@ -4846,3 +4846,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* długi tytuł quizu w poczekalni (tv.tsx): mniejszy font i do 3 linii zamiast ucinania */
+.tv-tytul-quizu.dlugi {
+  font-size: 72px !important;
+  -webkit-line-clamp: 3;
+}

@@ -452,7 +452,10 @@ function Poczekalnia({
 
         <section className="tv-prawa">
           {stan.okazja && <p className="tv-okazja">{stan.okazja}</p>}
-          <h1 className="tv-tytul-quizu">{stan.quiz?.tytul ?? "Quiz"}</h1>
+          {/* długi tytuł mniejszym fontem i na 3 linie, żeby się nie ucinał (18.11, quiz JOWES) */}
+          <h1 className={`tv-tytul-quizu${(stan.quiz?.tytul?.length ?? 0) > 28 ? " dlugi" : ""}`}>
+            {stan.quiz?.tytul ?? "Quiz"}
+          </h1>
           {start && doStartu !== null && (
             <p className="tv-start">
               Start <strong>{kiedyStart(start)}</strong> · {opisOdliczania(doStartu)}
