@@ -4793,3 +4793,9 @@
   font-size: 44px;
   line-height: 1.15;
 }
+
+/* długie odpowiedzi (całe zdania, np. pytania JOWES): mniejszy font, żeby kafelek nie miał 6 linii */
+.tv-odp-lista.dlugie .tv-odp {
+  font-size: 32px;
+  line-height: 1.25;
+}

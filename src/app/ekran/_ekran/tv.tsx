@@ -655,7 +655,7 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
           <ol
             className={`tv-odp-lista${z.typ === "prawda_falsz" ? " tv-odp-pf" : ""}${
               (z.dane.odpowiedzi?.length ?? 0) > 4 ? " gesto" : ""
-            }`}
+            }${(z.dane.odpowiedzi ?? []).some((o) => o.length > 70) ? " dlugie" : ""}`}
           >
             {(z.dane.odpowiedzi ?? []).map((o, i) => {
               const klasa = !wynik ? "" : czyPoprawna(i) ? " poprawna" : " przygaszona";
