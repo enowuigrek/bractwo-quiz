@@ -114,6 +114,21 @@ export function SeriaGracza({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
 
   // koniec pytań albo czasu: bez „Gotowe!”, który mignąłby zwycięzcy i zdradził koniec. Zwykle od razu
   // ciemny ekran werbli; w pijanym finale sam pasek, z którego płynnie wychodzi „pytanie 15/14”
+  // pula pytań się skończyła, a finał trwa (inni jeszcze odpowiadają, 18.11): zamiast ciemnych werbli, które wyglądały
+  // jak zawieszony telefon, krótki komunikat z paskiem czasu. Z pijanym finałem bez zmian (nie zdradzać dogrywki)
+  if (!teraz_ && zostalo > 0 && !stan.pijany_final) {
+    return (
+      <>
+        <p className="etykieta gra-pasek">
+          <span>Finał</span>
+          <span className="gra-kod">{Math.ceil(zostalo / 1000)} s</span>
+        </p>
+        {pasek}
+        <h1>Wszystkie pytania za Tobą!</h1>
+        <p className="gra-kibic">Pozostali jeszcze odpowiadają. Patrz na telewizor, kto pierwszy dobiegnie do mety.</p>
+      </>
+    );
+  }
   if (!teraz_ || zostalo <= 0) {
     return stan.pijany_final ? pasek : <Werble />;
   }
