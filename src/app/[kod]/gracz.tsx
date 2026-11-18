@@ -513,10 +513,20 @@ function WGrze({
         </p>
         <h1>Finał bez Ciebie</h1>
         {moj && <Miejsce moj={moj} />}
-        <p className="etap-uwaga">
-          Niestety nie wchodzisz do finału. Za chwilę zacznie się wyścig finalistów, a Ty stąd, z telefonu, będziesz
-          kibicować finalistom: Twoje okrzyki pojawią się na telewizorze.
-        </p>
+        {/* motyw neutralny (JOWES, 18.11): bez kibicowania z telefonu, za to grafika z wynikiem */}
+        {neutralny ? (
+          <>
+            <p className="etap-uwaga">
+              Niestety nie wchodzisz do finału. Dzięki za grę! Finał obejrzysz na telewizorze.
+            </p>
+            {moj && <GrafikaGracza nick={ja.nick} moj={moj} stan={stan} />}
+          </>
+        ) : (
+          <p className="etap-uwaga">
+            Niestety nie wchodzisz do finału. Za chwilę zacznie się wyścig finalistów, a Ty stąd, z telefonu, będziesz
+            kibicować finalistom: Twoje okrzyki pojawią się na telewizorze.
+          </p>
+        )}
       </>
     );
   }
@@ -574,9 +584,19 @@ function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSe
       <h1>Odpadasz po {moj.odpadl}. etapie</h1>
       <Miejsce moj={moj} />
       <p className="etap-uwaga">
-        Dzięki za walkę! Zostań z nami do finału: wtedy stąd, z telefonu, będziesz kibicować finalistom, a Twoje
-        okrzyki pojawią się na telewizorze.
+        {neutralny
+          ? "Dzięki za grę! Zostań z nami do finału: obejrzysz go na telewizorze."
+          : "Dzięki za walkę! Zostań z nami do finału: wtedy stąd, z telefonu, będziesz kibicować finalistom, a Twoje okrzyki pojawią się na telewizorze."}
       </p>
+      <GrafikaGracza nick={nick} moj={moj} stan={stan} />
+    </>
+  );
+}
+
+/** Grafika na pamiątkę z miejscem z tej chwili (odpadnięci przed finałem i spoza finału). */
+function GrafikaGracza({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSesji }) {
+  const neutralny = useNeutralny();
+  return (
       <UdostepnijWynik
         wynik={{
           tytul: stan.quiz?.tytul ?? "Quiz",
@@ -592,7 +612,6 @@ function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSe
         }}
         konta={[stan.lokal?.instagram, stan.browar?.instagram]}
       />
-    </>
   );
 }
 

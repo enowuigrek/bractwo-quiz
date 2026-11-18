@@ -26,6 +26,18 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   const [wyslane, ustawWyslane] = useState(0);
   const [wysylam, ustawWysylam] = useState(false);
   const [blad, ustawBlad] = useState<string | null>(null);
+
+  // motyw neutralny (JOWES, 18.11): bez okrzyków kibiców (mniej ruchu przy dużej grupie), finał ogląda się na TV
+  if (neutralny) {
+    return (
+      <>
+        <p className="etykieta gra-pasek">
+          <span>Finał</span>
+        </p>
+        <p className="gra-kibic">Finał trwa na telewizorze. Trzymaj kciuki za finalistów!</p>
+      </>
+    );
+  }
   const od = stan.faza_od ? Date.parse(stan.faza_od) : teraz;
   const do_ = stan.faza_do ? Date.parse(stan.faza_do) : Infinity;
   const f = finalisci[Math.min(wybrany, finalisci.length - 1)];

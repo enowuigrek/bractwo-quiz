@@ -2,9 +2,11 @@
 
 // Grafiki do udostępnienia w social mediach, rysowane w przeglądarce na <canvas>:
 // wynik gracza i podium gry dla lokalu (obie relacje 1080×1920).
-// Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru.
+// Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru (w motywie neutralnym jasna
+// grafika z samym logo motywu, 18.11).
 
 import { adresZdjecia, kolorNicku, kolorZAdresu, przesun, ZLOTY_KAPSEL } from "./kapsel";
+import { LOGO_NEUTRALNE } from "./motyw";
 
 export type LogoNaGrafice = { nazwa: string; logo_url: string | null } | null;
 
@@ -17,6 +19,8 @@ type Wspolne = {
   data: string;
   /** Konta do oznaczenia (z @), wypisane na dole grafiki. */
   oznaczenia?: string[];
+  /** Motyw neutralny (JOWES, 18.11): jasna grafika z logo motywu, bez logo Bractwa i bez „Piwu Cześć!”. */
+  neutralny?: boolean;
 };
 
 export type DaneWyniku = Wspolne & {
@@ -36,6 +40,13 @@ export type DanePodium = Wspolne & {
 const ZLOTO = "#e3ac3f";
 const PIANA = "#f4ecd8";
 const SZARY = "#9aa3ad";
+/** Kolory tekstu: na ciemnej grafice Bractwa kremowe i złote, na jasnej (motyw neutralny) ciemne i pomarańczowe. */
+function barwy(neutralny?: boolean) {
+  return neutralny
+    ? { tekst: "#1f1f1f", akcent: "#e58e00", szary: "#6b7480" }
+    : { tekst: PIANA, akcent: ZLOTO, szary: SZARY };
+}
+
 const METALE: Record<number, [string, string, string]> = {
   1: ["#fbe7a1", "#e3ac3f", "#8a5d10"],
   2: ["#f1f3f5", "#c5ccd3", "#6b747c"],
@@ -88,6 +99,15 @@ function rysujWpasowany(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x:
 
 /** Rząd logo wyśrodkowany w poziomie: Bractwo, lokal, × browar. */
 async function rysujLoga(ctx: CanvasRenderingContext2D, d: Wspolne, szer: number, y: number, wys: number) {
+  // motyw neutralny: samo logo motywu (lokal to ta sama organizacja, 18.11)
+  if (d.neutralny) {
+    const logo = await moze(LOGO_NEUTRALNE);
+    if (logo) {
+      const w = Math.min(szer - 160, wys * (logo.width / logo.height));
+      rysujWpasowany(ctx, logo, (szer - w) / 2, y, w, wys);
+    }
+    return;
+  }
   const [bractwo, lokal, browar] = await Promise.all([
     logoBractwa(),
     moze(d.lokal?.logo_url),
@@ -183,7 +203,17 @@ async function rysujAwatar(
   ctx.fillText(String(d.miejsce), cx, cy + r * 0.9 + rn * 0.05);
 }
 
-function tlo(ctx: CanvasRenderingContext2D, szer: number, wys: number) {
+function tlo(ctx: CanvasRenderingContext2D, szer: number, wys: number, neutralny?: boolean) {
+  if (neutralny) {
+    ctx.fillStyle = "#fffaf2";
+    ctx.fillRect(0, 0, szer, wys);
+    const blask = ctx.createRadialGradient(szer / 2, wys * 0.45, 0, szer / 2, wys * 0.45, szer * 0.9);
+    blask.addColorStop(0, "rgba(229, 142, 0, 0.18)");
+    blask.addColorStop(1, "rgba(229, 142, 0, 0)");
+    ctx.fillStyle = blask;
+    ctx.fillRect(0, 0, szer, wys);
+    return;
+  }
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, szer, wys);
   const blask = ctx.createRadialGradient(szer / 2, wys * 0.45, 0, szer / 2, wys * 0.45, szer * 0.9);
@@ -219,17 +249,20 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
   const ctx = plotno.getContext("2d");
   if (!ctx) throw new Error("Ta przeglądarka nie umie narysować grafiki.");
   await document.fonts.ready;
-  tlo(ctx, S, W);
+  const b = barwy(d.neutralny);
+  tlo(ctx, S, W, d.neutralny);
 
   await rysujLoga(ctx, d, S, 150, 170);
-  tekst(ctx, (d.okazja ?? "Quiz Bractwa Piwnego").toUpperCase(), S / 2, 450, 38, ZLOTO, 700, S - 120);
-  tekst(ctx, d.tytul, S / 2, 520, 56, PIANA, 800, S - 120);
+  tekst(ctx, (d.okazja ?? (d.neutralny ? "Quiz" : "Quiz Bractwa Piwnego")).toUpperCase(), S / 2, 450, 38, b.akcent, 700, S - 120);
+  tekst(ctx, d.tytul, S / 2, 520, 56, b.tekst, 800, S - 120);
 
   await rysujAwatar(ctx, d, S / 2, 860, 230);
 
   const podium = d.miejsce <= 3;
-  tekst(ctx, podium ? TYTULY[d.miejsce] : `${d.miejsce}. miejsce`, S / 2, 1270, 110, podium ? (METALE[d.miejsce]?.[1] ?? ZLOTO) : PIANA);
-  tekst(ctx, d.nick, S / 2, 1380, 72, PIANA, 800, S - 120);
+  // na jasnej grafice ciemniejszy odcień medalu (srebro na bieli ginęło)
+  const medal = METALE[d.miejsce]?.[d.neutralny ? 2 : 1] ?? b.akcent;
+  tekst(ctx, podium ? TYTULY[d.miejsce] : `${d.miejsce}. miejsce`, S / 2, 1270, 110, podium ? medal : b.tekst);
+  tekst(ctx, d.nick, S / 2, 1380, 72, b.tekst, 800, S - 120);
   const wynik = d.punkty === null ? "" : ` · ${d.punkty.toLocaleString("pl-PL")} pkt`;
   tekst(
     ctx,
@@ -237,13 +270,13 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
     S / 2,
     1460,
     42,
-    SZARY,
+    b.szary,
     600,
   );
 
-  if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, SZARY, 600, S - 120);
-  tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, PIANA, 600, S - 120);
-  tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
+  if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, b.szary, 600, S - 120);
+  tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, b.tekst, 600, S - 120);
+  if (!d.neutralny) tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
   return naBlob(plotno);
 }
 
@@ -260,11 +293,12 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
   const ctx = plotno.getContext("2d");
   if (!ctx) throw new Error("Ta przeglądarka nie umie narysować grafiki.");
   await document.fonts.ready;
-  tlo(ctx, S, W);
+  const b = barwy(d.neutralny);
+  tlo(ctx, S, W, d.neutralny);
 
   await rysujLoga(ctx, d, S, 150, 170);
-  tekst(ctx, (d.okazja ?? "Quiz Bractwa Piwnego").toUpperCase(), S / 2, 450, 38, ZLOTO, 700, S - 120);
-  tekst(ctx, d.tytul, S / 2, 520, 56, PIANA, 800, S - 120);
+  tekst(ctx, (d.okazja ?? (d.neutralny ? "Quiz" : "Quiz Bractwa Piwnego")).toUpperCase(), S / 2, 450, 38, b.akcent, 700, S - 120);
+  tekst(ctx, d.tytul, S / 2, 520, 56, b.tekst, 800, S - 120);
 
   // 2. z lewej, 1. w środku i najwyżej, 3. z prawej; pod awatarem nick i punkty, pod nimi stopień z numerem
   const DNO = 1500;
@@ -287,17 +321,17 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
     ctx.fillRect(p.x - SZER_STOPNIA / 2, gora, SZER_STOPNIA, p.wys);
     tekst(ctx, String(g.miejsce), p.x, gora + Math.min(p.wys - 30, 130), 110, "rgba(0, 0, 0, 0.55)", 800);
 
-    if (g.punkty !== null) tekst(ctx, `${g.punkty.toLocaleString("pl-PL")} pkt`, p.x, gora - 30, 32, SZARY, 600);
-    tekst(ctx, g.nick, p.x, gora - 76, p.i === 0 ? 52 : 42, metal, 800, SZER_STOPNIA + 20);
+    if (g.punkty !== null) tekst(ctx, `${g.punkty.toLocaleString("pl-PL")} pkt`, p.x, gora - 30, 32, b.szary, 600);
+    tekst(ctx, g.nick, p.x, gora - 76, p.i === 0 ? 52 : 42, d.neutralny ? ciemny : metal, 800, SZER_STOPNIA + 20);
     await rysujAwatar(ctx, g, p.x, gora - 160 - p.r, p.r);
   }
   // linia podłogi pod stopniami
-  ctx.fillStyle = ZLOTO;
+  ctx.fillStyle = b.akcent;
   ctx.fillRect(S * 0.05, DNO, S * 0.9, 4);
 
-  if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, SZARY, 600, S - 120);
-  tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, PIANA, 600, S - 120);
-  tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
+  if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, b.szary, 600, S - 120);
+  tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, b.tekst, 600, S - 120);
+  if (!d.neutralny) tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
   return naBlob(plotno);
 }
 

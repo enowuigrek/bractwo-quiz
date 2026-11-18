@@ -64,9 +64,11 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
           </ul>
           {kibic && (
             <p className="pomocniczy">
-              {e.seria
-                ? "Tym razem kibicujesz: w trakcie finału dopingujesz finalistów z telefonu."
-                : "Tym razem kibicujesz. Pytania i tak zobaczysz tutaj."}
+              {neutralny
+                ? "Tym razem oglądasz finał na telewizorze."
+                : e.seria
+                  ? "Tym razem kibicujesz: w trakcie finału dopingujesz finalistów z telefonu."
+                  : "Tym razem kibicujesz. Pytania i tak zobaczysz tutaj."}
             </p>
           )}
         </section>

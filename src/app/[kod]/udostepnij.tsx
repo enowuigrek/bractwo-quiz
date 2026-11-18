@@ -29,7 +29,7 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
     ustawTrwa(true);
     ustawKomunikat(null);
     try {
-      const co = await udostepnij(await grafikaWyniku({ ...wynik, oznaczenia }), nazwa, tekstPosta);
+      const co = await udostepnij(await grafikaWyniku({ ...wynik, oznaczenia, neutralny }), nazwa, tekstPosta);
       if (co === "pobrano") ustawKomunikat("Grafika pobrana. Pochwal się nią w social mediach!");
     } catch (e) {
       ustawKomunikat((e as Error).message);
@@ -45,9 +45,6 @@ export function UdostepnijWynik({ wynik, konta }: Props) {
       ustawKomunikat(oznaczenia.join(" "));
     }
   }
-
-  // motyw neutralny: bez grafiki na pamiątkę (jest na niej logo Bractwa i „Piwu Cześć!”)
-  if (neutralny) return null;
 
   return (
     <section className="udostepnij" aria-label="Wynik na pamiątkę">
