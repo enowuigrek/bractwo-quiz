@@ -50,3 +50,12 @@ export function naDrodzeFinalu(g: PostepFinalisty, bezMety = false): number {
 export function miejsceZWyscigu(miejsce: number, finalistow: number | null | undefined): boolean {
   return !!finalistow && miejsce <= finalistow;
 }
+
+/** Ilu graczy wchodzi do finału (`quizy.finalistow`, 18.11; domyślnie 3). */
+export const ilu_finalistow = (stan: { quiz: { finalistow?: number } | null } | null | undefined): number =>
+  stan?.quiz?.finalistow ?? 3;
+
+/** „trójka”, „piątka”…: grupa finalistów do napisów („ta trójka wchodzi do finału”). */
+export function grupaFinalu(n: number): string {
+  return ({ 2: "dwójka", 3: "trójka", 4: "czwórka", 5: "piątka", 6: "szóstka", 7: "siódemka", 8: "ósemka" } as Record<number, string>)[n] ?? `${n} najlepszych`;
+}

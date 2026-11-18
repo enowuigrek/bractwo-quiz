@@ -6,6 +6,7 @@ import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
 import { useNeutralny } from "@/components/motyw";
+import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
 /**
  * Plansza wstępu (faza `wstep`, quiz z etapami): zanim ruszy rozgrzewka, prowadzący opowiada całą drogę.
@@ -39,14 +40,18 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
           <motion.p className="tv-wstep-opis" {...wejscie(2)}>
             Przed nami {plan.length} {plan.length >= 5 ? "etapów" : "etapy"}. Z każdym pytaniem ścigacie się do mety.
             {plan.some((e) => e.finalowy) &&
-              (stan.w_grze > 3 ? " Po drodze odpadają najsłabsi, a o zwycięstwo walczy finałowa trójka." : " Na końcu finał.")}
+              (stan.w_grze > ilu_finalistow(stan)
+                ? ` Po drodze odpadają najsłabsi, a o zwycięstwo walczy finałowa ${grupaFinalu(ilu_finalistow(stan))}.`
+                : " Na końcu finał.")}
           </motion.p>
         ) : (
           <motion.p className="tv-wstep-opis" {...wejscie(2)}>
             Przed nami {plan.length} {plan.length >= 5 ? "etapów" : "etapy"}. Z każdym pytaniem nalewa się piwo, a wy
             ścigacie się do niego.
             {/* o odpadaniu tylko, gdy ktoś odpadnie (przy 2–3 graczach wszyscy grają w finale) */}
-            {stan.w_grze > 3 ? " Po drodze odpadają najsłabsi, a o piwo walczy finałowa trójka." : " Na końcu finał o piwo."}
+            {stan.w_grze > ilu_finalistow(stan)
+              ? ` Po drodze odpadają najsłabsi, a o piwo walczy finałowa ${grupaFinalu(ilu_finalistow(stan))}.`
+              : " Na końcu finał o piwo."}
           </motion.p>
         )}
 

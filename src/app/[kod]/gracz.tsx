@@ -503,7 +503,7 @@ function WGrze({
         <h1>Finał bez Ciebie</h1>
         {moj && <Miejsce moj={moj} />}
         <p className="etap-uwaga">
-          Niestety nie wchodzisz do finału. Za chwilę zacznie się wyścig trójki, a Ty stąd, z telefonu, będziesz
+          Niestety nie wchodzisz do finału. Za chwilę zacznie się wyścig finalistów, a Ty stąd, z telefonu, będziesz
           kibicować finalistom: Twoje okrzyki pojawią się na telewizorze.
         </p>
       </>

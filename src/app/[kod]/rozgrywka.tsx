@@ -70,7 +70,6 @@ export function Rozgrywka({
   // szkic niezatwierdzonej odpowiedzi (pary, kilka dobrych, szacowanie; 18.11): gdy skończy się czas przed
   // „Zatwierdź”, wysyłamy go sam (baza przyjmuje odpowiedź do sekundy po czasie), żeby zrobione się liczyło
   const szkic = useRef<{ zadanieId: string; dane: DaneOdpowiedzi } | null>(null);
-  const wyslijSzkic = useRef<() => void>(() => undefined);
   const idZadania = z?.id ?? null;
   const onSzkic = useCallback(
     (dane: DaneOdpowiedzi | null) => {
@@ -78,8 +77,18 @@ export function Rozgrywka({
     },
     [idZadania],
   );
+
+  // Odpowiedź z tego telefonu albo, po odświeżeniu strony, zapisana w bazie.
+  const mojaZBazy = z && moj && moj.zadanie_nr === z.nr ? moj.odpowiedz : null;
+  const lokalna = z && wyslana?.zadanieId === z.id ? wyslana : null;
+  const moja = lokalna?.dane ?? mojaZBazy?.dane ?? null;
+
   useEffect(() => {
-    if (czasMinal) wyslijSzkic.current();
+    const s = szkic.current;
+    if (!czasMinal || !s || s.zadanieId !== idZadania || moja !== null || wysylam) return;
+    szkic.current = null;
+    void odpowiedz(s.dane, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- wysyłamy raz, w chwili końca czasu
   }, [czasMinal, idZadania]);
   const kibic = czyKibic(stan, ja.nick);
   // plansza etapu pokazała już, jak odpowiadać, więc bez podpowiedzi rodzaju pytania
@@ -102,10 +111,6 @@ export function Rozgrywka({
     );
   }
 
-  // Odpowiedź z tego telefonu albo, po odświeżeniu strony, zapisana w bazie.
-  const mojaZBazy = moj && moj.zadanie_nr === z.nr ? moj.odpowiedz : null;
-  const lokalna = wyslana?.zadanieId === z.id ? wyslana : null;
-  const moja = lokalna?.dane ?? mojaZBazy?.dane ?? null;
   const wybrana = moja?.odpowiedz ?? null;
   const czasOdp = lokalna?.czasMs ?? mojaZBazy?.czas_ms ?? null;
   const bladTeraz = blad?.zadanieId === z.id ? blad.tekst : null;
@@ -149,13 +154,6 @@ export function Rozgrywka({
       </>
     );
   }
-
-  wyslijSzkic.current = () => {
-    const s = szkic.current;
-    if (!z || !s || s.zadanieId !== z.id || moja !== null || wysylam) return;
-    szkic.current = null;
-    void odpowiedz(s.dane, true);
-  };
 
   async function odpowiedz(dane: DaneOdpowiedzi, poCzasie = false) {
     if (!z || wysylam || moja !== null || (czasMinal && !poCzasie)) return;
@@ -322,7 +320,7 @@ export function Rozgrywka({
       {naglowek}
       {kibic ? (
         <div className="werdykt czesciowo">
-          <span className="werdykt-tytul">Finał trójki</span>
+          <span className="werdykt-tytul">Finał</span>
           <span className="pomocniczy">Tym razem kibicujesz.</span>
         </div>
       ) : !gotowe ? (

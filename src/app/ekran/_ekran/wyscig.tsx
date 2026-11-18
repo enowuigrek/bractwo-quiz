@@ -12,6 +12,7 @@ import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { useNeutralny } from "@/components/motyw";
+import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
 const START_S = 0.8;
@@ -182,8 +183,9 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   // finał trójki: trzy drogi schodzą się pod szklanką na środku
   if (etap?.finalowy) {
     // z całej listy, nie ze strony rankingu
-    const nicki = stan.finalisci?.map((f) => f.nick) ?? wszyscy.slice(0, 3).map((w) => w.nick);
-    const finalisci = wszyscy.filter((w) => nicki.includes(w.nick)).slice(0, 3);
+    const fin = ilu_finalistow(stan);
+    const nicki = stan.finalisci?.map((f) => f.nick) ?? wszyscy.slice(0, fin).map((w) => w.nick);
+    const finalisci = wszyscy.filter((w) => nicki.includes(w.nick)).slice(0, fin);
     return (
       <MotionConfig reducedMotion="user">
         <div className="tv-wyscig">
@@ -228,7 +230,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
                   {wiersz}
                   <p className="wyscig-strefa-finalu">
                     {stan.etap?.final_po_etapie
-                      ? "▲ ta trójka wchodzi do finału ▲"
+                      ? `▲ ta ${grupaFinalu(ilu_finalistow(stan))} wchodzi do finału ▲`
                       : `▲ ${odciecie} najlepszych gra dalej ▲`}
                   </p>
                 </Fragment>

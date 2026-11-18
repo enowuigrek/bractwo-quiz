@@ -32,6 +32,7 @@ import { UdostepnijPilota } from "./udostepnij";
 import { MenuPanelu, type GraWMenu } from "@/app/admin/(panel)/_komponenty/menu";
 import { wylogujAdmina } from "@/app/admin/akcje";
 import { useNeutralny } from "@/components/motyw";
+import { ilu_finalistow } from "@/lib/gra/final";
 
 const kluczPilota = (kod: string) => `bractwo-quiz:pilot:${kod}`;
 
@@ -673,7 +674,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
               {!etap.finalowy && (etap.przechodzi !== null || etap.final_po_etapie) && (
                 <p>
                   <strong>Odpadanie:</strong> po tym etapie gra dalej{" "}
-                  {etap.final_po_etapie ? "trójka (finał)" : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
+                  {etap.final_po_etapie ? `${ilu_finalistow(stan)} (finał)` : `${etap.przechodzi} najlepszych`}; teraz gra {stan.w_grze}.
                 </p>
               )}
             </section>
@@ -756,7 +757,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
                   <p className="pomocniczy">
                     {etap.nazwa}
                     {bezPunktow(etap) ? "" : ` · punkty ${napisMnoznika(etap.mnoznik)}`}
-                    {stan.finalisci ? " · finał trójki" : ""}
+                    {stan.finalisci ? " · finał" : ""}
                   </p>
                 )}
                 <p className="pilot-tresc">{z.tresc}</p>

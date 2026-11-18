@@ -2,10 +2,11 @@
 // (`wewn.odetnij`). Tu wspólne opisy dla TV i telefonów: gdzie jest kreska i co się dzieje po drodze.
 
 import type { StanSesji, WierszRankingu } from "./typy";
+import { ilu_finalistow } from "./final";
 
 /** Ilu gra dalej po bieżącym etapie: walka o finał to trójka, inaczej próg etapu (null: nikt nie odpada). */
 export function odciecieEtapu(stan: StanSesji): number | null {
-  if (stan.etap?.final_po_etapie) return 3;
+  if (stan.etap?.final_po_etapie) return ilu_finalistow(stan);
   return stan.etap?.przechodzi ?? null;
 }
 
