@@ -84,10 +84,15 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             <motion.div className="tv-etap-glowa" {...wejscie(0)}>
               {e.ikona && <IkonaEtapu ikona={e.ikona} className="tv-etap-ikona" />}
               <div>
-                <p className="tv-okazja">
-                  Etap {e.nr} z {e.liczba}
-                  {e.finalowy ? " · finał" : ""}
-                </p>
+                {/* motyw neutralny: nazwa to już „Etap N”, więc nad nią tylko finał */}
+                {!neutralny ? (
+                  <p className="tv-okazja">
+                    Etap {e.nr} z {e.liczba}
+                    {e.finalowy ? " · finał" : ""}
+                  </p>
+                ) : (
+                  e.finalowy && <p className="tv-okazja">Finał</p>
+                )}
                 <h1>{e.nazwa}</h1>
               </div>
             </motion.div>

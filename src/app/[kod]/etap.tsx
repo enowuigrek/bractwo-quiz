@@ -16,9 +16,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
     <>
       <p className="nadtytul">{nick}</p>
       <p className="etykieta gra-pasek">
-        <span>
-          Etap {e.nr} z {e.liczba}
-        </span>
+        <span>{neutralny ? (e.finalowy ? "Finał" : "") : `Etap ${e.nr} z ${e.liczba}`}</span>
         {!e.finalowy && (
           <span className="gra-kod">{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} pyt.`}</span>
         )}

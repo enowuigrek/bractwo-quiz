@@ -59,7 +59,8 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
           {plan.map((e, i) => (
             <motion.li key={e.nr} className={e.finalowy ? "final" : undefined} {...wejscie(3 + i)}>
               {e.ikona ? <IkonaEtapu ikona={e.ikona} className="tv-wstep-ikona" /> : null}
-              <span className="tv-wstep-nr">{e.nr}</span>
+              {/* motyw neutralny: nazwa to już „Etap N” */}
+              {!neutralny && <span className="tv-wstep-nr">{e.nr}</span>}
               <span className="tv-wstep-nazwa">{e.nazwa}</span>
               <span className="tv-wstep-graja">{zLiczba(liczby[i].graja, "gra", "grają")}</span>
               {!e.finalowy && (

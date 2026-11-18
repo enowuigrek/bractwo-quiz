@@ -31,16 +31,8 @@ export function zPozegnaniem(tekst: string, motyw: Motyw): string {
   return motyw === "bractwo" ? `${tekst} Piwu Cześć!` : tekst;
 }
 
-/** Nazwy etapów z szablonu Bractwa (src/lib/etapy.ts) w motywie neutralnym: bez nawiązań do piwa. */
-const NAZWY_ETAPOW_NEUTRALNE: Record<string, string> = {
-  "Na jedno": "Jedno",
-  "Jednak więcej": "Więcej",
-  "Ile?": "Ile?",
-  "Jakoś się ułoży": "Poukładaj",
-  "Jeszcze zdążę": "Ostatnia prosta",
-};
-
-const nazwaEtapu = (nazwa: string) => NAZWY_ETAPOW_NEUTRALNE[nazwa] ?? nazwa;
+/** Etapy w motywie neutralnym są tylko ponumerowane (18.11, JOWES): „Etap 1”, „Etap 2”… zamiast nazw z szablonu Bractwa. */
+const nazwaEtapu = (nr: number) => `Etap ${nr}`;
 
 /** Opis etapu bez piwa: „jak to jedno piwo” znika, „wyścig do piwa” to wyścig do mety. */
 const opisEtapu = (opis: string | null) =>
@@ -51,10 +43,10 @@ const opisEtapu = (opis: string | null) =>
     .replace(/do piwa/g, "do mety");
 
 type ZEtapami = {
-  etap?: { nazwa: string; opis: string | null } | null;
-  nastepny_etap?: { nazwa: string; opis: string | null } | null;
-  plan_etapow?: { nazwa: string }[] | null;
-  etapy?: { nazwa: string }[] | null;
+  etap?: { nr: number; nazwa: string; opis: string | null } | null;
+  nastepny_etap?: { nr: number; nazwa: string; opis: string | null } | null;
+  plan_etapow?: { nr: number; nazwa: string }[] | null;
+  etapy?: { nr: number; nazwa: string }[] | null;
 };
 
 /**
@@ -63,13 +55,13 @@ type ZEtapami = {
  */
 export function etapyWMotywie<S extends ZEtapami>(stan: S): S {
   if (typeof document === "undefined" || document.documentElement.dataset.motyw !== "neutralny") return stan;
-  const etap = <E extends { nazwa: string; opis: string | null }>(e: E | null | undefined) =>
-    e ? { ...e, nazwa: nazwaEtapu(e.nazwa), opis: opisEtapu(e.opis) } : e;
+  const etap = <E extends { nr: number; nazwa: string; opis: string | null }>(e: E | null | undefined) =>
+    e ? { ...e, nazwa: nazwaEtapu(e.nr), opis: opisEtapu(e.opis) } : e;
   return {
     ...stan,
     etap: etap(stan.etap),
     nastepny_etap: etap(stan.nastepny_etap),
-    plan_etapow: stan.plan_etapow?.map((e) => ({ ...e, nazwa: nazwaEtapu(e.nazwa) })),
-    etapy: stan.etapy?.map((e) => ({ ...e, nazwa: nazwaEtapu(e.nazwa) })),
+    plan_etapow: stan.plan_etapow?.map((e) => ({ ...e, nazwa: nazwaEtapu(e.nr) })),
+    etapy: stan.etapy?.map((e) => ({ ...e, nazwa: nazwaEtapu(e.nr) })),
   } as S;
 }

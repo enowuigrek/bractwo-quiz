@@ -314,13 +314,14 @@ function Wstep({ stan }: { stan: StanSesji }) {
 }
 
 function Etap({ stan }: { stan: StanSesji }) {
+  const neutralny = useNeutralny();
   const e = stan.etap;
   if (!e) return null;
   return (
     <div className="pr-srodek pr-lewo">
       <p className="pr-nadtytul">
-        Etap {e.nr} z {e.liczba}
-        {e.finalowy ? " · finał" : ""}
+        {neutralny ? (e.finalowy ? "Finał" : "") : `Etap ${e.nr} z ${e.liczba}`}
+        {!neutralny && e.finalowy ? " · finał" : ""}
       </p>
       <h1 className="pr-tytul">{e.nazwa}</h1>
       {e.opis && <p className="pr-opis pr-opis-duzy">{e.opis}</p>}
