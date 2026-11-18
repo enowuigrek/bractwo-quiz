@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./gry/lista-gier";
 import { motywZadania } from "@/lib/motyw-serwer";
 import { slowaLokalu } from "@/lib/motyw";
+import { NapisUruchom } from "@/components/ikony";
 
 export default async function Panel() {
   const rola = await wymagajAdmina();
@@ -34,7 +35,7 @@ export default async function Panel() {
         <>
           <p>
             <Link href="/admin/gry/nowa" className="przycisk zloty">
-              ▶ Uruchom quiz
+              <NapisUruchom />
             </Link>
           </p>
           <section className="panel-sekcja">

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNeutralny } from "@/components/motyw";
 import { slowaLokalu } from "@/lib/motyw";
+import { NapisUruchom } from "@/components/ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
 const WSPOLNE = [
@@ -80,7 +81,7 @@ export function Nawigacja({
         className="przycisk-maly zloty nawigacja-start"
         aria-current={uruchamianie ? "page" : undefined}
       >
-        ▶ Uruchom<span className="na-szerokim"> quiz</span>
+        <NapisUruchom krotko />
       </Link>
     </nav>
   );

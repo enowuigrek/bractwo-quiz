@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useNeutralny } from "@/components/motyw";
 import { slowaLokalu } from "@/lib/motyw";
+import { NapisUruchom } from "@/components/ikony";
 
 /**
  * Menu panelu na telefonie (26.10, Łukasz: zakładki, „Uruchom”, ustawienia i „Wyloguj” w jednym rzędzie robiły
@@ -143,7 +144,7 @@ export function MenuPanelu({
             </Link>
           ) : (
             <Link href="/admin/gry/nowa" onClick={zamknij} className="przycisk zloty panel-menu-start">
-              ▶ Uruchom quiz
+              <NapisUruchom />
             </Link>
           )}
           {pozycja("/admin/gry", "Rozgrywki", "trwające gry i historia", sciezka.startsWith("/admin/gry") && !uruchamianie)}

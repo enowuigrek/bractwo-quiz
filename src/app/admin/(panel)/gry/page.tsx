@@ -8,6 +8,7 @@ import { wybraneMiasto, wybranyLokal, type LokalAutor } from "../_komponenty/lok
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
 import { rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { motywZadania } from "@/lib/motyw-serwer";
+import { NapisUruchom } from "@/components/ikony";
 
 export const metadata: Metadata = { title: "Rozgrywki" };
 
@@ -56,7 +57,7 @@ export default async function Gry({ searchParams }: PageProps<"/admin/gry">) {
       <div className="naglowek-strony">
         <h1>Rozgrywki</h1>
         <Link href="/admin/gry/nowa" className="przycisk-maly zloty tylko-telefon">
-          ▶ Uruchom quiz
+          <NapisUruchom />
         </Link>
       </div>
       <ZakladkiRodzaju neutralny={(await motywZadania()) === "neutralny"} zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />

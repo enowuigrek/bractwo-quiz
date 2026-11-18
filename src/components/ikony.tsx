@@ -226,3 +226,15 @@ export function IkonaPodium3() {
     </svg>
   );
 }
+
+/**
+ * Napis przycisku „▶ Uruchom quiz” (18.11): trójkąt ze znakiem wariantu tekstowego (U+FE0E), bo iPhone bez niego
+ * rysuje „▶” jako kolorowe emoji. `krotko`: na wąskim ekranie samo „Uruchom” (nawigacja panelu).
+ */
+export function NapisUruchom({ krotko = false }: { krotko?: boolean }) {
+  return (
+    <>
+      {"▶︎"} Uruchom{krotko ? <span className="na-szerokim"> quiz</span> : " quiz"}
+    </>
+  );
+}
