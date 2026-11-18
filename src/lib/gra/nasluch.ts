@@ -11,6 +11,9 @@ import { etapyWMotywie } from "@/lib/motyw";
  */
 export type Zdarzenie = "stan" | "gracz" | "odpowiedz" | "okrzyk" | "gra";
 
+/** Zdarzenia na temacie `sesja:<KOD>:tv` (tylko TV i pilot), reszta na `sesja:<KOD>`. */
+const TYLKO_TV: readonly Zdarzenie[] = ["odpowiedz", "okrzyk"];
+
 /**
  * Trzyma dane strony gry w zgodzie z bazą. Woła `pobierz`:
  * - od razu i po każdym (ponownym) podłączeniu do Realtime,
@@ -21,7 +24,12 @@ export type Zdarzenie = "stan" | "gracz" | "odpowiedz" | "okrzyk" | "gra";
  * Wywołania nie nakładają się: zdarzenie w trakcie pobierania kończy się jednym dodatkowym pobraniem.
  */
 export function useNasluch(kod: string, pobierz: () => Promise<void>, zdarzenia: Zdarzenie[], coIleMs = 5000) {
-  useNasluchTematu(`sesja:${kod}`, pobierz, zdarzenia, coIleMs);
+  // odpowiedzi i okrzyki idą na osobny temat `sesja:<KOD>:tv` (`wewn.rozglos`, 18.11): słuchają ich tylko TV i pilot,
+  // a telefony nie dostają powiadomienia po każdej odpowiedzi każdego gracza (przy 50 graczach 2500 na pytanie)
+  const glowne = zdarzenia.filter((z) => !TYLKO_TV.includes(z));
+  const tv = zdarzenia.filter((z) => TYLKO_TV.includes(z));
+  useNasluchTematu(`sesja:${kod}`, pobierz, glowne, coIleMs);
+  useNasluchTematu(`sesja:${kod}:tv`, pobierz, tv, 0);
 }
 
 /** Jak `useNasluch`, ale na dowolnym temacie Realtime (np. `lokal:<adres_ekranu>`). */
@@ -37,8 +45,10 @@ export function useNasluchTematu(
   });
 
   const klucz = zdarzenia.join(",");
+  // bez zdarzeń nie ma czego słuchać (np. telefon na temacie TV); `coIleMs` 0 = bez zapasowego odpytywania
 
   useEffect(() => {
+    if (!klucz) return;
     let trwa = false;
     let jeszcze = false;
     let zamkniete = false;
@@ -68,10 +78,12 @@ export function useNasluchTematu(
       if (status === "SUBSCRIBED") void odswiez();
     });
 
-    void odswiez();
-    const zegar = setInterval(() => void odswiez(), coIleMs);
+    // temat pomocniczy (bez odpytywania): start i powrót karty obsługuje już temat główny
+    const pomocniczy = coIleMs <= 0;
+    if (!pomocniczy) void odswiez();
+    const zegar = pomocniczy ? undefined : setInterval(() => void odswiez(), coIleMs);
     const naWidok = () => {
-      if (document.visibilityState === "visible") void odswiez();
+      if (!pomocniczy && document.visibilityState === "visible") void odswiez();
     };
     document.addEventListener("visibilitychange", naWidok);
 
