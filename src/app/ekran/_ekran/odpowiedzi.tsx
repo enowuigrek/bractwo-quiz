@@ -275,12 +275,13 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
 /** Pełna tabela wyników po grze: wszyscy gracze z miejscem i punktami. */
 export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
   const wiersze = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
-  const k = wiersze.length <= 10 ? 1 : wiersze.length <= 20 ? 2 : wiersze.length <= 45 ? 3 : 4;
+  const n = wiersze.length;
+  const k = n <= 10 ? 1 : n <= 20 ? 2 : n <= 45 ? 3 : n <= 60 ? 4 : 5;
   const druzyny = stan.tryb === "druzyny";
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`tv-tabela${wiersze.length > 20 ? " gesto" : ""}`}>
+      <div className={`tv-tabela${n > 20 ? " gesto" : ""}${n > 45 ? " bardzo-gesto" : ""}`}>
         <header className="tv-ranking-gora">
           <h1>Tabela wyników</h1>
           <p className="tv-okazja">{stan.quiz?.tytul}</p>
