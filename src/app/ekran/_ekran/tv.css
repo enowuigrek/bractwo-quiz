@@ -4822,3 +4822,14 @@
 [data-motyw="neutralny"] .tv-ciekawostka-tekst strong {
   color: #b86a00;
 }
+
+/* jasny motyw: nicki na podium w ciemniejszym srebrze i brązie (jasne metale ginęły na białym tle) */
+[data-motyw="neutralny"] .tv-koniec .metal-2 .tv-stopien-nick,
+[data-motyw="neutralny"] .metal-2 .tv-stopien-nick {
+  color: #5f6870;
+}
+
+[data-motyw="neutralny"] .tv-koniec .metal-3 .tv-stopien-nick,
+[data-motyw="neutralny"] .metal-3 .tv-stopien-nick {
+  color: #a5561c;
+}
