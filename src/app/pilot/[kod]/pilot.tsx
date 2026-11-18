@@ -358,7 +358,7 @@ export function Pilot({ kod, tokenZAdresu, boty, naglowek = true }: Props) {
                 type="button"
                 className={`pilot-ikona${stan.muzyka ? " wlaczony" : ""}`}
                 aria-pressed={stan.muzyka}
-                aria-label="Muzyka i dźwięki na TV"
+                aria-label="Muzyka na TV"
                 title={stan.muzyka ? "Muzyka na TV: gra" : "Muzyka na TV: wyłączona"}
                 disabled={wysylam}
                 onClick={() => akcja("muzyka")}
