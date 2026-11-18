@@ -200,7 +200,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         {naglowek}
         <KoniecEtapu stan={stan} />
 
-        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${neutralny ? (nagroda ? 300 : 0) : szklanka}px` }}>
+        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${neutralny ? 0 : szklanka}px` }}>
           {/* nowa strona: tory od nowa (klucz) ze stanem sprzed pytania na tej stronie, potem jazda i zamiana torów
               jak na pierwszej (30.10) */}
           <motion.div
@@ -250,8 +250,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
             </div>
           </motion.div>
 
-          {/* motyw neutralny: bez szklanki, tory na całą szerokość (z kolumną tylko na nagrodę) */}
-          {(!neutralny || nagroda) && (
+          {/* motyw neutralny: bez szklanki i nagrody, tory na całą szerokość */}
+          {!neutralny && (
             <Szklanka
               przed={nalanieSzklanki(stan.quiz, lp - 1)}
               teraz={nalanieSzklanki(stan.quiz, lp)}
