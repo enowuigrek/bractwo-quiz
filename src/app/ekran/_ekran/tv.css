@@ -1667,7 +1667,7 @@
 
 /* Nagroda pod nickiem na podium */
 .tv-stopien-nagroda {
-  margin: -8px 0 16px;
+  margin: 10px 0 16px;
   padding: 6px 18px;
   border: 2px solid var(--zloto);
   border-radius: var(--r-pill);
@@ -4857,12 +4857,12 @@
 .tv-ciekawostka-tekst .tekst-planszy-kafelki {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px 14px;
+  gap: 6px 14px;
 }
 
 .tv-ciekawostka-tekst .tekst-planszy-kafelki li {
-  padding: 6px 18px;
-  font-size: 22px;
+  padding: 3px 16px;
+  font-size: 20px;
   font-weight: var(--w-semibold);
   white-space: nowrap;
   overflow: hidden;
