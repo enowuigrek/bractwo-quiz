@@ -487,7 +487,7 @@ function Poczekalnia({
             <p className="tv-etykieta">
               {druzyny ? "Drużyny" : "Gracze"}{" "}
               <span className="tv-licznik">
-                {stan.liczba_graczy}/{stan.max_graczy}
+                {stan.liczba_graczy}
               </span>
             </p>
             {gracze.length === 0 ? (

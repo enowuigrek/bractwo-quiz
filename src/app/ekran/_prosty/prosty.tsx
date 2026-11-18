@@ -254,7 +254,7 @@ function Poczekalnia({
           </p>
         )}
         <p className="pr-nadtytul">
-          Gracze {stan.liczba_graczy}/{stan.max_graczy}
+          Gracze {stan.liczba_graczy}
         </p>
         <ul className="pr-nicki">
           {widoczni.map((g) => (

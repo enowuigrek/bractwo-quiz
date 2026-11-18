@@ -419,7 +419,7 @@ function WGrze({
         )}
         <section style={{ marginTop: "var(--section-gap)" }}>
           <p className="etykieta">
-            {stan.tryb === "druzyny" ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}/{stan.max_graczy}
+            {stan.tryb === "druzyny" ? "Drużyny" : "Gracze"} · {stan.liczba_graczy}
           </p>
           {/* przy wielu graczach tylko część listy (z Tobą), żeby ekran nie przewijał się */}
           <ul className="nicki">
