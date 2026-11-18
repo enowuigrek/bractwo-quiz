@@ -1434,9 +1434,23 @@ html:has(.kolumna) {
   margin: 18px 0 4px;
 }
 
-/* kod QR na całą szerokość linku pod nim i z odstępem od niego (26.10: stał krzywo i przyklejony) */
+/* gracz, pilot i ekran: obok siebie, gdy jest miejsce (desktop), na telefonie jedno pod drugim (18.11) */
+.pilot-udostepnij-siatka {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  column-gap: 32px;
+  align-items: start;
+}
+
+.pilot-udostepnij-siatka > section {
+  min-width: 0;
+}
+
+/* kod QR z odstępem od linku pod nim (26.10: stał krzywo i przyklejony); na telefonie na całą szerokość, na
+   desktopie najwyżej 240 px (18.11: rozlewał się na pół ekranu) */
 .pilot-udostepnij .qr {
   width: 100%;
+  max-width: 240px;
   margin: 10px 0 12px;
 }
 

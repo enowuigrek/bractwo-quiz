@@ -47,19 +47,26 @@ export function UdostepnijPilota({ kod, token }: { kod: string; token: string })
     >
       <summary className="etykieta">Dołączanie, przekazanie pilota, ekran</summary>
       {gracz && pilot && adres && (
-        <>
-          <h3>Dla gracza</h3>
-          {qrGracza && <div className="qr" dangerouslySetInnerHTML={{ __html: qrGracza }} />}
-          <LinkDoSkopiowania url={gracz} />
+        // na szerokim ekranie obok siebie, na telefonie jedno pod drugim (`.pilot-udostepnij-siatka`)
+        <div className="pilot-udostepnij-siatka">
+          <section>
+            <h3>Dla gracza</h3>
+            {qrGracza && <div className="qr" dangerouslySetInnerHTML={{ __html: qrGracza }} />}
+            <LinkDoSkopiowania url={gracz} />
+          </section>
 
-          <h3>Przekaż pilota</h3>
-          <p className="pomocniczy">Nie pokazuj graczom: link prowadzi do pilota.</p>
-          {qrPilota && <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />}
-          <LinkDoSkopiowania url={pilot} />
+          <section>
+            <h3>Przekaż pilota</h3>
+            <p className="pomocniczy">Nie pokazuj graczom: link prowadzi do pilota.</p>
+            {qrPilota && <div className="qr" dangerouslySetInnerHTML={{ __html: qrPilota }} />}
+            <LinkDoSkopiowania url={pilot} />
+          </section>
 
-          <h3>Ekran</h3>
-          <LinkDoSkopiowania url={`${adres}/ekran/${kod}`} />
-        </>
+          <section>
+            <h3>Ekran</h3>
+            <LinkDoSkopiowania url={`${adres}/ekran/${kod}`} />
+          </section>
+        </div>
       )}
     </details>
   );
