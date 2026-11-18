@@ -8,7 +8,7 @@ import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
 import type { Nagroda, StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { deszczKonfetti, wybuchKonfetti } from "@/lib/konfetti";
 import { zagraj } from "@/lib/gra/efekty";
-import { naStronieRankingu } from "@/lib/gra/wyscig";
+import { CZOLOWKA_RANKINGU, naStronieRankingu, tylkoCzolowka } from "@/lib/gra/wyscig";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 
@@ -37,6 +37,8 @@ export function Licznik({ wartosc }: { wartosc: number }) {
  */
 /** Wysokość paska „Koniec etapu” z odstępem (wyścig odejmuje ją od miejsca na tory). */
 export const KONIEC_ETAPU_PX = 128;
+/** Powyżej tylu wierszy (czołówka dużej gry) tabela jest jeszcze gęstsza (`.czolowka`). */
+const NA_STRONIE_GESTO = 10;
 
 /**
  * Ranking po ostatnim pytaniu etapu: duży pasek pod nagłówkiem, wjeżdża po chwili, żeby było widać, że etap się
@@ -54,6 +56,28 @@ export function KoniecEtapu({ stan }: { stan: StanSesji }) {
       <span>Koniec etapu {stan.etap.nr}</span>
       <span className="tv-koniec-etapu-nazwa">{stan.etap.nazwa}</span>
     </motion.div>
+  );
+}
+
+/** Wysokość linijki pod czołówką dużej gry (`ResztaRankingu`), do liczenia miejsca na tory wyścigu. */
+export const RESZTA_RANKINGU_PX = 64;
+
+/**
+ * Duża gra (18.11): pod czołówką rankingu ilu graczy jest dalej, a gdy kreska odpadania wypada poza czołówką, ilu
+ * gra dalej. Swoje miejsce każdy widzi na telefonie.
+ */
+export function ResztaRankingu({ stan, graczy }: { stan: StanSesji; graczy: number }) {
+  if (!tylkoCzolowka(graczy)) return null;
+  const odciecie = odciecieEtapu(stan);
+  return (
+    <p className="tv-ranking-reszta">
+      <span>
+        i jeszcze <strong>{graczy - CZOLOWKA_RANKINGU}</strong> graczy · swoje miejsce widzisz na telefonie
+      </span>
+      {odciecie !== null && odciecie > CZOLOWKA_RANKINGU && odciecie < graczy && (
+        <span className="tv-ranking-reszta-kreska">▲ {odciecie} najlepszych gra dalej</span>
+      )}
+    </p>
   );
 }
 
@@ -115,7 +139,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
           // nowa strona wchodzi cała (klucz), bez czekania na znikające wiersze poprzedniej
           <motion.ol
             key={strona}
-            className={`tv-ranking-lista${wiersze.length > 8 ? " gesto" : ""}`}
+            className={`tv-ranking-lista${wiersze.length > NA_STRONIE_GESTO ? " czolowka" : wiersze.length > 8 ? " gesto" : ""}`}
             initial={strona > 0 ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
@@ -140,7 +164,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
                   >
                     <span className="tv-ranking-miejsce">{miejsce}.</span>
                     <span className="tv-ranking-nick">
-                      <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={52} />
+                      <Awatar nick={w.nick} zdjecie={w.zdjecie} rozmiar={wiersze.length > NA_STRONIE_GESTO ? 36 : 52} />
                       <span>{w.nick}</span>
                     </span>
                     <span className="tv-ranking-zmiana">
@@ -171,6 +195,7 @@ export function RankingTv({ stan, ranking }: { stan: StanSesji; ranking: WierszR
             </AnimatePresence>
           </motion.ol>
         )}
+        <ResztaRankingu stan={stan} graczy={ranking.length} />
       </div>
     </MotionConfig>
   );

@@ -6,10 +6,10 @@ import { Awatar } from "@/components/awatar";
 import { zagraj } from "@/lib/gra/efekty";
 import type { StanSesji, WierszRankingu } from "@/lib/gra/typy";
 import { odciecieEtapu, wzgledemKreski } from "@/lib/gra/odpadanie";
-import { naStronieRankingu, naTrasie, naTrasieFinalu, nalanieSzklanki } from "@/lib/gra/wyscig";
+import { naStronieRankingu, naTrasie, naTrasieFinalu, nalanieSzklanki, tylkoCzolowka } from "@/lib/gra/wyscig";
 import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
-import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik } from "./ranking";
+import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik, RESZTA_RANKINGU_PX, ResztaRankingu } from "./ranking";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { useNeutralny } from "@/components/motyw";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
@@ -81,6 +81,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
       (700 -
         (strefaFinalu ? STREFA_PX + odstep : 0) -
         (koniecEtapu ? KONIEC_ETAPU_PX : 0) -
+        (tylkoCzolowka(wszyscy.length) ? RESZTA_RANKINGU_PX : 0) -
         (torow - 1) * odstep) /
         Math.max(1, torow),
     ),
@@ -262,6 +263,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
             />
           )}
         </div>
+        <ResztaRankingu stan={stan} graczy={wszyscy.length} />
       </div>
     </MotionConfig>
   );

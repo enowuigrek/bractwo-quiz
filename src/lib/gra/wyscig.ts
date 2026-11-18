@@ -12,14 +12,23 @@ import { NAZWY_NEUTRALNE } from "@/lib/motyw";
 export const NA_STRONIE_RANKINGU = 10;
 export const STRONA_RANKINGU_S = 5;
 
+/**
+ * Duża gra (18.11, JOWES: 70 graczy to było 7 stron po każdym pytaniu): powyżej `PELNY_RANKING_DO` graczy TV po
+ * pytaniu pokazuje tylko czołówkę (`CZOLOWKA_RANKINGU`) i ilu graczy jest dalej; swoje miejsce każdy widzi na telefonie.
+ */
+export const PELNY_RANKING_DO = 20;
+export const CZOLOWKA_RANKINGU = 15;
+export const tylkoCzolowka = (n: number) => n > PELNY_RANKING_DO;
+
 /** Ile stron rankingu przy `n` graczach. */
-export const stronyRankingu = (n: number) => Math.max(1, Math.ceil(n / NA_STRONIE_RANKINGU));
+export const stronyRankingu = (n: number) => (tylkoCzolowka(n) ? 1 : Math.max(1, Math.ceil(n / NA_STRONIE_RANKINGU)));
 
 /**
  * Ilu graczy na stronie: po równo na wszystkie strony (28.10, Łukasz: przy 12 graczach 6 + 6, a nie 10 + 2),
- * najwyżej `NA_STRONIE_RANKINGU`.
+ * najwyżej `NA_STRONIE_RANKINGU`; w dużej grze sama czołówka.
  */
-export const naStronieRankingu = (n: number) => Math.max(1, Math.ceil(n / stronyRankingu(n)));
+export const naStronieRankingu = (n: number) =>
+  tylkoCzolowka(n) ? CZOLOWKA_RANKINGU : Math.max(1, Math.ceil(n / stronyRankingu(n)));
 
 /** Domyślny i największy limit graczy w grze (26.10: na razie 20, bo tyle mieści ranking na dwóch stronach). */
 export const MAX_GRACZY = 70;

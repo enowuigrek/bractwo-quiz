@@ -10,6 +10,7 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { IkonaPuchar } from "@/components/ikony";
 import { useNeutralny } from "@/components/motyw";
+import { ilu_finalistow } from "@/lib/gra/final";
 
 /**
  * Plansza etapu na TV (faza `etap`): który to etap, nazwa i zasady, mnożnik i czas, a obok telefon,
@@ -113,10 +114,10 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             </motion.ul>
             {/* odpadanie: walka o finał (trójka) albo próg po etapie z `etap.przechodzi` (src/app/pilot/[kod]/progi.tsx) */}
             {/* tylko gdy ktoś naprawdę odpada (26.10: przy 2–3 graczach nic) */}
-            {e.final_po_etapie && stan.w_grze > 3 ? (
+            {e.final_po_etapie && stan.w_grze > ilu_finalistow(stan) ? (
               <motion.p className="tv-etap-walka" {...wejscie(4)}>
-                <IkonaPuchar /> Walka o finał: po tym etapie <strong>3 najlepszych</strong> wchodzi do finału,{" "}
-                {stan.w_grze - 3} odpada i kibicuje.
+                <IkonaPuchar /> Walka o finał: po tym etapie <strong>{ilu_finalistow(stan)} najlepszych</strong> wchodzi do finału,{" "}
+                {stan.w_grze - ilu_finalistow(stan)} odpada i kibicuje.
               </motion.p>
             ) : (
               !e.final_po_etapie &&

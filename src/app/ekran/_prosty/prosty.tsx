@@ -3,11 +3,11 @@
 
 import { useSyncExternalStore } from "react";
 import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
-import { META_FINALU, krokiFinalu, miejsceZWyscigu } from "@/lib/gra/final";
+import { META_FINALU, ilu_finalistow, krokiFinalu, miejsceZWyscigu } from "@/lib/gra/final";
 import { odciecieEtapu } from "@/lib/gra/odpadanie";
 import type { GraczNaLiscie, StanSesji, WierszOdpowiedzi, WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
-import { naStronieRankingu, quizKlasyczny, stronyRankingu } from "@/lib/gra/wyscig";
+import { CZOLOWKA_RANKINGU, naStronieRankingu, quizKlasyczny, stronyRankingu, tylkoCzolowka } from "@/lib/gra/wyscig";
 import { bezPunktow } from "@/lib/etapy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
@@ -331,7 +331,7 @@ function Etap({ stan }: { stan: StanSesji }) {
         {!e.seria && e.czas_s && <span>{e.czas_s} s na odpowiedź</span>}
         {!e.finalowy && <span>Pytań: {e.liczba_pytan}</span>}
       </p>
-      {e.final_po_etapie && <p className="pr-uwaga">Po tym etapie 3 najlepszych wchodzi do finału.</p>}
+      {e.final_po_etapie && <p className="pr-uwaga">Po tym etapie {ilu_finalistow(stan)} najlepszych wchodzi do finału.</p>}
       {!e.final_po_etapie && e.przechodzi !== null && (
         <p className="pr-uwaga">Po tym etapie gra dalej {e.przechodzi} najlepszych.</p>
       )}
@@ -568,7 +568,7 @@ function Ranking({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[]
         lewy={koniecEtapu ? `Koniec etapu ${stan.etap!.nr}` : "Ranking"}
         prawy={stan.zadanie ? `Po pytaniu ${stan.zadanie.lp}` : null}
       />
-      <ol className="pr-tabela">
+      <ol className={`pr-tabela${widoczni.length > 10 ? " pr-gesto" : ""}`}>
         {widoczni.map((w, i) => (
           <li
             key={w.nick}
@@ -590,6 +590,11 @@ function Ranking({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[]
       {stron > 1 && (
         <p className="pr-stopka">
           Strona {strona + 1} z {stron}
+        </p>
+      )}
+      {tylkoCzolowka(ranking.length) && (
+        <p className="pr-stopka">
+          i jeszcze {ranking.length - CZOLOWKA_RANKINGU} graczy · swoje miejsce widzisz na telefonie
         </p>
       )}
     </div>

@@ -510,6 +510,12 @@
   color: var(--zloto);
 }
 
+/* czołówka dużej gry: 15 wierszy */
+.pr-tabela.pr-gesto li {
+  padding: 4px 24px;
+  font-size: 30px;
+}
+
 .pr-tabela .pr-kreska {
   border-bottom: 4px dashed var(--zloto);
 }

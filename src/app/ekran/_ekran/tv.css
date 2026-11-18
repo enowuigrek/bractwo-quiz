@@ -948,6 +948,38 @@
   font-size: 36px;
 }
 
+/* czołówka dużej gry (15 wierszy, ranking.tsx) */
+.tv-ranking-lista.czolowka {
+  margin-top: 16px;
+  gap: 6px;
+}
+
+.tv-ranking-lista.czolowka .tv-ranking-wiersz {
+  height: 46px;
+  font-size: 30px;
+}
+
+/* pod czołówką dużej gry: ilu graczy jest dalej (ResztaRankingu) */
+.tv-ranking-reszta {
+  margin: 14px 0 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  font-size: 32px;
+  color: var(--szary);
+}
+
+.tv-ranking-reszta strong {
+  color: var(--piana);
+}
+
+.tv-ranking-reszta-kreska {
+  color: var(--zloto);
+  font-weight: var(--w-black);
+}
+
 /* odcięcie po etapie: pod ostatnim, kto gra dalej (ranking.tsx) */
 .tv-ranking-wiersz.granica {
   box-shadow: 0 6px 0 -2px var(--zloto);
