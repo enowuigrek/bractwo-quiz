@@ -235,3 +235,17 @@ export function liczbaCzesci(typ: TypZadania, dane: DaneWidoczne): number {
   if (typ === "pary") return dane.lewe?.length ?? 1;
   return 1;
 }
+
+
+/** Liczba dociągnięta do kroku suwaka szacowania i do zakresu. */
+export function naKrok(x: number, min: number, max: number, krok: number): number {
+  const n = Math.round((x - min) / krok);
+  const wynik = Math.min(max, Math.max(min, min + n * krok));
+  return Number(wynik.toFixed(6));
+}
+
+/**
+ * Skąd startuje suwak szacowania na telefonie (środek zakresu na kroku). Nieruszony suwak to brak odpowiedzi, więc
+ * poprawna nie może tu stać (18.11: pytanie JOWES 0–3 z poprawną 1,5 dawało 0 temu, kto zostawił dobrą liczbę).
+ */
+export const startSuwaka = (min: number, max: number, krok: number) => naKrok((min + max) / 2, min, max, krok);

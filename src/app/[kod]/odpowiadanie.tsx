@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ZadanieWidoczne } from "@/lib/gra/typy";
-import { LITERY, celSzacowania, liczbaZJednostka, poprawnaSzacowania, type DaneOdpowiedzi } from "@/lib/zadania";
+import { LITERY, celSzacowania, liczbaZJednostka, naKrok, poprawnaSzacowania, startSuwaka, type DaneOdpowiedzi } from "@/lib/zadania";
 
 // Odpowiadanie na telefonie w nowych typach pytań. Każdy komponent dostaje `key={zadanie.id}`,
 // więc zaznaczenia czyszczą się przy następnym pytaniu. `wyslana`: odpowiedź już zapisana (blokuje zmiany).
@@ -54,18 +54,13 @@ export function OdpowiedzPrawdaFalsz({
 }
 
 /** Wartość z zakresu przyciągnięta do kroku (bez ogonów typu 0,30000000004). */
-function naKrok(x: number, min: number, max: number, krok: number): number {
-  const n = Math.round((x - min) / krok);
-  const wynik = Math.min(max, Math.max(min, min + n * krok));
-  return Number(wynik.toFixed(6));
-}
 
 /** Szacowanie: suwak z dużą liczbą i przyciskami −/+, potem „Zatwierdź”. */
 export function OdpowiedzLiczba({ z, wyslana, zablokowane, onWyslij, onSzkic }: Props) {
   const min = z.dane.min ?? 0;
   const max = z.dane.max ?? 100;
   const krok = z.dane.krok ?? 1;
-  const [wartosc, ustaw] = useState(() => naKrok((min + max) / 2, min, max, krok));
+  const [wartosc, ustaw] = useState(() => startSuwaka(min, max, krok));
   const [ruszona, ustawRuszona] = useState(false);
   const pokaz = wyslana?.liczba ?? wartosc;
   const koniec = !!wyslana || zablokowane;

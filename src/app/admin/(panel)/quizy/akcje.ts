@@ -16,7 +16,7 @@ import {
   SZABLONY_QUIZU,
   typDomyslny,
 } from "@/lib/etapy";
-import { czyTypZadania, PRAWDA_FALSZ, type Dodatki, type ZadanieDane } from "@/lib/zadania";
+import { czyTypZadania, PRAWDA_FALSZ, startSuwaka, type Dodatki, type ZadanieDane } from "@/lib/zadania";
 import { czytajPytania } from "@/lib/import-pytan";
 import { czytajTagi, listaQuizow, rodzajQuizu } from "@/lib/tagi";
 import { LIMITY, liczbaPytan } from "./limity";
@@ -316,6 +316,10 @@ function odczytajTresc(dane: FormData): { blad: string } | ({ tresc: string } & 
     const poprawna_do = liczbaZPola(surowe.poprawna_do);
     if (poprawna_do !== null && (poprawna_do <= poprawna || poprawna_do > max))
       return { blad: "„Poprawna do” musi być większa od poprawnej i w zakresie suwaka." };
+    // suwak startuje ze środka zakresu, a nieruszony suwak to brak odpowiedzi: kto zostawi dobrą liczbę, dostałby 0
+    const start = startSuwaka(min, max, krok);
+    if (start >= poprawna && start <= (poprawna_do ?? poprawna))
+      return { blad: "Poprawna liczba stoi na środku zakresu, skąd startuje suwak. Zmień zakres." };
     return {
       tresc,
       typ,
