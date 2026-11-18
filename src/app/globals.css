@@ -2076,22 +2076,20 @@ a.glowna-lokal:focus-visible {
   --pole: #0a0a0a;
 }
 
-/* Kto jak odpowiedział na telefonie (odpowiedzi-graczy.tsx): ramki w kolorach jak na TV, obok siebie, w środku
-   sama liczba (18.11: listy nicków przy dużej grupie były za długie); ramka z Tobą wyróżniona cieniem */
+/* Kto jak odpowiedział na telefonie (odpowiedzi-graczy.tsx): ramki w kolorach jak na TV, jedna pod drugą, w każdej
+   nazwa grupy z lewej i liczba z prawej (18.11: listy nicków przy dużej grupie były za długie, a obok siebie
+   „Częściowo” się ucinało); ramka z Tobą wyróżniona cieniem */
 .odpowiedzi-graczy {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  grid-auto-flow: column;
   gap: 10px;
   margin-top: 16px;
 }
 
 .odpowiedzi-graczy-ramka {
-  padding: 10px 8px 12px;
+  padding: 10px 16px;
   border: 2px solid var(--kamien2);
   border-radius: var(--r-card);
   background: var(--kamien);
-  text-align: center;
 }
 
 .odpowiedzi-graczy-ramka.dobrze {
@@ -2112,6 +2110,10 @@ a.glowna-lokal:focus-visible {
 }
 
 .odpowiedzi-graczy-etykieta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin: 0;
   font-size: var(--fs-small);
   font-weight: var(--w-black);
@@ -2131,11 +2133,10 @@ a.glowna-lokal:focus-visible {
   color: var(--czerwien);
 }
 
-/* liczba pod nazwą grupy, duża */
+/* liczba z prawej, duża */
 .odpowiedzi-graczy-etykieta span {
-  display: block;
-  margin-top: 4px;
-  font-size: 2rem;
+  font-size: 1.8rem;
+  line-height: 1;
   letter-spacing: 0;
   color: var(--piana);
 }
