@@ -67,7 +67,7 @@ export function Rozgrywka({
   const z = stan.zadanie;
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
 
-  // szkic niezatwierdzonej odpowiedzi (pary, kilka dobrych, szacowanie; 18.11): gdy skończy się czas przed
+  // szkic niezatwierdzonej odpowiedzi (pary, kolejność, kilka dobrych, szacowanie; 18.11): gdy skończy się czas przed
   // „Zatwierdź”, wysyłamy go sam (baza przyjmuje odpowiedź do sekundy po czasie), żeby zrobione się liczyło
   const szkic = useRef<{ zadanieId: string; dane: DaneOdpowiedzi } | null>(null);
   const idZadania = z?.id ?? null;
@@ -251,6 +251,7 @@ export function Rozgrywka({
             wyslana={moja}
             zablokowane={czasMinal || wysylam}
             onWyslij={(d) => void odpowiedz(d)}
+            onSzkic={onSzkic}
           />
         ) : z.typ === "pary" ? (
           <OdpowiedzPary

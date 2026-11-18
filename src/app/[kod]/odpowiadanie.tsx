@@ -170,9 +170,11 @@ export function OdpowiedzWielokrotna({ z, wyslana, zablokowane, onWyslij, onSzki
 }
 
 /** Kolejność: stukaj elementy po kolei, każdy dostaje numer. Stuknięcie ponumerowanego zdejmuje go, a dalsze numery się przesuwają. */
-export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij }: Props) {
+export function OdpowiedzKolejnosc({ z, wyslana, zablokowane, onWyslij, onSzkic }: Props) {
   const elementy = z.dane.elementy ?? [];
   const [ulozenie, ustaw] = useState<number[]>([]);
+  // szkic: to, co ułożone do tej pory (baza liczy dobrze ułożone sąsiednie pary)
+  useEffect(() => onSzkic?.(ulozenie.length ? { kolejnosc: ulozenie } : null), [ulozenie, onSzkic]);
   const ulozone = wyslana?.kolejnosc ?? ulozenie;
   const koniec = !!wyslana || zablokowane;
   const komplet = ulozenie.length === elementy.length;
@@ -420,7 +422,11 @@ export function Rozwiazanie({ z, moja }: { z: ZadanieWidoczne; moja: DaneOdpowie
     const el = z.dane.elementy ?? [];
     const twoja = moja?.kolejnosc ?? null;
     // para sąsiadów (i, i+1) jest dobra, gdy u gracza element p[i+1] stoi tuż za p[i] (tak liczy `wewn.ocena`)
-    const dobraPara = (i: number) => !!twoja && i + 1 < p.length && twoja[twoja.indexOf(p[i]) + 1] === p[i + 1];
+    // (niepełna kolejność po czasie: element, którego gracz nie ułożył, nie ma sąsiadów)
+    const dobraPara = (i: number) => {
+      const k = twoja ? twoja.indexOf(p[i]) : -1;
+      return !!twoja && k >= 0 && i + 1 < p.length && twoja[k + 1] === p[i + 1];
+    };
     return (
       <>
         <ol className="odp-lista">
