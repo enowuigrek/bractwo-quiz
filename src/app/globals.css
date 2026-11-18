@@ -4542,3 +4542,11 @@ button.kafelek {
   ) !important;
   background-color: transparent;
 }
+
+/* motyw neutralny: logo motywu (JOWES) stoi w nagłówkach z prawej, więc logo lokalu (to samo koło) w nagłówkach
+   znika; zostaje w tle gry i na ekranie lokalu bez gry */
+[data-motyw="neutralny"] .tv-logo-lokalu,
+[data-motyw="neutralny"] .pr-logo-lokalu,
+[data-motyw="neutralny"] .gra-loga-gospodarzy .gra-logo {
+  display: none;
+}
