@@ -143,11 +143,8 @@ const IKONY: Record<string, () => React.ReactElement> = {
 export function IkonaEtapu({ ikona, className }: { ikona: string; className: string }) {
   const nazwa = ikona.split("/").pop()?.replace(/\.[a-z]+$/, "") ?? "";
   const neutralny = useNeutralny();
-  const Ikona = (neutralny && IKONY_NEUTRALNE[nazwa]) || IKONY[nazwa];
-  if (!Ikona) return <img src={ikona} alt="" className={className} />;
-  return (
-    <span className={`${className} ikona-etapu`}>
-      <Ikona />
-    </span>
-  );
+  // proste funkcje rysujące SVG, wołane wprost (nie jako komponent wybrany w trakcie renderu)
+  const rysuj = (neutralny && IKONY_NEUTRALNE[nazwa]) || IKONY[nazwa];
+  if (!rysuj) return <img src={ikona} alt="" className={className} />;
+  return <span className={`${className} ikona-etapu`}>{rysuj()}</span>;
 }
