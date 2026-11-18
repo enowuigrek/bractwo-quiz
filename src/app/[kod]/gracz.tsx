@@ -404,7 +404,9 @@ function WGrze({
     return (
       <>
         <p className="nadtytul">Jesteś w grze</p>
-        <h1 style={{ color: "var(--zloto)", overflowWrap: "anywhere" }}>{ja.nick}</h1>
+        <h1 className="moj-nick" style={{ overflowWrap: "anywhere" }}>
+          {ja.nick}
+        </h1>
         {/* po dołączeniu kapsel jest zatwierdzony (27.10, Łukasz: bez poprawiania koloru i zdjęcia, żeby nie
             przeciągać), a zamiast tego godzina startu z odliczaniem, np. żeby zdążyć po piwo */}
         <div className="poczekalnia-kapsel">

@@ -4576,3 +4576,14 @@ button.kafelek {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   }
 }
+
+/* własny nick w poczekalni na telefonie (gracz.tsx): złoty w Bractwie, czarny w jasnym motywie JOWES */
+.moj-nick {
+  color: var(--zloto);
+}
+
+[data-motyw="neutralny"] .moj-nick,
+[data-motyw="neutralny"] .nicki li.ja,
+[data-motyw="neutralny"] .odpowiedzi-graczy li.ja span {
+  color: #1f1f1f;
+}
