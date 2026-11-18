@@ -4868,18 +4868,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* tabela wyników przy dużej grupie (ponad 45 graczy, do 70 od 18.11): niższe wiersze i mniejszy font */
-.tv-tabela.bardzo-gesto .tv-tabela-lista {
-  margin-top: 20px;
-  gap: 6px 20px;
-}
-
-.tv-tabela.bardzo-gesto .tv-tabela-wiersz,
-.tv-tabela.bardzo-gesto .tv-tabela-wiersz.finalista {
-  grid-template-columns: 48px minmax(0, 1fr) auto;
-  height: 42px;
-  padding: 0 12px;
-  gap: 10px;
-  font-size: 21px;
-}

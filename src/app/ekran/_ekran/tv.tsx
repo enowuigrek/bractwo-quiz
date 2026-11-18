@@ -760,6 +760,8 @@ function kluczEkranu(stan: StanSesji): string {
 
 /** Na końcu gry podium i tabela wyników zmieniają się co tyle sekund (pierwsze podium dłużej, o czas wjazdu). */
 const ZMIANA_KONCA_S = 10;
+/** Tyle graczy na jednej stronie tabeli na końcu gry (3 kolumny po 10). */
+const NA_STRONIE_TABELI = 30;
 
 /**
  * Koniec gry na TV (26.10, Łukasz): po podium (z wjazdem po kolei) TV sam pokazuje na zmianę pełną tabelę i podium
@@ -786,13 +788,17 @@ function KoniecNaZmiane({
   // pierwsze podium z wjazdem trwa dłużej; `tabela` i `koniec` od razu w rytmie co 10 s
   const pierwsze = stan.faza === "podium" ? RESZTA_PODIUM_S + ZMIANA_KONCA_S : ZMIANA_KONCA_S;
   const nr = (s < pierwsze ? 0 : 1 + Math.floor((s - pierwsze) / ZMIANA_KONCA_S)) + (stan.faza === "tabela" ? 1 : 0);
-  const tabela = nr % 2 === 1;
+  // duża grupa (18.11, do 70 graczy): tabela na kilka stron po `NA_STRONIE_TABELI`, każda przez `ZMIANA_KONCA_S`,
+  // potem znów podium (zamiast ściskać wszystkich na jednym ekranie)
+  const stronTabeli = Math.max(1, Math.ceil(ranking.length / NA_STRONIE_TABELI));
+  const miejsce = nr % (1 + stronTabeli);
+  const tabela = miejsce > 0;
   const dziekujemy = koniec || nr >= 2;
   return (
     <div key={nr} className="tv-ekran">
       {tabela ? (
         <div className="tv-koniec tv-koniec-tabela">
-          <TabelaTv stan={stan} ranking={ranking} />
+          <TabelaTv stan={stan} ranking={ranking} strona={miejsce - 1} stron={stronTabeli} />
           {dziekujemy && <p className="tv-dziekujemy">Dziękujemy za grę!<PiwuCzesc /></p>}
         </div>
       ) : (

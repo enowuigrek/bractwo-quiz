@@ -273,18 +273,34 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
 }
 
 /** Pełna tabela wyników po grze: wszyscy gracze z miejscem i punktami. */
-export function TabelaTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
-  const wiersze = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
+export function TabelaTv({
+  stan,
+  ranking,
+  strona = 0,
+  stron = 1,
+}: {
+  stan: StanSesji;
+  ranking: WierszRankingu[];
+  /** Duża grupa: która strona tabeli (po 30 graczy, KoniecNaZmiane w tv.tsx) i ile ich jest. */
+  strona?: number;
+  stron?: number;
+}) {
+  const wszystkie = [...ranking].sort((a, b) => a.miejsce - b.miejsce || a.nick.localeCompare(b.nick, "pl"));
+  const naStronie = Math.ceil(wszystkie.length / stron);
+  const wiersze = wszystkie.slice(strona * naStronie, (strona + 1) * naStronie);
   const n = wiersze.length;
-  const k = n <= 10 ? 1 : n <= 20 ? 2 : n <= 45 ? 3 : n <= 60 ? 4 : 5;
+  const k = n <= 10 ? 1 : n <= 20 ? 2 : 3;
   const druzyny = stan.tryb === "druzyny";
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`tv-tabela${n > 20 ? " gesto" : ""}${n > 45 ? " bardzo-gesto" : ""}`}>
+      <div className={`tv-tabela${n > 20 ? " gesto" : ""}`}>
         <header className="tv-ranking-gora">
           <h1>Tabela wyników</h1>
-          <p className="tv-okazja">{stan.quiz?.tytul}</p>
+          <p className="tv-okazja">
+            {stron > 1 ? `${strona + 1}/${stron} · ` : ""}
+            {stan.quiz?.tytul}
+          </p>
         </header>
         {wiersze.length === 0 ? (
           <p className="tv-zacheta">Nikt nie grał.</p>
