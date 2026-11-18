@@ -507,12 +507,22 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
         <header className="tv-naglowek">
           <LogaZBractwem lokal={stan.lokal} browar={stan.browar} />
         </header>
-        <div className="tv-ciekawostka-tresc">
+        {/* bez grafiki tekst na całą szerokość; długi tekst (np. ściąga w punktach, lista uczestników) mniejszym
+            fontem; nowe linie w tekście to nowe wiersze (18.11, plansze JOWES) */}
+        <div className={`tv-ciekawostka-tresc${z.grafika_url ? "" : " bez-grafiki"}`}>
           {z.grafika_url && <img src={z.grafika_url} alt="" className="tv-ciekawostka-grafika" />}
           <section>
-            <p className="tv-okazja">Ciekawostka</p>
+            <p className="tv-okazja tv-ciekawostka-etykieta">Ciekawostka</p>
             <h1>{z.tresc}</h1>
-            {z.dane.tekst && <p className="tv-ciekawostka-tekst">{z.dane.tekst}</p>}
+            {z.dane.tekst && (
+              <p
+                className={`tv-ciekawostka-tekst${
+                  z.dane.tekst.length > 700 ? " bardzo-dlugi" : z.dane.tekst.length > 380 ? " dlugi" : ""
+                }`}
+              >
+                {z.dane.tekst}
+              </p>
+            )}
           </section>
         </div>
       </div>
@@ -661,6 +671,9 @@ function Pytanie({ stan, teraz }: { stan: StanSesji; teraz: number }) {
           </ol>
         )}
       </div>
+
+      {/* wyjaśnienie po odsłonięciu odpowiedzi (`dane.wyjasnienie`, baza podaje je dopiero w fazie wyniku) */}
+      {wynik && z.dane.wyjasnienie && <p className="tv-wyjasnienie">{z.dane.wyjasnienie}</p>}
 
       <footer className="tv-pytanie-dol">
         {wynik ? (

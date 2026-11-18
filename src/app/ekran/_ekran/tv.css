@@ -4745,3 +4745,40 @@
 [data-motyw="neutralny"] .drogi-finalu-poswiata {
   display: none;
 }
+
+/* Plansza (ciekawostka) bez grafiki: tekst na całą szerokość; nowe linie w tekście to nowe wiersze; długi tekst
+   mniejszym fontem (18.11, plansze JOWES: ściągi w punktach, lista uczestników) */
+.tv-ciekawostka-tresc.bez-grafiki {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tv-ciekawostka-tekst {
+  white-space: pre-line;
+}
+
+.tv-ciekawostka-tekst.dlugi {
+  font-size: 30px;
+  line-height: 1.35;
+}
+
+.tv-ciekawostka-tekst.bardzo-dlugi {
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+/* motyw neutralny: plansze to nie tylko ciekawostki */
+[data-motyw="neutralny"] .tv-ciekawostka-etykieta {
+  display: none;
+}
+
+/* wyjaśnienie poprawnej odpowiedzi pod odpowiedziami, po odsłonięciu (`dane.wyjasnienie`) */
+.tv-wyjasnienie {
+  margin: 20px 0 0;
+  padding: 16px 24px;
+  border-left: 6px solid var(--zloto);
+  border-radius: 8px;
+  background: var(--kamien);
+  font-size: 28px;
+  line-height: 1.35;
+  color: var(--piana);
+}

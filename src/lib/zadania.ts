@@ -95,6 +95,8 @@ export type DaneWidoczne = {
   przedzial?: boolean;
   /** Ciekawostka: tekst pod tytułem. */
   tekst?: string;
+  /** Wyjaśnienie poprawnej odpowiedzi na TV po odsłonięciu (od fazy `wynik`, jak `poprawna`; 18.11). */
+  wyjasnienie?: string;
   /** Piwo (degustacja). */
   styl?: string | null;
   moc?: number | null;
