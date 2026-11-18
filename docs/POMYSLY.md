@@ -69,3 +69,16 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 
 - **Starsze telewizory Samsunga (przed 2025)**: od 25.10 jest prosty ekran (PLAN.md, „Prosty ekran TV…”). Zostało: sprawdzić na prawdziwym starym TV albo Chromium 69 (Rosetta) i ewentualnie dorobić animacje w prostym ekranie.
 - **Aplikacja Tizen z wyłączonym wygaszaczem** (25.10): mała pakowana aplikacja otwierająca ekran lokalu i wołająca `webapis.appcommon.setScreenSaver(SCREEN_SAVER_OFF)`; instalacja w trybie dewelopera (Apps2Samsung, konto Samsung, certyfikat na DUID telewizora). Niepewne, czy przebije wygaszacz OLED.
+
+## Porządki po JOWES (przegląd 18.11)
+
+- **Teksty motywu w jednym słowniku** zamiast ok. 44 rozgałęzień `neutralny ? … : …` („do piwa / do mety”, „Wyścig po piwo / Wyścig”). Opis etapów nie przez regex (`opisEtapu` w `motyw.ts`), tylko osobny tekst dla motywu. `etapyWMotywie` czyta `document` w warstwie danych: motyw przekazać jawnie.
+- **Domyślne liczby w jednym miejscu**: `DOMYSLNIE_FINALISTOW` zamiast rozsianych `?? 3`; napisy „finał trójki” (`formularz-quizu.tsx`, `zadania/edytor.tsx`, strona zasad) według quizu; `KROK_FINALU` (pijany finał) z mety quizu, nie z 12. W bazie: `coalesce(…, 3)` przy `not null default 3` zbędne.
+- **Martwy kod**: `wewn.meta_finalu()` bez argumentu, `zPozegnaniem` w `motyw.ts`, limit 12 graczy w `pilot_widok`; `ilu_finalistow` → `iluFinalistow`.
+- **TV: `useKolejnaPodpowiedz`** woła `pobierz` poza wspólną kolejką `useNasluch` (dwa pobrania stanu naraz, było tak i przed 18.11).
+- **Pary po czasie**: `-1` w szkicu dostaje kolor pary na telefonie przez ułamek sekundy (`odpowiadanie.tsx`, `para != null`).
+- **Migracje z `replace(pg_get_functiondef…)`** zawsze z `raise`, gdy wzorca nie ma (`wyjasnienie_ukryte_do_wyniku` tego nie ma).
+
+## Aplikacja dla firm (pomysł 18.11)
+
+- Wspólny rdzeń gry i „marka” jako ustawienie (dziś motyw z adresu, `src/lib/motyw.ts`): logo, kolory, czcionka, słownik tekstów, ikony etapów, dźwięki, co jest wyłączone (szklanka, pijany finał, kranoprzejęcie). Docelowo marka w bazie (organizacja → domena, logo, kolory) zamiast stałych w kodzie, a ustawienia gry (finaliści, meta, limity) w quizie, jak `quizy.finalistow` i `quizy.meta_finalu`.

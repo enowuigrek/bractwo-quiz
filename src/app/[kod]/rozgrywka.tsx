@@ -68,7 +68,7 @@ export function Rozgrywka({
   const { faza, doStartu, doKonca, czasMinal, bezLimitu } = fazaTeraz(stan, teraz);
 
   // szkic niezatwierdzonej odpowiedzi (pary, kolejność, kilka dobrych, szacowanie; 18.11): gdy skończy się czas przed
-  // „Zatwierdź”, wysyłamy go sam (baza przyjmuje odpowiedź do sekundy po czasie), żeby zrobione się liczyło
+  // „Zatwierdź”, wysyłamy go sam tuż przed końcem (baza przyjmuje odpowiedź do sekundy po czasie), żeby zrobione się liczyło
   const szkic = useRef<{ zadanieId: string; dane: DaneOdpowiedzi } | null>(null);
   const idZadania = z?.id ?? null;
   const onSzkic = useCallback(
@@ -83,13 +83,16 @@ export function Rozgrywka({
   const lokalna = z && wyslana?.zadanieId === z.id ? wyslana : null;
   const moja = lokalna?.dane ?? mojaZBazy?.dane ?? null;
 
+  // pół sekundy przed końcem, póki pytanie trwa (zwykły zapis, bez liczenia na sekundę zapasu w bazie przy słabym
+  // Wi-Fi); `czasMinal` zostaje na wypadek, gdyby telefon przespał tę chwilę
+  const koncowka = czasMinal || (faza === "pytanie" && !bezLimitu && doKonca <= 500);
   useEffect(() => {
     const s = szkic.current;
-    if (!czasMinal || !s || s.zadanieId !== idZadania || moja !== null || wysylam) return;
+    if (!koncowka || !s || s.zadanieId !== idZadania || moja !== null || wysylam) return;
     szkic.current = null;
     void odpowiedz(s.dane, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- wysyłamy raz, w chwili końca czasu
-  }, [czasMinal, idZadania]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- wysyłamy raz, tuż przed końcem czasu
+  }, [koncowka, idZadania]);
   const kibic = czyKibic(stan, ja.nick);
   // plansza etapu pokazała już, jak odpowiadać, więc bez podpowiedzi rodzaju pytania
   const zEtapami = (stan.quiz?.liczba_etapow ?? 0) > 0;
