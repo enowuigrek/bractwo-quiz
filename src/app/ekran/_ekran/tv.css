@@ -4833,3 +4833,16 @@
 [data-motyw="neutralny"] .metal-3 .tv-stopien-nick {
   color: #a5561c;
 }
+
+/* tabela wyników: „Tabela wyników” zawsze w jednej linii, długi tytuł quizu obok skraca się wielokropkiem */
+.tv-tabela .tv-ranking-gora h1 {
+  flex: none;
+  white-space: nowrap;
+}
+
+.tv-tabela .tv-ranking-gora .tv-okazja {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
