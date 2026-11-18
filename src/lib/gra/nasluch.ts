@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
 import type { FazaWidoczna, StanSesji } from "./typy";
+import { etapyWMotywie } from "@/lib/motyw";
 
 /**
  * Zdarzenia z bazy: na temacie `sesja:<KOD>` (patrz `wewn.rozglos`) oraz `gra`
@@ -108,7 +109,8 @@ export async function pobierzStan(kod: string): Promise<{ stan: StanSesji; przes
   const { data, error } = await supabase().rpc("stan_sesji", { p_kod: kod });
   const odebrano = Date.now();
   if (error) throw error;
-  const stan = data as StanSesji;
+  // motyw neutralny (np. JOWES): etapy bez nazw z piwem
+  const stan = etapyWMotywie(data as StanSesji);
   return { stan, przesuniecie: przesuniecieZegara(stan.teraz, wyslano, odebrano) };
 }
 

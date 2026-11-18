@@ -4660,3 +4660,47 @@
 [data-motyw="neutralny"] .tv-os-odp-kreska {
   background: rgba(0, 0, 0, 0.3);
 }
+
+/* motyw neutralny: odliczanie dokładnie na środku ekranu, na środku logo w tle (tlo.tsx): napisy nad i pod kółkiem
+   tej samej wysokości, a puste loga (logo lokalu w nagłówkach jest ukryte) nie zabierają miejsca */
+[data-motyw="neutralny"] .tv-srodek > .tv-loga {
+  display: none;
+}
+
+[data-motyw="neutralny"] .tv-srodek > .tv-okazja,
+[data-motyw="neutralny"] .tv-srodek > .tv-duzy {
+  display: flex;
+  justify-content: center;
+  height: 140px;
+  margin: 0;
+}
+
+[data-motyw="neutralny"] .tv-srodek > .tv-okazja {
+  align-items: flex-end;
+}
+
+[data-motyw="neutralny"] .tv-srodek > .tv-duzy {
+  align-items: flex-start;
+}
+
+/* odliczanie stało 16 px nad środkiem (nad nim i pod nim stoją jeszcze elementy sceny) */
+[data-motyw="neutralny"] .tv-srodek:has(> .tv-odliczanie) {
+  padding-top: 32px;
+}
+
+/* logo w tle bez przesuwania: tylko oddycha i lekko się obraca wokół środka, żeby odliczanie trafiało w jego środek */
+[data-motyw="neutralny"] .tv-tlo-logo {
+  animation-name: logo-tla-srodek;
+}
+
+@keyframes logo-tla-srodek {
+  0% {
+    transform: scale(1) rotate(-2.5deg);
+  }
+  50% {
+    transform: scale(1.06) rotate(0deg);
+  }
+  100% {
+    transform: scale(1.02) rotate(2.5deg);
+  }
+}
