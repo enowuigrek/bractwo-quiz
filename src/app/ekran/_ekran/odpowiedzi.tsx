@@ -13,6 +13,10 @@ import { LITERY, jedenWybor, liczbaCzesci, liczbaZJednostka, ulamek } from "@/li
  * Ile kolumn w ramce, żeby 30 graczy zmieściło się na scenie 1920×1080.
  * Wiersze płyną w dół kolumny (1–5 po lewej, 6–10 obok), jak w tabeli wyników.
  */
+/** Od tylu graczy ekran odpowiedzi pokazuje tylko najszybszych dobrych i liczby (18.11, do 70 graczy). */
+const DUZA_GRUPA = 36;
+const POKAZ_DOBRYCH = 24;
+
 function kolumny(n: number): number {
   // 18.11: do 70 graczy (JOWES), od 37 cztery kolumny
   return n <= 5 ? 1 : n <= 12 ? 2 : n <= 36 ? 3 : 4;
@@ -164,8 +168,12 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
   const czesciowo = odpowiedzi.filter((o) => o.poprawna === false && (o.ocena ?? 0) > 0);
   // brak odpowiedzi też w czerwonej ramce, na końcu (baza zwraca ich po odpowiedziach)
   const zle = odpowiedzi.filter((o) => o.poprawna === null || (o.poprawna === false && !((o.ocena ?? 0) > 0)));
+  // duża grupa (18.11, do 70 graczy): nicków nie da się przeczytać, więc w „Dobrze” najszybsi z dopiskiem
+  // „i jeszcze N”, a „Częściowo” i „Źle” same liczby
+  const duzo = odpowiedzi.length > DUZA_GRUPA;
+  const dobrePokaz = duzo ? dobre.slice(0, POKAZ_DOBRYCH) : dobre;
   // wspólna liczba kolumn dla wszystkich ramek i zagęszczenie: z liczby graczy, a gdy i tak się nie mieści, gęściej
-  const k = kolumny(odpowiedzi.length);
+  const k = duzo ? 3 : kolumny(odpowiedzi.length);
   const ekran = useRef<HTMLDivElement>(null);
   const [ciasno, ustawCiasno] = useState({ n: odpowiedzi.length, o: 0 });
   const o = ciasno.n === odpowiedzi.length ? ciasno.o : 0;
@@ -211,11 +219,14 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
           {dobre.length === 0 ? (
             <p className="tv-odpowiedzi-pusto">Nikt nie odpowiedział dobrze.</p>
           ) : (
-            <ol className="tv-odpowiedzi-lista" style={siatka(dobre.length, k)}>
-              {dobre.map((o, i) => (
-                <Wiersz key={o.nick} o={o} i={i} nr={i + 1} z={z} naDole={naDoleKolumny(i, dobre.length, k)} />
+            <ol className="tv-odpowiedzi-lista" style={siatka(dobrePokaz.length, k)}>
+              {dobrePokaz.map((o, i) => (
+                <Wiersz key={o.nick} o={o} i={i} nr={i + 1} z={z} naDole={naDoleKolumny(i, dobrePokaz.length, k)} />
               ))}
             </ol>
+          )}
+          {dobre.length > dobrePokaz.length && (
+            <p className="tv-odpowiedzi-pusto">i jeszcze {dobre.length - dobrePokaz.length}</p>
           )}
         </section>
 
@@ -224,7 +235,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             <p className="tv-odpowiedzi-etykieta">
               Częściowo <span>{czesciowo.length}</span>
             </p>
-            <ul className="tv-odpowiedzi-lista" style={siatka(czesciowo.length, k)}>
+            {!duzo && <ul className="tv-odpowiedzi-lista" style={siatka(czesciowo.length, k)}>
               {czesciowo.map((o, i) => (
                 <Wiersz
                   key={o.nick}
@@ -234,7 +245,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
                   naDole={naDoleKolumny(i, czesciowo.length, k)}
                 />
               ))}
-            </ul>
+            </ul>}
           </section>
         )}
 
@@ -243,7 +254,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
             <p className="tv-odpowiedzi-etykieta">
               Źle <span>{zle.length}</span>
             </p>
-            <ul className="tv-odpowiedzi-lista" style={siatka(zle.length, k)}>
+            {!duzo && <ul className="tv-odpowiedzi-lista" style={siatka(zle.length, k)}>
               {zle.map((o, i) => (
                 <Wiersz
                   key={o.nick}
@@ -253,7 +264,7 @@ export function OdpowiedziTv({ stan, odpowiedzi }: { stan: StanSesji; odpowiedzi
                   naDole={naDoleKolumny(i, zle.length, k)}
                 />
               ))}
-            </ul>
+            </ul>}
           </section>
         )}
       </div>
