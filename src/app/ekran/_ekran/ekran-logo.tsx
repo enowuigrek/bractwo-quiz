@@ -2,6 +2,8 @@
 /* eslint-disable @next/next/no-img-element -- logo lokalu z bucketu Supabase, skalowane CSS-em na scenie */
 
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
+import { useNeutralny } from "@/components/motyw";
+import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 type Props = {
   lokal: { nazwa: string; logo_url: string | null } | null;
@@ -18,6 +20,7 @@ type Props = {
  * dokłada tytuł, godzinę i odliczanie. Zapowiedziany wyścig po piwo ma dalej plansze (plansze.tsx).
  */
 export function EkranLogo({ lokal, zapowiedz = null, przesuniecie = 0 }: Props) {
+  const neutralny = useNeutralny();
   const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   return (
     <div className={`ekran-logo${zapowiedz ? " z-zapowiedzia" : ""}`}>
@@ -32,7 +35,7 @@ export function EkranLogo({ lokal, zapowiedz = null, przesuniecie = 0 }: Props) 
       {zapowiedz && (
         <div className="ekran-logo-zapowiedz">
           {zapowiedz.okazja && <p className="tv-okazja">{zapowiedz.okazja}</p>}
-          <h1 className="plansza-tytul">{zapowiedz.tytul ?? "Pub quiz"}</h1>
+          <h1 className="plansza-tytul">{zapowiedz.tytul ?? nazwaRodzajuQuizu("klasyczny", neutralny)}</h1>
           {zapowiedz.planowany_start && doStartu !== null && (
             <p className="plansza-start">
               <span>

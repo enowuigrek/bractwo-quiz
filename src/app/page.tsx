@@ -3,6 +3,7 @@ import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { WpiszKod } from "./ekran/wpisz-kod";
 import { motywZadania } from "@/lib/motyw-serwer";
+import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 
 // zapowiedzi zmieniają się rzadko: odświeżamy co minutę zamiast przy każdym wejściu
 export const revalidate = 60;
@@ -81,7 +82,7 @@ export default async function Home() {
                   <span>
                     {[
                       kiedy(g.planowany_start),
-                      g.okazja ?? ((g.quizy?.etapy[0]?.count ?? 0) > 0 ? "Wyścig po piwo" : "Pub quiz"),
+                      g.okazja ?? nazwaRodzajuQuizu(rodzajQuizu(g.quizy ?? {}), neutralny),
                       g.lokale?.miasto,
                     ]
                       .filter(Boolean)

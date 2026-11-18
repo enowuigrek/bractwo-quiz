@@ -18,7 +18,7 @@ import { usunieciGry, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../wyn
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
 import { motywZadania } from "@/lib/motyw-serwer";
-import { NAZWY_NEUTRALNE } from "@/lib/motyw";
+import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { Notatki, type AutorNotatki } from "./notatki";
 import { PrzegladPytan, type GraczPrzegladu } from "./przeglad-pytan";
@@ -372,16 +372,7 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
               dane={{
                 tytul: gra.quizy?.tytul ?? "Quiz",
                 // bez okazji rodzaj gry, jak na grafice gracza
-                // motyw neutralny (JOWES): nazwy bez piwa i pubu
-                okazja:
-                  gra.okazja ??
-                  ((gra.quizy?.etapy[0]?.count ?? 0) > 0
-                    ? neutralny
-                      ? NAZWY_NEUTRALNE.wyscig
-                      : "Wyścig po piwo"
-                    : neutralny
-                      ? NAZWY_NEUTRALNE.klasyczny
-                      : "Pub quiz"),
+                okazja: gra.okazja ?? nazwaRodzajuQuizu(rodzajQuizu(gra.quizy ?? {}), neutralny),
                 lokal: gra.lokale ? { nazwa: gra.lokale.nazwa, logo_url: gra.lokale.logo_url } : null,
                 browar: gra.browar_nazwa ? { nazwa: gra.browar_nazwa, logo_url: gra.browar_logo_url } : null,
                 data: new Date(gra.faza_od ?? gra.utworzono).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw" }),

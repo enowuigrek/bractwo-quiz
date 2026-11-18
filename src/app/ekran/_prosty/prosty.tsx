@@ -16,6 +16,7 @@ import { sekundy } from "@/lib/czas";
 import "./prosty.css";
 import { LogoBractwa } from "@/components/logo-bractwa";
 import { useNeutralny } from "@/components/motyw";
+import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 // Prosty ekran TV dla starszych przeglądarek telewizorów (src/lib/gra/prosty.ts: kiedy się włącza). Te same dane
 // i ta sama gra co pełny ekran (pobiera je Tv w ekran/_ekran/tv.tsx, muzyka i efekty grają jak zwykle), tylko bez
@@ -85,6 +86,7 @@ export function LogoProste({
   zapowiedz: Pick<Zapowiedz, "planowany_start" | "tytul" | "okazja"> | null;
   przesuniecie: number;
 }) {
+  const neutralny = useNeutralny();
   const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   return (
     <div className="pr-srodek">
@@ -98,7 +100,7 @@ export function LogoProste({
         <h1 className="pr-tytul">{lokal?.nazwa ?? "Quiz"}</h1>
       )}
       {zapowiedz?.okazja && <p className="pr-nadtytul">{zapowiedz.okazja}</p>}
-      {zapowiedz && <h1 className="pr-tytul pr-tytul-maly">{zapowiedz.tytul ?? "Pub quiz"}</h1>}
+      {zapowiedz && <h1 className="pr-tytul pr-tytul-maly">{zapowiedz.tytul ?? nazwaRodzajuQuizu("klasyczny", neutralny)}</h1>}
       {zapowiedz?.planowany_start && doStartu !== null && (
         <p className="pr-start">
           Start <strong>{kiedyStart(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}

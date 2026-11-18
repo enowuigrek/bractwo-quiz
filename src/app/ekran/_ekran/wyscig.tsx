@@ -12,6 +12,7 @@ import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik, RESZTA_RANKINGU_PX, ResztaRankingu } from "./ranking";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
 import { useNeutralny } from "@/components/motyw";
+import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
 /** Po ilu sekundach od wejścia ekranu wszystko rusza (najpierw widać stan sprzed pytania). */
@@ -176,7 +177,13 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
 
   const naglowek = (
     <header className="tv-ranking-gora">
-      <h1>{neutralny ? (etap?.finalowy ? "Finał" : "Wyścig") : etap?.finalowy ? "Finał: wyścig po piwo" : "Wyścig po piwo"}</h1>
+      <h1>
+        {etap?.finalowy
+          ? neutralny
+            ? "Finał"
+            : `Finał: ${nazwaRodzajuQuizu("wyscig").toLowerCase()}`
+          : nazwaRodzajuQuizu("wyscig", neutralny)}
+      </h1>
       {z && <p className="tv-okazja">{`${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}</p>}
     </header>
   );

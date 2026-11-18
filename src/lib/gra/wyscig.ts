@@ -1,4 +1,4 @@
-import { NAZWY_NEUTRALNE } from "@/lib/motyw";
+import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 // Wyścig zamiast tabeli rankingu. Położenie zależy tylko od własnych punktów w stałej skali (część maksimum
 // do zdobycia przed finałem), więc zła odpowiedź = stoisz w miejscu, a szybka dobra = większy krok niż wolna.
@@ -48,9 +48,8 @@ export function nazwaRodzaju(
   neutralny = false,
 ): string {
   if (!stan?.quiz) return "Quiz";
-  if (stan.quiz.degustacja) return "Degustacja";
-  if (quizKlasyczny(stan)) return neutralny ? NAZWY_NEUTRALNE.klasyczny : "Pub quiz";
-  return neutralny ? NAZWY_NEUTRALNE.wyscig : "Wyścig po piwo";
+  // jedno źródło nazw rodzajów (src/lib/tagi.ts)
+  return nazwaRodzajuQuizu(stan.quiz.degustacja ? "degustacja" : quizKlasyczny(stan) ? "klasyczny" : "wyscig", neutralny);
 }
 
 /**

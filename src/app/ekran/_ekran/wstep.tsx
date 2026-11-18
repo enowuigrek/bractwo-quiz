@@ -6,6 +6,7 @@ import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
 import { useNeutralny } from "@/components/motyw";
+import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
 /**
@@ -34,7 +35,7 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
           {stan.quiz?.tytul ?? "Quiz"}
         </motion.p>
         <motion.h1 className="tv-wstep-tytul" {...wejscie(1)}>
-          {neutralny ? "Wyścig" : "Wyścig po piwo"}
+          {nazwaRodzajuQuizu("wyscig", neutralny)}
         </motion.h1>
         {neutralny ? (
           <motion.p className="tv-wstep-opis" {...wejscie(2)}>
