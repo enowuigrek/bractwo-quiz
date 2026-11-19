@@ -1,24 +1,32 @@
 "use client";
 
 import { createContext, useContext } from "react";
+import { MARKI, type IdMarki, type Marka } from "@/lib/marka";
 import type { Motyw } from "@/lib/motyw";
 
-const KontekstMotywu = createContext<Motyw>("bractwo");
+const KontekstMarki = createContext<IdMarki>("bractwo");
 
-/** Motyw z root layoutu (z adresu żądania) dla komponentów klienckich. */
-export function DostawcaMotywu({ motyw, children }: { motyw: Motyw; children: React.ReactNode }) {
-  return <KontekstMotywu.Provider value={motyw}>{children}</KontekstMotywu.Provider>;
+/** Marka z root layoutu (z adresu żądania) dla komponentów klienckich. Z serwera idzie samo `id`. */
+export function DostawcaMarki({ marka, children }: { marka: IdMarki; children: React.ReactNode }) {
+  return <KontekstMarki.Provider value={marka}>{children}</KontekstMarki.Provider>;
 }
 
+export function useMarka(): Marka {
+  return MARKI[useContext(KontekstMarki)];
+}
+
+/** Dawny podział na motywy, do czasu przejścia wszystkich miejsc na `useMarka()`. */
 export function useMotyw(): Motyw {
-  return useContext(KontekstMotywu);
+  return useContext(KontekstMarki) === "bractwo" ? "bractwo" : "neutralny";
 }
 
+/** Dawny podział na motywy, do czasu przejścia wszystkich miejsc na `useMarka()`. */
 export function useNeutralny(): boolean {
-  return useContext(KontekstMotywu) === "neutralny";
+  return useContext(KontekstMarki) !== "bractwo";
 }
 
-/** „ Piwu Cześć!” (ze spacją na początku) na końcu tekstu, w motywie neutralnym nic. */
+/** Pożegnanie marki (ze spacją na początku) na końcu tekstu, np. „ Piwu Cześć!”. */
 export function PiwuCzesc() {
-  return useNeutralny() ? null : <> Piwu Cześć!</>;
+  const pozegnanie = useMarka().teksty.pozegnanie;
+  return pozegnanie ? <> {pozegnanie}</> : null;
 }

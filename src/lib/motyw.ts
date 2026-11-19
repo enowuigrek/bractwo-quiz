@@ -4,36 +4,27 @@
  * np. alias na Vercelu) i na każdym hoście zaczynającym się od `neutralny.` (lokalnie `neutralny.localhost:3100`).
  * Linki i kody QR budujemy z bieżącego adresu, więc telefony graczy same trafiają na ten sam motyw co TV.
  */
+import { MARKI, markaZHosta } from "./marka";
+
 export type Motyw = "bractwo" | "neutralny";
 
+// Stałe poniżej czytają już marki (src/lib/marka.ts, 19.11) i znikną, gdy wszystkie miejsca przejdą na markę.
+
 /** Logo motywu neutralnego (stoi tam, gdzie w motywie Bractwa logo Bractwa). `null` = bez logo. */
-export const LOGO_NEUTRALNE: string | null = "/loga/jowes/jowes.png";
+export const LOGO_NEUTRALNE: string | null = MARKI.jowes.logo;
 
 /** Nazwy rodzajów quizu w motywie neutralnym (zamiast „Wyścig po piwo” i „Pub quiz”). */
-export const NAZWY_NEUTRALNE = { wyscig: "Wyścig", klasyczny: "Quiz klasyczny" } as const;
+export const NAZWY_NEUTRALNE = MARKI.jowes.teksty.rodzaje;
 
-/**
- * Słowa na lokal w panelu (18.11): w Bractwie lokal, w motywie neutralnym organizacja (firma, nie knajpa). Jedno
- * źródło dla zakładek, menu i tytułów stron.
- */
-export const SLOWA_LOKALU = {
-  bractwo: { lokal: "Lokal", lokale: "Lokale", moj: "Mój lokal", ustawienia: "Ustawienia lokalu" },
-  neutralny: { lokal: "Organizacja", lokale: "Organizacje", moj: "Moja organizacja", ustawienia: "Ustawienia organizacji" },
-} as const;
+/** Słowa na lokal w panelu (18.11): w Bractwie lokal, w motywie neutralnym organizacja (firma, nie knajpa). */
+export const SLOWA_LOKALU = { bractwo: MARKI.bractwo.teksty.lokal, neutralny: MARKI.jowes.teksty.lokal } as const;
 export const slowaLokalu = (neutralny: boolean) => SLOWA_LOKALU[neutralny ? "neutralny" : "bractwo"];
 
 /** Nazwa aplikacji w tytule strony. */
-export const NAZWA_APLIKACJI: Record<Motyw, string> = { bractwo: "Bractwo Quiz", neutralny: "Quiz" };
+export const NAZWA_APLIKACJI: Record<Motyw, string> = { bractwo: MARKI.bractwo.nazwa, neutralny: MARKI.jowes.nazwa };
 
 export function motywZHosta(host: string | null | undefined, hostyNeutralne = ""): Motyw {
-  const h = (host ?? "").toLowerCase().split(":")[0];
-  if (!h) return "bractwo";
-  if (h.startsWith("neutralny.")) return "neutralny";
-  const lista = hostyNeutralne
-    .split(",")
-    .map((x) => x.trim().toLowerCase())
-    .filter(Boolean);
-  return lista.includes(h) ? "neutralny" : "bractwo";
+  return markaZHosta(host, hostyNeutralne) === "bractwo" ? "bractwo" : "neutralny";
 }
 
 /** Pożegnanie na końcu tekstu: w Bractwie „Piwu Cześć!”, w neutralnym nic. */
@@ -44,13 +35,8 @@ export function zPozegnaniem(tekst: string, motyw: Motyw): string {
 /** Etapy w motywie neutralnym są tylko ponumerowane (18.11, JOWES): „Etap 1”, „Etap 2”… zamiast nazw z szablonu Bractwa. */
 const nazwaEtapu = (nr: number) => `Etap ${nr}`;
 
-/** Opis etapu bez piwa: „jak to jedno piwo” znika, „wyścig do piwa” to wyścig do mety. */
-const opisEtapu = (opis: string | null) =>
-  opis &&
-  opis
-    .replace(/,? jak to jedno piwo/g, "")
-    .replace(/wyścig do piwa/g, "wyścig do mety")
-    .replace(/do piwa/g, "do mety");
+/** Opis etapu bez piwa (`opisEtapu` marki JOWES). */
+const opisEtapu = (opis: string | null) => opis && MARKI.jowes.teksty.opisEtapu(opis);
 
 type ZEtapami = {
   etap?: { nr: number; nazwa: string; opis: string | null } | null;
