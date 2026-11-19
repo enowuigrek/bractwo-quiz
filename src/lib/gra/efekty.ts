@@ -101,13 +101,9 @@ export function wznowEfekty(): void {
   if (c && c.state !== "running") void c.resume().catch(() => undefined);
 }
 
-/**
- * Motyw neutralny (src/lib/motyw.ts, atrybut `data-motyw` na `<html>`): efekty jak w Bractwie, tylko bez nalewania
- * piwa (18.11, Łukasz: samo nalewanie kojarzy się z piwem). Nalewanie jest `TYLKO_PLIK`, więc bez pliku milczy.
- */
-function adresPliku(nazwa: string): string | null {
-  const neutralny = typeof document !== "undefined" && document.documentElement.dataset.motyw === "neutralny";
-  return neutralny && nazwa.startsWith("nalewanie") ? null : `/dzwieki/${nazwa}.mp3`;
+/** Plik nagrania (bez nalewania w marce, która go nie ma, pilnuje `EfektyTv`). */
+function adresPliku(nazwa: string): string {
+  return `/dzwieki/${nazwa}.mp3`;
 }
 
 /** Plik, wczytany raz; `null`, gdy go nie ma (wtedy synteza). */

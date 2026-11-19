@@ -8,7 +8,8 @@ import { DrogiFinalu, drogi } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { OkrzykiNaDrogach } from "./okrzyki";
 import { IkonaMegafon } from "@/components/ikony";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 /**
  * Seria na TV (faza `seria`): gracze odpowiadają we własnym tempie, a tu na żywo jadą po równych drogach
@@ -30,7 +31,7 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   // z pijanym finałem nikt nie dobiega do szklanki: wyścig ma wyglądać, jakby trwał dalej
   const naDrodze = (g: SeriaGracz) => (e?.finalowy ? naDrodzeFinalu(g, stan.pijany_final, metaFinalu(stan)) : Math.min(1, g.dobre / n));
   const najlepszy = Math.max(0, ...gracze.map(naDrodze));
-  const neutralny = useNeutralny();
+  const marka = useMarka();
 
   // ocena ostatniej odpowiedzi każdego finalisty: porównanie z poprzednim stanem serii (liczone przy zmianie
   // danych, w czasie renderu, jak zaleca React dla wartości wyprowadzonych z poprzednich propsów)
@@ -67,13 +68,13 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
                 polozenie={gracze.map(naDrodze)}
                 teraz={teraz}
               />
-              {/* motyw neutralny (JOWES, 18.11, prośba Zbyszka): przy każdej drodze chmurka z pytaniem gracza */}
-              {neutralny && !przedStartem && <ChmurkiPytan gracze={gracze} />}
+              {/* JOWES (18.11, prośba Zbyszka): przy każdej drodze chmurka z pytaniem gracza */}
+              {ma(marka, "chmurki-pytan-w-finale") && !przedStartem && <ChmurkiPytan gracze={gracze} />}
             </>
           }
           opoznienie={0}
           trwanie={0.9}
-          szklanka={neutralny ? null : <Szklanka przed={1} teraz={1} doKonca={0} />}
+          szklanka={ma(marka, "szklanka") ? <Szklanka przed={1} teraz={1} doKonca={0} /> : null}
           gracze={gracze.map((g) => ({
             nick: g.nick,
             zdjecie: g.zdjecie,
@@ -101,8 +102,9 @@ export function SeriaTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 }
 
 /**
- * Chmurki z pytaniem każdego finalisty (motyw neutralny, 18.11): po prawej, na końcu jego drogi (tam, gdzie w Bractwie
- * stoi szklanka), na wysokości drogi, z dzióbkiem w jej stronę. Sama treść pytania, bez rozwiązania (`stan_sesji`).
+ * Chmurki z pytaniem każdego finalisty (`chmurki-pytan-w-finale`, JOWES, 18.11): po prawej, na końcu jego drogi
+ * (tam, gdzie w Bractwie stoi szklanka), na wysokości drogi, z dzióbkiem w jej stronę. Sama treść pytania,
+ * bez rozwiązania (`stan_sesji`).
  * Wysokość chmurki z odstępu między drogami, a treść ucina się do tylu linii, ile się zmieści.
  */
 function ChmurkiPytan({ gracze }: { gracze: SeriaGracz[] }) {

@@ -24,33 +24,3 @@ export function motywZHosta(host: string | null | undefined, hostyNeutralne = ""
 export function zPozegnaniem(tekst: string, motyw: Motyw): string {
   return motyw === "bractwo" ? `${tekst} Piwu Cześć!` : tekst;
 }
-
-/** Etapy w motywie neutralnym są tylko ponumerowane (18.11, JOWES): „Etap 1”, „Etap 2”… zamiast nazw z szablonu Bractwa. */
-const nazwaEtapu = (nr: number) => `Etap ${nr}`;
-
-/** Opis etapu bez piwa (`opisEtapu` marki JOWES). */
-const opisEtapu = (opis: string | null) => opis && MARKI.jowes.teksty.opisEtapu(opis);
-
-type ZEtapami = {
-  etap?: { nr: number; nazwa: string; opis: string | null } | null;
-  nastepny_etap?: { nr: number; nazwa: string; opis: string | null } | null;
-  plan_etapow?: { nr: number; nazwa: string }[] | null;
-  etapy?: { nr: number; nazwa: string }[] | null;
-};
-
-/**
- * Stan gry z etapami nazwanymi bez piwa, gdy strona ma motyw neutralny (`data-motyw` na `<html>`). Nazwy siedzą
- * w etapach quizu w bazie, więc ten sam quiz gra się pod oboma adresami; tu zmieniamy tylko to, co widać.
- */
-export function etapyWMotywie<S extends ZEtapami>(stan: S): S {
-  if (typeof document === "undefined" || document.documentElement.dataset.motyw !== "neutralny") return stan;
-  const etap = <E extends { nr: number; nazwa: string; opis: string | null }>(e: E | null | undefined) =>
-    e ? { ...e, nazwa: nazwaEtapu(e.nr), opis: opisEtapu(e.opis) } : e;
-  return {
-    ...stan,
-    etap: etap(stan.etap),
-    nastepny_etap: etap(stan.nastepny_etap),
-    plan_etapow: stan.plan_etapow?.map((e) => ({ ...e, nazwa: nazwaEtapu(e.nr) })),
-    etapy: stan.etapy?.map((e) => ({ ...e, nazwa: nazwaEtapu(e.nr) })),
-  } as S;
-}

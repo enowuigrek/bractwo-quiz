@@ -62,7 +62,7 @@ Każdy punkt to kandydat na **opcję marki albo quizu**: co JOWES wyłączył al
 | 2.15 | **Podium** | Złoto, srebro, brąz. | Ciemniejsze srebro i brąz (na jasnym tle). | Kolory marki. | |
 | 2.16 | **Favicon, miniatura linku, tytuł strony** | Bractwo Quiz. | Koło JOWES, jasna miniatura „Quiz na żywo”, tytuł „Quiz”. | Marka. | |
 | 2.17 | **Efekty dźwiękowe** | Wszystkie, z nalewaniem po pytaniu. | Te same bez nalewania. | Marka (zestaw dźwięków). Muzyka ta sama. | |
-| 2.18 | **Grafika „na pamiątkę”** | Jest. | Nie ma. | Marka. | |
+| 2.18 | **Grafika „na pamiątkę”** | Ciemna, z logo Bractwa i „Piwu Cześć!”. | Jasna, z samym logo JOWES (na telefonie zamiast kibicowania). | Marka. | |
 
 ### Teksty
 

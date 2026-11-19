@@ -14,7 +14,8 @@ import { Scena, Tv } from "./tv";
 import { LogoProste, PlanszaProsta, ScenaProsta } from "../_prosty/prosty";
 import { EkranLogo } from "./ekran-logo";
 import { useTrybProsty } from "@/lib/gra/prosty";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 type Props = {
   adres: string;
@@ -52,7 +53,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   useNowaWersja(!kod);
   // starsza przeglądarka telewizora: prosta plansza zamiast przewijanych plansz (src/lib/gra/prosty.ts)
   const prosty = useTrybProsty();
-  const neutralny = useNeutralny();
+  const marka = useMarka();
 
   // zapowiedź z automatem: chwilę przed godziną startu ekran sam otwiera poczekalnię (baza sprawdza godzinę i automat),
   // a zdarzenie `gra` z bazy przełącza go na grę z QR
@@ -118,8 +119,8 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
   );
   // zapowiedziany wyścig po piwo: dotychczasowe plansze (lokal z Bractwem, browar, zmiany co 10 s); bez zapowiedzi
   // i przy klasycznym pub quizie jeden ekran z logo lokalu (26.10), przy klasycznym z godziną i odliczaniem
-  // motyw neutralny: zawsze ekran z logo (plansze są o Bractwie)
-  const wyscig = !!zapowiedz && !zapowiedz.klasyczny && !neutralny;
+  // marka bez plansz zapowiedzi (np. JOWES): zawsze ekran z logo (plansze są o Bractwie)
+  const wyscig = !!zapowiedz && !zapowiedz.klasyczny && ma(marka, "plansze-zapowiedzi");
   if (prosty) {
     return (
       <ScenaProsta>

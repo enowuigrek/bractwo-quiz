@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase/przegladarka";
 import type { FazaWidoczna, StanSesji } from "./typy";
-import { etapyWMotywie } from "@/lib/motyw";
+import { etapyWMarce, type Marka } from "@/lib/marka";
 
 /**
  * Zdarzenia z bazy: na temacie `sesja:<KOD>` (patrz `wewn.rozglos`) oraz `gra`
@@ -116,13 +116,13 @@ export function komunikatBledu(blad: unknown): string {
 }
 
 /** Pobiera `stan_sesji` i mierzy przesunięcie zegara. */
-export async function pobierzStan(kod: string): Promise<{ stan: StanSesji; przesuniecie: number }> {
+export async function pobierzStan(kod: string, marka: Marka): Promise<{ stan: StanSesji; przesuniecie: number }> {
   const wyslano = Date.now();
   const { data, error } = await supabase().rpc("stan_sesji", { p_kod: kod });
   const odebrano = Date.now();
   if (error) throw error;
-  // motyw neutralny (np. JOWES): etapy bez nazw z piwem
-  const stan = etapyWMotywie(data as StanSesji);
+  // etapy tak, jak je widać w marce strony (np. JOWES: same numery, opisy bez piwa)
+  const stan = etapyWMarce(data as StanSesji, marka);
   return { stan, przesuniecie: przesuniecieZegara(stan.teraz, wyslano, odebrano) };
 }
 

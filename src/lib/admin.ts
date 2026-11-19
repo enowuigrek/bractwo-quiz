@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { supabaseAdmin } from "./supabase/serwer";
-import { motywZadania } from "./motyw-serwer";
+import { markaZadania } from "./motyw-serwer";
 
 const CIASTECZKO = "bq_admin";
 // 30 dni: prowadzący loguje się w domu i w lokalu nie musi wpisywać hasła na telefonie.
@@ -52,7 +52,7 @@ export type Rola =
       typ: "lokal";
       konto: Konto;
       lokalId: string;
-      /** Panel na adresie motywu neutralnego (src/lib/motyw.ts, np. JOWES): tylko quizy swojego lokalu, bez Bractwa. */
+      /** Marka z `lokalTylkoSwoje` (src/lib/marka.ts, np. JOWES): tylko quizy swojego lokalu, bez Bractwa. */
       tylkoSwoje?: boolean;
     };
 
@@ -311,7 +311,7 @@ export const rolaAdmina = cache(async (): Promise<Rola | null> => {
   const k: Konto = { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url };
   if (rola.rola === "tworca") return { typ: "tworca", konto: k };
   if (rola.rola === "lokal") {
-    const tylkoSwoje = (await motywZadania()) === "neutralny";
+    const tylkoSwoje = (await markaZadania()).zasady.lokalTylkoSwoje;
     return { typ: "lokal", konto: k, lokalId: rola.lokalId, tylkoSwoje };
   }
   const { data } = await supabaseAdmin().from("lokale").select("id").eq("testowy", true).returns<{ id: string }[]>();

@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- dawne ikony etapów z /public, gdyby któryś quiz miał własną */
 
-import { useNeutralny } from "./motyw";
+import { useMarka } from "./motyw";
 
 // Ikony etapów (26.10, Łukasz: grafiki z AI wyglądały przypadkowo): proste liniowe ikony jak reszta aplikacji
 // (`src/components/ikony.tsx`), złotą linią (`currentColor`). W bazie zostaje adres dawnej grafiki (`etapy.ikona`),
@@ -86,7 +86,7 @@ function Klepsydra() {
   );
 }
 
-/** Motyw neutralny zamiast szklanki „Na jedno”: tarcza. */
+/** Ikony neutralne zamiast szklanki „Na jedno”: tarcza. */
 function Tarcza() {
   return (
     <svg {...linia}>
@@ -99,7 +99,7 @@ function Tarcza() {
   );
 }
 
-/** Motyw neutralny zamiast deski ze szklankami „Jednak więcej”: stos kart. */
+/** Ikony neutralne zamiast deski ze szklankami „Jednak więcej”: stos kart. */
 function Karty() {
   return (
     <svg {...linia}>
@@ -111,7 +111,7 @@ function Karty() {
   );
 }
 
-/** Motyw neutralny zamiast menzurki „Ile?”: suwak z podziałką. */
+/** Ikony neutralne zamiast menzurki „Ile?”: suwak z podziałką. */
 function Suwak() {
   return (
     <svg {...linia}>
@@ -124,7 +124,7 @@ function Suwak() {
   );
 }
 
-/** Ikony kojarzące się z piwem i laboratorium piwowara, podmieniane w motywie neutralnym (src/lib/motyw.ts). */
+/** Ikony kojarzące się z piwem i laboratorium piwowara, podmieniane w marce z `ikonyEtapow: "neutralne"`. */
 const IKONY_NEUTRALNE: Record<string, () => React.ReactElement> = {
   "na-jedno": Tarcza,
   "jednak-wiecej": Karty,
@@ -142,9 +142,9 @@ const IKONY: Record<string, () => React.ReactElement> = {
 /** Ikona etapu z `etapy.ikona` (adres grafiki): liniowa, gdy znamy nazwę, inaczej sam obrazek. */
 export function IkonaEtapu({ ikona, className }: { ikona: string; className: string }) {
   const nazwa = ikona.split("/").pop()?.replace(/\.[a-z]+$/, "") ?? "";
-  const neutralny = useNeutralny();
+  const neutralne = useMarka().ikonyEtapow === "neutralne";
   // proste funkcje rysujące SVG, wołane wprost (nie jako komponent wybrany w trakcie renderu)
-  const rysuj = (neutralny && IKONY_NEUTRALNE[nazwa]) || IKONY[nazwa];
+  const rysuj = (neutralne && IKONY_NEUTRALNE[nazwa]) || IKONY[nazwa];
   if (!rysuj) return <img src={ikona} alt="" className={className} />;
   return <span className={`${className} ikona-etapu`}>{rysuj()}</span>;
 }

@@ -15,7 +15,8 @@ import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowan
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 // Prosty ekran TV dla starszych przeglądarek telewizorów (src/lib/gra/prosty.ts: kiedy się włącza). Te same dane
@@ -316,14 +317,14 @@ function Wstep({ stan }: { stan: StanSesji }) {
 }
 
 function Etap({ stan }: { stan: StanSesji }) {
-  const neutralny = useNeutralny();
+  const zNazwami = ma(useMarka(), "nazwy-etapow");
   const e = stan.etap;
   if (!e) return null;
   return (
     <div className="pr-srodek pr-lewo">
       <p className="pr-nadtytul">
-        {neutralny ? (e.finalowy ? "Finał" : "") : `Etap ${e.nr} z ${e.liczba}`}
-        {!neutralny && e.finalowy ? " · finał" : ""}
+        {zNazwami ? `Etap ${e.nr} z ${e.liczba}` : e.finalowy ? "Finał" : ""}
+        {zNazwami && e.finalowy ? " · finał" : ""}
       </p>
       <h1 className="pr-tytul">{e.nazwa}</h1>
       {e.opis && <p className="pr-opis pr-opis-duzy">{e.opis}</p>}

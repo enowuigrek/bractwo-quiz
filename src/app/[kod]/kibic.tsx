@@ -5,7 +5,8 @@ import { Awatar } from "@/components/awatar";
 import { HasloKibica } from "@/components/haslo-kibica";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import { HASLA, ODSTEP_OKRZYKOW_MS } from "@/lib/gra/okrzyki";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 import type { StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";
 import type { Ja } from "./rozgrywka";
@@ -19,8 +20,8 @@ type Wynik = { przyjety: boolean; powod?: string; za_ms?: number; wyslane?: numb
  * (pilnuje `kibicuj` w bazie, tu tylko przyciski czekają). `teraz`: zegar serwera.
  */
 export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; teraz: number }) {
-  const neutralny = useNeutralny();
-  const hasla = useMarka().teksty.okrzyki;
+  const marka = useMarka();
+  const hasla = marka.teksty.okrzyki;
   const finalisci = stan.finalisci ?? [];
   const [wybrany, ustawWybrany] = useState(0);
   const [wolneOd, ustawWolneOd] = useState(0);
@@ -28,8 +29,8 @@ export function Kibicowanie({ stan, ja, teraz }: { stan: StanSesji; ja: Ja; tera
   const [wysylam, ustawWysylam] = useState(false);
   const [blad, ustawBlad] = useState<string | null>(null);
 
-  // motyw neutralny (JOWES, 18.11): bez okrzyków kibiców (mniej ruchu przy dużej grupie), finał ogląda się na TV
-  if (neutralny) {
+  // marka bez kibicowania (JOWES, 18.11): bez okrzyków kibiców (mniej ruchu przy dużej grupie), finał ogląda się na TV
+  if (!ma(marka, "kibicowanie")) {
     return (
       <>
         <p className="etykieta gra-pasek">

@@ -11,7 +11,8 @@ import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik, RESZTA_RANKINGU_PX, ResztaRankingu } from "./ranking";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
@@ -31,8 +32,8 @@ const STREFA_PX = 56;
  * Grafiki szklanki i lady: public/grafiki, generowane skryptem scripts/grafiki.mjs.
  */
 export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
-  const neutralny = useNeutralny();
   const marka = useMarka();
+  const zSzklanka = ma(marka, "szklanka");
   const z = stan.zadanie;
   const n = stan.quiz?.liczba_zadan ?? 0;
   const lp = z?.lp ?? 0;
@@ -211,7 +212,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
         {naglowek}
         <KoniecEtapu stan={stan} />
 
-        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${neutralny ? 0 : szklanka}px` }}>
+        <div className="wyscig-plansza" style={{ gridTemplateColumns: `minmax(0, 1fr) ${zSzklanka ? szklanka : 0}px` }}>
           {/* nowa strona: tory od nowa (klucz) ze stanem sprzed pytania na tej stronie, potem jazda i zamiana torów
               jak na pierwszej (30.10) */}
           <motion.div
@@ -261,8 +262,8 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
             </div>
           </motion.div>
 
-          {/* motyw neutralny: bez szklanki i nagrody, tory na całą szerokość */}
-          {!neutralny && (
+          {/* marka bez szklanki (np. JOWES): bez szklanki i nagrody, tory na całą szerokość */}
+          {zSzklanka && (
             <Szklanka
               przed={nalanieSzklanki(stan.quiz, lp - 1)}
               teraz={nalanieSzklanki(stan.quiz, lp)}
@@ -321,7 +322,7 @@ export function Szklanka({
   /** Nazwa nagrody za 1. miejsce: o nią toczy się wyścig. */
   nagroda?: string | null;
 }) {
-  const neutralny = useNeutralny();
+  const zSzklanka = ma(useMarka(), "szklanka");
   return (
     <div className="wyscig-szklanka" aria-hidden>
       <div className="wyscig-szklo">
@@ -332,7 +333,7 @@ export function Szklanka({
           Gracie o: <strong>{nagroda}</strong>
         </p>
       )}
-      <p className="wyscig-szklanka-opis">{doKonca || neutralny ? "" : "Nalane!"}</p>
+      <p className="wyscig-szklanka-opis">{doKonca || !zSzklanka ? "" : "Nalane!"}</p>
     </div>
   );
 }

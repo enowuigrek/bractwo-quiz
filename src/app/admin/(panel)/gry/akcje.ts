@@ -10,7 +10,8 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Nagroda, StanFormularza } from "@/lib/typy";
 import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { LIMITY } from "../quizy/limity";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
+import { ma } from "@/lib/marka";
 
 const MAX_OKAZJA = 80;
 const MAX_NOTATKA = 5000;
@@ -120,9 +121,9 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
   // „Pijany finał”: dogrywka bez punktów po finale serią; imię osoby za barem do jednego z pytań.
   // tylko w wyścigu po piwo (quiz z finałem serią); klasyczny pub quiz nie ma finału
   // (od 26.10 włącza go też lokal; pytania zmienia tylko główny)
-  // motyw neutralny (JOWES) nie ma pijanego finału, także z ręcznie wysłanego formularza
+  // marka bez pijanego finału (np. JOWES) go nie włącza, także z ręcznie wysłanego formularza
   const pijany_final =
-    !!finalySerii && dane.get("pijany_final") === "on" && (await motywZadania()) !== "neutralny";
+    !!finalySerii && dane.get("pijany_final") === "on" && ma(await markaZadania(), "pijany-final");
   // gra głównego jest domyślnie tylko jego (lokal jej nie widzi; przełącznik w kreatorze); gra z ukrytego quizu zawsze
   const tylko_glowny = widziWszystko(rola) && (dane.get("tylko_glowny") === "on" || !quiz?.udostepniony);
   const za_barem = pijany_final

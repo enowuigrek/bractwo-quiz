@@ -2,7 +2,8 @@
 import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { WpiszKod } from "./ekran/wpisz-kod";
-import { markaZadania, motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
+import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 
 // zapowiedzi zmieniają się rzadko: odświeżamy co minutę zamiast przy każdym wejściu
@@ -48,9 +49,9 @@ async function zapowiedziane() {
  * (30.10, Łukasz): obsługa ma swoje adresy w zakładkach, a graczy to tylko myli.
  */
 export default async function Home() {
-  const [neutralny, marka] = await Promise.all([motywZadania().then((m) => m === "neutralny"), markaZadania()]);
-  // motyw neutralny: bez zapowiedzi quizów Bractwa i linku do Bractwa
-  const zapowiedzi = neutralny ? [] : await zapowiedziane();
+  const marka = await markaZadania();
+  // marka bez zapowiedzi (np. JOWES): bez quizów Bractwa w lokalach
+  const zapowiedzi = ma(marka, "zapowiedzi-na-glownej") ? await zapowiedziane() : [];
 
   return (
     <main className="kolumna glowna">
@@ -96,9 +97,9 @@ export default async function Home() {
       )}
 
       <footer className="glowna-stopka">
-        {!neutralny && (
-          <a href="https://bractwopiwne.pl" target="_blank" rel="noopener" className="glowna-bractwo">
-            bractwopiwne.pl
+        {marka.strona && (
+          <a href={marka.strona.adres} target="_blank" rel="noopener" className="glowna-bractwo">
+            {marka.strona.napis}
           </a>
         )}
         <p className="autor">

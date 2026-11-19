@@ -17,7 +17,8 @@ import { bezResetu } from "../../_komponenty/bez-resetu";
 import { IkonaEdytuj } from "@/components/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { dodajEtap, zapiszEtap } from "../akcje";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy" | "seria" | "plan_pytan" | "typ_domyslny">;
 
@@ -47,8 +48,8 @@ function FormularzEtapu({
   onGotowe: () => void;
   onAnuluj?: () => void;
 }) {
-  // motyw neutralny (JOWES, 18.11): etapy są tylko ponumerowane, więc bez nazwy (w bazie zostaje, bo jest wymagana)
-  const neutralny = useNeutralny();
+  // marka bez nazw etapów (JOWES, 18.11): etapy są tylko ponumerowane, więc bez nazwy (w bazie zostaje, bo wymagana)
+  const zNazwami = ma(useMarka(), "nazwy-etapow");
   const [pola, ustawPola] = useState<Pola>(etap ?? PUSTY);
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(async (poprzedni, dane) => {
     const wynik = etap ? await zapiszEtap(quizId, etap.id, poprzedni, dane) : await dodajEtap(quizId, poprzedni, dane);
@@ -87,13 +88,13 @@ function FormularzEtapu({
                   })
                 }
               >
-                {neutralny ? (s.finalowy ? "Finał" : NAZWY_TYPOW[s.typy[0]]) : s.nazwa}
+                {zNazwami ? s.nazwa : s.finalowy ? "Finał" : NAZWY_TYPOW[s.typy[0]]}
               </button>
             ))}
           </div>
         </div>
       )}
-      {neutralny ? (
+      {!zNazwami ? (
         <input type="hidden" name="nazwa" value={pola.nazwa || "Etap"} />
       ) : (
         <div>
@@ -258,7 +259,7 @@ export function NaglowekEtapu({
   /** Pytania etapu i miejsca na nowe: chowają się po zwinięciu. */
   children?: React.ReactNode;
 }) {
-  const neutralny = useNeutralny();
+  const zNazwami = ma(useMarka(), "nazwy-etapow");
   const [edycja, ustawEdycje] = useState(false);
   const [zwiniety, ustawZwiniety] = useState(false);
   const naglowek = edycja ? (
@@ -279,7 +280,7 @@ export function NaglowekEtapu({
             aria-expanded={!zwiniety}
             onClick={() => ustawZwiniety((z) => !z)}
           >
-            <span className="etap-nr">Etap {etap.nr}</span> {!neutralny && etap.nazwa}
+            <span className="etap-nr">Etap {etap.nr}</span> {zNazwami && etap.nazwa}
           </button>
         </h3>
         <p className="etap-znaczki">

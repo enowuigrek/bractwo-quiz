@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { DNO, KRAWEDZ, POD_PIANA, brzegSzklanki, pianaNaPiwie, poziom } from "@/lib/gra/szklanka";
-import { useNeutralny } from "./motyw";
+import { useMarka } from "./motyw";
+import { ma } from "@/lib/marka";
 
 const BRZEG = brzegSzklanki();
 
@@ -49,9 +50,9 @@ export function SzklankaPiwa({
   }, [nalewa, opoznienie]);
 
   const cz = nalewa ? teraz : przed;
-  const neutralny = useNeutralny();
-  // motyw neutralny (src/lib/motyw.ts): bez szklanki, gracze po prostu ścigają się w prawo
-  if (neutralny) return null;
+  // marka bez szklanki (np. JOWES): gracze po prostu ścigają się w prawo
+  const zSzklanka = ma(useMarka(), "szklanka");
+  if (!zSzklanka) return null;
   const piana = pianaNaPiwie(cz);
   // bąbelki tylko w nalanym piwie, pod pianą (w pełnej szklance pod jej czapą z grafiki)
   const babelkiOd = cz >= 1 ? POD_PIANA : Math.min(DNO, poziom(cz) + 2);

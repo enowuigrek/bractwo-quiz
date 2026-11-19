@@ -5,7 +5,8 @@ import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { WpiszKod } from "./wpisz-kod";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
+import { ma } from "@/lib/marka";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: "Ekran" };
@@ -26,8 +27,8 @@ export default async function Ekran() {
     .order("miasto")
     .order("nazwa")
     .returns<Pick<Lokal, "id" | "nazwa" | "miasto" | "logo_url" | "adres_ekranu">[]>();
-  // motyw neutralny: bez listy lokali Bractwa, tylko kod gry
-  const lokale = (await motywZadania()) === "neutralny" ? [] : (data ?? []);
+  // marka bez listy lokali (np. JOWES): tylko kod gry
+  const lokale = ma(await markaZadania(), "lista-lokali") ? (data ?? []) : [];
 
   return (
     <main className="kolumna glowna">

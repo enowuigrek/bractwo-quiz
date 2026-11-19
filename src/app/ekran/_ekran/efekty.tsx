@@ -7,6 +7,8 @@ import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { GASNIECIE_S, WYBUCH_PRZED_S } from "@/lib/pijany";
 import type { StanSesji } from "@/lib/gra/typy";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 /** Tyle ostatnich sekund pytania tyka zegar. */
 const TYKANIE_S = 5;
@@ -56,17 +58,19 @@ type Migawka = {
 export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
   const poprzednia = useRef<Migawka | null>(null);
   const werble = useRef<(() => void) | null>(null);
+  // marka bez nalewania (np. JOWES, 18.11, Łukasz: samo nalewanie kojarzy się z piwem): efekty jak w Bractwie bez niego
+  const nalewanie = ma(useMarka(), "dzwiek-nalewania");
 
   // ten sam gest co muzyka (OK na pilocie TV) pozwala grać efekty
   useEffect(() => {
-    wczytajEfekty(WSZYSTKIE);
+    wczytajEfekty(nalewanie ? WSZYSTKIE : WSZYSTKIE.filter((e) => e !== "nalewanie"));
     const gest = () => wznowEfekty();
     for (const g of GESTY) window.addEventListener(g, gest);
     return () => {
       for (const g of GESTY) window.removeEventListener(g, gest);
       werble.current?.();
     };
-  }, []);
+  }, [nalewanie]);
 
   // muzyka już gra, więc przeglądarka pozwala na dźwięk: efekty też, bez czekania na gest. Po przeładowaniu TV
   // (nowa wersja) muzyka potrafiła ruszyć sama, a efekty milczały do najbliższego OK na pilocie (25.10)
@@ -143,7 +147,8 @@ export function EfektyTv({ stan, teraz }: { stan: StanSesji; teraz: number }) {
     // klasyczny pub quiz nie ma szklanki, więc ranking bez nalewania (26.10)
     if (b.faza === "ranking" && p.faza !== "ranking" && !quizKlasyczny(stan)) {
       // koniec etapu (nie finału): dzwonek „ostatnia kolejka”; zwykły ranking: nalewanie (jeśli jest plik)
-      zagraj(stan.ostatnie_w_etapie && !stan.etap?.finalowy ? "dzwonek" : "nalewanie");
+      if (stan.ostatnie_w_etapie && !stan.etap?.finalowy) zagraj("dzwonek");
+      else if (nalewanie) zagraj("nalewanie");
     }
 
     // finał serią: krok naprzód za dobrą, cofnięcie za złą (najwyżej jeden każdego rodzaju naraz)

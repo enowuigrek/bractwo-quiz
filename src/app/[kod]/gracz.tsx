@@ -35,7 +35,8 @@ import { ZdjecieGracza } from "./zdjecie-gracza";
 import { DegustacjaGracza } from "./degustacja";
 import { czyDegustacja } from "@/lib/degustacja";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { PiwuCzesc, useMarka, useNeutralny } from "@/components/motyw";
+import { PiwuCzesc, useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
@@ -81,7 +82,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   const pobierz = useCallback(async () => {
     try {
-      const { stan, przesuniecie } = await pobierzStan(kod);
+      const { stan, przesuniecie } = await pobierzStan(kod, marka);
       zapamietajKoniecSerii(stan);
       ustawStan(stan);
       ustawPrzesuniecie(przesuniecie);
@@ -116,7 +117,7 @@ export function Gracz({ kod }: { kod: string }) {
       // chwilowy brak sieci nie zasłania gry, którą już widać
       if (!komunikat.startsWith("Brak połączenia")) ustawBladGry(komunikat);
     }
-  }, [kod, wyrzuc]);
+  }, [kod, wyrzuc, marka]);
 
   useNasluch(kod, pobierz, ["stan", "gracz"]);
   useKolejnaPodpowiedz(stan, przesuniecie, pobierz);
@@ -246,10 +247,10 @@ function Naglowek({
   /** Rodzaj gry: „Wyścig po piwo” albo „Pub quiz” (`nazwaRodzaju`). */
   napis?: string;
 }) {
-  // bez logo gospodarzy napis idzie na lewo, zamiast wisieć na środku (18.11). Motyw neutralny (JOWES) nie pokazuje
-  // logo lokalu w nagłówku (jest w tle), więc tam też zostaje jedno logo z prawej
-  const neutralny = useNeutralny();
-  if (neutralny || (!lokal?.logo_url && !browar?.logo_url)) {
+  // bez logo gospodarzy napis idzie na lewo, zamiast wisieć na środku (18.11). Marka bez logo lokalu w nagłówku
+  // (JOWES: jest w tle) też zostawia jedno logo z prawej
+  const zLogoLokalu = ma(useMarka(), "logo-lokalu-w-naglowku");
+  if (!zLogoLokalu || (!lokal?.logo_url && !browar?.logo_url)) {
     return (
       <header className="gra-naglowek">
         <span className="logo-quiz-napis gra-napis-quiz">{napis}</span>
@@ -386,7 +387,6 @@ function WGrze({
   // gęściej w odliczaniu, żeby pytanie odsłoniło się możliwie równo z TV
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan.faza), stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
-  const neutralny = useNeutralny();
   const marka = useMarka();
 
   // degustacja (02.11): karta, „ty i sala” i „Twoja degustacja” zamiast pytań, rankingu i medali
@@ -514,8 +514,8 @@ function WGrze({
         </p>
         <h1>Finał bez Ciebie</h1>
         {moj && <Miejsce moj={moj} />}
-        {/* motyw neutralny (JOWES, 18.11): bez kibicowania z telefonu, za to grafika z wynikiem */}
-        {neutralny ? (
+        {/* marka bez kibicowania (JOWES, 18.11): zamiast niego grafika z wynikiem */}
+        {!ma(marka, "kibicowanie") ? (
           <>
             <p className="etap-uwaga">
               Niestety nie wchodzisz do finału. Dzięki za grę! Finał obejrzysz na telewizorze.
@@ -575,7 +575,7 @@ function WGrze({
  * Grafikę na pamiątkę może pobrać od razu (26.10), z miejscem z chwili odpadnięcia.
  */
 function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSesji }) {
-  const neutralny = useNeutralny();
+  const kibicowanie = ma(useMarka(), "kibicowanie");
   return (
     <>
       <p className="nadtytul gra-ja">
@@ -585,7 +585,7 @@ function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSe
       <h1>Odpadasz po {moj.odpadl}. etapie</h1>
       <Miejsce moj={moj} />
       <p className="etap-uwaga">
-        {neutralny
+        {!kibicowanie
           ? "Dzięki za grę! Zostań z nami do finału: obejrzysz go na telewizorze."
           : "Dzięki za walkę! Zostań z nami do finału: wtedy stąd, z telefonu, będziesz kibicować finalistom, a Twoje okrzyki pojawią się na telewizorze."}
       </p>

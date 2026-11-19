@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import type { PrzykladyDemo } from "@/lib/marka";
 import { NAZWY_TYPOW, PODPOWIEDZI_TYPOW, type TypZadania } from "@/lib/zadania";
 
 // Animowany telefon na planszy etapu: palec sam pokazuje, jak odpowiada się w danym typie pytania.
@@ -88,7 +89,7 @@ function Zatwierdz({ blysk }: { blysk: boolean }) {
 
 type Scena = { tresc: string; elementy: React.ReactNode; sciezka: Punkt[] };
 
-function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
+function scena(typ: TypZadania, t: number, p: PrzykladyDemo): Scena {
   const poStuku = (chwila: number) => t > chwila + 0.02;
   switch (typ) {
     // ciekawostka nie ma odpowiedzi, więc nie ma czego pokazywać na telefonie (etap_json jej nie podaje)
@@ -96,10 +97,10 @@ function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
     case "piwo":
       return { tresc: "", elementy: null, sciezka: [] };
     case "wybor": {
-      // motyw neutralny (src/lib/motyw.ts): przykłady bez piwa
-      const odp = neutralny ? ["Mars", "Jowisz", "Wenus", "Merkury"] : ["Pils", "Weizen", "Koźlak", "IPA"];
+      // przykłady z marki (src/lib/marka.ts): w Bractwie o piwie, w JOWES bez piwa
+      const odp = p.wybor.odp;
       return {
-        tresc: neutralny ? "Która z tych planet jest największa?" : "Które z tych piw warzy się z pszenicy?",
+        tresc: p.wybor.tresc,
         elementy: odp.map((o, i) => (
           <Kafel
             key={o}
@@ -122,7 +123,7 @@ function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
     case "prawda_falsz": {
       const srodek = (i: number) => ({ x: 20 + 80 + i * 180, y: 350 });
       return {
-        tresc: neutralny ? "Wieloryb jest ssakiem." : "Porter bałtycki to piwo ciemne.",
+        tresc: p.prawdaFalsz,
         // jak na telefonie w serii: płaskie koła, zielone ✓ i czerwone ✗, bez napisów
         elementy: ["prawda", "falsz"].map((o, i) => (
           <div
@@ -143,10 +144,10 @@ function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
       };
     }
     case "wielokrotny": {
-      const odp = neutralny ? ["Jabłko", "Marchew", "Gruszka", "Ziemniak"] : ["Cascade", "Pils", "Citra", "Monachijski"];
+      const odp = p.wielokrotny.odp;
       const zaznaczone = [poStuku(0.22), false, poStuku(0.42), false];
       return {
-        tresc: neutralny ? "Które z nich to owoce?" : "Które z nich to chmiele?",
+        tresc: p.wielokrotny.tresc,
         elementy: (
           <>
             {odp.map((o, i) => (
@@ -176,9 +177,9 @@ function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
     }
     case "kolejnosc": {
       // bez etapów warzenia: to pytanie jest w quizie o piwie, a plansza nie może zdradzać odpowiedzi
-      const odp = neutralny ? ["Kot", "Mysz", "Słoń", "Pies"] : ["Kufel 0,5 l", "Kieliszek", "Beczka", "Puszka 0,33 l"];
+      const odp = p.kolejnosc.odp;
       // właściwa kolejność kafelków i chwile stuknięć
-      const kolej = neutralny ? [1, 0, 3, 2] : [1, 3, 0, 2];
+      const kolej = p.kolejnosc.kolej;
       const chwile = [0.16, 0.3, 0.44, 0.58];
       const numer = (i: number) => {
         const k = kolej.indexOf(i);
@@ -263,7 +264,7 @@ function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
       const liczba = Math.round(v * 20);
       const kciukX = 40 + v * 300;
       return {
-        tresc: neutralny ? "Ile minut potrwa dziś przerwa na kawę?" : "Ile kufli wypije dziś stolik nr 3?",
+        tresc: p.szacowanie,
         elementy: (
           <>
             <p className="demo-liczba">{liczba}</p>
@@ -291,8 +292,8 @@ function scena(typ: TypZadania, t: number, neutralny: boolean): Scena {
 export function DemoTelefonu({ typy }: { typy: TypZadania[] }) {
   const { t, nr } = useCykl();
   const typ = typy[nr % typy.length] ?? "wybor";
-  const neutralny = useNeutralny();
-  const { tresc, elementy, sciezka } = scena(typ, t, neutralny);
+  const przyklady = useMarka().przyklady;
+  const { tresc, elementy, sciezka } = scena(typ, t, przyklady);
   const p = palec(sciezka, t);
   return (
     <figure className="demo">

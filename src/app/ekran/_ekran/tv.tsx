@@ -56,7 +56,8 @@ const FAZY_DEGUSTACJI = ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "
 import { useTrybProsty } from "@/lib/gra/prosty";
 import { LogoBractwa } from "@/components/logo-bractwa";
 import { TekstPlanszy } from "@/components/tekst-planszy";
-import { PiwuCzesc, useNeutralny } from "@/components/motyw";
+import { PiwuCzesc, useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 // Scena ma co najmniej 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo. Na ekranie
 // o innym kształcie niż 16:9 scena wypełnia go całego (wyższa albo szersza w swoich pikselach), zamiast stać
@@ -127,8 +128,9 @@ export function Scena({
 type Props = { kod: string; qr: string; host: string };
 
 export function Tv({ kod, qr, host }: Props) {
-  // motyw neutralny (src/lib/motyw.ts): wyścig też na tle z logo lokalu, bez baru i nastrojów
-  const neutralny = useNeutralny();
+  // marka bez baru (np. JOWES): wyścig też na tle z logo lokalu, bez nastrojów
+  const marka = useMarka();
+  const bezBaru = !ma(marka, "tlo-baru");
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [ranking, ustawRanking] = useState<WierszRankingu[]>([]);
@@ -143,7 +145,7 @@ export function Tv({ kod, qr, host }: Props) {
 
   const pobierz = useCallback(async () => {
     try {
-      const { stan, przesuniecie } = await pobierzStan(kod);
+      const { stan, przesuniecie } = await pobierzStan(kod, marka);
       zapamietajKoniecSerii(stan);
       // lista nicków w poczekalni, a w pijanym finale bez finału trójki: kto lata po ekranie
       if (stan.faza === "poczekalnia" || (stan.faza === "pijany" && !stan.finalisci)) {
@@ -183,7 +185,7 @@ export function Tv({ kod, qr, host }: Props) {
     } catch (e) {
       ustawBlad(komunikatBledu(e));
     }
-  }, [kod]);
+  }, [kod, marka]);
 
   // okrzyk: kibic w serii finału (dymek nad drogą finalisty)
   useNasluch(kod, pobierz, ["stan", "gracz", "odpowiedz", "okrzyk"]);
@@ -222,7 +224,7 @@ export function Tv({ kod, qr, host }: Props) {
     return (
       <ScenaProsta
         ciemna={stan?.faza === "werble"}
-        lokalTla={stan && (quizKlasyczny(stan) || neutralny) ? (zamknieta ? null : (stan.lokal ?? null)) : undefined}
+        lokalTla={stan && (quizKlasyczny(stan) || bezBaru) ? (zamknieta ? null : (stan.lokal ?? null)) : undefined}
       >
         <ProstyTv
           stan={stan}
@@ -249,7 +251,7 @@ export function Tv({ kod, qr, host }: Props) {
     <Scena
       zgaszona={stan?.faza === "werble"}
       nastroj={stan ? nastrojFazy(stan) : undefined}
-      lokalTla={stan && (quizKlasyczny(stan) || neutralny) ? (zamknieta ? null : (stan.lokal ?? null)) : undefined}
+      lokalTla={stan && (quizKlasyczny(stan) || bezBaru) ? (zamknieta ? null : (stan.lokal ?? null)) : undefined}
     >
       {!stan ? (
         <div className="tv-srodek">

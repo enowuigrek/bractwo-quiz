@@ -9,7 +9,8 @@ import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { IkonaPuchar } from "@/components/ikony";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 import { ilu_finalistow } from "@/lib/gra/final";
 
 /**
@@ -19,7 +20,6 @@ import { ilu_finalistow } from "@/lib/gra/final";
  * Prowadzący tłumaczy i startuje etap z pilota, więc plansza czeka bez limitu.
  */
 export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
-  const neutralny = useNeutralny();
   const marka = useMarka();
   const e = stan.etap;
   // gdy opis z finalistami nie mieści się w wysokości ekranu, plansza zmniejsza się o stopień (25.10: na planszy finału
@@ -86,8 +86,8 @@ export function EtapTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode 
             <motion.div className="tv-etap-glowa" {...wejscie(0)}>
               {e.ikona && <IkonaEtapu ikona={e.ikona} className="tv-etap-ikona" />}
               <div>
-                {/* motyw neutralny: nazwa to już „Etap N”, więc nad nią tylko finał */}
-                {!neutralny ? (
+                {/* marka bez nazw etapów: nazwa to już „Etap N”, więc nad nią tylko finał */}
+                {ma(marka, "nazwy-etapow") ? (
                   <p className="tv-okazja">
                     Etap {e.nr} z {e.liczba}
                     {e.finalowy ? " · finał" : ""}

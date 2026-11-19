@@ -14,7 +14,7 @@ export type IdMarki = "bractwo" | "jowes";
 export type Element =
   /** szklanka na mecie wyścigu i jej nalewanie (z „Gracie o: …”) */
   | "szklanka"
-  /** tło baru z nastrojami w wyścigu (bez niego tło z logo lokalu, jak w pub quizie) */
+  /** bar: tło z nastrojami w wyścigu i drewniana lada pod drogami (bez niego tło z logo lokalu, jak w pub quizie) */
   | "tlo-baru"
   | "pijany-final"
   /** gościnny browar w kreatorze */
@@ -60,8 +60,17 @@ export type Slownik = {
   przykladTytulu: string;
   /** hasła kibiców (numery jak w `HASLA`, bo w bazie jest tylko numer) */
   okrzyki: readonly (readonly [string, string])[];
-  /** opis etapu z bazy, jak go widać w tej marce */
-  opisEtapu: (opis: string) => string;
+  /** opis etapu z bazy, jak go widać w tej marce; bez tego opis jak w bazie */
+  opisEtapu?: (opis: string) => string;
+};
+
+export type PrzykladyDemo = {
+  wybor: { tresc: string; odp: readonly string[] };
+  prawdaFalsz: string;
+  wielokrotny: { tresc: string; odp: readonly string[] };
+  /** `kolej`: właściwa kolejność kafelków (od najmniejszego) */
+  kolejnosc: { odp: readonly string[]; kolej: readonly number[] };
+  szacowanie: string;
 };
 
 export type Marka = {
@@ -73,6 +82,8 @@ export type Marka = {
   /** logo marki tam, gdzie w Bractwie stoi logo Bractwa */
   logo: string;
   ikony: { ico: string; png: string; apple: string };
+  /** strona marki w stopce strony głównej */
+  strona: { adres: string; napis: string } | null;
   /** konto do oznaczania na grafikach (bez @) */
   instagram: string | null;
   czcionka: "openSans" | "nunito";
@@ -87,6 +98,8 @@ export type Marka = {
   ikonyEtapow: "piwne" | "neutralne";
   awatar: "kapsel" | "kolo";
   teksty: Slownik;
+  /** przykładowe pytania w animacji etapu na TV (`demo.tsx`); indeksy dobrych odpowiedzi są w animacji */
+  przyklady: PrzykladyDemo;
   wylaczone: readonly Element[];
   /** zasady panelu zależne od adresu (tymczasowo w marce, docelowo w roli albo organizacji) */
   zasady: {
@@ -116,4 +129,31 @@ export function markaZHosta(host: string | null | undefined, hostyNeutralne = ""
     .map((x) => x.trim().toLowerCase())
     .filter(Boolean);
   return lista.includes(h) ? "jowes" : "bractwo";
+}
+
+type ZEtapami = {
+  etap?: { nr: number; nazwa: string; opis: string | null } | null;
+  nastepny_etap?: { nr: number; nazwa: string; opis: string | null } | null;
+  plan_etapow?: { nr: number; nazwa: string }[] | null;
+  etapy?: { nr: number; nazwa: string }[] | null;
+};
+
+/**
+ * Stan gry z etapami takimi, jak je widać w marce: bez nazw z szablonu („Etap 1”, „Etap 2”…), gdy marka je wyłącza,
+ * i z opisem po `opisEtapu`. Nazwy i opisy siedzą w etapach quizu w bazie, więc ten sam quiz gra się w każdej marce.
+ */
+export function etapyWMarce<S extends ZEtapami>(stan: S, marka: Marka): S {
+  const zNazwami = ma(marka, "nazwy-etapow");
+  const opis = marka.teksty.opisEtapu;
+  if (zNazwami && !opis) return stan;
+  const nazwa = (e: { nr: number; nazwa: string }) => (zNazwami ? e.nazwa : `Etap ${e.nr}`);
+  const etap = <E extends { nr: number; nazwa: string; opis: string | null }>(e: E | null | undefined) =>
+    e ? { ...e, nazwa: nazwa(e), opis: e.opis && opis ? opis(e.opis) : e.opis } : e;
+  return {
+    ...stan,
+    etap: etap(stan.etap),
+    nastepny_etap: etap(stan.nastepny_etap),
+    plan_etapow: stan.plan_etapow?.map((e) => ({ ...e, nazwa: nazwa(e) })),
+    etapy: stan.etapy?.map((e) => ({ ...e, nazwa: nazwa(e) })),
+  } as S;
 }

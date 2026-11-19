@@ -4,12 +4,12 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { czyKibic } from "./rozgrywka";
 import { IkonaPuchar } from "@/components/ikony";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 import { ilu_finalistow } from "@/lib/gra/final";
 
 /** Telefon w fazie `etap`: nazwa i zasady etapu, mnożnik, a w finale trójki: grasz czy kibicujesz. */
 export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
-  const neutralny = useNeutralny();
   const marka = useMarka();
   const e = stan.etap;
   if (!e) return <p className="pomocniczy">Za chwilę start.</p>;
@@ -18,7 +18,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
     <>
       <p className="nadtytul">{nick}</p>
       <p className="etykieta gra-pasek">
-        <span>{neutralny ? (e.finalowy ? "Finał" : "") : `Etap ${e.nr} z ${e.liczba}`}</span>
+        <span>{ma(marka, "nazwy-etapow") ? `Etap ${e.nr} z ${e.liczba}` : e.finalowy ? "Finał" : ""}</span>
         {!e.finalowy && (
           <span className="gra-kod">{e.liczba_pytan === 1 ? "1 pytanie" : `${e.liczba_pytan} pyt.`}</span>
         )}
@@ -65,7 +65,7 @@ export function EtapGracza({ stan, nick }: { stan: StanSesji; nick: string }) {
           </ul>
           {kibic && (
             <p className="pomocniczy">
-              {neutralny
+              {!ma(marka, "kibicowanie")
                 ? "Tym razem oglądasz finał na telewizorze."
                 : e.seria
                   ? "Tym razem kibicujesz: w trakcie finału dopingujesz finalistów z telefonu."

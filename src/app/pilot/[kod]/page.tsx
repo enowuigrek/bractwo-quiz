@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { jestTworca, rolaAdmina } from "@/lib/admin";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
 import { poprawnyKod } from "@/lib/gra/kod";
 import { NaglowekPanelu } from "@/app/admin/(panel)/_komponenty/naglowek-panelu";
 import { Pilot } from "./pilot";
@@ -33,7 +33,7 @@ export default async function StronaPilota({ params, searchParams }: PageProps<"
           <Pilot
             kod={kod}
             tokenZAdresu={token}
-            boty={jestTworca(rola) || (await motywZadania()) === "neutralny"}
+            boty={jestTworca(rola) || (await markaZadania()).zasady.botyDlaKazdego}
             naglowek={false}
           />
         </main>

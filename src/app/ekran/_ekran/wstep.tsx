@@ -5,7 +5,8 @@ import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
@@ -16,8 +17,8 @@ import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
  * pytaniem: kto pierwszy do piwa.
  */
 export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
-  const neutralny = useNeutralny();
   const marka = useMarka();
+  const zSzklanka = ma(marka, "szklanka");
   const plan = stan.plan_etapow ?? [];
   const wejscie = (i: number) => ({
     initial: { opacity: 0, y: 24 },
@@ -38,7 +39,7 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
         <motion.h1 className="tv-wstep-tytul" {...wejscie(1)}>
           {nazwaRodzajuQuizu("wyscig", marka)}
         </motion.h1>
-        {neutralny ? (
+        {!zSzklanka ? (
           <motion.p className="tv-wstep-opis" {...wejscie(2)}>
             Przed nami {plan.length} {plan.length >= 5 ? "etapów" : "etapy"}. Z każdym pytaniem ścigacie się do mety.
             {plan.some((e) => e.finalowy) &&
@@ -61,8 +62,8 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
           {plan.map((e, i) => (
             <motion.li key={e.nr} className={e.finalowy ? "final" : undefined} {...wejscie(3 + i)}>
               {e.ikona ? <IkonaEtapu ikona={e.ikona} className="tv-wstep-ikona" /> : null}
-              {/* motyw neutralny: nazwa to już „Etap N” */}
-              {!neutralny && <span className="tv-wstep-nr">{e.nr}</span>}
+              {/* marka bez nazw etapów: nazwa to już „Etap N” */}
+              {ma(marka, "nazwy-etapow") && <span className="tv-wstep-nr">{e.nr}</span>}
               <span className="tv-wstep-nazwa">{e.nazwa}</span>
               <span className="tv-wstep-graja">{zLiczba(liczby[i].graja, "gra", "grają")}</span>
               {!e.finalowy && (
@@ -74,8 +75,8 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
               )}
             </motion.li>
           ))}
-          {/* motyw neutralny: bez szklanki na mecie */}
-          {!neutralny && (
+          {/* marka bez szklanki: bez szklanki na mecie */}
+          {zSzklanka && (
             <motion.li className="tv-wstep-meta" {...wejscie(3 + plan.length)}>
               <img src="/grafiki/szklanka.webp" alt="" />
             </motion.li>

@@ -13,7 +13,8 @@ import { uruchomGre } from "../akcje";
 import { testFinalu } from "../../quizy/[id]/test-finalu";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
-import { useMarka, useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
+import { ma } from "@/lib/marka";
 
 export type QuizDoWyboru = {
   id: string;
@@ -55,7 +56,6 @@ function isoStartu(data: string, godzina: string): string {
 
 /** Uruchamianie gry krokami (kafelki): miasto → lokal → rodzaj → quiz (z tematem), potem szczegóły. */
 export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
-  const neutralny = useNeutralny();
   const marka = useMarka();
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
@@ -276,9 +276,9 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
 
           )}
 
-          {/* motyw neutralny (np. JOWES): bez nagród w kreatorze, gra bierze nagrody domyślne quizu (`quizy.nagrody`) */}
-          {neutralny && <input type="hidden" name="nagrody" value={0} />}
-          {!degustacja && !neutralny && (
+          {/* marka bez nagród przy grze (np. JOWES): gra bierze nagrody domyślne quizu (`quizy.nagrody`) */}
+          {!ma(marka, "nagrody-przy-grze") && <input type="hidden" name="nagrody" value={0} />}
+          {!degustacja && ma(marka, "nagrody-przy-grze") && (
           <fieldset>
             <legend>Nagrody</legend>
             <label className="przelacznik">
@@ -345,9 +345,9 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
               </fieldset>
           )}
 
-              {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału); w motywie neutralnym
-                  (JOWES) wcale: bez pola gra idzie bez pijanego finału */}
-              {wybrany?.pijany && !neutralny && (
+              {/* pijany finał tylko po finale wyścigu po piwo (klasyczny pub quiz nie ma finału); w marce bez
+                  niego (JOWES) wcale: bez pola gra idzie bez pijanego finału */}
+              {wybrany?.pijany && ma(marka, "pijany-final") && (
                 <fieldset>
                   <legend>Pijany finał</legend>
                   <label className="przelacznik">
@@ -427,8 +427,8 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
           </div>
 
           {/* wydarzenie (kranoprzejęcie; grafika na poczekalnię wyłączona 26.10) tylko w wyścigu: klasyczny pub quiz to mniejsza
-              impreza; w motywie neutralnym (JOWES) bez kranoprzejęcia */}
-          {!klasyczny && !neutralny && (
+              impreza; w marce bez kranoprzejęcia (JOWES) bez niego */}
+          {!klasyczny && ma(marka, "kranoprzejecie") && (
             <fieldset>
               <legend>Wydarzenie</legend>
               <label className="przelacznik">
