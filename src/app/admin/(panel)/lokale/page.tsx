@@ -3,15 +3,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli } from "@/lib/admin-dostep";
-import { motywZadania } from "@/lib/motyw-serwer";
-import { slowaLokalu } from "@/lib/motyw";
+import { markaZadania } from "@/lib/motyw-serwer";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";
 import { IkonaEdytuj } from "@/components/ikony";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: slowaLokalu((await motywZadania()) === "neutralny").lokale };
+  return { title: (await markaZadania()).teksty.lokal.lokale };
 }
 
 export default async function Lokale() {

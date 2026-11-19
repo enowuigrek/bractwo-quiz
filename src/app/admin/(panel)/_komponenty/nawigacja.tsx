@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
-import { useNeutralny } from "@/components/motyw";
-import { slowaLokalu } from "@/lib/motyw";
+import { useMarka } from "@/components/motyw";
 import { NapisUruchom } from "@/components/ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).
@@ -25,11 +24,11 @@ export function Nawigacja({
   tworca?: boolean;
 }) {
   const sciezka = usePathname();
-  const neutralny = useNeutralny();
+  const slowa = useMarka().teksty.lokal;
   // lokale to zwykła zakładka (30.10, Łukasz: zębatka „Ustawienia” prowadziła tylko do lokali); lokal ma „Mój lokal”
   const POZYCJE = [
     ...WSPOLNE,
-    { href: ustawienia, tekst: lokal ? slowaLokalu(neutralny).moj : slowaLokalu(neutralny).lokale },
+    { href: ustawienia, tekst: lokal ? slowa.moj : slowa.lokale },
     ...(tworca ? [{ href: "/admin/konta", tekst: "Konta" }] : []),
   ];
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");

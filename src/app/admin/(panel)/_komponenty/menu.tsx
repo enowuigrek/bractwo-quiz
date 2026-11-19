@@ -4,8 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useNeutralny } from "@/components/motyw";
-import { slowaLokalu } from "@/lib/motyw";
+import { useMarka } from "@/components/motyw";
 import { NapisUruchom } from "@/components/ikony";
 
 /**
@@ -62,7 +61,7 @@ export function MenuPanelu({
 }) {
   const sciezka = usePathname();
   const [otwarte, ustawOtwarte] = useState(false);
-  const neutralny = useNeutralny();
+  const marka = useMarka();
   const zamknij = () => ustawOtwarte(false);
   const uruchamianie = sciezka.startsWith("/admin/gry/nowa");
 
@@ -107,7 +106,7 @@ export function MenuPanelu({
       <nav id="panel-menu-szuflada" className="panel-menu-szuflada" aria-label="Panel" inert={!otwarte}>
         {lokal && (
           <section>
-            <p className="etykieta">{slowaLokalu(neutralny).moj}</p>
+            <p className="etykieta">{marka.teksty.lokal.moj}</p>
             <Link
               href={ustawienia}
               onClick={zamknij}

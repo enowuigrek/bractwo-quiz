@@ -48,6 +48,8 @@ export type Slownik = {
   lokal: { lokal: string; lokale: string; moj: string; ustawienia: string };
   /** cel wyścigu: „kto pierwszy dobiegnie do piwa” */
   doCelu: string;
+  /** nagłówek rankingu w finale wyścigu na TV */
+  naglowekFinalu: string;
   /** „jak wygląda wyścig po piwo” */
   wyscigOpis: string;
   /** pożegnanie na samym końcu tekstu; `null` = bez pożegnania */

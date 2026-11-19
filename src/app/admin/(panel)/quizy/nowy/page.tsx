@@ -3,12 +3,12 @@ import Link from "next/link";
 import { mozeDegustacje, wymagajAdmina } from "@/lib/admin";
 import { nazwaRodzajuQuizu, listaQuizow, nowyQuiz, rodzajZAdresu as czytajRodzaj } from "@/lib/tagi";
 import { FormularzQuizu } from "../formularz-quizu";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
 
 export const metadata: Metadata = { title: "Nowy quiz" };
 
 export default async function NowyQuiz({ searchParams }: PageProps<"/admin/quizy/nowy">) {
-  const neutralny = (await motywZadania()) === "neutralny";
+  const marka = await markaZadania();
   const rola = await wymagajAdmina();
   const { rodzaj: rodzajZAdresu } = await searchParams;
   // rodzaj z zakładki listy quizów; w formularzu już się go nie zmienia
@@ -17,10 +17,10 @@ export default async function NowyQuiz({ searchParams }: PageProps<"/admin/quizy
     <main>
       <p className="okruchy">
         <Link href={listaQuizow(rodzaj).slice(0, -1)}>
-          ← {nazwaRodzajuQuizu(rodzaj, neutralny)}
+          ← {nazwaRodzajuQuizu(rodzaj, marka)}
         </Link>
       </p>
-      <h1>{nowyQuiz(rodzaj, neutralny)}</h1>
+      <h1>{nowyQuiz(rodzaj, marka)}</h1>
       <section className="karta">
         <FormularzQuizu rodzaj={rodzaj} />
       </section>

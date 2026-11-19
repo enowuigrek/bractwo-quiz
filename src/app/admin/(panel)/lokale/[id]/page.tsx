@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { widziWszystko, wymagajAdmina, lokalRoli, rolaAdmina } from "@/lib/admin";
-import { motywZadania } from "@/lib/motyw-serwer";
-import { slowaLokalu } from "@/lib/motyw";
+import { markaZadania } from "@/lib/motyw-serwer";
 import { filtrGier, filtrQuizow, ukryteOsobyLokali, wymagajLokalu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
@@ -13,8 +12,8 @@ import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "../../gry/lista-gie
 
 /** Tytuł karty jak zakładka w panelu: własny lokal to „Mój lokal” („Moja organizacja”), cudzy „Lokal” (18.11). */
 export async function generateMetadata({ params }: PageProps<"/admin/lokale/[id]">): Promise<Metadata> {
-  const [{ id }, rola, motyw] = await Promise.all([params, rolaAdmina(), motywZadania()]);
-  const slowa = slowaLokalu(motyw === "neutralny");
+  const [{ id }, rola, marka] = await Promise.all([params, rolaAdmina(), markaZadania()]);
+  const slowa = marka.teksty.lokal;
   return { title: rola && lokalRoli(rola) === id ? slowa.moj : slowa.lokal };
 }
 

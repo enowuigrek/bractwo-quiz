@@ -8,7 +8,7 @@ import { IkonaKosz, IkonaOkoPrzekreslone } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przywrocQuiz, usunQuizNaZawsze } from "../akcje";
 import { liczbaPiw, liczbaPytan } from "../limity";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
 
 export const metadata: Metadata = { title: "Kosz" };
 
@@ -32,7 +32,7 @@ const BLEDY: Record<string, string> = {
  * z pytaniami i grafikami). Najnowsze na górze.
  */
 export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kosz">) {
-  const neutralny = (await motywZadania()) === "neutralny";
+  const marka = await markaZadania();
   const rola = await wymagajAdmina();
   const { blad } = await searchParams;
   // lokal widzi w koszu tylko swoje quizy (quizów Bractwa nie usuwa)
@@ -69,7 +69,7 @@ export default async function Kosz({ searchParams }: PageProps<"/admin/quizy/kos
                       <IkonaOkoPrzekreslone /> prywatny ·{" "}
                     </>
                   )}
-                  {nazwaRodzajuQuizu(rodzajQuizu(q), neutralny)} ·{" "}
+                  {nazwaRodzajuQuizu(rodzajQuizu(q), marka)} ·{" "}
                   {(q.degustacja ? liczbaPiw : liczbaPytan)(q.zadania[0]?.count ?? 0)} · w koszu od{" "}
                   {new Date(q.usunieto).toLocaleString("pl-PL", {
                     timeZone: "Europe/Warsaw",

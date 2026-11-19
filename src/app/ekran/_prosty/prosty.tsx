@@ -15,7 +15,7 @@ import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowan
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka, useNeutralny } from "@/components/motyw";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 // Prosty ekran TV dla starszych przeglądarek telewizorów (src/lib/gra/prosty.ts: kiedy się włącza). Te same dane
@@ -86,7 +86,7 @@ export function LogoProste({
   zapowiedz: Pick<Zapowiedz, "planowany_start" | "tytul" | "okazja"> | null;
   przesuniecie: number;
 }) {
-  const neutralny = useNeutralny();
+  const marka = useMarka();
   const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   return (
     <div className="pr-srodek">
@@ -100,7 +100,7 @@ export function LogoProste({
         <h1 className="pr-tytul">{lokal?.nazwa ?? "Quiz"}</h1>
       )}
       {zapowiedz?.okazja && <p className="pr-nadtytul">{zapowiedz.okazja}</p>}
-      {zapowiedz && <h1 className="pr-tytul pr-tytul-maly">{zapowiedz.tytul ?? nazwaRodzajuQuizu("klasyczny", neutralny)}</h1>}
+      {zapowiedz && <h1 className="pr-tytul pr-tytul-maly">{zapowiedz.tytul ?? nazwaRodzajuQuizu("klasyczny", marka)}</h1>}
       {zapowiedz?.planowany_start && doStartu !== null && (
         <p className="pr-start">
           Start <strong>{kiedyStart(zapowiedz.planowany_start)}</strong> · {opisOdliczania(doStartu)}
@@ -639,7 +639,7 @@ function Seria({ stan, teraz }: { stan: StanSesji; teraz: number }) {
 }
 
 function Podium({ stan, ranking, koniec = false }: { stan: StanSesji; ranking: WierszRankingu[]; koniec?: boolean }) {
-  const neutralny = useNeutralny();
+  const pozegnanie = useMarka().teksty.pozegnanie;
   const trojka = ranking.slice(0, 3);
   // po finale miejsce trójki dał wyścig: bez punktów, jak na głównym ekranie
   const finalistow = stan.finalisci?.length;
@@ -664,7 +664,7 @@ function Podium({ stan, ranking, koniec = false }: { stan: StanSesji; ranking: W
       </ol>
       <p className="pr-opis">
         {[stan.okazja, stan.quiz?.tytul, stan.lokal?.nazwa].filter(Boolean).join(" · ")}
-        {koniec && !neutralny ? " · Piwu Cześć!" : ""}
+        {koniec && pozegnanie ? ` · ${pozegnanie}` : ""}
       </p>
     </div>
   );

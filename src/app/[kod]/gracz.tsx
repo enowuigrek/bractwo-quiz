@@ -35,7 +35,7 @@ import { ZdjecieGracza } from "./zdjecie-gracza";
 import { DegustacjaGracza } from "./degustacja";
 import { czyDegustacja } from "@/lib/degustacja";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { PiwuCzesc, useNeutralny } from "@/components/motyw";
+import { PiwuCzesc, useMarka, useNeutralny } from "@/components/motyw";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;
 
@@ -52,7 +52,7 @@ function widoczni(gracze: GraczNaLiscie[], ja: string): GraczNaLiscie[] {
 }
 
 export function Gracz({ kod }: { kod: string }) {
-  const neutralny = useNeutralny();
+  const marka = useMarka();
   const [stan, ustawStan] = useState<StanSesji | null>(null);
   const [gracze, ustawGraczy] = useState<GraczNaLiscie[]>([]);
   const [bladGry, ustawBladGry] = useState<string | null>(null);
@@ -165,7 +165,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!stan || sprawdzamToken) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, neutralny)} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, marka)} />
         <p className="pomocniczy">Łączę z grą…</p>
       </>
     );
@@ -174,7 +174,7 @@ export function Gracz({ kod }: { kod: string }) {
   if (!ja) {
     return (
       <>
-        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, neutralny)} />
+        <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, marka)} />
         {stan.faza === "koniec" ? (
           <>
             <h1>Ta gra już się skończyła</h1>
@@ -217,7 +217,7 @@ export function Gracz({ kod }: { kod: string }) {
 
   return (
     <>
-      <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, neutralny)} />
+      <Naglowek lokal={stan?.lokal} browar={stan?.browar} napis={nazwaRodzaju(stan, marka)} />
       <WGrze
         stan={stan}
         ja={ja}
@@ -387,6 +387,7 @@ function WGrze({
   const teraz = useCzasSerwera(przesuniecie, zZegarem(stan.faza), stan.faza === "przygotuj" ? 100 : 250);
   useKoniecPytania(stan.kod, stan, teraz);
   const neutralny = useNeutralny();
+  const marka = useMarka();
 
   // degustacja (02.11): karta, „ty i sala” i „Twoja degustacja” zamiast pytań, rankingu i medali
   if (czyDegustacja(stan) && ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "koniec"].includes(stan.faza)) {
@@ -473,7 +474,7 @@ function WGrze({
       <>
         <p className="nadtytul">{ja.nick}</p>
         <h1>Zaraz zaczynamy!</h1>
-        <p>Patrz na telewizor: prowadzący opowie, jak wygląda {neutralny ? "wyścig" : "wyścig po piwo"}.</p>
+        <p>Patrz na telewizor: prowadzący opowie, jak wygląda {marka.teksty.wyscigOpis}.</p>
         <Gotowy stan={stan} token={ja.token} />
       </>
     );
@@ -595,12 +596,12 @@ function Odpadl({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSe
 
 /** Grafika na pamiątkę z miejscem z tej chwili (odpadnięci przed finałem i spoza finału). */
 function GrafikaGracza({ nick, moj, stan }: { nick: string; moj: MojWynik; stan: StanSesji }) {
-  const neutralny = useNeutralny();
+  const marka = useMarka();
   return (
       <UdostepnijWynik
         wynik={{
           tytul: stan.quiz?.tytul ?? "Quiz",
-          okazja: stan.okazja ?? nazwaRodzaju(stan, neutralny),
+          okazja: stan.okazja ?? nazwaRodzaju(stan, marka),
           lokal: stan.lokal,
           browar: stan.browar,
           data: new Date().toLocaleDateString("pl-PL"),

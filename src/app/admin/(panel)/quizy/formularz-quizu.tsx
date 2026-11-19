@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
 import { SZABLONY_ETAPOW, SZABLONY_QUIZU, bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { RodzajQuizu } from "@/lib/tagi";
 import type { StanFormularza } from "@/lib/typy";
@@ -17,7 +17,7 @@ import { LIMITY, liczbaPytan } from "./limity";
  * pytania bez etapów. Po utworzeniu przechodzi do edycji pytań.
  */
 export function FormularzQuizu({ rodzaj }: { rodzaj: RodzajQuizu }) {
-  const neutralny = useNeutralny();
+  const marka = useMarka();
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(utworzQuiz, {});
   // klucze szablonów to rodzaje
   const szablon = SZABLONY_QUIZU.find((s) => s.klucz === rodzaj);
@@ -65,7 +65,7 @@ export function FormularzQuizu({ rodzaj }: { rodzaj: RodzajQuizu }) {
           name="tytul"
           className="pole"
           placeholder={
-            rodzaj === "degustacja" ? "np. Spotkanie Bractwa, piwa domowe" : neutralny ? "np. Forum PS" : "np. Portery i stouty"
+            rodzaj === "degustacja" ? "np. Spotkanie Bractwa, piwa domowe" : marka.teksty.przykladTytulu
           }
           required
           maxLength={LIMITY.tytul}

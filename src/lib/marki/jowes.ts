@@ -26,6 +26,7 @@ export const JOWES: Marka = {
       ustawienia: "Ustawienia organizacji",
     },
     doCelu: "do mety",
+    naglowekFinalu: "Finał",
     wyscigOpis: "wyścig",
     pozegnanie: null,
     przykladOkazji: "np. Forum PS",

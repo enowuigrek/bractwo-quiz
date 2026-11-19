@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { adresAplikacji } from "@/lib/adres";
 import { jestTworca, widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { motywZadania } from "@/lib/motyw-serwer";
-import { slowaLokalu } from "@/lib/motyw";
+import { markaZadania } from "@/lib/motyw-serwer";
 import { ukryteOsobyLokali, wymagajLokalu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
@@ -15,7 +14,7 @@ import { usunLokal } from "../../akcje";
 import { FormularzLokalu } from "../../formularz";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: slowaLokalu((await motywZadania()) === "neutralny").ustawienia };
+  return { title: (await markaZadania()).teksty.lokal.ustawienia };
 }
 
 export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/[id]/edycja">) {

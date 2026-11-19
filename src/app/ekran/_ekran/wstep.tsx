@@ -5,7 +5,7 @@ import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka, useNeutralny } from "@/components/motyw";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
@@ -17,6 +17,7 @@ import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
  */
 export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode }) {
   const neutralny = useNeutralny();
+  const marka = useMarka();
   const plan = stan.plan_etapow ?? [];
   const wejscie = (i: number) => ({
     initial: { opacity: 0, y: 24 },
@@ -35,7 +36,7 @@ export function WstepTv({ stan, loga }: { stan: StanSesji; loga: React.ReactNode
           {stan.quiz?.tytul ?? "Quiz"}
         </motion.p>
         <motion.h1 className="tv-wstep-tytul" {...wejscie(1)}>
-          {nazwaRodzajuQuizu("wyscig", neutralny)}
+          {nazwaRodzajuQuizu("wyscig", marka)}
         </motion.h1>
         {neutralny ? (
           <motion.p className="tv-wstep-opis" {...wejscie(2)}>

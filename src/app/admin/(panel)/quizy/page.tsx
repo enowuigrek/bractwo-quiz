@@ -17,7 +17,7 @@ import {
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz, ustawWidocznoscQuizu } from "./akcje";
 import { nowyQuiz, rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
 
 export const metadata: Metadata = { title: "Quizy" };
 
@@ -118,7 +118,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
         </p>
       )}
 
-      <ZakladkiRodzaju neutralny={(await motywZadania()) === "neutralny"} zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
+      <ZakladkiRodzaju marka={await markaZadania()} zDegustacja={mozeDegustacje(rola)} rodzaj={rodzaj} adres={(r) => adres(r, { ...wybrane, tag: null })} />
       <FiltryListy
         lokale={lokale ?? []}
         tagi={tagi}
@@ -198,7 +198,7 @@ export default async function Quizy({ searchParams }: PageProps<"/admin/quizy">)
 
       <div className="panel-sekcja przyciski">
         <Link href={`/admin/quizy/nowy?rodzaj=${rodzaj}`} className="przycisk zloty">
-          {nowyQuiz(rodzaj, (await motywZadania()) === "neutralny")}
+          {nowyQuiz(rodzaj, await markaZadania())}
         </Link>
         {/* pytania dogrywki „Pijany finał” (tylko po finale wyścigu po piwo), wspólne dla wszystkich gier;
             pytania zmienia tylko główny */}

@@ -17,7 +17,7 @@ import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { usunieciGry, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../wyniki";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
 import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { Notatki, type AutorNotatki } from "./notatki";
@@ -41,7 +41,7 @@ type GraZDanymi = Sesja & {
 
 export default async function Gra({ params, searchParams }: PageProps<"/admin/gry/[id]">) {
   const rola = await wymagajAdmina();
-  const neutralny = (await motywZadania()) === "neutralny";
+  const marka = await markaZadania();
   const { id } = await params;
   const widokPytan = (await searchParams).widok === "pytania";
   // z pilota (udostepnij.tsx) przychodzi kod gry zamiast id: najnowsza gra z tym kodem
@@ -372,7 +372,7 @@ export default async function Gra({ params, searchParams }: PageProps<"/admin/gr
               dane={{
                 tytul: gra.quizy?.tytul ?? "Quiz",
                 // bez okazji rodzaj gry, jak na grafice gracza
-                okazja: gra.okazja ?? nazwaRodzajuQuizu(rodzajQuizu(gra.quizy ?? {}), neutralny),
+                okazja: gra.okazja ?? nazwaRodzajuQuizu(rodzajQuizu(gra.quizy ?? {}), marka),
                 lokal: gra.lokale ? { nazwa: gra.lokale.nazwa, logo_url: gra.lokale.logo_url } : null,
                 browar: gra.browar_nazwa ? { nazwa: gra.browar_nazwa, logo_url: gra.browar_logo_url } : null,
                 data: new Date(gra.faza_od ?? gra.utworzono).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw" }),

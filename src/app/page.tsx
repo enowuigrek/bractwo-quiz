@@ -2,7 +2,7 @@
 import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { WpiszKod } from "./ekran/wpisz-kod";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania, motywZadania } from "@/lib/motyw-serwer";
 import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 
 // zapowiedzi zmieniają się rzadko: odświeżamy co minutę zamiast przy każdym wejściu
@@ -48,7 +48,7 @@ async function zapowiedziane() {
  * (30.10, Łukasz): obsługa ma swoje adresy w zakładkach, a graczy to tylko myli.
  */
 export default async function Home() {
-  const neutralny = (await motywZadania()) === "neutralny";
+  const [neutralny, marka] = await Promise.all([motywZadania().then((m) => m === "neutralny"), markaZadania()]);
   // motyw neutralny: bez zapowiedzi quizów Bractwa i linku do Bractwa
   const zapowiedzi = neutralny ? [] : await zapowiedziane();
 
@@ -82,7 +82,7 @@ export default async function Home() {
                   <span>
                     {[
                       kiedy(g.planowany_start),
-                      g.okazja ?? nazwaRodzajuQuizu(rodzajQuizu(g.quizy ?? {}), neutralny),
+                      g.okazja ?? nazwaRodzajuQuizu(rodzajQuizu(g.quizy ?? {}), marka),
                       g.lokale?.miasto,
                     ]
                       .filter(Boolean)

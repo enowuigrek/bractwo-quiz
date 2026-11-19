@@ -1,3 +1,4 @@
+import type { Marka } from "@/lib/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 // Wyścig zamiast tabeli rankingu. Położenie zależy tylko od własnych punktów w stałej skali (część maksimum
@@ -44,12 +45,12 @@ export function quizKlasyczny(stan: { quiz: { liczba_etapow: number } | null }):
  */
 export function nazwaRodzaju(
   stan: { quiz: { liczba_etapow: number; degustacja?: boolean } | null } | null | undefined,
-  /** Motyw neutralny (src/lib/motyw.ts): nazwy bez piwa i pubu (`NAZWY_NEUTRALNE`). */
-  neutralny = false,
+  /** marka strony (src/lib/marka.ts): nazwy rodzajów z jej słownika */
+  marka: Marka,
 ): string {
   if (!stan?.quiz) return "Quiz";
   // jedno źródło nazw rodzajów (src/lib/tagi.ts)
-  return nazwaRodzajuQuizu(stan.quiz.degustacja ? "degustacja" : quizKlasyczny(stan) ? "klasyczny" : "wyscig", neutralny);
+  return nazwaRodzajuQuizu(stan.quiz.degustacja ? "degustacja" : quizKlasyczny(stan) ? "klasyczny" : "wyscig", marka);
 }
 
 /**

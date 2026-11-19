@@ -19,6 +19,7 @@ export const BRACTWO: Marka = {
     rodzaje: { wyscig: "Wyścig po piwo", klasyczny: "Pub quiz" },
     lokal: { lokal: "Lokal", lokale: "Lokale", moj: "Mój lokal", ustawienia: "Ustawienia lokalu" },
     doCelu: "do piwa",
+    naglowekFinalu: "Finał: wyścig po piwo",
     wyscigOpis: "wyścig po piwo",
     pozegnanie: "Piwu Cześć!",
     przykladOkazji: "np. Dzień Porteru",

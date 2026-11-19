@@ -1,4 +1,4 @@
-import { NAZWY_NEUTRALNE } from "@/lib/motyw";
+import type { Marka } from "@/lib/marka";
 
 // Tematyczne oznaczenia quizów (`quizy.tagi`): wpisywane po przecinku w panelu, do filtrowania listy quizów
 // i wyboru quizu przy uruchamianiu gry.
@@ -29,13 +29,13 @@ export const NAZWY_RODZAJOW: Record<RodzajQuizu, string> = {
   degustacja: "Degustacja",
 };
 
-/** Nazwa rodzaju; w motywie neutralnym (src/lib/motyw.ts) bez piwa i pubu. */
-export const nazwaRodzajuQuizu = (rodzaj: RodzajQuizu, neutralny = false) =>
-  neutralny && rodzaj !== "degustacja" ? NAZWY_NEUTRALNE[rodzaj] : NAZWY_RODZAJOW[rodzaj];
+/** Nazwa rodzaju w marce (src/lib/marka.ts): wyścig i pub quiz ze słownika marki, degustacja zawsze tak samo. */
+export const nazwaRodzajuQuizu = (rodzaj: RodzajQuizu, marka: Marka) =>
+  rodzaj === "degustacja" ? NAZWY_RODZAJOW.degustacja : marka.teksty.rodzaje[rodzaj];
 
 /** „Nowy wyścig po piwo”, „Nowy pub quiz”, „Nowa degustacja”: przycisk i nagłówek nowego quizu z nazwy zakładki (30.10). */
-export const nowyQuiz = (rodzaj: RodzajQuizu, neutralny = false) =>
-  `${rodzaj === "degustacja" ? "Nowa" : "Nowy"} ${nazwaRodzajuQuizu(rodzaj, neutralny).toLowerCase()}`;
+export const nowyQuiz = (rodzaj: RodzajQuizu, marka: Marka) =>
+  `${rodzaj === "degustacja" ? "Nowa" : "Nowy"} ${nazwaRodzajuQuizu(rodzaj, marka).toLowerCase()}`;
 
 /** Rodzaje, które rola widzi: degustacja tylko z `mozeDegustacje` (03.11). */
 export const rodzajeQuizow = (zDegustacja: boolean): readonly RodzajQuizu[] =>

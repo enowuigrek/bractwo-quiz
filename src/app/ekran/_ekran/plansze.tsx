@@ -7,7 +7,7 @@ import type { WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Loga } from "./tv";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka, useNeutralny } from "@/components/motyw";
 import { LOGO_NEUTRALNE } from "@/lib/motyw";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
@@ -35,6 +35,7 @@ const STOPNIE = [1, 0, 2];
  */
 export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }: Props) {
   const neutralny = useNeutralny();
+  const marka = useMarka();
   const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   const liczbaPlansz = ostatnia ? 4 : 3;
   const [licznik, ustawLicznik] = useState(0);
@@ -60,7 +61,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
                 .filter(Boolean)
                 .join(" · ")}
             </p>
-            <h1 className="plansza-tytul">{zapowiedz.tytul ?? (neutralny ? "Quiz" : "Quiz Bractwa Piwnego")}</h1>
+            <h1 className="plansza-tytul">{zapowiedz.tytul ?? marka.teksty.tytulQuizu}</h1>
             {zapowiedz.planowany_start && doStartu !== null && (
               <p className="plansza-start">
                 <span>
@@ -77,7 +78,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
               <LogoBractwa className="tv-logo-bractwo-duze" />
               <Loga lokal={lokal} />
             </div>
-            <h1 className="plansza-tytul">{neutralny ? "Quiz" : "Quiz Bractwa Piwnego"}</h1>
+            <h1 className="plansza-tytul">{marka.teksty.tytulQuizu}</h1>
             <p className="tv-okazja">Wkrótce start · {lokal.nazwa}</p>
           </div>
         )}

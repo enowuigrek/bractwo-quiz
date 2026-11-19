@@ -13,7 +13,7 @@ import { uruchomGre } from "../akcje";
 import { testFinalu } from "../../quizy/[id]/test-finalu";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka, useNeutralny } from "@/components/motyw";
 
 export type QuizDoWyboru = {
   id: string;
@@ -56,6 +56,7 @@ function isoStartu(data: string, godzina: string): string {
 /** Uruchamianie gry krokami (kafelki): miasto → lokal → rodzaj → quiz (z tematem), potem szczegóły. */
 export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
   const neutralny = useNeutralny();
+  const marka = useMarka();
   const [stan, akcja, trwa] = useActionState<StanFormularza, FormData>(uruchomGre, {});
 
   const miasta = [...new Set(lokale.map((p) => p.miasto).filter((m): m is string => !!m))].sort((a, b) =>
@@ -175,7 +176,7 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
                     setAuto(r === "klasyczny");
                   }}
                 />
-                {nazwaRodzajuQuizu(r, neutralny)}
+                {nazwaRodzajuQuizu(r, marka)}
               </label>
             ))}
           </div>
@@ -242,7 +243,7 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
         <>
           <div>
             <label htmlFor="okazja">Nazwa (opcjonalnie, widać ją na TV)</label>
-            <input id="okazja" name="okazja" className="pole" placeholder={neutralny ? "np. Forum PS" : "np. Dzień Porteru"} maxLength={80} />
+            <input id="okazja" name="okazja" className="pole" placeholder={marka.teksty.przykladOkazji} maxLength={80} />
           </div>
 
           {!degustacja && (

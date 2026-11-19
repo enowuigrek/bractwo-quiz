@@ -11,7 +11,7 @@ import { SzklankaPiwa } from "@/components/szklanka-piwa";
 import { DrogiFinalu } from "./drogi";
 import { KONIEC_ETAPU_PX, KoniecEtapu, Licznik, RESZTA_RANKINGU_PX, ResztaRankingu } from "./ranking";
 import { useStronaRankingu } from "@/lib/gra/strona-rankingu";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka, useNeutralny } from "@/components/motyw";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";
 
@@ -32,6 +32,7 @@ const STREFA_PX = 56;
  */
 export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRankingu[] }) {
   const neutralny = useNeutralny();
+  const marka = useMarka();
   const z = stan.zadanie;
   const n = stan.quiz?.liczba_zadan ?? 0;
   const lp = z?.lp ?? 0;
@@ -178,11 +179,7 @@ export function WyscigTv({ stan, ranking }: { stan: StanSesji; ranking: WierszRa
   const naglowek = (
     <header className="tv-ranking-gora">
       <h1>
-        {etap?.finalowy
-          ? neutralny
-            ? "Finał"
-            : `Finał: ${nazwaRodzajuQuizu("wyscig").toLowerCase()}`
-          : nazwaRodzajuQuizu("wyscig", neutralny)}
+        {etap?.finalowy ? marka.teksty.naglowekFinalu : nazwaRodzajuQuizu("wyscig", marka)}
       </h1>
       {z && <p className="tv-okazja">{`${etap ? `${etap.nazwa} · ` : ""}po pytaniu ${lp}`}</p>}
     </header>

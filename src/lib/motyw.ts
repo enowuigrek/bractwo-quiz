@@ -13,13 +13,6 @@ export type Motyw = "bractwo" | "neutralny";
 /** Logo motywu neutralnego (stoi tam, gdzie w motywie Bractwa logo Bractwa). `null` = bez logo. */
 export const LOGO_NEUTRALNE: string | null = MARKI.jowes.logo;
 
-/** Nazwy rodzajów quizu w motywie neutralnym (zamiast „Wyścig po piwo” i „Pub quiz”). */
-export const NAZWY_NEUTRALNE = MARKI.jowes.teksty.rodzaje;
-
-/** Słowa na lokal w panelu (18.11): w Bractwie lokal, w motywie neutralnym organizacja (firma, nie knajpa). */
-export const SLOWA_LOKALU = { bractwo: MARKI.bractwo.teksty.lokal, neutralny: MARKI.jowes.teksty.lokal } as const;
-export const slowaLokalu = (neutralny: boolean) => SLOWA_LOKALU[neutralny ? "neutralny" : "bractwo"];
-
 /** Nazwa aplikacji w tytule strony. */
 export const NAZWA_APLIKACJI: Record<Motyw, string> = { bractwo: MARKI.bractwo.nazwa, neutralny: MARKI.jowes.nazwa };
 
