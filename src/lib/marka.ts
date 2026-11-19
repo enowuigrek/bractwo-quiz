@@ -54,6 +54,8 @@ export type Slownik = {
   wyscigOpis: string;
   /** pożegnanie na samym końcu tekstu; `null` = bez pożegnania */
   pozegnanie: string | null;
+  /** opis linku do ekranu (podgląd w Messengerze itp.): ekranu lokalu i ekranu gry */
+  opisEkranu: { lokal: string; gra: string };
   /** podpowiedź w polu okazji w kreatorze gry */
   przykladOkazji: string;
   /** podpowiedź w polu tytułu quizu (wyścig i pub quiz) */
@@ -80,7 +82,18 @@ export type Marka = {
   /** opis strony (metadane) */
   opis: string;
   /** logo marki tam, gdzie w Bractwie stoi logo Bractwa */
-  logo: string;
+  logo: {
+    plik: string;
+    /** białe logo na ciemne tło (`biale` w `LogoBractwa`); `null` = zawsze `plik` */
+    biale: string | null;
+    alt: string;
+    /** klasa CSS logo (wybielanie i blask Bractwa albo logo motywu) */
+    klasa: string;
+    /** szerokość do wysokości, gdy stała (logo przez next/image); `null` = szerokość z obrazka */
+    proporcja: number | null;
+    /** szerokie logo: przy dużym logo napis „Quiz” stoi pod nim */
+    szerokie: boolean;
+  };
   ikony: { ico: string; png: string; apple: string };
   /** strona marki w stopce strony głównej */
   strona: { adres: string; napis: string } | null;
@@ -94,6 +107,16 @@ export type Marka = {
     tekst: string;
     akcent: string;
     szary: string;
+  };
+  /** miniatura linku do ekranu (`ekran/[adres]/opengraph-image.tsx`) */
+  podglad: {
+    tytul: string;
+    /** podpis pod tytułem; `null` = nazwa lokalu albo kod gry */
+    podpis: string | null;
+    tlo: string;
+    tekst: string;
+    /** wymiary logo w px (generator nie zgaduje szerokości); bez `szer` szerokość z proporcji */
+    logo: { szer?: number; wys: number };
   };
   ikonyEtapow: "piwne" | "neutralne";
   awatar: "kapsel" | "kolo";

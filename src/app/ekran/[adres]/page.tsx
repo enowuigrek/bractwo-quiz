@@ -7,8 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { EkranLokalu } from "../_ekran/ekran-lokalu";
 import { Tv } from "../_ekran/tv";
 import "../_ekran/tv.css";
-import { NAZWA_APLIKACJI } from "@/lib/motyw";
-import { motywZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/motyw-serwer";
 
 type Lokal = { nazwa: string; logo_url: string | null };
 
@@ -27,13 +26,9 @@ export async function generateMetadata({ params }: PageProps<"/ekran/[adres]">):
   const lokal = await lokalPoAdresie(adres);
   // podgląd linku (Messenger itp.): tytuł z lokalem i miniatura z opengraph-image.tsx
   const tytul = lokal ? `Ekran quizu · ${lokal.nazwa}` : `Ekran gry ${adres.toUpperCase()}`;
-  const neutralny = (await motywZadania()) === "neutralny";
-  const nazwa = NAZWA_APLIKACJI[neutralny ? "neutralny" : "bractwo"];
-  const opis = neutralny
-    ? "Otwórz ten link na telewizorze: gra pokaże się sama."
-    : lokal
-    ? "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze w lokalu: plansze, zapowiedź i gra pokażą się same."
-    : "Quiz Bractwa Piwnego. Otwórz ten link na telewizorze: gra pokaże się sama.";
+  const marka = await markaZadania();
+  const nazwa = marka.nazwa;
+  const opis = lokal ? marka.teksty.opisEkranu.lokal : marka.teksty.opisEkranu.gra;
   return {
     title: `Ekran ${lokal ? lokal.nazwa : adres.toUpperCase()}`,
     description: opis,
@@ -60,7 +55,7 @@ export default async function StronaEkranu({ params }: PageProps<"/ekran/[adres]
     type: "svg",
     margin: 0,
     errorCorrectionLevel: "M",
-    // jasne pola przezroczyste: kod bierze tło ramki (kremowe w Bractwie, białe w motywie neutralnym, 18.11)
+    // jasne pola przezroczyste: kod bierze tło ramki (kremowe w Bractwie, białe w JOWES, 18.11)
     color: { dark: "#000000", light: "#00000000" },
   });
   return <Tv kod={adres} qr={qr} host={baza.replace(/^https?:\/\//, "")} />;

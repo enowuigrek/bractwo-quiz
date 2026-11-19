@@ -1,11 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { LOGO_NEUTRALNE } from "@/lib/motyw";
-import { useNeutralny } from "./motyw";
-
-// Proporcje przyciętego viewBox w public/loga/bractwo.svg
-const PROPORCJA = 3284 / 1990;
+import { useMarka } from "./motyw";
 
 type Props = {
   /** Wysokość logo w px. Napis „Quiz” skaluje się razem z nim. */
@@ -16,31 +12,29 @@ type Props = {
 };
 
 /**
- * Logo Bractwa (zawsze białe, bez blasku) + złoty napis „Quiz”. W motywie neutralnym (src/lib/motyw.ts) logo motywu
- * albo sam napis.
+ * Logo marki + napis „Quiz” w kolorze akcentu. Logo Bractwa (zawsze białe, bez blasku) o stałych proporcjach idzie
+ * przez next/image, logo o dowolnych proporcjach (JOWES) zwykłym obrazkiem.
  */
 export function LogoQuiz({ wysokosc = 72, dopisek, priorytet }: Props) {
-  const neutralny = useNeutralny();
+  const { logo } = useMarka();
   return (
-    // motyw neutralny: logo JOWES jest szerokie, więc przy dużym logo napis „Quiz” stoi pod nim
+    // szerokie logo (JOWES): przy dużym logo napis „Quiz” stoi pod nim
     <span
-      className={`logo-quiz${neutralny && wysokosc >= 60 ? " logo-quiz-pod" : ""}`}
+      className={`logo-quiz${logo.szerokie && wysokosc >= 60 ? " logo-quiz-pod" : ""}`}
       style={{ fontSize: Math.round(wysokosc * 0.42) }}
     >
-      {!neutralny ? (
+      {logo.proporcja ? (
         <Image
-          src="/loga/bractwo.svg"
-          alt="Bractwo Piwne"
-          width={Math.round(wysokosc * PROPORCJA)}
+          src={logo.plik}
+          alt={logo.alt}
+          width={Math.round(wysokosc * logo.proporcja)}
           height={wysokosc}
           priority={priorytet}
-          className="logo-bractwo"
+          className={logo.klasa}
         />
       ) : (
-        LOGO_NEUTRALNE && (
-          // eslint-disable-next-line @next/next/no-img-element -- logo motywu z public, dowolne proporcje
-          <img src={LOGO_NEUTRALNE} alt="" className="logo-motywu" style={{ height: wysokosc, width: "auto" }} />
-        )
+        // eslint-disable-next-line @next/next/no-img-element -- logo marki z public, dowolne proporcje
+        <img src={logo.plik} alt={logo.alt} className={logo.klasa} style={{ height: wysokosc, width: "auto" }} />
       )}
       <span className="logo-quiz-napis">
         Quiz

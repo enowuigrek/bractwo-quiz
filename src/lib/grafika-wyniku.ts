@@ -2,11 +2,11 @@
 
 // Grafiki do udostępnienia w social mediach, rysowane w przeglądarce na <canvas>:
 // wynik gracza i podium gry dla lokalu (obie relacje 1080×1920).
-// Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru (w motywie neutralnym jasna
-// grafika z samym logo motywu, 18.11).
+// Bez instrukcji odbioru nagród: zamiast nich loga Bractwa, lokalu i ewentualnie browaru. Kolory, logo, tytuł
+// i pożegnanie z marki (src/lib/marka.ts): JOWES ma jasną grafikę z samym logo JOWES (18.11).
 
 import { adresZdjecia, kolorNicku, kolorZAdresu, przesun, ZLOTY_KAPSEL } from "./kapsel";
-import { LOGO_NEUTRALNE } from "./motyw";
+import { ma, type Marka } from "./marka";
 
 export type LogoNaGrafice = { nazwa: string; logo_url: string | null } | null;
 
@@ -19,9 +19,10 @@ type Wspolne = {
   data: string;
   /** Konta do oznaczenia (z @), wypisane na dole grafiki. */
   oznaczenia?: string[];
-  /** Motyw neutralny (JOWES, 18.11): jasna grafika z logo motywu, bez logo Bractwa i bez „Piwu Cześć!”. */
-  neutralny?: boolean;
 };
+
+/** Marka strony (`useMarka()`), dokładana przy rysowaniu: kolory, logo, tytuł i pożegnanie. */
+type ZMarka = { marka: Marka };
 
 export type DaneWyniku = Wspolne & {
   nick: string;
@@ -40,11 +41,16 @@ export type DanePodium = Wspolne & {
 const ZLOTO = "#e3ac3f";
 const PIANA = "#f4ecd8";
 const SZARY = "#9aa3ad";
-/** Kolory tekstu: na ciemnej grafice Bractwa kremowe i złote, na jasnej (motyw neutralny) ciemne i pomarańczowe. */
-function barwy(neutralny?: boolean) {
-  return neutralny
-    ? { tekst: "#1f1f1f", akcent: "#e58e00", szary: "#6b7480" }
-    : { tekst: PIANA, akcent: ZLOTO, szary: SZARY };
+/** Kolory tekstu z marki: na ciemnej grafice Bractwa kremowe i złote, na jasnej (JOWES) ciemne i pomarańczowe. */
+const barwy = (marka: Marka) => marka.kolory;
+
+/** Jasna grafika (jasne tło marki). */
+const jasna = (marka: Marka) => marka.kolory.tlo === "jasne";
+
+/** `#rrggbb` jako `rgba(r, g, b, a)`. */
+function rgba(hex: string, a: number) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
 const METALE: Record<number, [string, string, string]> = {
@@ -69,9 +75,9 @@ function wczytaj(src: string): Promise<HTMLImageElement> {
 }
 
 /** Logo Bractwa jest czarne; na ciemną grafikę przemalowujemy je na biało. */
-async function logoBractwa(): Promise<HTMLImageElement | null> {
+async function logoBractwa(plik: string): Promise<HTMLImageElement | null> {
   try {
-    const svg = await (await fetch("/loga/bractwo.svg")).text();
+    const svg = await (await fetch(plik)).text();
     const biale = svg.replace("<g>", '<g fill="#fff">').replaceAll("stroke:#000", "stroke:#fff");
     return await wczytaj(URL.createObjectURL(new Blob([biale], { type: "image/svg+xml" })));
   } catch {
@@ -98,10 +104,10 @@ function rysujWpasowany(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x:
 }
 
 /** Rząd logo wyśrodkowany w poziomie: Bractwo, lokal, × browar. */
-async function rysujLoga(ctx: CanvasRenderingContext2D, d: Wspolne, szer: number, y: number, wys: number) {
-  // motyw neutralny: samo logo motywu (lokal to ta sama organizacja, 18.11)
-  if (d.neutralny) {
-    const logo = await moze(LOGO_NEUTRALNE);
+async function rysujLoga(ctx: CanvasRenderingContext2D, d: Wspolne & ZMarka, szer: number, y: number, wys: number) {
+  // marka bez logo lokalu obok swojego (JOWES: lokal to ta sama organizacja, 18.11): samo logo marki
+  if (!ma(d.marka, "logo-lokalu-w-naglowku")) {
+    const logo = await moze(d.marka.logo.plik);
     if (logo) {
       const w = Math.min(szer - 160, wys * (logo.width / logo.height));
       rysujWpasowany(ctx, logo, (szer - w) / 2, y, w, wys);
@@ -109,7 +115,7 @@ async function rysujLoga(ctx: CanvasRenderingContext2D, d: Wspolne, szer: number
     return;
   }
   const [bractwo, lokal, browar] = await Promise.all([
-    logoBractwa(),
+    logoBractwa(d.marka.logo.plik),
     moze(d.lokal?.logo_url),
     moze(d.browar?.logo_url),
   ]);
@@ -203,24 +209,21 @@ async function rysujAwatar(
   ctx.fillText(String(d.miejsce), cx, cy + r * 0.9 + rn * 0.05);
 }
 
-function tlo(ctx: CanvasRenderingContext2D, szer: number, wys: number, neutralny?: boolean) {
-  if (neutralny) {
-    ctx.fillStyle = "#fffaf2";
-    ctx.fillRect(0, 0, szer, wys);
-    const blask = ctx.createRadialGradient(szer / 2, wys * 0.45, 0, szer / 2, wys * 0.45, szer * 0.9);
-    blask.addColorStop(0, "rgba(229, 142, 0, 0.18)");
-    blask.addColorStop(1, "rgba(229, 142, 0, 0)");
-    ctx.fillStyle = blask;
-    ctx.fillRect(0, 0, szer, wys);
-    return;
-  }
-  ctx.fillStyle = "#000";
+/** Tło: czarne albo kremowe (jasna marka) z poświatą w kolorze akcentu. */
+function tlo(ctx: CanvasRenderingContext2D, szer: number, wys: number, marka: Marka) {
+  const jasne = jasna(marka);
+  ctx.fillStyle = jasne ? "#fffaf2" : "#000";
   ctx.fillRect(0, 0, szer, wys);
   const blask = ctx.createRadialGradient(szer / 2, wys * 0.45, 0, szer / 2, wys * 0.45, szer * 0.9);
-  blask.addColorStop(0, "rgba(227, 172, 63, 0.28)");
-  blask.addColorStop(1, "rgba(227, 172, 63, 0)");
+  blask.addColorStop(0, rgba(marka.kolory.akcent, jasne ? 0.18 : 0.28));
+  blask.addColorStop(1, rgba(marka.kolory.akcent, 0));
   ctx.fillStyle = blask;
   ctx.fillRect(0, 0, szer, wys);
+}
+
+/** Pożegnanie marki na dole grafiki („Piwu Cześć!”). */
+function pozegnanie(ctx: CanvasRenderingContext2D, szer: number, marka: Marka) {
+  if (marka.teksty.pozegnanie) tekst(ctx, marka.teksty.pozegnanie, szer / 2, 1780, 44, marka.kolory.akcent, 800);
 }
 
 function tekst(ctx: CanvasRenderingContext2D, t: string, x: number, y: number, rozmiar: number, kolor: string, waga = 800, maks?: number) {
@@ -240,7 +243,7 @@ function naBlob(plotno: HTMLCanvasElement): Promise<Blob> {
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 
 /** Wynik gracza jako relacja 1080×1920. */
-export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
+export async function grafikaWyniku(d: DaneWyniku & ZMarka): Promise<Blob> {
   const S = 1080;
   const W = 1920;
   const plotno = document.createElement("canvas");
@@ -249,18 +252,18 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
   const ctx = plotno.getContext("2d");
   if (!ctx) throw new Error("Ta przeglądarka nie umie narysować grafiki.");
   await document.fonts.ready;
-  const b = barwy(d.neutralny);
-  tlo(ctx, S, W, d.neutralny);
+  const b = barwy(d.marka);
+  tlo(ctx, S, W, d.marka);
 
   await rysujLoga(ctx, d, S, 150, 170);
-  tekst(ctx, (d.okazja ?? (d.neutralny ? "Quiz" : "Quiz Bractwa Piwnego")).toUpperCase(), S / 2, 450, 38, b.akcent, 700, S - 120);
+  tekst(ctx, (d.okazja ?? d.marka.teksty.tytulQuizu).toUpperCase(), S / 2, 450, 38, b.akcent, 700, S - 120);
   tekst(ctx, d.tytul, S / 2, 520, 56, b.tekst, 800, S - 120);
 
   await rysujAwatar(ctx, d, S / 2, 860, 230);
 
   const podium = d.miejsce <= 3;
   // na jasnej grafice ciemniejszy odcień medalu (srebro na bieli ginęło)
-  const medal = METALE[d.miejsce]?.[d.neutralny ? 2 : 1] ?? b.akcent;
+  const medal = METALE[d.miejsce]?.[jasna(d.marka) ? 2 : 1] ?? b.akcent;
   tekst(ctx, podium ? TYTULY[d.miejsce] : `${d.miejsce}. miejsce`, S / 2, 1270, 110, podium ? medal : b.tekst);
   tekst(ctx, d.nick, S / 2, 1380, 72, b.tekst, 800, S - 120);
   const wynik = d.punkty === null ? "" : ` · ${d.punkty.toLocaleString("pl-PL")} pkt`;
@@ -276,7 +279,7 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
 
   if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, b.szary, 600, S - 120);
   tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, b.tekst, 600, S - 120);
-  if (!d.neutralny) tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
+  pozegnanie(ctx, S, d.marka);
   return naBlob(plotno);
 }
 
@@ -284,7 +287,7 @@ export async function grafikaWyniku(d: DaneWyniku): Promise<Blob> {
  * Podium gry jako relacja 1080×1920 (dla lokalu, z panelu): ten sam układ co grafika gracza (26.10, Łukasz: wcześniej
  * post 1080×1350 wyglądał gorzej), tylko w środku trójka na stopniach podium.
  */
-export async function grafikaPodium(d: DanePodium): Promise<Blob> {
+export async function grafikaPodium(d: DanePodium & ZMarka): Promise<Blob> {
   const S = 1080;
   const W = 1920;
   const plotno = document.createElement("canvas");
@@ -293,11 +296,11 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
   const ctx = plotno.getContext("2d");
   if (!ctx) throw new Error("Ta przeglądarka nie umie narysować grafiki.");
   await document.fonts.ready;
-  const b = barwy(d.neutralny);
-  tlo(ctx, S, W, d.neutralny);
+  const b = barwy(d.marka);
+  tlo(ctx, S, W, d.marka);
 
   await rysujLoga(ctx, d, S, 150, 170);
-  tekst(ctx, (d.okazja ?? (d.neutralny ? "Quiz" : "Quiz Bractwa Piwnego")).toUpperCase(), S / 2, 450, 38, b.akcent, 700, S - 120);
+  tekst(ctx, (d.okazja ?? d.marka.teksty.tytulQuizu).toUpperCase(), S / 2, 450, 38, b.akcent, 700, S - 120);
   tekst(ctx, d.tytul, S / 2, 520, 56, b.tekst, 800, S - 120);
 
   // 2. z lewej, 1. w środku i najwyżej, 3. z prawej; pod awatarem nick i punkty, pod nimi stopień z numerem
@@ -322,7 +325,7 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
     tekst(ctx, String(g.miejsce), p.x, gora + Math.min(p.wys - 30, 130), 110, "rgba(0, 0, 0, 0.55)", 800);
 
     if (g.punkty !== null) tekst(ctx, `${g.punkty.toLocaleString("pl-PL")} pkt`, p.x, gora - 30, 32, b.szary, 600);
-    tekst(ctx, g.nick, p.x, gora - 76, p.i === 0 ? 52 : 42, d.neutralny ? ciemny : metal, 800, SZER_STOPNIA + 20);
+    tekst(ctx, g.nick, p.x, gora - 76, p.i === 0 ? 52 : 42, jasna(d.marka) ? ciemny : metal, 800, SZER_STOPNIA + 20);
     await rysujAwatar(ctx, g, p.x, gora - 160 - p.r, p.r);
   }
   // linia podłogi pod stopniami
@@ -331,7 +334,7 @@ export async function grafikaPodium(d: DanePodium): Promise<Blob> {
 
   if (d.oznaczenia?.length) tekst(ctx, d.oznaczenia.join("  "), S / 2, 1620, 34, b.szary, 600, S - 120);
   tekst(ctx, [d.lokal?.nazwa, d.data].filter(Boolean).join(" · "), S / 2, 1700, 36, b.tekst, 600, S - 120);
-  if (!d.neutralny) tekst(ctx, "Piwu Cześć!", S / 2, 1780, 44, ZLOTO, 800);
+  pozegnanie(ctx, S, d.marka);
   return naBlob(plotno);
 }
 

@@ -3,8 +3,7 @@ import { Nunito, Open_Sans } from "next/font/google";
 import "../../docs/tokens.css";
 import "./globals.css";
 import { POLYFILLE } from "@/lib/polyfille";
-import { NAZWA_APLIKACJI } from "@/lib/motyw";
-import { idMarkiZadania, motywZadania } from "@/lib/motyw-serwer";
+import { idMarkiZadania, markaZadania, motywZadania } from "@/lib/motyw-serwer";
 import { DostawcaMarki } from "@/components/motyw";
 
 const openSans = Open_Sans({
@@ -20,33 +19,23 @@ const nunito = Nunito({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const motyw = await motywZadania();
-  // podstrony podają sam swój tytuł, a nazwę aplikacji (według motywu) dokleja szablon
-  const nazwa = NAZWA_APLIKACJI[motyw];
-  const title = { default: nazwa, template: `%s · ${nazwa}` };
-  // ikony według motywu (pliki w public/ikony, nie w app/, bo ikony z plików w app/ wygrywają z metadanymi)
-  if (motyw === "neutralny") {
-    return {
-      title,
-      description: "Quiz na żywo",
-      icons: { icon: [{ url: "/ikony/jowes.ico", sizes: "32x32" }, "/ikony/jowes.png"], apple: "/ikony/jowes-apple.png" },
-    };
-  }
+  const { nazwa, opis, ikony } = await markaZadania();
+  // podstrony podają sam swój tytuł, a nazwę aplikacji (według marki) dokleja szablon; ikony z public/ikony,
+  // nie z app/, bo ikony z plików w app/ wygrywają z metadanymi
   return {
-    title,
-    description: "Quiz Bractwa Piwnego – Piwu Cześć!",
-    icons: { icon: [{ url: "/ikony/bractwo.ico", sizes: "32x32" }, "/ikony/bractwo.png"], apple: "/ikony/bractwo-apple.png" },
+    title: { default: nazwa, template: `%s · ${nazwa}` },
+    description: opis,
+    icons: { icon: [{ url: ikony.ico, sizes: "32x32" }, ikony.png], apple: ikony.apple },
   };
 }
 
 export async function generateViewport(): Promise<Viewport> {
-  // pasek przeglądarki na telefonie w kolorze tła motywu
-  const motyw = await motywZadania();
-  return { themeColor: motyw === "neutralny" ? "#ffffff" : "#000000", viewportFit: "cover" };
+  // pasek przeglądarki na telefonie w kolorze tła marki
+  return { themeColor: (await markaZadania()).kolory.pasek, viewportFit: "cover" };
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  // motyw z adresu strony (src/lib/motyw.ts): neutralny bez piwa i Bractwa, np. dla quizu firmowego
+  // marka z adresu strony (src/lib/marka.ts); `data-motyw` zostaje dla CSS do czasu przejścia na `data-marka`
   const [motyw, marka] = await Promise.all([motywZadania(), idMarkiZadania()]);
   return (
     <html lang="pl" className={`${openSans.variable} ${nunito.variable}`} data-motyw={motyw} data-marka={marka}>

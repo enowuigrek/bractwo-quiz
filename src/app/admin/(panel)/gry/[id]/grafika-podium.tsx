@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { grafikaPodium, udostepnij, type DanePodium } from "@/lib/grafika-wyniku";
-import { BRACTWO_INSTAGRAM } from "@/lib/konta";
-import { useNeutralny } from "@/components/motyw";
+import { useMarka } from "@/components/motyw";
 
 /**
  * Grafika z podium dla lokalu (relacja 1080×1920 jak grafika gracza): loga, tytuł, trójka na podium. Na komputerze pobiera plik,
@@ -13,15 +12,15 @@ export function GrafikaPodium({ dane, konta }: { dane: DanePodium; konta: (strin
   const [trwa, ustawTrwa] = useState(false);
   const [komunikat, ustawKomunikat] = useState<string | null>(null);
   const [blad, ustawBlad] = useState<string | null>(null);
-  const neutralny = useNeutralny();
-  const oznaczenia = [...new Set([neutralny ? null : BRACTWO_INSTAGRAM, ...konta].filter((k): k is string => !!k))].map((k) => `@${k}`);
+  const marka = useMarka();
+  const oznaczenia = [...new Set([marka.instagram, ...konta].filter((k): k is string => !!k))].map((k) => `@${k}`);
 
   async function pobierz() {
     ustawTrwa(true);
     ustawKomunikat(null);
     ustawBlad(null);
     try {
-      const blob = await grafikaPodium({ ...dane, oznaczenia, neutralny });
+      const blob = await grafikaPodium({ ...dane, oznaczenia, marka });
       const co = await udostepnij(blob, "podium-quizu.png", [`Zwycięzcy quizu ${dane.tytul}!`, ...oznaczenia].join(" "));
       if (co === "pobrano") ustawKomunikat("Pobrana: podium-quizu.png");
     } catch (e) {

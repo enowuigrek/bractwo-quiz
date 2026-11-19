@@ -7,8 +7,7 @@ import type { WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Loga } from "./tv";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { useMarka, useNeutralny } from "@/components/motyw";
-import { LOGO_NEUTRALNE } from "@/lib/motyw";
+import { useMarka } from "@/components/motyw";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
 const ZMIANA_MS = 10_000;
@@ -34,7 +33,6 @@ const STOPNIE = [1, 0, 2];
  * u góry jest lokal × browar (Bractwo ma wtedy swoją osobną planszę).
  */
 export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }: Props) {
-  const neutralny = useNeutralny();
   const marka = useMarka();
   const doStartu = useDoStartu(zapowiedz?.planowany_start ?? null, przesuniecie);
   const liczbaPlansz = ostatnia ? 4 : 3;
@@ -120,7 +118,7 @@ export function Plansze({ lokal, ostatnia, zapowiedz = null, przesuniecie = 0 }:
         )}
         {nr === 2 && (
           <div className="plansza-srodek">
-            {neutralny && !LOGO_NEUTRALNE ? <Loga lokal={lokal} /> : <LogoBractwa className="plansza-logo-duze" />}
+            <LogoBractwa className="plansza-logo-duze" />
           </div>
         )}
       </div>
