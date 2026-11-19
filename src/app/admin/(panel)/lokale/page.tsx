@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { filtrLokaliRoli } from "@/lib/admin-dostep";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";
 import { Miniatura } from "../_komponenty/grafika";

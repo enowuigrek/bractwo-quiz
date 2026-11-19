@@ -35,7 +35,7 @@ import { ZdjecieGracza } from "./zdjecie-gracza";
 import { DegustacjaGracza } from "./degustacja";
 import { czyDegustacja } from "@/lib/degustacja";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { PiwuCzesc, useMarka } from "@/components/motyw";
+import { PiwuCzesc, useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 const kluczTokenu = (kod: string) => `bractwo-quiz:gracz:${kod}`;

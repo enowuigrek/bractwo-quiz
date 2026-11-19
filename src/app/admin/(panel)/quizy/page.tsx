@@ -17,7 +17,7 @@ import {
 import { PrzyciskPotwierdz } from "../_komponenty/przycisk-potwierdz";
 import { usunQuiz, ustawWidocznoscQuizu } from "./akcje";
 import { nowyQuiz, rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 
 export const metadata: Metadata = { title: "Quizy" };
 

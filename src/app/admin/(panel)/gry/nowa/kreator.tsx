@@ -13,7 +13,7 @@ import { uruchomGre } from "../akcje";
 import { testFinalu } from "../../quizy/[id]/test-finalu";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 export type QuizDoWyboru = {

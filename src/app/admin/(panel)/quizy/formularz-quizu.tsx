@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { SZABLONY_ETAPOW, SZABLONY_QUIZU, bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { RodzajQuizu } from "@/lib/tagi";
 import type { StanFormularza } from "@/lib/typy";

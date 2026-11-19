@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { adresAplikacji } from "@/lib/adres";
 import { jestTworca, widziWszystko, wymagajAdmina } from "@/lib/admin";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { ukryteOsobyLokali, wymagajLokalu } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Lokal } from "@/lib/typy";

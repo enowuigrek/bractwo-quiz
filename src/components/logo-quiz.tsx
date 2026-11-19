@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMarka } from "./motyw";
+import { useMarka } from "./marka";
 
 type Props = {
   /** Wysokość logo w px. Napis „Quiz” skaluje się razem z nim. */

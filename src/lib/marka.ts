@@ -1,9 +1,9 @@
 /**
  * Marka (19.11): wszystko, czym różnią się wersje aplikacji (Bractwo, JOWES, kolejne firmy), w jednym obiekcie
  * zamiast rozgałęzień `neutralny ? … : …`. Rdzeń gry ma wszystkie elementy, a marka wyłącza swoje (`wylaczone`).
- * Marka wynika z adresu strony, nie z bazy (`markaZHosta`), tak jak dawny motyw neutralny (`src/lib/motyw.ts`).
+ * Marka wynika z adresu strony, nie z bazy (`markaZHosta`); do 19.11 był to „motyw neutralny”.
  * Plik jest wspólny dla serwera i przeglądarki: obiekt marki ma w środku funkcje, więc do komponentów klienckich
- * idzie samo `id`, a obiekt bierze się z `MARKI` (`useMarka()` w `src/components/motyw.tsx`).
+ * idzie samo `id`, a obiekt bierze się z `MARKI` (`useMarka()` w `src/components/marka.tsx`).
  */
 import { BRACTWO } from "./marki/bractwo";
 import { JOWES } from "./marki/jowes";

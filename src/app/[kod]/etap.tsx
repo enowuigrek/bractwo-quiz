@@ -4,7 +4,7 @@ import type { StanSesji } from "@/lib/gra/typy";
 import { NAZWY_TYPOW } from "@/lib/zadania";
 import { czyKibic } from "./rozgrywka";
 import { IkonaPuchar } from "@/components/ikony";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 import { ilu_finalistow } from "@/lib/gra/final";
 

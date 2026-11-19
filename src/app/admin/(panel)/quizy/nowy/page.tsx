@@ -3,7 +3,7 @@ import Link from "next/link";
 import { mozeDegustacje, wymagajAdmina } from "@/lib/admin";
 import { nazwaRodzajuQuizu, listaQuizow, nowyQuiz, rodzajZAdresu as czytajRodzaj } from "@/lib/tagi";
 import { FormularzQuizu } from "../formularz-quizu";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 
 export const metadata: Metadata = { title: "Nowy quiz" };
 

@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { Awatar } from "@/components/awatar";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 // Plansza finału: równe drewniane drogi z lewej, równoległe i blisko siebie (od 26.10; wcześniej zbiegały się

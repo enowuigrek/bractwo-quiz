@@ -8,7 +8,7 @@ import { DrogiFinalu, drogi } from "./drogi";
 import { Szklanka } from "./wyscig";
 import { OkrzykiNaDrogach } from "./okrzyki";
 import { IkonaMegafon } from "@/components/ikony";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 /**

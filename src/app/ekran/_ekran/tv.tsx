@@ -56,7 +56,7 @@ const FAZY_DEGUSTACJI = ["pytanie", "wynik", "odpowiedzi", "podium", "tabela", "
 import { useTrybProsty } from "@/lib/gra/prosty";
 import { LogoBractwa } from "@/components/logo-bractwa";
 import { TekstPlanszy } from "@/components/tekst-planszy";
-import { PiwuCzesc, useMarka } from "@/components/motyw";
+import { PiwuCzesc, useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 // Scena ma co najmniej 1920×1080 i skaluje się do ekranu, żeby każdy telewizor wyglądał tak samo. Na ekranie

@@ -7,7 +7,7 @@ import { fazaTeraz, sekundaOdliczania } from "@/lib/gra/nasluch";
 import { quizKlasyczny } from "@/lib/gra/wyscig";
 import { GASNIECIE_S, WYBUCH_PRZED_S } from "@/lib/pijany";
 import type { StanSesji } from "@/lib/gra/typy";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 /** Tyle ostatnich sekund pytania tyka zegar. */

@@ -5,7 +5,7 @@ w quizie Bractwa, co staje się opcją w ustawieniach, a co zostaje tylko dla ma
 
 Przy każdym punkcie: **jak jest teraz** i **propozycja** (moja, do Twojej decyzji). Kolumna „Decyzja” jest do wypełnienia.
 
-Skróty: **Bractwo** = adres quiz.bractwopiwne.pl (motyw Bractwa), **JOWES** = adres jowes-quiz.vercel.app (motyw neutralny).
+Skróty: **Bractwo** = adres quiz.bractwopiwne.pl (motyw Bractwa), **JOWES** = adres jowes-quiz.vercel.app (marka JOWES).
 
 ---
 

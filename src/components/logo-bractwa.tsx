@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- logo z public, skalowane CSS-em */
 
-import { useMarka } from "./motyw";
+import { useMarka } from "./marka";
 
 /**
  * Logo marki na ekranach gry (src/lib/marka.ts): w Bractwie logo Bractwa, w JOWES logo JOWES.

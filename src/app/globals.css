@@ -129,7 +129,7 @@ input.pole[type="time"] {
   background: var(--chmiel);
 }
 
-/* tekst na czerwieni: w Bractwie kremowy (--piana), w motywie neutralnym biały (--na-czerwieni), bo tam --piana to
+/* tekst na czerwieni: w Bractwie kremowy (--piana), w JOWES biały (--na-czerwieni), bo tam --piana to
    ciemny tekst na jasnym tle (18.11: „Zakończ grę” i kosze miały ciemny napis) */
 .przycisk.niebezpieczny {
   color: var(--na-czerwieni, var(--piana));
@@ -174,7 +174,7 @@ input.pole[type="time"] {
   gap: 0.5em;
 }
 
-/* motyw neutralny przy dużym logo (logo-quiz.tsx): napis pod szerokim logo JOWES, logo nie szersze niż ekran */
+/* JOWES przy dużym logo (logo-quiz.tsx): napis pod szerokim logo JOWES, logo nie szersze niż ekran */
 .logo-quiz-pod {
   flex-direction: column;
   align-items: flex-start;
@@ -4527,10 +4527,10 @@ button.kafelek {
   font-style: italic;
 }
 
-/* ===== Motyw neutralny (src/lib/motyw.ts, 18.11): quiz bez piwa i Bractwa, np. firmowy ===== */
+/* ===== Marka JOWES (src/lib/marki/jowes.ts, 18.11): quiz bez piwa i Bractwa, np. firmowy ===== */
 
 /* jasny motyw jak strona JOWES (jowes.pl): białe tło, ciemnoszary tekst, pomarańcz z logo zamiast złota */
-[data-motyw="neutralny"] {
+[data-marka="jowes"] {
   --bg: #fff;
   --kamien: #f3f4f6;
   --kamien2: #e1e4e8;
@@ -4554,8 +4554,8 @@ button.kafelek {
 }
 
 /* telefon gracza i TV mają własne ciemne powierzchnie (.ekran-gracza, .tv): w motywie JOWES jasne */
-[data-motyw="neutralny"] .ekran-gracza,
-[data-motyw="neutralny"] .tv {
+[data-marka="jowes"] .ekran-gracza,
+[data-marka="jowes"] .tv {
   --kamien: #f3f4f6;
   --kamien2: #e1e4e8;
   --kamien3: #e9ecef;
@@ -4564,7 +4564,7 @@ button.kafelek {
 
 /* awatary: kółko jak logo JOWES zamiast kapsla z ząbkami: kolorowy pierścień, cienka biała szczelina i kolorowe
    wnętrze (litera albo selfie, które przy `padding` z awatar.tsx zaczyna się na 76% promienia) */
-[data-motyw="neutralny"] .awatar {
+[data-marka="jowes"] .awatar {
   background-image: radial-gradient(
     circle closest-side,
     var(--kolor-awatara, var(--zloto)) 0 80%,
@@ -4575,18 +4575,18 @@ button.kafelek {
   background-color: transparent;
 }
 
-/* motyw neutralny: logo motywu (JOWES) stoi w nagłówkach (TV, telefon, panel), więc logo lokalu (to samo koło)
+/* JOWES: logo marki stoi w nagłówkach (TV, telefon, panel), więc logo lokalu (to samo koło)
    w nagłówkach znika; zostaje w tle gry, na ekranie lokalu bez gry i na przycisku konta */
-[data-motyw="neutralny"] .tv-logo-lokalu,
-[data-motyw="neutralny"] .pr-logo-lokalu,
-[data-motyw="neutralny"] .panel-logo .panel-logo-lokalu,
-[data-motyw="neutralny"] .gra-loga-gospodarzy .gra-logo {
+[data-marka="jowes"] .tv-logo-lokalu,
+[data-marka="jowes"] .pr-logo-lokalu,
+[data-marka="jowes"] .panel-logo .panel-logo-lokalu,
+[data-marka="jowes"] .gra-loga-gospodarzy .gra-logo {
   display: none;
 }
 
-/* motyw neutralny: kolumna strony na szerokim ekranie (globals.css, @media) biała z lekkim cieniem zamiast granatowej */
+/* JOWES: kolumna strony na szerokim ekranie (globals.css, @media) biała z lekkim cieniem zamiast granatowej */
 @media (min-width: 960px) {
-  [data-motyw="neutralny"] .kolumna:not(.kolumna-pilot) {
+  [data-marka="jowes"] .kolumna:not(.kolumna-pilot) {
     background: #fff;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   }
@@ -4597,8 +4597,8 @@ button.kafelek {
   color: var(--zloto);
 }
 
-[data-motyw="neutralny"] .moj-nick,
-[data-motyw="neutralny"] .nicki li.ja {
+[data-marka="jowes"] .moj-nick,
+[data-marka="jowes"] .nicki li.ja {
   color: #1f1f1f;
 }
 
@@ -4642,7 +4642,7 @@ button.kafelek {
   background: var(--zloto);
 }
 
-[data-motyw="neutralny"] .tekst-planszy-punkty li::before {
+[data-marka="jowes"] .tekst-planszy-punkty li::before {
   background: #e58e00;
 }
 
@@ -4658,12 +4658,12 @@ button.kafelek {
   color: var(--zloto);
 }
 
-[data-motyw="neutralny"] .tekst-planszy strong {
+[data-marka="jowes"] .tekst-planszy strong {
   color: #b86a00;
 }
 
-/* telefon: plansza w motywie neutralnym bez napisu „Ciekawostka” (plansze to nie tylko ciekawostki) */
-[data-motyw="neutralny"] .gra-ciekawostka-etykieta {
+/* telefon: plansza w JOWES bez napisu „Ciekawostka” (plansze to nie tylko ciekawostki) */
+[data-marka="jowes"] .gra-ciekawostka-etykieta {
   display: none;
 }
 
@@ -4678,7 +4678,7 @@ button.kafelek {
   gap: 12px;
 }
 
-[data-motyw="neutralny"] .gra-ja {
+[data-marka="jowes"] .gra-ja {
   color: #1f1f1f;
 }
 

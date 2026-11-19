@@ -7,7 +7,7 @@ import type { WierszRankingu } from "@/lib/gra/typy";
 import { kiedyStart, opisOdliczania, useDoStartu, type Zapowiedz } from "@/lib/gra/zapowiedz";
 import { Loga } from "./tv";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 
 /** Co ile ms zmienia się plansza na ekranie lokalu bez gry. */
 const ZMIANA_MS = 10_000;

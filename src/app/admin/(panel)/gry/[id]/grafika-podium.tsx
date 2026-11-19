@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { grafikaPodium, udostepnij, type DanePodium } from "@/lib/grafika-wyniku";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 
 /**
  * Grafika z podium dla lokalu (relacja 1080×1920 jak grafika gracza): loga, tytuł, trójka na podium. Na komputerze pobiera plik,

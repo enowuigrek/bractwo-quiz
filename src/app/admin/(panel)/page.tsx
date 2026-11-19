@@ -3,7 +3,7 @@ import { lokalRoli, wymagajAdmina } from "@/lib/admin";
 import { filtrGier, filtrQuizow } from "@/lib/admin-dostep";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./gry/lista-gier";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { NapisUruchom } from "@/components/ikony";
 
 export default async function Panel() {

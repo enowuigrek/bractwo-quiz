@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- logo lokalu z bucketu Supabase, skalowane CSS-em na scenie */
 
 import { kiedyStart, opisOdliczania, useDoStartu } from "@/lib/gra/zapowiedz";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 
 type Props = {

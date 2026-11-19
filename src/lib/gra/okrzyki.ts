@@ -14,7 +14,7 @@ export const HASLA: readonly (readonly [string, string])[] = [
   ["Jedziesz, ", "!"],
 ];
 
-/** Hasła w motywie neutralnym (src/lib/motyw.ts, np. JOWES): te same numery, bez piwa (18.11). */
+/** Hasła marki JOWES (src/lib/marki/jowes.ts): te same numery, bez piwa (18.11). */
 export const HASLA_NEUTRALNE: readonly (readonly [string, string])[] = HASLA.map((h, i) =>
   i === 1 ? (["", ", meta czeka!"] as const) : h,
 );

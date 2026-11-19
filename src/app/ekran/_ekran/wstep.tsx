@@ -5,7 +5,7 @@ import { IkonaEtapu } from "@/components/ikony-etapow";
 import { motion, MotionConfig } from "motion/react";
 import type { StanSesji } from "@/lib/gra/typy";
 import { liczbyEtapow, zLiczba } from "@/lib/gra/odpadanie";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 import { grupaFinalu, ilu_finalistow } from "@/lib/gra/final";

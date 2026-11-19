@@ -10,7 +10,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { Nagroda, StanFormularza } from "@/lib/typy";
 import { MAX_GRACZY } from "@/lib/gra/wyscig";
 import { LIMITY } from "../quizy/limity";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { ma } from "@/lib/marka";
 
 const MAX_OKAZJA = 80;

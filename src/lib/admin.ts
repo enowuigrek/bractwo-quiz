@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { supabaseAdmin } from "./supabase/serwer";
-import { markaZadania } from "./motyw-serwer";
+import { markaZadania } from "./marka-serwer";
 
 const CIASTECZKO = "bq_admin";
 // 30 dni: prowadzący loguje się w domu i w lokalu nie musi wpisywać hasła na telefonie.

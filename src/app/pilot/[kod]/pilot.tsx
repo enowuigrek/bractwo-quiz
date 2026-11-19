@@ -31,7 +31,7 @@ import { BotyPilota, useBoty } from "./boty";
 import { UdostepnijPilota } from "./udostepnij";
 import { MenuPanelu, type GraWMenu } from "@/app/admin/(panel)/_komponenty/menu";
 import { wylogujAdmina } from "@/app/admin/akcje";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 import { ilu_finalistow } from "@/lib/gra/final";
 

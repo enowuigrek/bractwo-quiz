@@ -2,7 +2,7 @@
 import { LogoQuiz } from "@/components/logo-quiz";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { WpiszKod } from "./ekran/wpisz-kod";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 

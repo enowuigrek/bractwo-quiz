@@ -17,7 +17,7 @@ import { ustawOdbiorNagrody, usunGre, zakonczGre } from "../akcje";
 import { usunieciGry, wynikiGry, zadaniaGry, type OdpowiedzGracza } from "../wyniki";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { GrafikaPodium } from "./grafika-podium";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { nazwaRodzajuQuizu, rodzajQuizu } from "@/lib/tagi";
 import { LinkDoSkopiowania } from "./kopiuj";
 import { Notatki, type AutorNotatki } from "./notatki";

@@ -2,7 +2,6 @@
 
 import { createContext, useContext } from "react";
 import { MARKI, type IdMarki, type Marka } from "@/lib/marka";
-import type { Motyw } from "@/lib/motyw";
 
 const KontekstMarki = createContext<IdMarki>("bractwo");
 
@@ -13,16 +12,6 @@ export function DostawcaMarki({ marka, children }: { marka: IdMarki; children: R
 
 export function useMarka(): Marka {
   return MARKI[useContext(KontekstMarki)];
-}
-
-/** Dawny podział na motywy, do czasu przejścia wszystkich miejsc na `useMarka()`. */
-export function useMotyw(): Motyw {
-  return useContext(KontekstMarki) === "bractwo" ? "bractwo" : "neutralny";
-}
-
-/** Dawny podział na motywy, do czasu przejścia wszystkich miejsc na `useMarka()`. */
-export function useNeutralny(): boolean {
-  return useContext(KontekstMarki) !== "bractwo";
 }
 
 /** Pożegnanie marki (ze spacją na początku) na końcu tekstu, np. „ Piwu Cześć!”. */

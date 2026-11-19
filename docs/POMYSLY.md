@@ -72,13 +72,14 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 
 ## Porządki po JOWES (przegląd 18.11)
 
-- **Teksty motywu w jednym słowniku** zamiast ok. 44 rozgałęzień `neutralny ? … : …` („do piwa / do mety”, „Wyścig po piwo / Wyścig”). Opis etapów nie przez regex (`opisEtapu` w `motyw.ts`), tylko osobny tekst dla motywu. `etapyWMotywie` czyta `document` w warstwie danych: motyw przekazać jawnie.
+- **Opis etapu dla marki bez regexu**: od 19.11 teksty są w słowniku marki (`src/lib/marka.ts`), ale opis etapu JOWES dalej powstaje podmianą słów (`opisEtapu` w `marki/jowes.ts`). Lepiej: osobny opis w quizie albo szablonie (JOWES-DECYZJE 2.1).
+- **CSS według elementów, nie marki**: wyłączenia, które robi sam CSS (etykieta „Ciekawostka”, logo lokalu w nagłówku, kształt awatara), wiszą na `[data-marka="jowes"]`. Przy trzeciej marce: atrybut z listą wyłączonych na `<html>` (np. `data-bez~="etykieta-ciekawostki"`) i kolory marki jako zmienne zamiast osobnych reguł.
 - **Domyślne liczby w jednym miejscu**: `DOMYSLNIE_FINALISTOW` zamiast rozsianych `?? 3`; napisy „finał trójki” (`formularz-quizu.tsx`, `zadania/edytor.tsx`, strona zasad) według quizu; `KROK_FINALU` (pijany finał) z mety quizu, nie z 12. W bazie: `coalesce(…, 3)` przy `not null default 3` zbędne.
-- **Martwy kod**: `wewn.meta_finalu()` bez argumentu, `zPozegnaniem` w `motyw.ts`, limit 12 graczy w `pilot_widok`; `ilu_finalistow` → `iluFinalistow`.
+- **Martwy kod**: `wewn.meta_finalu()` bez argumentu, limit 12 graczy w `pilot_widok`; `ilu_finalistow` → `iluFinalistow`.
 - **TV: `useKolejnaPodpowiedz`** woła `pobierz` poza wspólną kolejką `useNasluch` (dwa pobrania stanu naraz, było tak i przed 18.11).
 - **Pary po czasie**: `-1` w szkicu dostaje kolor pary na telefonie przez ułamek sekundy (`odpowiadanie.tsx`, `para != null`).
 - **Migracje z `replace(pg_get_functiondef…)`** zawsze z `raise`, gdy wzorca nie ma (`wyjasnienie_ukryte_do_wyniku` tego nie ma).
 
 ## Aplikacja dla firm (pomysł 18.11)
 
-- Wspólny rdzeń gry i „marka” jako ustawienie (dziś motyw z adresu, `src/lib/motyw.ts`): logo, kolory, czcionka, słownik tekstów, ikony etapów, dźwięki, co jest wyłączone (szklanka, pijany finał, kranoprzejęcie). Docelowo marka w bazie (organizacja → domena, logo, kolory) zamiast stałych w kodzie, a ustawienia gry (finaliści, meta, limity) w quizie, jak `quizy.finalistow` i `quizy.meta_finalu`.
+- Wspólny rdzeń gry i „marka” jako ustawienie (od 19.11 marka z adresu, `src/lib/marka.ts`, obiekty w `src/lib/marki/`): logo, kolory, czcionka, słownik tekstów, ikony etapów, dźwięki, co jest wyłączone (szklanka, pijany finał, kranoprzejęcie). Docelowo marka w bazie (organizacja → domena, logo, kolory) zamiast stałych w kodzie, a ustawienia gry (finaliści, meta, limity) w quizie, jak `quizy.finalistow` i `quizy.meta_finalu`.

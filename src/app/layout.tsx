@@ -3,8 +3,8 @@ import { Nunito, Open_Sans } from "next/font/google";
 import "../../docs/tokens.css";
 import "./globals.css";
 import { POLYFILLE } from "@/lib/polyfille";
-import { idMarkiZadania, markaZadania, motywZadania } from "@/lib/motyw-serwer";
-import { DostawcaMarki } from "@/components/motyw";
+import { idMarkiZadania, markaZadania } from "@/lib/marka-serwer";
+import { DostawcaMarki } from "@/components/marka";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -12,7 +12,7 @@ const openSans = Open_Sans({
   axes: ["wdth"],
 });
 
-// font motywu neutralnego (JOWES), jak na jowes.pl
+// font marki JOWES, jak na jowes.pl
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin", "latin-ext"],
@@ -35,10 +35,10 @@ export async function generateViewport(): Promise<Viewport> {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  // marka z adresu strony (src/lib/marka.ts); `data-motyw` zostaje dla CSS do czasu przejścia na `data-marka`
-  const [motyw, marka] = await Promise.all([motywZadania(), idMarkiZadania()]);
+  // marka z adresu strony (src/lib/marka.ts); CSS marki wisi na `data-marka`
+  const marka = await idMarkiZadania();
   return (
-    <html lang="pl" className={`${openSans.variable} ${nunito.variable}`} data-motyw={motyw} data-marka={marka}>
+    <html lang="pl" className={`${openSans.variable} ${nunito.variable}`} data-marka={marka}>
       <head>
         {/* starsze przeglądarki telewizorów (src/lib/polyfille.ts): przed całym kodem Next */}
         <script dangerouslySetInnerHTML={{ __html: POLYFILLE }} />

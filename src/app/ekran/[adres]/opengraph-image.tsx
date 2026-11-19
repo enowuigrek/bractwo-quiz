@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { adresAplikacji } from "@/lib/adres";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { ma } from "@/lib/marka";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 
 // Miniatura linku do ekranu (Messenger, WhatsApp, SMS): logo Bractwa i lokalu na ciemnym tle ze złotą poświatą,
 // pod nimi „Quiz Bractwa Piwnego” i nazwa lokalu. Dla kodu gry samo logo Bractwa i kod. Tytuł, podpis, tło i logo

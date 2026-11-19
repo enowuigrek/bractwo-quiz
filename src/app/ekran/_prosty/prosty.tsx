@@ -15,7 +15,7 @@ import { LITERY, PRAWDA_FALSZ, celSzacowania, liczbaZJednostka, poprawnaSzacowan
 import { sekundy } from "@/lib/czas";
 import "./prosty.css";
 import { LogoBractwa } from "@/components/logo-bractwa";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 import { nazwaRodzajuQuizu } from "@/lib/tagi";
 

@@ -14,7 +14,7 @@ import { Scena, Tv } from "./tv";
 import { LogoProste, PlanszaProsta, ScenaProsta } from "../_prosty/prosty";
 import { EkranLogo } from "./ekran-logo";
 import { useTrybProsty } from "@/lib/gra/prosty";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 type Props = {
@@ -84,7 +84,7 @@ export function EkranLokalu({ adres, lokal, baza }: Props) {
       type: "svg",
       margin: 0,
       errorCorrectionLevel: "M",
-      // jasne pola przezroczyste: kod bierze tło ramki (kremowe w Bractwie, białe w motywie neutralnym, 18.11)
+      // jasne pola przezroczyste: kod bierze tło ramki (kremowe w Bractwie, białe w JOWES, 18.11)
       color: { dark: "#000000", light: "#00000000" },
     }).then((svg) => {
       if (aktualny) ustawQr({ kod, svg });

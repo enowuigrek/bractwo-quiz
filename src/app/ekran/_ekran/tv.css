@@ -1652,7 +1652,7 @@
 }
 
 /* logo JOWES jest szerokie (koło z napisem): na wysokości 560 px wychodziło za scenę (18.11) */
-[data-motyw="neutralny"] .plansza-logo-duze {
+[data-marka="jowes"] .plansza-logo-duze {
   width: 1300px;
   height: auto;
 }
@@ -3200,7 +3200,7 @@
   translate: -50% -50%;
 }
 
-/* motyw neutralny: chmurki z pytaniem każdego finalisty na końcu jego drogi (seria.tsx, ChmurkiPytan, 18.11) */
+/* JOWES: chmurki z pytaniem każdego finalisty na końcu jego drogi (seria.tsx, ChmurkiPytan, 18.11) */
 .seria-chmurka {
   position: absolute;
   z-index: 3;
@@ -4707,8 +4707,8 @@
   font-size: 34px;
 }
 
-/* ===== Motyw neutralny (src/lib/motyw.ts): jasny jak strona JOWES, bez drewnianej lady ===== */
-[data-motyw="neutralny"] .wyscig-lada {
+/* ===== Marka JOWES (src/lib/marki/jowes.ts): jasny jak strona JOWES, bez drewnianej lady ===== */
+[data-marka="jowes"] .wyscig-lada {
   background: linear-gradient(180deg, #fff, #eef0f3);
   box-shadow:
     inset 0 0 0 1px #dfe3e8,
@@ -4716,38 +4716,38 @@
 }
 
 /* tło: białe z ciepłym pomarańczowym światłem, logo w tle w kolorze i bardzo blade, bez ciemnych brzegów baru */
-[data-motyw="neutralny"] .tv-tlo-lokalu {
+[data-marka="jowes"] .tv-tlo-lokalu {
   background: radial-gradient(ellipse at 50% 40%, #fff 0%, #fff8ec 60%, #ffeccc 100%);
 }
 
-[data-motyw="neutralny"] .tv-tlo-logo {
+[data-marka="jowes"] .tv-tlo-logo {
   opacity: 0.07;
   filter: none;
 }
 
-[data-motyw="neutralny"] .tv-tlo-ciemne-brzegi,
-[data-motyw="neutralny"] .tv-smuga {
+[data-marka="jowes"] .tv-tlo-ciemne-brzegi,
+[data-marka="jowes"] .tv-smuga {
   display: none;
 }
 
-[data-motyw="neutralny"] .tv-blask {
+[data-marka="jowes"] .tv-blask {
   background: radial-gradient(circle, rgba(255, 170, 30, 0.12) 0%, rgba(255, 170, 30, 0.05) 35%, transparent 65%);
 }
 
 /* kod QR ma ciemne moduły: tło zawsze białe (w ciemnym motywie było kremowe `--piana`) */
-[data-motyw="neutralny"] .tv-qr {
+[data-marka="jowes"] .tv-qr {
   background: #fff;
   box-shadow: 0 0 0 2px #e1e4e8, 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* nagrody w poczekalni (JOWES, 18.11): każda w ramce, równe kolumny wyrównane do góry, mniejszy font, żeby długie
    nazwy („Grant marketingowy 500 zł”) nie rozpychały wiersza */
-[data-motyw="neutralny"] .tv-nagrody-start {
+[data-marka="jowes"] .tv-nagrody-start {
   gap: 16px;
   align-items: stretch;
 }
 
-[data-motyw="neutralny"] .tv-nagrody-start li {
+[data-marka="jowes"] .tv-nagrody-start li {
   flex: 1 1 0;
   min-width: 0;
   align-items: flex-start;
@@ -4765,59 +4765,59 @@
 }
 
 /* jasny motyw JOWES: elementy TV z kolorami pod ciemne tło wpisanymi na sztywno */
-[data-motyw="neutralny"] .tv-gotowi {
+[data-marka="jowes"] .tv-gotowi {
   background: rgba(255, 255, 255, 0.85);
 }
 
-[data-motyw="neutralny"] .tv-gotowi-z {
+[data-marka="jowes"] .tv-gotowi-z {
   color: var(--szary);
 }
 
-[data-motyw="neutralny"] .tv-gotowi.wszyscy {
+[data-marka="jowes"] .tv-gotowi.wszyscy {
   background: color-mix(in srgb, var(--chmiel) 14%, #fff);
 }
 
-[data-motyw="neutralny"] .tv-odp-slupek {
+[data-marka="jowes"] .tv-odp-slupek {
   background: rgba(0, 0, 0, 0.06);
 }
 
-[data-motyw="neutralny"] .tv-koniec-etapu {
+[data-marka="jowes"] .tv-koniec-etapu {
   background: color-mix(in srgb, var(--zloto) 14%, #fff);
 }
 
-[data-motyw="neutralny"] .tv-os-odp-kreska {
+[data-marka="jowes"] .tv-os-odp-kreska {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* motyw neutralny: odliczanie dokładnie na środku ekranu, na środku logo w tle (tlo.tsx): napisy nad i pod kółkiem
+/* JOWES: odliczanie dokładnie na środku ekranu, na środku logo w tle (tlo.tsx): napisy nad i pod kółkiem
    tej samej wysokości, a puste loga (logo lokalu w nagłówkach jest ukryte) nie zabierają miejsca */
-[data-motyw="neutralny"] .tv-srodek > .tv-loga {
+[data-marka="jowes"] .tv-srodek > .tv-loga {
   display: none;
 }
 
-[data-motyw="neutralny"] .tv-srodek > .tv-okazja,
-[data-motyw="neutralny"] .tv-srodek > .tv-duzy {
+[data-marka="jowes"] .tv-srodek > .tv-okazja,
+[data-marka="jowes"] .tv-srodek > .tv-duzy {
   display: flex;
   justify-content: center;
   height: 140px;
   margin: 0;
 }
 
-[data-motyw="neutralny"] .tv-srodek > .tv-okazja {
+[data-marka="jowes"] .tv-srodek > .tv-okazja {
   align-items: flex-end;
 }
 
-[data-motyw="neutralny"] .tv-srodek > .tv-duzy {
+[data-marka="jowes"] .tv-srodek > .tv-duzy {
   align-items: flex-start;
 }
 
 /* odliczanie stało 16 px nad środkiem (nad nim i pod nim stoją jeszcze elementy sceny) */
-[data-motyw="neutralny"] .tv-srodek:has(> .tv-odliczanie) {
+[data-marka="jowes"] .tv-srodek:has(> .tv-odliczanie) {
   padding-top: 32px;
 }
 
 /* logo w tle bez przesuwania: tylko oddycha i lekko się obraca wokół środka, żeby odliczanie trafiało w jego środek */
-[data-motyw="neutralny"] .tv-tlo-logo {
+[data-marka="jowes"] .tv-tlo-logo {
   animation-name: logo-tla-srodek;
 }
 
@@ -4834,43 +4834,43 @@
 }
 
 /* jasny motyw: dymki z odpowiedziami na osi szacowania jasne (tekst jest już ciemny z `--piana`) */
-[data-motyw="neutralny"] .tv-os-odp-podpis {
+[data-marka="jowes"] .tv-os-odp-podpis {
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
-[data-motyw="neutralny"] .tv-os-odp-gracz .awatar {
+[data-marka="jowes"] .tv-os-odp-gracz .awatar {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
 /* podpisy graczy na drogach finału */
-[data-motyw="neutralny"] .drogi-finalu-podpis {
+[data-marka="jowes"] .drogi-finalu-podpis {
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 /* jasny motyw: telefon z animacją na planszy etapu (demo.tsx) z jasnym ekranem jak prawdziwy telefon gracza
-   w motywie JOWES; ramka zostaje ciemna jak obudowa */
-[data-motyw="neutralny"] .demo-telefon {
+   w JOWES; ramka zostaje ciemna jak obudowa */
+[data-marka="jowes"] .demo-telefon {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
 }
 
-[data-motyw="neutralny"] .demo-ekran {
+[data-marka="jowes"] .demo-ekran {
   background: #fff;
 }
 
-[data-motyw="neutralny"] .demo-palec {
+[data-marka="jowes"] .demo-palec {
   background: rgba(0, 0, 0, 0.12);
   border-color: rgba(0, 0, 0, 0.45);
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.15);
 }
 
-[data-motyw="neutralny"] .demo-palec.stuka {
+[data-marka="jowes"] .demo-palec.stuka {
   background: rgba(229, 142, 0, 0.6);
 }
 
-/* finał: bez złotej poświaty pod szklanką (szklanki w motywie neutralnym nie ma) */
-[data-motyw="neutralny"] .drogi-finalu-poswiata {
+/* finał: bez złotej poświaty pod szklanką (szklanki w JOWES nie ma) */
+[data-marka="jowes"] .drogi-finalu-poswiata {
   display: none;
 }
 
@@ -4907,8 +4907,8 @@
   line-height: 1.35;
 }
 
-/* motyw neutralny: plansze to nie tylko ciekawostki */
-[data-motyw="neutralny"] .tv-ciekawostka-etykieta {
+/* JOWES: plansze to nie tylko ciekawostki */
+[data-marka="jowes"] .tv-ciekawostka-etykieta {
   display: none;
 }
 
@@ -4947,18 +4947,18 @@
   color: var(--zloto);
 }
 
-[data-motyw="neutralny"] .tv-ciekawostka-tekst strong {
+[data-marka="jowes"] .tv-ciekawostka-tekst strong {
   color: #b86a00;
 }
 
 /* jasny motyw: nicki na podium w ciemniejszym srebrze i brązie (jasne metale ginęły na białym tle) */
-[data-motyw="neutralny"] .tv-koniec .metal-2 .tv-stopien-nick,
-[data-motyw="neutralny"] .metal-2 .tv-stopien-nick {
+[data-marka="jowes"] .tv-koniec .metal-2 .tv-stopien-nick,
+[data-marka="jowes"] .metal-2 .tv-stopien-nick {
   color: #5f6870;
 }
 
-[data-motyw="neutralny"] .tv-koniec .metal-3 .tv-stopien-nick,
-[data-motyw="neutralny"] .metal-3 .tv-stopien-nick {
+[data-marka="jowes"] .tv-koniec .metal-3 .tv-stopien-nick,
+[data-marka="jowes"] .metal-3 .tv-stopien-nick {
   color: #a5561c;
 }
 
@@ -4998,12 +4998,12 @@
 }
 
 /* jasny motyw: dymki okrzyków kibiców w finale białe (tło `--piana` jest tu ciemnym kolorem tekstu) */
-[data-motyw="neutralny"] .okrzyk-dymek {
+[data-marka="jowes"] .okrzyk-dymek {
   background: #fff;
   color: #333;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
-[data-motyw="neutralny"] .okrzyk-kibic {
+[data-marka="jowes"] .okrzyk-kibic {
   color: #b86a00;
 }

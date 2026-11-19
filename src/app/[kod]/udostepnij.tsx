@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { grafikaWyniku, udostepnij, type DaneWyniku } from "@/lib/grafika-wyniku";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 
 type Props = {
   wynik: DaneWyniku;

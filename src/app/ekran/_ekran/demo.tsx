@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import type { PrzykladyDemo } from "@/lib/marka";
 import { NAZWY_TYPOW, PODPOWIEDZI_TYPOW, type TypZadania } from "@/lib/zadania";
 

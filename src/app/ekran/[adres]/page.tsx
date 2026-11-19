@@ -7,7 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { EkranLokalu } from "../_ekran/ekran-lokalu";
 import { Tv } from "../_ekran/tv";
 import "../_ekran/tv.css";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 
 type Lokal = { nazwa: string; logo_url: string | null };
 

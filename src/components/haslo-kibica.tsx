@@ -1,6 +1,6 @@
 "use client";
 
-import { useMarka } from "./motyw";
+import { useMarka } from "./marka";
 
 /**
  * Hasło kibica z nickiem finalisty: „Jedziesz, Nowy!”. Od 26.10 sam tekst, bez awatara w środku (Łukasz: kibic

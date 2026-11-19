@@ -173,6 +173,14 @@ Skrót dla następnej sesji: co jest, gdzie leży i co jest otwarte. Historia de
 - **Format:** Chromium dekoduje MP3 z ffmpeg (`libmp3lame`) co do próbki, bez ciszy enkodera (sprawdzone 02.11 na tonie 132 423 próbek). Łukasz daje WAV, my konwertujemy: `ffmpeg -i etap-1-start.wav -c:a libmp3lame -b:a 192k public/muzyka/etap-1-start.mp3` (tak samo pętla) i usuwamy stary `etap-1.mp3`.
 - **Sprawdzone** na grze z botami z tonami testowymi: poczekalnia po staremu, pętla 1. etapu wczytana z góry i grana przez Web Audio (bufor 7 s, pętla od 4 s), „Zakończ grę” ją ucisza. **Niesprawdzone:** prawdziwe utwory na Samsungu i przejście pijanego finału z pętlą.
 
+### Marka zamiast motywu neutralnego (19.11) ✅
+
+Pierwszy krok wydzielania rdzenia (JOWES-DECYZJE, sekcja 2): około 350 rozgałęzień „motyw neutralny” zamienione na obiekt marki, bez zmian w wyglądzie obu wersji.
+- `src/lib/marka.ts`: typ `Marka`, `MARKI`, `ma(marka, element)`, `markaZHosta`, `etapyWMarce`; marki `src/lib/marki/bractwo.ts` i `jowes.ts`. Klient `useMarka()` (`src/components/marka.tsx`), serwer `markaZadania()` (`src/lib/marka-serwer.ts`), CSS `[data-marka="jowes"]`. `motyw.ts`, `useNeutralny`, `motywZadania` i `data-motyw` usunięte.
+- Kroki (każdy osobnym commitem, sprawdzony w obu markach na `next start`): 1) typ i wybór marki, 2) słownik tekstów, 3) wyłączone elementy, ikony, przykłady w animacji, zasady panelu, etapy i nalewanie bez czytania `document`, 4) logo, ikony strony, metadane, miniatura linku, grafiki wyniku i podium, 5) CSS i porządki.
+- Niesprawdzone na oko: grafiki „na pamiątkę” i podium (porównane w kodzie) oraz chmurki pytań w finale JOWES (finał przeskoczony SQL-em, bez pytań finalistów).
+- Dalej: marka w bazie (organizacja → domena, logo, kolory) i opis etapu bez podmiany słów (POMYSLY.md, „Aplikacja dla firm” i „Porządki po JOWES”).
+
 ## Na 25.10: dźwięki i pijany finał
 
 ### Dźwięki (efekty na TV) ✅ zrobione, opis w „Efekty dźwiękowe na TV (25.10)”

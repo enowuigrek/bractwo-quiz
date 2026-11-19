@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { NapisUruchom } from "@/components/ikony";
 
 // Quizy = przygotowanie pytań, Rozgrywki = uruchomione quizy (trwające i historia).

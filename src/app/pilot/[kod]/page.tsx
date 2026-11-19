@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { jestTworca, rolaAdmina } from "@/lib/admin";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { poprawnyKod } from "@/lib/gra/kod";
 import { NaglowekPanelu } from "@/app/admin/(panel)/_komponenty/naglowek-panelu";
 import { Pilot } from "./pilot";
 
 export async function generateMetadata({ params }: PageProps<"/pilot/[kod]">): Promise<Metadata> {
   const { kod } = await params;
-  // nazwa aplikacji dopisuje szablon tytułu z layoutu (według motywu)
+  // nazwa aplikacji dopisuje szablon tytułu z layoutu (według marki)
   return { title: `Pilot ${kod.toUpperCase()}`, robots: { index: false } };
 }
 

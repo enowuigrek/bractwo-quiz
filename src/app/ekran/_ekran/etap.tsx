@@ -9,7 +9,7 @@ import { bezPunktow, napisMnoznika } from "@/lib/etapy";
 import type { StanSesji } from "@/lib/gra/typy";
 import { DemoTelefonu } from "./demo";
 import { IkonaPuchar } from "@/components/ikony";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 import { ilu_finalistow } from "@/lib/gra/final";
 

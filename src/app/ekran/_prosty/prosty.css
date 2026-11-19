@@ -187,8 +187,8 @@
   box-sizing: content-box;
 }
 
-/* kod QR ma przezroczyste jasne pola: w motywie neutralnym `--piana` to ciemny tekst, więc tło białe (18.11) */
-[data-motyw="neutralny"] .pr-qr {
+/* kod QR ma przezroczyste jasne pola: w JOWES `--piana` to ciemny tekst, więc tło białe (18.11) */
+[data-marka="jowes"] .pr-qr {
   background: #fff;
 }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DNO, KRAWEDZ, POD_PIANA, brzegSzklanki, pianaNaPiwie, poziom } from "@/lib/gra/szklanka";
-import { useMarka } from "./motyw";
+import { useMarka } from "./marka";
 import { ma } from "@/lib/marka";
 
 const BRZEG = brzegSzklanki();

@@ -15,7 +15,7 @@ import { nazwaRodzaju, quizKlasyczny } from "@/lib/gra/wyscig";
 import { miejsceZWyscigu } from "@/lib/gra/final";
 import { IkonaMegafon } from "@/components/ikony";
 import { adresZdjecia } from "@/lib/kapsel";
-import { PiwuCzesc, useMarka } from "@/components/motyw";
+import { PiwuCzesc, useMarka } from "@/components/marka";
 
 const TYTULY: Record<number, string> = { 1: "Zwycięstwo!", 2: "Srebro!", 3: "Brąz!" };
 

@@ -3,7 +3,7 @@
 import { jestTworca, rolaAdmina } from "@/lib/admin";
 import type { PilotStan } from "@/lib/gra/typy";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 
 /**
  * Boty do testów (26.10): tylko dla głównego (lokale ich nie potrzebują), także zanim poczekalnia się otworzy.

@@ -7,7 +7,7 @@ import { FiltryListy, ZakladkiRodzaju, type WybraneFiltry } from "../_komponenty
 import { wybraneMiasto, wybranyLokal, type LokalAutor } from "../_komponenty/lokale-autorzy";
 import { ListaGier, ZAPYTANIE_GIER, type GraNaLiscie } from "./lista-gier";
 import { rodzajQuizu, rodzajZAdresu as czytajRodzaj, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 import { NapisUruchom } from "@/components/ikony";
 
 export const metadata: Metadata = { title: "Rozgrywki" };

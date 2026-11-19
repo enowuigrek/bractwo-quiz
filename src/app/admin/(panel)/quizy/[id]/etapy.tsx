@@ -17,7 +17,7 @@ import { bezResetu } from "../../_komponenty/bez-resetu";
 import { IkonaEdytuj } from "@/components/ikony";
 import { KomunikatFormularza } from "../../_komponenty/stan";
 import { dodajEtap, zapiszEtap } from "../akcje";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 
 type Pola = Pick<Etap, "nazwa" | "opis" | "mnoznik" | "czas_s" | "finalowy" | "seria" | "plan_pytan" | "typ_domyslny">;

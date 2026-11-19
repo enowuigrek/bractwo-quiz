@@ -5,7 +5,7 @@ import { Awatar } from "@/components/awatar";
 import { HasloKibica } from "@/components/haslo-kibica";
 import { komunikatBledu } from "@/lib/gra/nasluch";
 import { HASLA, ODSTEP_OKRZYKOW_MS } from "@/lib/gra/okrzyki";
-import { useMarka } from "@/components/motyw";
+import { useMarka } from "@/components/marka";
 import { ma } from "@/lib/marka";
 import type { StanSesji } from "@/lib/gra/typy";
 import { supabase } from "@/lib/supabase/przegladarka";

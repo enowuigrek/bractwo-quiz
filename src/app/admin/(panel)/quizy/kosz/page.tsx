@@ -8,7 +8,7 @@ import { IkonaKosz, IkonaOkoPrzekreslone } from "@/components/ikony";
 import { PrzyciskPotwierdz } from "../../_komponenty/przycisk-potwierdz";
 import { przywrocQuiz, usunQuizNaZawsze } from "../akcje";
 import { liczbaPiw, liczbaPytan } from "../limity";
-import { markaZadania } from "@/lib/motyw-serwer";
+import { markaZadania } from "@/lib/marka-serwer";
 
 export const metadata: Metadata = { title: "Kosz" };
 
