@@ -79,7 +79,7 @@ export async function uruchomGre(_: StanFormularza, dane: FormData): Promise<Sta
 
   const [{ data: lokal }, { count: pytania }, { data: quiz }, { count: finalySerii }, { count: etapow }] =
     await Promise.all([
-    db.from("lokale").select("id").eq("id", lokal_id).maybeSingle(),
+    db.from("lokale").select("id").eq("id", lokal_id).eq("marka", rola.marka).maybeSingle(),
     db.from("zadania").select("id", { count: "exact", head: true }).eq("quiz_id", quiz_id),
     db
       .from("quizy")

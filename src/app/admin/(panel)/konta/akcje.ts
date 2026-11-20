@@ -47,10 +47,21 @@ export async function zapiszKonto(id: string | null, _: StanKonta, dane: FormDat
 
   let kontoId = id;
   if (kontoId) {
-    const { error } = await db.from("konta").update({ nazwa, email }).eq("id", kontoId);
+    const { data: zmienione, error } = await db
+      .from("konta")
+      .update({ nazwa, email })
+      .eq("id", kontoId)
+      .eq("marka", tworca.marka)
+      .select("id");
     if (error) return { blad: error.code === "23505" ? "Ten e-mail ma już inne konto." : error.message };
+    if (!zmienione?.length) return { blad: "Nie ma takiego konta." };
   } else {
-    const { data, error } = await db.from("konta").insert({ nazwa, email }).select("id").single<{ id: string }>();
+    // nowe konto należy do marki adresu (20.11): loguje się tylko pod nim
+    const { data, error } = await db
+      .from("konta")
+      .insert({ nazwa, email, marka: tworca.marka })
+      .select("id")
+      .single<{ id: string }>();
     if (error) return { blad: error.code === "23505" ? "Ten e-mail ma już konto." : error.message };
     kontoId = data.id;
   }
@@ -92,7 +103,7 @@ export async function wygenerujLink(id: string): Promise<StanKonta> {
 export async function ustawBlokade(id: string, zablokowane: boolean): Promise<void> {
   const tworca = await wymagajTworcy();
   if (id === tworca.konto.id) throw new Error("Nie blokuj własnego konta.");
-  const { error } = await supabaseAdmin().from("konta").update({ zablokowane }).eq("id", id);
+  const { error } = await supabaseAdmin().from("konta").update({ zablokowane }).eq("id", id).eq("marka", tworca.marka);
   if (error) throw new Error(`Nie udało się: ${error.message}`);
   refresh();
 }
@@ -101,7 +112,7 @@ export async function ustawBlokade(id: string, zablokowane: boolean): Promise<vo
 export async function usunKonto(id: string): Promise<void> {
   const tworca = await wymagajTworcy();
   if (id === tworca.konto.id) throw new Error("Nie usuwaj własnego konta.");
-  const { error } = await supabaseAdmin().from("konta").delete().eq("id", id);
+  const { error } = await supabaseAdmin().from("konta").delete().eq("id", id).eq("marka", tworca.marka);
   if (error) throw new Error(`Nie udało się usunąć konta: ${error.message}`);
   redirect("/admin/konta");
 }

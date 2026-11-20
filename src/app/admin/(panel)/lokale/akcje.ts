@@ -8,7 +8,6 @@ import { SEGMENTY_PANELU } from "@/lib/adres-ekranu";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { adresZNazwy, FORMAT_ADRESU_EKRANU, MAX_ADRES_EKRANU } from "@/lib/adres-ekranu";
 import { kontoInstagram } from "@/lib/instagram";
-import { idMarkiZadania } from "@/lib/marka-serwer";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
@@ -31,7 +30,7 @@ export async function zapiszLokal(
   }
   // nowe lokale zakłada twórca; Bractwo zmienia istniejące (poza testowym)
   if (!id && !jestTworca(rola)) return { blad: "Nowy lokal dodaje twórca." };
-  if (id) wymagajLokalu(rola, id);
+  if (id) await wymagajLokalu(rola, id);
   const db = supabaseAdmin();
 
   const nazwa = tekst(dane, "nazwa");
@@ -77,7 +76,7 @@ export async function zapiszLokal(
     for (let n = 2; uzyte.has(adres); n++) adres = `${baza}-${n}`;
     zmiany.adres_ekranu = adres;
     // nowy lokal należy do marki adresu, pod którym go założono (jego rola loguje się tylko tam, 20.11)
-    zmiany.marka = await idMarkiZadania();
+    zmiany.marka = rola.marka;
   }
   try {
     if (logo) zmiany.logo_url = await wyslijGrafike(logo, "lokale");
@@ -125,9 +124,9 @@ async function zapiszSwojLokal(id: string, dane: FormData): Promise<StanFormular
 }
 
 export async function usunLokal(id: string): Promise<void> {
-  await wymagajTworcy();
+  const rola = await wymagajTworcy();
   const db = supabaseAdmin();
-  const { data } = await db.from("lokale").delete().eq("id", id).select("logo_url").maybeSingle();
+  const { data } = await db.from("lokale").delete().eq("id", id).eq("marka", rola.marka).select("logo_url").maybeSingle();
   await usunGrafike(data?.logo_url);
   redirect("/admin/lokale");
 }

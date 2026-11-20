@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function EdycjaLokalu({ params }: PageProps<"/admin/lokale/[id]/edycja">) {
   const rola = await wymagajAdmina();
   const { id } = await params;
-  wymagajLokalu(rola, id);
+  await wymagajLokalu(rola, id);
   const glowny = widziWszystko(rola);
   const db = supabaseAdmin();
   const [{ data: lokal }, { data: wszystkie }, { data: osoby }, ukryte] = await Promise.all([

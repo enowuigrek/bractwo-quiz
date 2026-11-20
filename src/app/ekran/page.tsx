@@ -20,15 +20,17 @@ export const revalidate = 300;
  * która jest dla graczy) albo kod gry dla TV bez ekranu lokalu.
  */
 export default async function Ekran() {
+  const marka = await markaZadania();
   const { data } = await supabaseAdmin()
     .from("lokale")
     .select("id, nazwa, miasto, logo_url, adres_ekranu")
     .eq("testowy", false)
+    .eq("marka", marka.id)
     .order("miasto")
     .order("nazwa")
     .returns<Pick<Lokal, "id" | "nazwa" | "miasto" | "logo_url" | "adres_ekranu">[]>();
   // marka bez listy lokali (np. JOWES): tylko kod gry
-  const lokale = ma(await markaZadania(), "lista-lokali") ? (data ?? []) : [];
+  const lokale = ma(marka, "lista-lokali") ? (data ?? []) : [];
 
   return (
     <main className="kolumna glowna">

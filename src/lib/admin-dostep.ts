@@ -11,8 +11,20 @@ import { supabaseAdmin } from "./supabase/serwer";
 //   i zwolnienia ekranu przed startem (28.10), bez pilota i strony gry;
 // - lokale: tylko swój (logo, Instagram, hasło).
 // Strona bez dostępu pokazuje 404, a akcja kończy się błędem. Listy filtrują `filtrQuizow` / `filtrGier`.
+// Ponad tym marka (20.11): pod adresem marki każda rola, także twórca, widzi tylko quizy, gry, lokale i konta tej
+// marki (`marka` w tabelach, `rola.marka` z adresu). JOWES i Bractwo nie nachodzą na siebie.
 
 type ZFiltrem<Q> = { or(filtr: string): Q };
+
+/** Tylko wiersze marki adresu (kolumna `marka`). */
+// bez ograniczenia typu: pełny typ zapytania Supabase w ograniczeniu generyka przekracza głębokość TS
+const wMarce = <Q>(zapytanie: Q, rola: Rola): Q =>
+  (zapytanie as unknown as { eq(k: string, w: string): Q }).eq("marka", rola.marka);
+
+/** 404, gdy rzecz należy do innej marki niż adres. */
+function wymagajMarki(rola: Rola, marka: string | null | undefined): void {
+  if (marka !== rola.marka) notFound();
+}
 
 /** Filtr PostgREST dla Bractwa: bez lokalu testowego. */
 function filtrBractwa(rola: Rola): string {
@@ -26,8 +38,8 @@ const ukryteDlaBractwa = (rola: Rola, d: { lokal_id: string | null }) =>
 
 /** Lokale na listach i w filtrach: lokal testowy widzi tylko twórca. */
 export function filtrLokaliRoli<Q>(zapytanie: Q, rola: Rola): Q {
-  // bez ograniczenia typu: pełny typ zapytania Supabase w ograniczeniu generyka przekracza głębokość TS
-  return jestTworca(rola) ? zapytanie : (zapytanie as unknown as { eq(k: string, w: boolean): Q }).eq("testowy", false);
+  const zMarki = wMarce(zapytanie, rola);
+  return jestTworca(rola) ? zMarki : (zMarki as unknown as { eq(k: string, w: boolean): Q }).eq("testowy", false);
 }
 
 /**
@@ -44,7 +56,8 @@ export async function ukryteOsobyLokali(rola: Rola): Promise<string[]> {
 const widocznyQuiz = (rola: Rola) => `or(udostepniony.is.true,autor_konto_id.eq.${rola.konto.id})`;
 
 /** Quizy, które rola widzi na listach i w kreatorze (`wlasne`: tylko te, które może zmieniać, np. w koszu). */
-export function filtrQuizow<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, wlasne = false): Q {
+export function filtrQuizow<Q extends ZFiltrem<Q>>(wszystkie: Q, rola: Rola, wlasne = false): Q {
+  const zapytanie = wMarce(wszystkie, rola);
   const lokal = lokalRoli(rola);
   if (jestTworca(rola)) return zapytanie;
   if (!lokal) return zapytanie.or(`and(${widocznyQuiz(rola)},or(${filtrBractwa(rola)}))`);
@@ -58,7 +71,8 @@ export function filtrQuizow<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, wla
  * Gry, które rola widzi na listach. `zBractwa`: lokal widzi też gry Bractwa (`tylko_glowny`) w swoim lokalu, bo
  * zajmują jego ekran (tylko listy rozgrywek; menu ze skrótem do pilota ich nie bierze).
  */
-export function filtrGier<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, zBractwa = false): Q {
+export function filtrGier<Q extends ZFiltrem<Q>>(wszystkie: Q, rola: Rola, zBractwa = false): Q {
+  const zapytanie = wMarce(wszystkie, rola);
   const lokal = lokalRoli(rola);
   if (jestTworca(rola)) return zapytanie;
   if (!lokal) return zapytanie.or(filtrBractwa(rola));
@@ -70,13 +84,14 @@ export function filtrGier<Q extends ZFiltrem<Q>>(zapytanie: Q, rola: Rola, zBrac
  * zmieniać. Zwraca, czy rola może quiz zmieniać.
  */
 export async function wymagajQuizu(rola: Rola, quizId: string, podglad = false): Promise<{ mozeZmieniac: boolean }> {
-  if (jestTworca(rola)) return { mozeZmieniac: true };
   const lokal = lokalRoli(rola);
   const { data } = await supabaseAdmin()
     .from("quizy")
-    .select("lokal_id, udostepniony, autor_konto_id")
+    .select("lokal_id, udostepniony, autor_konto_id, marka")
     .eq("id", quizId)
-    .maybeSingle<{ lokal_id: string | null; udostepniony: boolean; autor_konto_id: string | null }>();
+    .maybeSingle<{ lokal_id: string | null; udostepniony: boolean; autor_konto_id: string | null; marka: string }>();
+  wymagajMarki(rola, data?.marka);
+  if (jestTworca(rola)) return { mozeZmieniac: true };
   // prywatny quiz widzi tylko autor (i twórca)
   if (!data || (!data.udostepniony && data.autor_konto_id !== rola.konto.id)) notFound();
   if (!lokal) {
@@ -89,13 +104,14 @@ export async function wymagajQuizu(rola: Rola, quizId: string, podglad = false):
 }
 
 export async function wymagajGry(rola: Rola, sesjaId: string, podglad = false): Promise<{ gosc: boolean }> {
-  if (jestTworca(rola)) return { gosc: false };
   const lokal = lokalRoli(rola);
   const { data } = await supabaseAdmin()
     .from("sesje")
-    .select("lokal_id, tylko_glowny, faza")
+    .select("lokal_id, tylko_glowny, faza, marka")
     .eq("id", sesjaId)
-    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean; faza: string }>();
+    .maybeSingle<{ lokal_id: string | null; tylko_glowny: boolean; faza: string; marka: string }>();
+  wymagajMarki(rola, data?.marka);
+  if (jestTworca(rola)) return { gosc: false };
   if (!lokal) {
     if (!data || ukryteDlaBractwa(rola, data)) notFound();
     return { gosc: false };
@@ -109,8 +125,10 @@ export async function wymagajGry(rola: Rola, sesjaId: string, podglad = false): 
   return { gosc: false };
 }
 
-/** Ustawienia lokalu: twórca każdego, Bractwo każdego poza testowym, lokal tylko swojego. */
-export function wymagajLokalu(rola: Rola, lokalId: string): void {
+/** Ustawienia lokalu: twórca każdego, Bractwo każdego poza testowym, lokal tylko swojego; zawsze z marki adresu. */
+export async function wymagajLokalu(rola: Rola, lokalId: string): Promise<void> {
+  const { data } = await supabaseAdmin().from("lokale").select("marka").eq("id", lokalId).maybeSingle<{ marka: string }>();
+  wymagajMarki(rola, data?.marka);
   const lokal = lokalRoli(rola);
   if (lokal && lokal !== lokalId) notFound();
   if (widziWszystko(rola) && ukryteLokale(rola).includes(lokalId)) notFound();
@@ -121,7 +139,10 @@ export function wymagajLokalu(rola: Rola, lokalId: string): void {
  * Siebie każdy może obejrzeć.
  */
 export async function wymagajOsoby(rola: Rola, kontoId: string): Promise<void> {
-  if (widziWszystko(rola) || rola.konto.id === kontoId) return;
+  if (rola.konto.id === kontoId) return;
+  const { data: konto } = await supabaseAdmin().from("konta").select("marka").eq("id", kontoId).maybeSingle<{ marka: string }>();
+  wymagajMarki(rola, konto?.marka);
+  if (widziWszystko(rola)) return;
   const lokal = lokalRoli(rola);
   const { data } = await supabaseAdmin()
     .from("konta_role")

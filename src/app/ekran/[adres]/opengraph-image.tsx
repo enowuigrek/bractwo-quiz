@@ -49,13 +49,14 @@ async function openSans(waga: number, tekst: string): Promise<ArrayBuffer | null
 export default async function Miniatura({ params }: { params: Promise<{ adres: string }> }) {
   const { adres } = await params;
   const baza = await adresAplikacji();
+  const marka = await markaZadania();
   const { data: lokal } = await supabaseAdmin()
     .from("lokale")
     .select("nazwa, logo_url")
     .eq("adres_ekranu", adres.toLowerCase())
+    .eq("marka", marka.id)
     .maybeSingle<{ nazwa: string; logo_url: string | null }>();
 
-  const marka = await markaZadania();
   const { podglad } = marka;
   const tytul = podglad.tytul;
   const podpis = podglad.podpis ?? (lokal ? lokal.nazwa : `Gra ${adres.toUpperCase()}`);

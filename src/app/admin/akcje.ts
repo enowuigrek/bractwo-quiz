@@ -13,6 +13,7 @@ import {
   wyloguj,
   zaloguj,
 } from "@/lib/admin";
+import { idMarkiZadania } from "@/lib/marka-serwer";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
@@ -51,7 +52,9 @@ export async function zalozKonto(_: StanFormularza, dane: FormData): Promise<Sta
   if (blad) return { blad };
   await zwolnij();
   const db = supabaseAdmin();
-  const { data, error } = await db.from("konta").insert({ email, nazwa }).select("id").single<{ id: string }>();
+  // konto należy do marki adresu, pod którym je założono (20.11)
+  const marka = await idMarkiZadania();
+  const { data, error } = await db.from("konta").insert({ email, nazwa, marka }).select("id").single<{ id: string }>();
   if (error) {
     return { blad: error.code === "23505" ? "Konto z tym e-mailem już jest. Zaloguj się." : `Nie udało się: ${error.message}` };
   }

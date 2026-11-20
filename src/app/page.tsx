@@ -30,11 +30,12 @@ function kiedy(iso: string) {
  * Zapowiedziane gry w lokalach, jeszcze przed startem (godzinę po planowanym starcie znikają, nawet jeśli prowadzący
  * zaczął później); gry testowe bez lokalu i z lokalu testowego się nie pokazują.
  */
-async function zapowiedziane() {
+async function zapowiedziane(marka: string) {
   const { data } = await supabaseAdmin()
     .from("sesje")
     .select("kod, planowany_start, okazja, quizy(etapy(count)), lokale!inner(nazwa, miasto, logo_url)")
     .eq("faza", "poczekalnia")
+    .eq("marka", marka)
     .eq("lokale.testowy", false)
     .gte("planowany_start", new Date(Date.now() - 60 * 60 * 1000).toISOString())
     .order("planowany_start")
@@ -51,7 +52,7 @@ async function zapowiedziane() {
 export default async function Home() {
   const marka = await markaZadania();
   // marka bez zapowiedzi (np. JOWES): bez quizów Bractwa w lokalach
-  const zapowiedzi = ma(marka, "zapowiedzi-na-glownej") ? await zapowiedziane() : [];
+  const zapowiedzi = ma(marka, "zapowiedzi-na-glownej") ? await zapowiedziane(marka.id) : [];
 
   return (
     <main className="kolumna glowna">

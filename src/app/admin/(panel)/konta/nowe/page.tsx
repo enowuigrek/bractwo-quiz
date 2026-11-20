@@ -7,11 +7,12 @@ import { FormularzKonta, type LokalDoWyboru } from "../formularz";
 export const metadata: Metadata = { title: "Nowe konto" };
 
 export default async function NoweKonto({ searchParams }: PageProps<"/admin/konta/nowe">) {
-  await wymagajTworcy();
+  const rola = await wymagajTworcy();
   const { lokal } = await searchParams;
   const { data: lokale } = await supabaseAdmin()
     .from("lokale")
     .select("id, nazwa, logo_url, testowy")
+    .eq("marka", rola.marka)
     .order("nazwa")
     .returns<LokalDoWyboru[]>();
   return (

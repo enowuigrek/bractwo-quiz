@@ -7,16 +7,20 @@ import { supabaseAdmin } from "@/lib/supabase/serwer";
 import { EkranLokalu } from "../_ekran/ekran-lokalu";
 import { Tv } from "../_ekran/tv";
 import "../_ekran/tv.css";
-import { markaZadania } from "@/lib/marka-serwer";
+import { idMarkiZadania, markaZadania } from "@/lib/marka-serwer";
 
 type Lokal = { nazwa: string; logo_url: string | null };
 
-/** `adres` to adres ekranu lokalu (małe litery) albo kod gry (4 litery). Lokal ma pierwszeństwo. */
+/**
+ * `adres` to adres ekranu lokalu (małe litery) albo kod gry (4 litery). Lokal ma pierwszeństwo. Tylko lokale marki
+ * adresu (20.11): ekran lokalu JOWES nie otwiera się pod adresem Bractwa i odwrotnie.
+ */
 async function lokalPoAdresie(adres: string): Promise<Lokal | null> {
   const { data } = await supabaseAdmin()
     .from("lokale")
     .select("nazwa, logo_url")
     .eq("adres_ekranu", adres.toLowerCase())
+    .eq("marka", await idMarkiZadania())
     .maybeSingle<Lokal>();
   return data;
 }

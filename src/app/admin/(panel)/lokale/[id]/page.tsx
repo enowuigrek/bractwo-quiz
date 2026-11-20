@@ -34,7 +34,7 @@ function najczesciej(wartosci: (string | null | undefined)[]): { nazwa: string; 
 export default async function StronaLokalu({ params }: PageProps<"/admin/lokale/[id]">) {
   const rola = await wymagajAdmina();
   const { id } = await params;
-  wymagajLokalu(rola, id);
+  await wymagajLokalu(rola, id);
   const db = supabaseAdmin();
   const [{ data: lokal }, { data: osoby }, { data: gryZBazy }, { data: quizy }, ukryte] = await Promise.all([
     db.from("lokale").select("id, nazwa, miasto, logo_url, adres_ekranu, instagram").eq("id", id).maybeSingle<Lokal>(),

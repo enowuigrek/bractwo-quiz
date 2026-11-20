@@ -19,6 +19,8 @@ export default async function Konto({ params }: PageProps<"/admin/konta/[id]">) 
       .from("konta")
       .select("id, nazwa, email, skrot, zablokowane, konta_role(rola, lokal_id)")
       .eq("id", id)
+      // konto innej marki (20.11) tu nie istnieje
+      .eq("marka", tworca.marka)
       .maybeSingle<
         Omit<KontoDoEdycji, "role"> & {
           skrot: string | null;
@@ -26,7 +28,12 @@ export default async function Konto({ params }: PageProps<"/admin/konta/[id]">) 
           konta_role: KontoDoEdycji["role"];
         }
       >(),
-    db.from("lokale").select("id, nazwa, logo_url, testowy").order("nazwa").returns<LokalDoWyboru[]>(),
+    db
+      .from("lokale")
+      .select("id, nazwa, logo_url, testowy")
+      .eq("marka", tworca.marka)
+      .order("nazwa")
+      .returns<LokalDoWyboru[]>(),
   ]);
   if (!konto) notFound();
   const ja = konto.id === tworca.konto.id;

@@ -26,10 +26,12 @@ const opisRol = (k: KontoNaLiscie) =>
 
 /** Konta osobowe (30.10, tylko twórca): kto ma dostęp i do czego; nowe konta bez ról czekają na górze. */
 export default async function Konta() {
-  await wymagajTworcy();
+  const rola = await wymagajTworcy();
   const { data, error } = await supabaseAdmin()
     .from("konta")
     .select("id, nazwa, email, skrot, zablokowane, ostatnie_logowanie, konta_role(rola, lokale(nazwa))")
+    // konta marki adresu (20.11): JOWES i Bractwo mają osobne
+    .eq("marka", rola.marka)
     .order("nazwa")
     .returns<KontoNaLiscie[]>();
   const konta = data ?? [];

@@ -46,7 +46,7 @@ function rowne(a: string, b: string): boolean {
  * Uprawnienia sprawdzamy funkcjami niżej i w `admin-dostep.ts`, a nie porównując role.
  */
 export type Konto = { id: string; nazwa: string; email: string; zdjecie_url: string | null };
-export type Rola =
+export type Rola = (
   | { typ: "tworca"; konto: Konto }
   | { typ: "bractwo"; konto: Konto; testowe: string[] }
   | {
@@ -55,7 +55,11 @@ export type Rola =
       lokalId: string;
       /** Marka z `lokalTylkoSwoje` (src/lib/marka.ts, np. JOWES): tylko quizy swojego lokalu, bez Bractwa. */
       tylkoSwoje?: boolean;
-    };
+    }
+) & {
+  /** Marka adresu (src/lib/marka.ts, 20.11): panel widzi tylko jej quizy, gry, lokale i konta. */
+  marka: IdMarki;
+};
 
 /** Rola nadana kontu (`konta_role`) albo wybrana w „działam jako”. */
 export type RolaKonta = { rola: "tworca" } | { rola: "bractwo" } | { rola: "lokal"; lokalId: string };
@@ -144,6 +148,8 @@ export function emailZPola(pole: FormDataEntryValue | null): string | null {
 // --- konta i role --------------------------------------------------------------------------------------------
 
 type KontoZBazy = Konto & {
+  /** marka konta: loguje się tylko pod jej adresem (twórca pod każdym) */
+  marka: string;
   skrot: string | null;
   zablokowane: boolean;
   konta_role: { rola: "tworca" | "bractwo" | "lokal"; lokal_id: string | null; lokale: { marka: string } | null }[];
@@ -152,7 +158,7 @@ type KontoZBazy = Konto & {
 async function pobierzKonto(kontoId: string): Promise<KontoZBazy | null> {
   const { data } = await supabaseAdmin()
     .from("konta")
-    .select("id, nazwa, email, zdjecie_url, skrot, zablokowane, konta_role(rola, lokal_id, lokale(marka))")
+    .select("id, nazwa, email, zdjecie_url, marka, skrot, zablokowane, konta_role(rola, lokal_id, lokale(marka))")
     .eq("id", kontoId)
     .maybeSingle<KontoZBazy>();
   return data;
@@ -162,11 +168,13 @@ async function pobierzKonto(kontoId: string): Promise<KontoZBazy | null> {
 const kontoZBazy = cache(pobierzKonto);
 
 /**
- * Role nadane kontu, w kolejności: twórca, Bractwo, lokale. Z `marka` tylko te, które działają na adresie tej marki:
- * rola lokalu tylko na adresie marki lokalu (`lokale.marka`, 20.11), twórca i Bractwo na każdym. Bez `marka` wszystkie.
+ * Role nadane kontu, w kolejności: twórca, Bractwo, lokale. Z `marka` tylko te, które działają na adresie tej marki
+ * (20.11): konto innej marki nie ma tu żadnej (`konta.marka`), twórca ma swoje pod każdym adresem, a rola lokalu
+ * działa tylko na adresie marki lokalu (`lokale.marka`). Bez `marka` wszystkie.
  */
 function nadaneRole(konto: KontoZBazy, marka: IdMarki | null): RolaKonta[] {
   const role = konto.konta_role;
+  if (marka && konto.marka !== marka && !role.some((r) => r.rola === "tworca")) return [];
   return [
     ...(role.some((r) => r.rola === "tworca") ? [{ rola: "tworca" as const }] : []),
     ...(role.some((r) => r.rola === "bractwo") ? [{ rola: "bractwo" as const }] : []),
@@ -342,13 +350,14 @@ export const rolaAdmina = cache(async (): Promise<Rola | null> => {
   // rola lokalu innej marki (np. JOWES na adresie Bractwa) tu nie działa
   if (!(await mozeDzialacJako(konto, rola, await idMarkiZadania()))) return null;
   const k: Konto = { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url };
-  if (rola.rola === "tworca") return { typ: "tworca", konto: k };
+  const marka = await markaZadania();
+  if (rola.rola === "tworca") return { typ: "tworca", konto: k, marka: marka.id };
   if (rola.rola === "lokal") {
-    const tylkoSwoje = (await markaZadania()).zasady.lokalTylkoSwoje;
-    return { typ: "lokal", konto: k, lokalId: rola.lokalId, tylkoSwoje };
+    const tylkoSwoje = marka.zasady.lokalTylkoSwoje;
+    return { typ: "lokal", konto: k, lokalId: rola.lokalId, tylkoSwoje, marka: marka.id };
   }
   const { data } = await supabaseAdmin().from("lokale").select("id").eq("testowy", true).returns<{ id: string }[]>();
-  return { typ: "bractwo", konto: k, testowe: (data ?? []).map((l) => l.id) };
+  return { typ: "bractwo", konto: k, testowe: (data ?? []).map((l) => l.id), marka: marka.id };
 });
 
 export async function czyAdmin(): Promise<boolean> {

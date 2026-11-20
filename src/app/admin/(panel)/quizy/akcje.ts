@@ -76,6 +76,8 @@ export async function utworzQuiz(_: StanFormularza, dane: FormData): Promise<Sta
       opis: tekst(dane, "opis") || null,
       tagi: czytajTagi(tekst(dane, "tagi")),
       lokal_id: lokalRoli(rola),
+      // quiz bez lokalu należy do marki adresu (quiz lokalu dostaje markę lokalu w bazie, 20.11)
+      marka: rola.marka,
       autor_konto_id: rola.konto.id,
       degustacja,
     })

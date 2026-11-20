@@ -15,7 +15,7 @@ export default async function Panel() {
     // główny: liczba lokali; lokal: adres swojego ekranu
     lokalId
       ? db.from("lokale").select("id, adres_ekranu").eq("id", lokalId)
-      : db.from("lokale").select("id, adres_ekranu", { count: "exact" }),
+      : db.from("lokale").select("id, adres_ekranu", { count: "exact" }).eq("marka", rola.marka),
     filtrQuizow(db.from("quizy").select("*", { count: "exact", head: true }), rola).is("usunieto", null),
     filtrGier(db.from("sesje").select(ZAPYTANIE_GIER), rola, true)
       .neq("faza", "koniec")
