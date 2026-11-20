@@ -22,6 +22,8 @@ export type StanLogowania = { blad?: string; ok?: string };
 const zwolnij = () => new Promise((r) => setTimeout(r, 800));
 
 const CZEKA = "Konto czeka, aż Łukasz nada mu dostęp.";
+// rola lokalu działa tylko pod adresem marki lokalu (20.11)
+const INNY_ADRES = "To konto loguje się pod innym adresem quizu.";
 
 /** Logowanie e-mailem i hasłem (konta osobowe, 30.10). Konto bez ról jeszcze nie wchodzi. */
 export async function zalogujAdmina(_: StanLogowania, dane: FormData): Promise<StanLogowania> {
@@ -32,7 +34,7 @@ export async function zalogujAdmina(_: StanLogowania, dane: FormData): Promise<S
     return { blad: "Zły e-mail albo hasło." };
   }
   const rola = domyslnaRola(wynik.role);
-  if (!rola) return { blad: CZEKA };
+  if (!rola) return { blad: wynik.gdzieIndziej ? INNY_ADRES : CZEKA };
   await zaloguj(wynik.konto.id, rola);
   redirect("/admin");
 }
@@ -65,8 +67,9 @@ export async function ustawHasloZLinku(token: string, _: StanFormularza, dane: F
   const blad = bladHasla(haslo, String(dane.get("haslo2") ?? ""));
   if (blad) return { blad };
   await ustawHaslo(konto.id, haslo);
-  const rola = domyslnaRola(await roleKonta(konto.id));
-  if (!rola) return { ok: `Hasło zapisane. ${CZEKA}` };
+  const { role, gdzieIndziej } = await roleKonta(konto.id);
+  const rola = domyslnaRola(role);
+  if (!rola) return { ok: `Hasło zapisane. ${gdzieIndziej ? INNY_ADRES : CZEKA}` };
   await zaloguj(konto.id, rola);
   redirect("/admin");
 }

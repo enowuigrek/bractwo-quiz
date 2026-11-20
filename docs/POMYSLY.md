@@ -82,4 +82,4 @@ Etapy z planszą, mnożnikiem, finałem trójki jako serią i utrudnieniami w dr
 
 ## Aplikacja dla firm (pomysł 18.11)
 
-- Wspólny rdzeń gry i „marka” jako ustawienie (od 19.11 marka z adresu, `src/lib/marka.ts`, obiekty w `src/lib/marki/`): logo, kolory, czcionka, słownik tekstów, ikony etapów, dźwięki, co jest wyłączone (szklanka, pijany finał, kranoprzejęcie). Docelowo marka w bazie (organizacja → domena, logo, kolory) zamiast stałych w kodzie, a ustawienia gry (finaliści, meta, limity) w quizie, jak `quizy.finalistow` i `quizy.meta_finalu`.
+- Wspólny rdzeń gry i „marka” jako ustawienie (od 19.11 marka z adresu, `src/lib/marka.ts`, obiekty w `src/lib/marki/`): logo, kolory, czcionka, słownik tekstów, ikony etapów, dźwięki, co jest wyłączone (szklanka, pijany finał, kranoprzejęcie). Od 20.11 lokal ma już markę w bazie (`lokale.marka`, rola lokalu loguje się tylko pod jej adresem). Docelowo marka w bazie (organizacja → domena, logo, kolory) zamiast stałych w kodzie, a ustawienia gry (finaliści, meta, limity) w quizie, jak `quizy.finalistow` i `quizy.meta_finalu`.

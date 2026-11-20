@@ -5,7 +5,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { supabaseAdmin } from "./supabase/serwer";
-import { markaZadania } from "./marka-serwer";
+import { idMarkiZadania, markaZadania } from "./marka-serwer";
+import type { IdMarki } from "./marka";
 
 const CIASTECZKO = "bq_admin";
 // 30 dni: prowadzący loguje się w domu i w lokalu nie musi wpisywać hasła na telefonie.
@@ -145,13 +146,13 @@ export function emailZPola(pole: FormDataEntryValue | null): string | null {
 type KontoZBazy = Konto & {
   skrot: string | null;
   zablokowane: boolean;
-  konta_role: { rola: "tworca" | "bractwo" | "lokal"; lokal_id: string | null }[];
+  konta_role: { rola: "tworca" | "bractwo" | "lokal"; lokal_id: string | null; lokale: { marka: string } | null }[];
 };
 
 async function pobierzKonto(kontoId: string): Promise<KontoZBazy | null> {
   const { data } = await supabaseAdmin()
     .from("konta")
-    .select("id, nazwa, email, zdjecie_url, skrot, zablokowane, konta_role(rola, lokal_id)")
+    .select("id, nazwa, email, zdjecie_url, skrot, zablokowane, konta_role(rola, lokal_id, lokale(marka))")
     .eq("id", kontoId)
     .maybeSingle<KontoZBazy>();
   return data;
@@ -160,20 +161,38 @@ async function pobierzKonto(kontoId: string): Promise<KontoZBazy | null> {
 /** Konto raz na żądanie (layout i strona pytają o rolę); logowanie i zmiana hasła czytają świeże. */
 const kontoZBazy = cache(pobierzKonto);
 
-/** Role nadane kontu, w kolejności: twórca, Bractwo, lokale. */
-function nadaneRole(konto: KontoZBazy): RolaKonta[] {
+/**
+ * Role nadane kontu, w kolejności: twórca, Bractwo, lokale. Z `marka` tylko te, które działają na adresie tej marki:
+ * rola lokalu tylko na adresie marki lokalu (`lokale.marka`, 20.11), twórca i Bractwo na każdym. Bez `marka` wszystkie.
+ */
+function nadaneRole(konto: KontoZBazy, marka: IdMarki | null): RolaKonta[] {
   const role = konto.konta_role;
   return [
     ...(role.some((r) => r.rola === "tworca") ? [{ rola: "tworca" as const }] : []),
     ...(role.some((r) => r.rola === "bractwo") ? [{ rola: "bractwo" as const }] : []),
-    ...role.filter((r) => r.rola === "lokal" && r.lokal_id).map((r) => ({ rola: "lokal" as const, lokalId: r.lokal_id! })),
+    ...role
+      .filter((r) => r.rola === "lokal" && r.lokal_id && (!marka || r.lokale?.marka === marka))
+      .map((r) => ({ rola: "lokal" as const, lokalId: r.lokal_id! })),
   ];
 }
 
-/** Czy konto może działać w tej roli: nadana, a twórca może każdą (podgląd widoku Bractwa i lokali). */
-function mozeDzialacJako(konto: KontoZBazy, rola: RolaKonta): boolean {
-  const role = nadaneRole(konto);
-  if (role.some((r) => r.rola === "tworca")) return true;
+/** Marka lokalu (`lokale.marka`); `null`, gdy lokalu nie ma. */
+async function markaLokalu(lokalId: string): Promise<string | null> {
+  const { data } = await supabaseAdmin()
+    .from("lokale")
+    .select("marka")
+    .eq("id", lokalId)
+    .maybeSingle<{ marka: string }>();
+  return data?.marka ?? null;
+}
+
+/**
+ * Czy konto może działać w tej roli na adresie tej marki: rola nadana, a twórca może każdą (podgląd widoku Bractwa
+ * i lokali), ale lokal tylko z marki adresu.
+ */
+async function mozeDzialacJako(konto: KontoZBazy, rola: RolaKonta, marka: IdMarki): Promise<boolean> {
+  const role = nadaneRole(konto, marka);
+  if (role.some((r) => r.rola === "tworca")) return rola.rola !== "lokal" || (await markaLokalu(rola.lokalId)) === marka;
   return role.some((r) => kodRoli(r) === kodRoli(rola));
 }
 
@@ -193,15 +212,18 @@ function rolaZKodu(kod: string): RolaKonta | null {
 export async function roleDoWyboru(rola: Rola): Promise<{ kod: string; nazwa: string; logo_url: string | null }[]> {
   const konto = await kontoZBazy(rola.konto.id);
   if (!konto) return [];
-  const tworca = nadaneRole(konto).some((r) => r.rola === "tworca");
+  const marka = await idMarkiZadania();
+  const tworca = nadaneRole(konto, marka).some((r) => r.rola === "tworca");
+  // tylko lokale marki adresu: rola lokalu innej marki działa tylko pod jej adresem
   const { data: lokale } = await supabaseAdmin()
     .from("lokale")
     .select("id, nazwa, logo_url")
+    .eq("marka", marka)
     .order("nazwa")
     .returns<{ id: string; nazwa: string; logo_url: string | null }[]>();
   const role: RolaKonta[] = tworca
     ? [{ rola: "tworca" }, { rola: "bractwo" }, ...(lokale ?? []).map((l) => ({ rola: "lokal" as const, lokalId: l.id }))]
-    : nadaneRole(konto);
+    : nadaneRole(konto, marka);
   return role.map((r) => {
     const lokal = r.rola === "lokal" ? lokale?.find((l) => l.id === r.lokalId) : null;
     return {
@@ -214,7 +236,11 @@ export async function roleDoWyboru(rola: Rola): Promise<{ kod: string; nazwa: st
 
 // --- logowanie ---------------------------------------------------------------------------------------------
 
-export type WynikLogowania = { konto: Konto; role: RolaKonta[] } | null;
+/**
+ * `role`: role działające na tym adresie; `gdzieIndziej`: konto ma role, ale żadna nie działa na tym adresie
+ * (np. lokal JOWES na adresie Bractwa).
+ */
+export type WynikLogowania = { konto: Konto; role: RolaKonta[]; gdzieIndziej: boolean } | null;
 
 /**
  * Konto po e-mailu i haśle. Twórca może też wejść hasłem głównym z `.env` (`ADMIN_HASLO_GLOWNE`): na start, zanim
@@ -228,17 +254,21 @@ export async function sprawdzLogowanie(email: string, haslo: string): Promise<Wy
     .maybeSingle<{ id: string }>();
   const konto = data ? await pobierzKonto(data.id) : null;
   if (!konto || konto.zablokowane) return null;
-  const role = nadaneRole(konto);
+  const role = nadaneRole(konto, await idMarkiZadania());
   const glowne = process.env.ADMIN_HASLO_GLOWNE;
   const awaryjne = !!glowne && role.some((r) => r.rola === "tworca") && rowne(haslo, glowne);
   if (!awaryjne && !(await zgodneHaslo(konto.skrot, haslo))) return null;
-  return { konto: { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url }, role };
+  const gdzieIndziej = role.length === 0 && nadaneRole(konto, null).length > 0;
+  const k = { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url };
+  return { konto: k, role, gdzieIndziej };
 }
 
-/** Role konta (puste, gdy zablokowane albo czeka na nadanie ról). */
-export async function roleKonta(kontoId: string): Promise<RolaKonta[]> {
+/** Role konta działające na tym adresie (puste, gdy zablokowane albo czeka na nadanie ról) i czy ma je gdzie indziej. */
+export async function roleKonta(kontoId: string): Promise<{ role: RolaKonta[]; gdzieIndziej: boolean }> {
   const konto = await pobierzKonto(kontoId);
-  return konto && !konto.zablokowane ? nadaneRole(konto) : [];
+  if (!konto || konto.zablokowane) return { role: [], gdzieIndziej: false };
+  const role = nadaneRole(konto, await idMarkiZadania());
+  return { role, gdzieIndziej: role.length === 0 && nadaneRole(konto, null).length > 0 };
 }
 
 /** Kod aktywnej roli (jak w `roleDoWyboru`), do zaznaczenia w „działam jako”. */
@@ -274,7 +304,9 @@ export function wazneCiasteczko(wartosc: string | undefined): boolean {
 export async function zaloguj(kontoId: string, rola: RolaKonta): Promise<void> {
   // świeże konto: po zmianie hasła w tym samym żądaniu ciasteczko musi dostać nową wersję hasła
   const konto = await pobierzKonto(kontoId);
-  if (!konto || !mozeDzialacJako(konto, rola)) throw new Error("Brak dostępu do tej roli.");
+  if (!konto || !(await mozeDzialacJako(konto, rola, await idMarkiZadania()))) {
+    throw new Error("Brak dostępu do tej roli.");
+  }
   (await cookies()).set(CIASTECZKO, wartoscCiasteczka(kontoId, rola, konto.skrot), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -307,7 +339,8 @@ export const rolaAdmina = cache(async (): Promise<Rola | null> => {
   const konto = await kontoZBazy(c.kontoId);
   const rola = rolaZKodu(c.kod);
   if (!konto || konto.zablokowane || !rola || wersjaHasla(konto.skrot) !== c.wersja) return null;
-  if (!mozeDzialacJako(konto, rola)) return null;
+  // rola lokalu innej marki (np. JOWES na adresie Bractwa) tu nie działa
+  if (!(await mozeDzialacJako(konto, rola, await idMarkiZadania()))) return null;
   const k: Konto = { id: konto.id, nazwa: konto.nazwa, email: konto.email, zdjecie_url: konto.zdjecie_url };
   if (rola.rola === "tworca") return { typ: "tworca", konto: k };
   if (rola.rola === "lokal") {

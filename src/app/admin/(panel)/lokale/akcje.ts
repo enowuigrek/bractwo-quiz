@@ -8,6 +8,7 @@ import { SEGMENTY_PANELU } from "@/lib/adres-ekranu";
 import { bladGrafiki, plikZFormularza, usunGrafike, wyslijGrafike } from "@/lib/grafiki";
 import { adresZNazwy, FORMAT_ADRESU_EKRANU, MAX_ADRES_EKRANU } from "@/lib/adres-ekranu";
 import { kontoInstagram } from "@/lib/instagram";
+import { idMarkiZadania } from "@/lib/marka-serwer";
 import { supabaseAdmin } from "@/lib/supabase/serwer";
 import type { StanFormularza } from "@/lib/typy";
 
@@ -75,6 +76,8 @@ export async function zapiszLokal(
     let adres = baza;
     for (let n = 2; uzyte.has(adres); n++) adres = `${baza}-${n}`;
     zmiany.adres_ekranu = adres;
+    // nowy lokal należy do marki adresu, pod którym go założono (jego rola loguje się tylko tam, 20.11)
+    zmiany.marka = await idMarkiZadania();
   }
   try {
     if (logo) zmiany.logo_url = await wyslijGrafike(logo, "lokale");

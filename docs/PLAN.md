@@ -179,6 +179,7 @@ Pierwszy krok wydzielania rdzenia (JOWES-DECYZJE, sekcja 2): około 350 rozgał�
 - `src/lib/marka.ts`: typ `Marka`, `MARKI`, `ma(marka, element)`, `markaZHosta`, `etapyWMarce`; marki `src/lib/marki/bractwo.ts` i `jowes.ts`. Klient `useMarka()` (`src/components/marka.tsx`), serwer `markaZadania()` (`src/lib/marka-serwer.ts`), CSS `[data-marka="jowes"]`. `motyw.ts`, `useNeutralny`, `motywZadania` i `data-motyw` usunięte.
 - Kroki (każdy osobnym commitem, sprawdzony w obu markach na `next start`): 1) typ i wybór marki, 2) słownik tekstów, 3) wyłączone elementy, ikony, przykłady w animacji, zasady panelu, etapy i nalewanie bez czytania `document`, 4) logo, ikony strony, metadane, miniatura linku, grafiki wyniku i podium, 5) CSS i porządki.
 - Niesprawdzone na oko: grafiki „na pamiątkę” i podium (porównane w kodzie) oraz chmurki pytań w finale JOWES (finał przeskoczony SQL-em, bez pytań finalistów).
+- 20.11: lokal ma markę (`lokale.marka`, migracja `20261120144541_lokale_marka`, JOWES = `jowes`). Rola lokalu loguje się tylko pod adresem swojej marki (Zbyszko z kontem lokalu JOWES wchodził na adres Bractwa i widział quizy Bractwa). Sprawdzone kontem testowym: link z hasłem i logowanie pod adresem Bractwa dają „To konto loguje się pod innym adresem quizu.”, pod JOWES wchodzi; twórca pod adresem Bractwa nie ma JOWES w „działam jako”.
 - Dalej: marka w bazie (organizacja → domena, logo, kolory) i opis etapu bez podmiany słów (POMYSLY.md, „Aplikacja dla firm” i „Porządki po JOWES”).
 
 ## Na 25.10: dźwięki i pijany finał
