@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- loga lokali z bucketu Supabase albo z /public */
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useState } from "react";
 import type { Lokal, StanFormularza } from "@/lib/typy";
 import { bezResetu } from "../../_komponenty/bez-resetu";
 import { PoleGrafiki } from "../../_komponenty/grafika";
@@ -10,7 +10,6 @@ import { KomunikatFormularza } from "../../_komponenty/stan";
 import { LIMITY, liczbaPiw, liczbaPytan } from "../../quizy/limity";
 import { nazwaRodzajuQuizu, rodzajeQuizow, wszystkieTagi, type RodzajQuizu } from "@/lib/tagi";
 import { uruchomGre } from "../akcje";
-import { testFinalu } from "../../quizy/[id]/test-finalu";
 import { ZdjecieNagrody } from "./zdjecie-nagrody";
 import { IkonaMiasto, IkonaPodium1, IkonaPodium3 } from "@/components/ikony";
 import { useMarka } from "@/components/marka";
@@ -71,7 +70,6 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
   const [rodzaj, setRodzaj] = useState<RodzajQuizu>("wyscig");
   const [temat, setTemat] = useState<string | null>(null);
   const [quiz, setQuiz] = useState("");
-  const [trwaTest, startTest] = useTransition();
   const wRodzaju = quizy.filter((q) => q.rodzaj === rodzaj);
   const tematy = wszystkieTagi(wRodzaju);
   const doWyboru = temat ? wRodzaju.filter((q) => q.tagi.includes(temat)) : wRodzaju;
@@ -463,17 +461,6 @@ export function Kreator({ lokale, quizy, glowny, zDegustacja }: Props) {
               {trwa ? "Zapisuję…" : zapowiedz ? "Uruchom grę z zapowiedzią" : "Uruchom grę"}
             </button>
           </div>
-          {/* test samego finału tego quizu z botami (18.11): osobna gra bez lokalu, nie ta z kreatora */}
-          {wybrany?.pijany && (
-            <button
-              type="button"
-              className="przycisk-maly"
-              disabled={trwaTest}
-              onClick={() => startTest(() => testFinalu(wybrany.id))}
-            >
-              {trwaTest ? "Zakładam test…" : "Test finału"}
-            </button>
-          )}
         </>
       )}
     </form>
