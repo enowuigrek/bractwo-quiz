@@ -21,8 +21,15 @@ Poprawka tylko dla JOWES (np. pilna przed eventem) to commit na `jowes`, który 
 - [x] Dane w bazie rozdzielone markami (`marka` w lokalach, quizach, grach i kontach): eksport JOWES to „wszystko z `marka = 'jowes'`”.
 - [x] Posprzątać JOWES przed eksportem (25.11): usunięte 24 gry testowe (wszystko poza DABQ i MLGJ) i klasyczny quiz
       z kosza („Jak dobrze znasz JOWES i siebie nawzajem?”). Zostały: lokal JOWES, „Quiz JOWES”, gry DABQ i MLGJ.
-- [ ] Skrypt eksportu i importu danych JOWES (Claude): lokal JOWES, konto zbyszko@jowes.pl z rolą, „Quiz JOWES” z etapami,
-      pytaniami i nagrodami, gry DABQ i MLGJ z graczami, odpowiedziami i wynikami, pliki z bucketu (logo, grafiki pytań).
+- [x] Skrypty eksportu i importu (25.11, `scripts/jowes/`): eksport bierze wszystko z `marka = 'jowes'` (lokal, konto
+      z rolą, „Quiz JOWES” z etapami i 45 pytaniami, gry DABQ i MLGJ: 41 graczy, 843 odpowiedzi, okrzyki) i 10 plików
+      z bucketu (zdjęcia graczy). Import podmienia adresy plików na nową bazę i wstawia wiersze z tymi samymi id.
+      Sprawdzone: eksport i plan importu; sam zapis do nowej bazy sprawdzimy dopiero na niej.
+      ```bash
+      node --env-file=.env.local scripts/jowes/eksport.mjs ../jowes-eksport
+      node scripts/jowes/import.mjs ../jowes-eksport --na-sucho
+      ```
+      Katalog z eksportem musi być poza repo (nicki, zdjęcia, skróty haseł); skrypt odmawia zapisu w repo.
 - [ ] Zrzut samego schematu bazy Bractwa (tabele, funkcje, wyzwalacze, uprawnienia, bucket), bez danych i bez treści quizów
       Bractwa. Potrzebne hasło bazy z panelu Supabase (Connect → connection string), potem:
       `pg_dump --schema-only --no-owner --schema=public --schema=wewn "<connection string>" > schemat.sql`
@@ -38,7 +45,14 @@ Poprawka tylko dla JOWES (np. pilna przed eventem) to commit na `jowes`, który 
 2. **Supabase**: nowy projekt, region Frankfurt (`eu-central-1`, jak baza Bractwa i Vercel `fra1`). Zapisać: adres
    projektu, klucz publiczny, klucz sekretny, hasło bazy (do menedżera haseł, nie do czatu).
 3. **Schemat**: wgrać `schemat.sql`, sprawdzić bucket na grafiki i Realtime (Broadcast).
-4. **Dane**: uruchomić import JOWES do nowej bazy, sprawdzić, że Quiz JOWES i gra DABQ są w panelu.
+4. **Dane**: świeży eksport (jeśli od ostatniego coś się zmieniło), potem import do nowej bazy: najpierw na sucho
+   (sprawdza połączenie, tabele i bucket), potem naprawdę. Adres i klucz nowej bazy tylko w poleceniu:
+   ```bash
+   CEL_SUPABASE_URL=https://<nowy>.supabase.co CEL_SUPABASE_SECRET_KEY=<klucz> node scripts/jowes/import.mjs ../jowes-eksport --na-sucho
+   CEL_SUPABASE_URL=https://<nowy>.supabase.co CEL_SUPABASE_SECRET_KEY=<klucz> node scripts/jowes/import.mjs ../jowes-eksport
+   ```
+   Potem sprawdzić w panelu nowego wdrożenia: lokal JOWES, Quiz JOWES, gry DABQ i MLGJ z wynikami i zdjęciami.
+   Logo JOWES to plik z repo (`public/loga/jowes/`), nie z bucketu, więc przychodzi z kodem.
 5. **Vercel**: nowy projekt z tego repo, gałąź produkcyjna `jowes`, region `fra1`. Zmienne:
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`: z nowej bazy,
    - `ADMIN_SEKRET`, `CRON_SECRET`, `ADMIN_HASLO_GLOWNE`: nowe, inne niż w Bractwie,
