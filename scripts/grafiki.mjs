@@ -344,6 +344,14 @@ const GRAFIKI = {
       "dark wooden bar counter, most of them tilted or on their sides, slightly bent crimped edges catching warm " +
       "light, shallow depth of field, dark background, plain caps without any print.",
   ),
+  // ciekawostka „Korona na butelce” (Painter, 1892)
+  "dol-ciek-kapsel": zdjecie(
+    "kapsel-warsztat.webp",
+    "A 19th-century bottling workshop at dusk, a heavy cast-iron hand-operated crown capping machine on a wooden " +
+      "workbench, rows of dark glass beer bottles, a wooden crate full of shiny new metal crown caps, warm gas lamp " +
+      "light, dust in the air.",
+    STYL_ZDJECIA,
+  ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
     "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +
