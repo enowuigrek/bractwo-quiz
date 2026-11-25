@@ -139,6 +139,20 @@ export const MARKI: Record<IdMarki, Marka> = { bractwo: BRACTWO, jowes: JOWES };
 export const ma = (marka: Marka, element: Element) => !marka.wylaczone.includes(element);
 
 /**
+ * Marka całego wdrożenia (25.11, osobny Vercel i Supabase dla JOWES): zmienna `MARKA` (`bractwo` albo `jowes`)
+ * ustawia markę niezależnie od adresu, więc wdrożenie pod domeną JOWES nie potrzebuje listy hostów. Bez niej
+ * (albo z nieznaną wartością) marka wynika z adresu (`markaZHosta`).
+ */
+export function markaWdrozenia(
+  host: string | null | undefined,
+  env: { MARKA?: string; HOSTY_NEUTRALNE?: string },
+): IdMarki {
+  const wymuszona = env.MARKA?.trim().toLowerCase();
+  if (wymuszona && wymuszona in MARKI) return wymuszona as IdMarki;
+  return markaZHosta(host, env.HOSTY_NEUTRALNE);
+}
+
+/**
  * Marka z adresu strony: JOWES na hostach z `HOSTY_NEUTRALNE` (lista po przecinku, np. alias na Vercelu) i na każdym
  * hoście zaczynającym się od `neutralny.` (lokalnie `neutralny.localhost:3100`), poza tym Bractwo. Linki i kody QR
  * budujemy z bieżącego adresu, więc telefony graczy same trafiają na tę samą markę co TV.

@@ -1,11 +1,14 @@
 import "server-only";
 import { headers } from "next/headers";
-import { MARKI, markaZHosta, type IdMarki, type Marka } from "./marka";
+import { MARKI, markaWdrozenia, type IdMarki, type Marka } from "./marka";
 
-/** Marka bieżącego żądania (src/lib/marka.ts), z adresu strony. */
+/** Marka bieżącego żądania (src/lib/marka.ts): ze zmiennej `MARKA` wdrożenia, a bez niej z adresu strony. */
 export async function idMarkiZadania(): Promise<IdMarki> {
   const h = await headers();
-  return markaZHosta(h.get("x-forwarded-host") ?? h.get("host"), process.env.HOSTY_NEUTRALNE);
+  return markaWdrozenia(h.get("x-forwarded-host") ?? h.get("host"), {
+    MARKA: process.env.MARKA,
+    HOSTY_NEUTRALNE: process.env.HOSTY_NEUTRALNE,
+  });
 }
 
 export async function markaZadania(): Promise<Marka> {
