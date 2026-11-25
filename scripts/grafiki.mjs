@@ -337,12 +337,14 @@ const GRAFIKI = {
     "A dark glass beer bottle without any label standing in crushed ice on a dark wooden bar, frost and sharp ice " +
       "crystals around it, a small glass of very dark, thick strong beer beside it, dark background.",
   ),
-  // „Ile ząbków ma kapsel?”: kapsle leżą bokiem albo pod kątem, żeby ząbków nie dało się po prostu policzyć
+  // „Ile ząbków ma kapsel?”: kapsle mają mieć prawdziwe 21 ząbków (podpowiedź), ale nakładają się i leżą pod kątem,
+  // żeby trudno je było policzyć. Pierwsza wersja z Gemini miała ok. 25, więc każdą nową trzeba policzyć.
   "dol-kapsle": zdjecie(
     "kapsle.webp",
-    "Macro close-up of a scattered pile of used golden, copper and dark metal beer bottle caps (crown caps) lying on a " +
-      "dark wooden bar counter, most of them tilted or on their sides, slightly bent crimped edges catching warm " +
-      "light, shallow depth of field, dark background, plain caps without any print.",
+    "Macro close-up of a scattered pile of used golden, copper and dark metal beer bottle caps (standard crown caps, " +
+      "each with exactly 21 crimped teeth around the rim) lying on a dark wooden bar counter, overlapping each other, " +
+      "most of them tilted or on their sides, slightly bent crimped edges catching warm light, shallow depth of field, " +
+      "dark background, plain caps without any print.",
   ),
   // ciekawostka „Korona na butelce” (Painter, 1892)
   "dol-ciek-kapsel": zdjecie(
