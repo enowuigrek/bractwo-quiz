@@ -260,6 +260,83 @@ const GRAFIKI = {
       "soft morning light.",
     STYL_ZDJECIA,
   ),
+  // „Piwny quiz Bractwa: dolewka” (25.11): ten sam styl co Piwny quiz (piwo i szkło: STYL, miejsca: STYL_ZDJECIA)
+  "dol-brzeczka": zdjecie(
+    "brzeczka.webp",
+    "Clear amber sweet wort streaming from a brass tap of a copper lauter tun into a brewing kettle, steam rising, " +
+      "a bed of spent grain visible in the tun, warm brewhouse light, dark background.",
+    STYL_ZDJECIA,
+  ),
+  "dol-ciek-doppelbock": zdjecie(
+    "doppelbock.webp",
+    "Vaulted stone cellar of an old Bavarian monastery at night lit by candles, a glass of dark mahogany strong lager " +
+      "with a creamy head next to a loaf of rustic bread on a rough wooden table, old wooden barrels in the background.",
+    STYL_ZDJECIA,
+  ),
+  "dol-chmielenie-na-zimno": zdjecie(
+    "chmielenie-na-zimno.webp",
+    "Green hop pellets and a few fresh hop cones falling into the open top hatch of a stainless steel fermentation " +
+      "tank with foaming fermenting beer inside, modern craft brewery, warm light, dark background.",
+  ),
+  "dol-altbier": zdjecie(
+    "altbier.webp",
+    "A small straight-sided cylindrical beer glass (about 0.25 litre) of clear copper-brown beer with a creamy off-white " +
+      "head, standing on a dark wooden table of a traditional German brewpub with old dark wood panelling, warm lights " +
+      "blurred behind.",
+  ),
+  // zamówione jako oset, wyszedł tulipan, więc pytanie ma odpowiedź „Tulipan”
+  "dol-szklo-tulipan": zdjecie(
+    "szklo-tulipan.webp",
+    "A stemmed Belgian tulip beer glass (bulbous bowl narrowing above and a flared rim) filled with dark ruby-brown " +
+      "strong ale with a beige foam head, standing on a dark wooden bar, warm light, dark background, the whole glass " +
+      "visible.",
+  ),
+  "dol-dekokcja": zdjecie(
+    "dekokcja.webp",
+    "A long wooden brewer's paddle stirring thick bubbling grain mash boiling in a smaller copper kettle, steam rising, " +
+      "a larger mash tun next to it, traditional brewhouse, warm light.",
+    STYL_ZDJECIA,
+  ),
+  "dol-ciek-diacetyl": zdjecie(
+    "diacetyl.webp",
+    "A glass of clear golden lager with a white foam head next to a small block of fresh butter softly melting on a " +
+      "wooden board, on a dark bar counter, warm side light, playful still life, dark background.",
+  ),
+  "dol-chmielnik-usa": zdjecie(
+    "chmielnik-usa.webp",
+    "A vast hop farm in a dry American valley at golden hour, endless straight rows of tall green hop bines on high " +
+      "wire trellises, brown desert hills in the distance.",
+    STYL_ZDJECIA,
+  ),
+  "dol-berliner": zdjecie(
+    "berliner.webp",
+    "A wide bowl-shaped stemmed glass of pale cloudy wheat beer tinted bright raspberry red with syrup, a drinking " +
+      "straw in it, on a dark wooden café table, warm evening light, blurred lights behind.",
+  ),
+  "dol-chmielnik": zdjecie(
+    "chmielnik.webp",
+    "View looking up from the ground in a hop garden in late summer: tall green hop bines climbing strings up to a high " +
+      "wire trellis held by tall wooden poles, golden evening sky, sun flare through the leaves.",
+    STYL_ZDJECIA,
+  ),
+  // bez dat i znaków epoki, które zdradzałyby rok
+  "dol-pils-piwnice": zdjecie(
+    "pils-piwnice.webp",
+    "Old brewery cellars carved in sandstone rock, a long vaulted corridor lined with huge oak lagering barrels, dim " +
+      "warm lamp light, cold damp atmosphere.",
+    STYL_ZDJECIA,
+  ),
+  "dol-ciek-pilzno": zdjecie(
+    "pilzno.webp",
+    "A historic Central European town square in the 1830s at dusk, wooden beer barrels knocked open in front of a town " +
+      "hall, murky beer flowing across the cobblestones into the gutters, townhouses with arcades, dramatic evening sky.",
+    STYL_ZDJECIA,
+  ),
+  "dol-snake-venom": zdjecie(
+    "snake-venom.webp",
+    "A dark glass beer bottle without any label standing in crushed ice on a dark wooden bar, frost and sharp ice " +
+      "crystals around it, a small glass of very dark, thick strong beer beside it, dark background.",
+  ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
     "Cozy craft beer pub interior at night, warm golden pendant lamps, rows of beer taps and bottles softly out of focus " +
