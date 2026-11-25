@@ -332,8 +332,8 @@ const GRAFIKI = {
       "hall, murky beer flowing across the cobblestones into the gutters, townhouses with arcades, dramatic evening sky.",
     STYL_ZDJECIA,
   ),
-  "dol-snake-venom": zdjecie(
-    "snake-venom.webp",
+  "dol-eisbock": zdjecie(
+    "eisbock.webp",
     "A dark glass beer bottle without any label standing in crushed ice on a dark wooden bar, frost and sharp ice " +
       "crystals around it, a small glass of very dark, thick strong beer beside it, dark background.",
   ),
