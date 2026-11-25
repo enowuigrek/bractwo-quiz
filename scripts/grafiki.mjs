@@ -337,13 +337,12 @@ const GRAFIKI = {
     "A dark glass beer bottle without any label standing in crushed ice on a dark wooden bar, frost and sharp ice " +
       "crystals around it, a small glass of very dark, thick strong beer beside it, dark background.",
   ),
-  // najstarsze znane piwo (jaskinia Raqefet, ok. 13 tys. lat temu): bez ludzi i bez wskazówek co do liczby lat
-  "dol-raqefet": zdjecie(
-    "raqefet.webp",
-    "Inside a prehistoric limestone cave, deep round stone mortars carved into the rock floor, some filled with a " +
-      "murky amber fermenting grain mash with foam, handfuls of wild grass grain and simple stone pestles beside them, " +
-      "warm flickering firelight from a small fire, the cave entrance glowing softly in the background.",
-    STYL_ZDJECIA,
+  // „Ile ząbków ma kapsel?”: kapsle leżą bokiem albo pod kątem, żeby ząbków nie dało się po prostu policzyć
+  "dol-kapsle": zdjecie(
+    "kapsle.webp",
+    "Macro close-up of a scattered pile of used golden, copper and dark metal beer bottle caps (crown caps) lying on a " +
+      "dark wooden bar counter, most of them tilted or on their sides, slightly bent crimped edges catching warm " +
+      "light, shallow depth of field, dark background, plain caps without any print.",
   ),
   "tlo-poczekalnia": tlo(
     "tlo-poczekalnia.webp",
