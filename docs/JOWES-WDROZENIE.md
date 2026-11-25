@@ -19,9 +19,8 @@ Poprawka tylko dla JOWES (np. pilna przed eventem) to commit na `jowes`, który 
 
 - [x] Marka całego wdrożenia ze zmiennej `MARKA` (`jowes`): adres nie ma znaczenia, lista `HOSTY_NEUTRALNE` niepotrzebna.
 - [x] Dane w bazie rozdzielone markami (`marka` w lokalach, quizach, grach i kontach): eksport JOWES to „wszystko z `marka = 'jowes'`”.
-- [ ] Posprzątać JOWES przed eksportem: gry testowe (wszystko poza DABQ i MLGJ) i klasyczny quiz z kosza („Jak dobrze znasz
-      JOWES i siebie nawzajem?”, ma 8 gier testowych: SWUG, CEYF, NWVH, DLKE, FUQR, KMFM, DBAR, QBUD; kosz nie usuwa quizu
-      z grami).
+- [x] Posprzątać JOWES przed eksportem (25.11): usunięte 24 gry testowe (wszystko poza DABQ i MLGJ) i klasyczny quiz
+      z kosza („Jak dobrze znasz JOWES i siebie nawzajem?”). Zostały: lokal JOWES, „Quiz JOWES”, gry DABQ i MLGJ.
 - [ ] Skrypt eksportu i importu danych JOWES (Claude): lokal JOWES, konto zbyszko@jowes.pl z rolą, „Quiz JOWES” z etapami,
       pytaniami i nagrodami, gry DABQ i MLGJ z graczami, odpowiedziami i wynikami, pliki z bucketu (logo, grafiki pytań).
 - [ ] Zrzut samego schematu bazy Bractwa (tabele, funkcje, wyzwalacze, uprawnienia, bucket), bez danych i bez treści quizów
