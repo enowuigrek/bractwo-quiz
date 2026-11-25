@@ -340,7 +340,7 @@ const GRAFIKI = {
   // „Ile ząbków ma kapsel?”: kapsle mają mieć prawdziwe 21 ząbków (podpowiedź), ale nakładają się i leżą pod kątem,
   // żeby trudno je było policzyć. Pierwsza wersja z Gemini miała ok. 25, więc każdą nową trzeba policzyć.
   "dol-kapsle": zdjecie(
-    "kapsle.webp",
+    "kapsle-21.webp",
     "Macro close-up of a scattered pile of used golden, copper and dark metal beer bottle caps (standard crown caps, " +
       "each with exactly 21 crimped teeth around the rim) lying on a dark wooden bar counter, overlapping each other, " +
       "most of them tilted or on their sides, slightly bent crimped edges catching warm light, shallow depth of field, " +
